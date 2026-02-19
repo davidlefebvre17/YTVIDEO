@@ -1,0 +1,37 @@
+{
+  "name": "trading-youtube-maker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Automated trading YouTube video generator — powered by Remotion + Claude AI",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "generate": "npx tsx scripts/generate.ts",
+    "fetch": "npx tsx scripts/fetch-data.ts",
+    "script": "npx tsx scripts/write-script.ts",
+    "prompt-test": "npx tsx scripts/prompt-test.ts",
+    "studio": "npx tsx scripts/prompt-studio.ts",
+    "render": "npx tsx scripts/render.ts",
+    "preview": "npm run dev -w @yt-maker/remotion-app",
+    "dev": "npm run dev -w @yt-maker/remotion-app",
+    "typecheck": "tsc --build tsconfig.json"
+  },
+  "keywords": [
+    "remotion",
+    "trading",
+    "youtube",
+    "ai",
+    "tts"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "tsx": "^4.7.0",
+    "turbo": "^2.0.0",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1"
+  }
+}

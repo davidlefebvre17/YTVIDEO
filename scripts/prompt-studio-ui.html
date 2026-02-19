@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prompt Studio — TradingRecap</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0b0f1a;
+      --bg-light: #151b2e;
+      --surface: #1a2138;
+      --surface-light: #222b45;
+      --primary: #00b4d8;
+      --gold: #ffd60a;
+      --green: #00cc70;
+      --red: #ff4757;
+      --orange: #ff6b35;
+      --purple: #7b2ff7;
+      --text: #ffffff;
+      --text-muted: rgba(255,255,255,0.5);
+      --text-dim: rgba(255,255,255,0.25);
+      --border: rgba(255,255,255,0.08);
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Top bar */
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 24px;
+      background: var(--bg-light);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .topbar .logo {
+      font-size: 18px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary), var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      white-space: nowrap;
+    }
+
+    .topbar select, .topbar button {
+      font-family: var(--font);
+      font-size: 13px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .topbar select:hover, .topbar button:hover {
+      border-color: var(--primary);
+    }
+
+    .lang-toggle {
+      display: flex;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .lang-toggle button {
+      border: none;
+      border-radius: 0;
+      padding: 8px 16px;
+      font-weight: 600;
+      background: var(--surface);
+      color: var(--text-muted);
+    }
+
+    .lang-toggle button.active {
+      background: var(--primary);
+      color: var(--bg);
+    }
+
+    .btn-generate {
+      background: linear-gradient(135deg, var(--primary), #0077b6) !important;
+      color: white !important;
+      font-weight: 700;
+      padding: 8px 24px !important;
+      border: none !important;
+      font-size: 14px !important;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-generate:hover {
+      filter: brightness(1.15);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(0, 180, 216, 0.3);
+    }
+
+    .btn-generate:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+      filter: none;
+    }
+
+    .btn-save {
+      background: var(--surface) !important;
+      color: var(--green) !important;
+      font-weight: 600;
+    }
+
+    .spacer { flex: 1; }
+
+    .status {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: var(--mono);
+    }
+
+    /* Main layout */
+    .main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Panels */
+    .panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .panel:first-child {
+      border-right: 1px solid var(--border);
+    }
+
+    .panel-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel-section:last-child {
+      border-bottom: none;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background: var(--bg-light);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .panel-header h3 {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+    }
+
+    .panel-header .badge {
+      font-size: 10px;
+      font-family: var(--mono);
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--surface-light);
+      color: var(--text-dim);
+    }
+
+    .panel-content {
+      flex: 1;
+      overflow: auto;
+      padding: 0;
+    }
+
+    textarea, .code-display {
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      color: var(--text);
+      border: none;
+      resize: none;
+      padding: 16px;
+      font-family: var(--mono);
+      font-size: 12.5px;
+      line-height: 1.65;
+      outline: none;
+      tab-size: 2;
+    }
+
+    textarea::placeholder {
+      color: var(--text-dim);
+    }
+
+    .code-display {
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow: auto;
+    }
+
+    /* Stats table */
+    .stats-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .stats-table th {
+      text-align: left;
+      padding: 8px 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-light);
+      position: sticky;
+      top: 0;
+    }
+
+    .stats-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .stats-table tr:hover td {
+      background: var(--surface);
+    }
+
+    .type-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .type-intro { background: rgba(0,180,216,0.2); color: var(--primary); }
+    .type-market_overview { background: rgba(0,119,182,0.2); color: #0077b6; }
+    .type-deep_dive { background: rgba(255,214,10,0.2); color: var(--gold); }
+    .type-news { background: rgba(255,107,53,0.2); color: var(--orange); }
+    .type-predictions { background: rgba(123,47,247,0.2); color: var(--purple); }
+    .type-outro { background: rgba(0,204,112,0.2); color: var(--green); }
+    .type-previously_on { background: rgba(0,180,216,0.15); color: var(--primary); }
+
+    .ratio-good { color: var(--green); }
+    .ratio-warn { color: var(--gold); }
+    .ratio-bad { color: var(--red); }
+
+    /* Loading spinner */
+    .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid var(--text-dim);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Result section title */
+    .result-title {
+      padding: 16px;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--gold);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .result-desc {
+      padding: 8px 16px 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Tab system for output */
+    .tabs {
+      display: flex;
+      gap: 0;
+      background: var(--bg-light);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .tab {
+      padding: 8px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .tab:hover { color: var(--text); }
+    .tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .tab-content { display: none; flex: 1; overflow: auto; min-height: 0; }
+    .tab-content.active { display: flex; flex-direction: column; }
+
+    /* Empty state */
+    .empty-state {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--text-dim);
+      font-size: 14px;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .empty-state .icon { font-size: 32px; opacity: 0.3; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--text-dim); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="logo">Prompt Studio</div>
+
+    <select id="snapshotSelect">
+      <option value="">-- Select snapshot --</option>
+    </select>
+
+    <div class="lang-toggle">
+      <button id="langFr" class="active" onclick="setLang('fr')">FR</button>
+      <button id="langEn" onclick="setLang('en')">EN</button>
+    </div>
+
+    <button class="btn-generate" id="btnGenerate" onclick="generate()" disabled>
+      Generate
+    </button>
+
+    <button class="btn-save" id="btnSave" onclick="saveResult()" style="display:none">
+      Save JSON
+    </button>
+
+    <div class="spacer"></div>
+    <div class="status" id="status">Ready</div>
+  </div>
+
+  <!-- Main area -->
+  <div class="main">
+    <!-- Left panel: inputs -->
+    <div class="panel">
+      <div class="panel-section" style="flex: 2">
+        <div class="panel-header">
+          <h3>System Prompt</h3>
+          <span class="badge" id="promptBadge">0 chars</span>
+        </div>
+        <div class="panel-content">
+          <textarea
+            id="systemPrompt"
+            placeholder="Select a snapshot and language to load the prompt..."
+            spellcheck="false"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="panel-section" style="flex: 1">
+        <div class="panel-header">
+          <h3>User Message (Market Data)</h3>
+          <span class="badge" id="messageBadge">0 chars</span>
+        </div>
+        <div class="panel-content">
+          <div class="code-display" id="userMessage" style="color: var(--text-muted)">
+            Select a snapshot to preview the formatted market data...
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right panel: output -->
+    <div class="panel">
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('stats')">Stats</div>
+        <div class="tab" onclick="switchTab('json')">JSON Output</div>
+        <div class="tab" onclick="switchTab('sections')">Sections</div>
+      </div>
+
+      <!-- Stats tab -->
+      <div class="tab-content active" id="tab-stats">
+        <div id="resultHeader"></div>
+        <div style="flex:1; overflow:auto">
+          <table class="stats-table" id="statsTable" style="display:none">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Title</th>
+                <th>Duration</th>
+                <th>Words</th>
+                <th>Expected</th>
+                <th>Ratio</th>
+              </tr>
+            </thead>
+            <tbody id="statsBody"></tbody>
+          </table>
+          <div class="empty-state" id="statsEmpty">
+            <div class="icon">&#9881;</div>
+            <div>Click Generate to test your prompt</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- JSON tab -->
+      <div class="tab-content" id="tab-json">
+        <div class="panel-content">
+          <div class="code-display" id="jsonOutput" style="color: var(--primary)">
+            Output will appear here after generation...
+          </div>
+        </div>
+      </div>
+
+      <!-- Sections tab -->
+      <div class="tab-content" id="tab-sections">
+        <div style="flex:1; overflow:auto; padding: 16px" id="sectionsContent">
+          <div class="empty-state">
+            <div class="icon">&#128196;</div>
+            <div>Generate a script to see narration per section</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentLang = "fr";
+    let currentSnapshot = null;
+    let currentUserMessage = "";
+    let lastResult = null;
+
+    // Init: load snapshots
+    async function init() {
+      const res = await fetch("/api/snapshots");
+      const files = await res.json();
+      const select = document.getElementById("snapshotSelect");
+      for (const f of files) {
+        const opt = document.createElement("option");
+        opt.value = f;
+        opt.textContent = f.replace("snapshot-", "").replace(".json", "");
+        select.appendChild(opt);
+      }
+      // Auto-select first
+      if (files.length > 0) {
+        select.value = files[0];
+        loadSnapshot(files[0]);
+      }
+      loadPrompt();
+    }
+
+    // Language toggle
+    function setLang(lang) {
+      currentLang = lang;
+      document.getElementById("langFr").className = lang === "fr" ? "active" : "";
+      document.getElementById("langEn").className = lang === "en" ? "active" : "";
+      loadPrompt();
+    }
+
+    // Load system prompt
+    async function loadPrompt() {
+      const res = await fetch(`/api/prompt?lang=${currentLang}`);
+      const data = await res.json();
+      const el = document.getElementById("systemPrompt");
+      el.value = data.prompt;
+      document.getElementById("promptBadge").textContent = `${data.prompt.length} chars`;
+    }
+
+    // Load snapshot
+    document.getElementById("snapshotSelect").addEventListener("change", (e) => {
+      if (e.target.value) loadSnapshot(e.target.value);
+    });
+
+    async function loadSnapshot(file) {
+      setStatus("Loading snapshot...");
+      const res = await fetch(`/api/snapshot?file=${file}`);
+      const data = await res.json();
+      currentSnapshot = data.snapshot;
+      currentUserMessage = data.formatted;
+
+      document.getElementById("userMessage").textContent = data.formatted;
+      document.getElementById("messageBadge").textContent = `${data.formatted.length} chars`;
+      document.getElementById("btnGenerate").disabled = false;
+      setStatus("Ready — snapshot loaded");
+    }
+
+    // Generate
+    async function generate() {
+      const btn = document.getElementById("btnGenerate");
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Generating...';
+      setStatus("Calling LLM...");
+
+      const systemPrompt = document.getElementById("systemPrompt").value;
+      const userMessage = currentUserMessage;
+
+      try {
+        const start = Date.now();
+        const res = await fetch("/api/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ systemPrompt, userMessage }),
+        });
+
+        const data = await res.json();
+
+        if (data.error) {
+          setStatus(`Error: ${data.error.slice(0, 100)}`);
+          document.getElementById("jsonOutput").textContent = data.error;
+          btn.disabled = false;
+          btn.textContent = "Generate";
+          return;
+        }
+
+        lastResult = data.result;
+        const elapsed = data.elapsedMs;
+
+        // Show JSON
+        document.getElementById("jsonOutput").textContent = JSON.stringify(data.result, null, 2);
+
+        // Show header
+        const header = document.getElementById("resultHeader");
+        header.innerHTML = `
+          <div class="result-title">${escHtml(data.result.title || "Untitled")}</div>
+          <div class="result-desc">
+            ${escHtml(data.result.description || "")}
+            <br><br>
+            <span style="color:var(--primary); font-family:var(--mono); font-size:11px">
+              ${data.result.sections?.length || 0} sections &bull;
+              ${data.result.totalDurationSec || 0}s (${((data.result.totalDurationSec || 0)/60).toFixed(1)}m) &bull;
+              ${elapsed}ms
+            </span>
+          </div>
+        `;
+
+        // Show stats table
+        renderStats(data.result);
+        renderSections(data.result);
+
+        document.getElementById("btnSave").style.display = "";
+        setStatus(`Done in ${(elapsed / 1000).toFixed(1)}s`);
+      } catch (err) {
+        setStatus(`Error: ${err.message}`);
+      }
+
+      btn.disabled = false;
+      btn.textContent = "Generate";
+    }
+
+    function renderStats(script) {
+      const table = document.getElementById("statsTable");
+      const body = document.getElementById("statsBody");
+      const empty = document.getElementById("statsEmpty");
+
+      table.style.display = "";
+      empty.style.display = "none";
+      body.innerHTML = "";
+
+      let totalWords = 0;
+      let totalExpected = 0;
+
+      for (const s of (script.sections || [])) {
+        const words = s.narration ? s.narration.split(/\s+/).length : 0;
+        const expected = Math.round((s.durationSec / 60) * 150);
+        const ratio = expected > 0 ? (words / expected) : 0;
+        totalWords += words;
+        totalExpected += expected;
+
+        let ratioClass = "ratio-good";
+        if (ratio < 0.6 || ratio > 1.5) ratioClass = "ratio-bad";
+        else if (ratio < 0.8 || ratio > 1.2) ratioClass = "ratio-warn";
+
+        body.innerHTML += `
+          <tr>
+            <td><span class="type-badge type-${s.type}">${s.type}</span></td>
+            <td style="color:var(--text); font-family:var(--font)">${escHtml(s.title || "")}</td>
+            <td>${s.durationSec}s</td>
+            <td>${words}</td>
+            <td style="color:var(--text-dim)">~${expected}</td>
+            <td class="${ratioClass}">${ratio.toFixed(2)}x</td>
+          </tr>
+        `;
+      }
+
+      // Total row
+      const totalRatio = totalExpected > 0 ? (totalWords / totalExpected) : 0;
+      body.innerHTML += `
+        <tr style="font-weight:700; background:var(--bg-light)">
+          <td colspan="2" style="color:var(--text-muted)">TOTAL</td>
+          <td>${script.totalDurationSec || 0}s</td>
+          <td>${totalWords}</td>
+          <td style="color:var(--text-dim)">~${totalExpected}</td>
+          <td>${totalRatio.toFixed(2)}x</td>
+        </tr>
+      `;
+    }
+
+    function renderSections(script) {
+      const container = document.getElementById("sectionsContent");
+      if (!script.sections || script.sections.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div>No sections</div></div>';
+        return;
+      }
+
+      let html = "";
+      for (const s of script.sections) {
+        const words = s.narration ? s.narration.split(/\s+/).length : 0;
+        const cues = (s.visualCues || []).map(c =>
+          `<span style="display:inline-block;padding:2px 6px;margin:2px;border-radius:4px;font-size:10px;background:var(--surface-light);color:var(--text-muted)">${c.type}${c.asset ? ` (${c.asset})` : ""}</span>`
+        ).join("");
+
+        html += `
+          <div style="margin-bottom:20px; padding:16px; background:var(--surface); border-radius:12px; border-left:4px solid">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px">
+              <span class="type-badge type-${s.type}" style="font-size:11px">${s.type}</span>
+              <span style="font-size:11px; color:var(--text-dim); font-family:var(--mono)">${s.durationSec}s &bull; ${words} words</span>
+            </div>
+            <div style="font-size:15px; font-weight:700; margin-bottom:10px; color:var(--text)">${escHtml(s.title || "")}</div>
+            <div style="font-size:13px; color:var(--text-muted); line-height:1.7">${escHtml(s.narration || "")}</div>
+            ${cues ? `<div style="margin-top:10px">${cues}</div>` : ""}
+          </div>
+        `;
+      }
+      container.innerHTML = html;
+    }
+
+    // Tabs
+    function switchTab(name) {
+      document.querySelectorAll(".tab").forEach((t, i) => {
+        const tabs = ["stats", "json", "sections"];
+        t.className = tabs[i] === name ? "tab active" : "tab";
+      });
+      document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+      document.getElementById(`tab-${name}`).classList.add("active");
+    }
+
+    // Save
+    async function saveResult() {
+      if (!lastResult) return;
+      const res = await fetch("/api/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ script: lastResult }),
+      });
+      const data = await res.json();
+      setStatus(`Saved: ${data.saved}`);
+    }
+
+    // Utils
+    function setStatus(msg) {
+      document.getElementById("status").textContent = msg;
+    }
+
+    function escHtml(s) {
+      return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // Update char count on prompt edit
+    document.getElementById("systemPrompt").addEventListener("input", (e) => {
+      document.getElementById("promptBadge").textContent = `${e.target.value.length} chars`;
+    });
+
+    init();
+  </script>
+</body>
+</html>

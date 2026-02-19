@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+    "jsx": "react-jsx",
+    "strict": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@yt-maker/core": ["packages/core/src/index.ts"],
+      "@yt-maker/data": ["packages/data/src/index.ts"],
+      "@yt-maker/ai": ["packages/ai/src/index.ts"],
+      "@yt-maker/tts": ["packages/tts/src/index.ts"],
+      "@yt-maker/remotion-app": ["packages/remotion-app/src/index.ts"]
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": [
+    "packages/core/src/**/*",
+    "packages/data/src/**/*",
+    "packages/ai/src/**/*",
+    "packages/tts/src/**/*",
+    "packages/remotion-app/src/**/*",
+    "scripts/**/*"
+  ]
+}
