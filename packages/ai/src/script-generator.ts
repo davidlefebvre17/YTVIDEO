@@ -1,9 +1,11 @@
-import type { DailySnapshot, EpisodeScript, EpisodeType, Language, ScriptSection } from "@yt-maker/core";
+import type { DailySnapshot, EpisodeScript, EpisodeType, Language, ScriptSection, ThemesDuJour } from "@yt-maker/core";
 import { generateStructuredJSON } from "./llm-client";
 import { getDailyRecapSystemPrompt } from "./prompts/daily-recap";
 import { getChartAnalysisSystemPrompt } from "./prompts/chart-analysis";
 import { loadKnowledge } from "./knowledge-loader";
 import { selectRelevantNews } from "./news-selector";
+import { buildThemesDuJour } from "./editorial-score";
+import { getCompanyProfile, getProfileContext } from "./company-profiles";
 
 export interface PrevEntry {
   snapshot: DailySnapshot;
@@ -101,6 +103,96 @@ function formatPrevContext(prev: PrevContext): string {
 }
 
 /**
+ * Format the ThemesDuJour block for injection into the prompt.
+ * This replaces the flat news list with a structured editorial analysis
+ * that guides the LLM in building its narrative.
+ */
+function formatThemesDuJour(tdj: ThemesDuJour): string {
+  let text = `## Themes du jour (analyse editoriale pre-digeree)\n\n`;
+
+  // Market regime at the top — sets the tone
+  text += `### REGIME : ${tdj.marketRegime}\n\n`;
+
+  // Themes sorted by editorial score (already sorted by caller)
+  for (let i = 0; i < tdj.themes.length; i++) {
+    const theme = tdj.themes[i];
+    const rank = i === 0 ? "dominant" : `#${i + 1}`;
+    text += `### Theme ${rank} : ${theme.label.fr} [buzz=${theme.buzzScore.toFixed(0)}, editorial=${theme.editorialScore.toFixed(0)}]\n`;
+
+    // Top articles (max 3)
+    for (const title of theme.newsItems.slice(0, 3)) {
+      text += `- ${title}\n`;
+    }
+
+    // Related assets with market data
+    if (theme.assets.length > 0) {
+      text += `> Assets lies : ${theme.assets.join(", ")}\n`;
+    }
+
+    // Sector clusters if present
+    if (theme.sectorClusters && theme.sectorClusters.length > 0) {
+      for (const sc of theme.sectorClusters) {
+        const moversStr = sc.movers
+          .map((m) => `${m.name} ${m.changePct >= 0 ? "+" : ""}${m.changePct.toFixed(1)}%`)
+          .join(", ");
+        text += `> Cluster sectoriel ${sc.sector} (${sc.direction}, moy ${sc.avgChangePct >= 0 ? "+" : ""}${sc.avgChangePct.toFixed(1)}%) : ${moversStr}\n`;
+      }
+    }
+
+    // Causal chain if present
+    if (theme.causalChain && theme.causalChain.length > 0) {
+      text += `> Chaine causale : ${theme.causalChain.join(" -> ")}\n`;
+    }
+
+    // Editorial score breakdown (compact)
+    const bd = theme.breakdown;
+    text += `> Score : amplitude=${bd.amplitude.toFixed(0)} breadth=${bd.breadth.toFixed(0)} surprise=${bd.surprise.toFixed(0)} causal=${bd.causalDepth.toFixed(0)} symbolic=${bd.symbolic.toFixed(0)} news=${bd.newsFrequency.toFixed(0)} regime=${bd.regimeCoherence.toFixed(0)}\n`;
+
+    text += "\n";
+  }
+
+  // Active causal chains (max 3)
+  if (tdj.causalChains.length > 0) {
+    text += `### Chaines causales actives\n`;
+    for (const chain of tdj.causalChains.slice(0, 3)) {
+      text += `- **${chain.name}** (confiance: ${(chain.confidence * 100).toFixed(0)}%)\n`;
+      for (const step of chain.confirmedSteps) {
+        text += `  [CONFIRME] ${step}\n`;
+      }
+      if (chain.suggestedNarration) {
+        text += `  Suggestion narration : "${chain.suggestedNarration}"\n`;
+      }
+      text += `  Assets lies : ${chain.relatedAssets.join(", ")}\n`;
+    }
+    text += "\n";
+  }
+
+  // Sector clusters (standalone, not already shown in themes)
+  if (tdj.sectorClusters.length > 0) {
+    text += `### Clusters sectoriels detectes\n`;
+    for (const sc of tdj.sectorClusters) {
+      const moversStr = sc.movers
+        .map((m) => `${m.name} ${m.changePct >= 0 ? "+" : ""}${m.changePct.toFixed(1)}%`)
+        .join(", ");
+      text += `- ${sc.sector} (${sc.direction}, moy ${sc.avgChangePct >= 0 ? "+" : ""}${sc.avgChangePct.toFixed(1)}%, ${sc.movers.length} titres) : ${moversStr}\n`;
+    }
+    text += "\n";
+  }
+
+  // Event surprises
+  if (tdj.eventSurprises.length > 0) {
+    text += `### Events avec surprise\n`;
+    for (const es of tdj.eventSurprises) {
+      const dir = es.direction === "above" ? "au-dessus" : es.direction === "below" ? "en-dessous" : "en ligne";
+      text += `- ${es.eventName} : ${es.actual} vs ${es.forecast} attendu (${dir}, ${es.magnitude}) → assets lies : ${es.relatedAssets.join(", ")}\n`;
+    }
+    text += "\n";
+  }
+
+  return text;
+}
+
+/**
  * Format a snapshot into a rich prompt for the LLM.
  * Includes technical indicators when available.
  */
@@ -131,6 +223,11 @@ export function formatSnapshotForPrompt(
     text += "\n";
   }
 
+  // ── Themes du jour (pre-digested editorial analysis) ──────────────
+  if (snapshot.themesDuJour) {
+    text += formatThemesDuJour(snapshot.themesDuJour);
+  }
+
   // ── Assets watchlist (sorted by drama score) ──────────────────────
   const sorted = [...snapshot.assets].sort((a, b) => {
     const da = a.technicals?.dramaScore ?? 0;
@@ -154,7 +251,7 @@ export function formatSnapshotForPrompt(
       text += `  Supports: ${t.supports.map(fmt).join(", ") || "—"} | Résistances: ${t.resistances.map(fmt).join(", ") || "—"}\n`;
       if (t.isNear52wHigh) text += `  *** PROCHE DU PLUS HAUT 52 SEMAINES ***\n`;
       if (t.isNear52wLow) text += `  *** PROCHE DU PLUS BAS 52 SEMAINES ***\n`;
-      text += `  Drama Score: ${t.dramaScore.toFixed(1)}\n`;
+      // Drama score is internal metadata — not sent to LLM to prevent leaking into narration
     }
 
     if (asset.multiTF) {
@@ -173,12 +270,17 @@ export function formatSnapshotForPrompt(
     text += `## Movers actions (top ${movers.length} flaggés sur ~763 analysées)\n\n`;
     for (const m of movers) {
       const dir = m.changePct >= 0 ? "+" : "";
-      text += `- **${m.name}** (${m.symbol}, ${m.index}): ${dir}${m.changePct.toFixed(2)}% — ${m.reason.join(", ")}`;
+      const profile = getCompanyProfile(m.symbol);
+      const sectorStr = profile?.sector ? ` [${profile.sector}]` : "";
+      text += `- **${m.name}** (${m.symbol}, ${m.index})${sectorStr}: ${dir}${m.changePct.toFixed(2)}% — ${m.reason.join(", ")}`;
       if (m.technicals) {
         text += ` | RSI=${m.technicals.rsi14.toFixed(0)} trend=${m.technicals.trend}`;
       }
       if (m.earningsDetail?.publishingToday) {
         text += ` | *** RÉSULTATS PUBLIÉS AUJOURD'HUI ***`;
+      }
+      if (profile?.correlation) {
+        text += `\n  → Corrélation: ${profile.correlation}`;
       }
       text += "\n";
 
@@ -275,11 +377,15 @@ export function formatSnapshotForPrompt(
   if ((snapshot.earnings ?? []).length > 0) {
     text += `## Résultats d'entreprises\n`;
     for (const e of snapshot.earnings!.slice(0, 10)) {
-      text += `- ${e.symbol} (${e.hour === "bmo" ? "avant ouverture" : e.hour === "amc" ? "après clôture" : "pendant séance"})`;
+      const profile = getCompanyProfile(e.symbol);
+      const nameStr = profile ? `${profile.name} (${e.symbol})` : e.symbol;
+      text += `- **${nameStr}** — ${e.hour === "bmo" ? "avant ouverture" : e.hour === "amc" ? "après clôture" : "pendant séance"}`;
+      if (profile?.sector) text += ` | Secteur: ${profile.sector}`;
       if (e.epsEstimate !== undefined) text += ` | EPS consensus: ${e.epsEstimate}`;
       if (e.epsActual !== undefined) text += ` | **EPS réel: ${e.epsActual}**`;
       if (e.revenueEstimate !== undefined) text += ` | CA consensus: ${(e.revenueEstimate / 1e9).toFixed(1)}Md$`;
       if (e.revenueActual !== undefined) text += ` | **CA réel: ${(e.revenueActual / 1e9).toFixed(1)}Md$**`;
+      if (profile?.correlation) text += `\n  → Corrélation: ${profile.correlation}`;
       text += "\n";
     }
     text += "\n";
@@ -379,6 +485,15 @@ export async function generateScript(
   // Load knowledge context
   const knowledgeContext = loadKnowledge(snapshot);
   console.log(`Knowledge context: ${knowledgeContext.length} chars loaded`);
+
+  // Build editorial themes (pre-digested analysis) and attach to snapshot
+  if (!snapshot.themesDuJour) {
+    const tdj = buildThemesDuJour(snapshot, snapshot.news, options.lang);
+    snapshot.themesDuJour = tdj;
+    console.log(`Themes du jour: ${tdj.themes.length} themes, regime=${tdj.marketRegime}, ${tdj.causalChains.length} causal chains, ${tdj.sectorClusters.length} sector clusters`);
+  } else {
+    console.log(`Themes du jour: already computed (${snapshot.themesDuJour.themes.length} themes)`);
+  }
 
   const systemPrompt =
     options.type === "chart_analysis"

@@ -1,0 +1,3490 @@
+[
+  {
+    "symbol": "0001.HK",
+    "name": "CK Hutchison",
+    "finnhubIndustry": "Industrial Conglomerates",
+    "sector": "Industrial Conglomerates",
+    "correlation": "Conglomérat HK — CK Hutchison",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "0002.HK",
+    "name": "CLP Holdings",
+    "finnhubIndustry": "Utilities",
+    "sector": "Utilities",
+    "correlation": "Défensif HK — CLP Holdings",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "0003.HK",
+    "name": "HK & China Gas",
+    "finnhubIndustry": "Utilities",
+    "sector": "Utilities",
+    "correlation": "Gaz HK — HK & China Gas",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "0005.HK",
+    "name": "HSBC Holdings",
+    "finnhubIndustry": "Banks",
+    "sector": "Banks",
+    "correlation": "Yields, Asie — HSBC HK",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "0006.HK",
+    "name": "Power Assets",
+    "finnhubIndustry": "Utilities",
+    "sector": "Utilities",
+    "correlation": "Énergie HK — Power Assets",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "0011.HK",
+    "name": "Hang Seng Bank",
+    "finnhubIndustry": "Real Estate",
+    "sector": "Real Estate",
+    "correlation": "Immobilier HK — Hang Seng Bank",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "0012.HK",
+    "name": "Henderson Land",
+    "finnhubIndustry": "Real Estate",
+    "sector": "Real Estate",
+    "correlation": "Immobilier HK — Henderson Land",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "0016.HK",
+    "name": "Sun Hung Kai Properties",
+    "finnhubIndustry": "Real Estate",
+    "sector": "Real Estate",
+    "correlation": "Immobilier HK — SHK Properties",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "0017.HK",
+    "name": "New World Development",
+    "finnhubIndustry": "Real Estate",
+    "sector": "Real Estate",
+    "correlation": "Immobilier HK — New World Development",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "0388.HK",
+    "name": "Hong Kong Exchanges",
+    "finnhubIndustry": "Financial Services",
+    "sector": "Financial Services",
+    "correlation": "Volumes HK — HKEX",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "0669.HK",
+    "name": "Techtronic Industries",
+    "finnhubIndustry": "Industrial Conglomerates",
+    "sector": "Industrial Conglomerates",
+    "correlation": "Outillage, Milwaukee — Techtronic",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "0688.HK",
+    "name": "China Overseas Land",
+    "finnhubIndustry": "Real Estate",
+    "sector": "Real Estate",
+    "correlation": "Immobilier Chine — China Overseas Land",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "0700.HK",
+    "name": "Tencent Holdings",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "Chine tech, régulation — Tencent",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "0762.HK",
+    "name": "China Unicom",
+    "finnhubIndustry": "Telecom Services",
+    "sector": "Telecom Services",
+    "correlation": "Télécom Chine — China Unicom",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "0883.HK",
+    "name": "CNOOC",
+    "finnhubIndustry": "Oil & Gas",
+    "sector": "Oil & Gas",
+    "correlation": "CL=F ↑↑, pétrole offshore Chine — CNOOC",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "0939.HK",
+    "name": "China Construction Bank",
+    "finnhubIndustry": "Banks",
+    "sector": "Banks",
+    "correlation": "Banque Chine — CCB",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "0941.HK",
+    "name": "China Mobile",
+    "finnhubIndustry": "Telecom Services",
+    "sector": "Telecom Services",
+    "correlation": "Télécom Chine — China Mobile",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "0960.HK",
+    "name": "Longfor Properties",
+    "finnhubIndustry": "Real Estate",
+    "sector": "Real Estate",
+    "correlation": "Immobilier Chine — Longfor",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "1038.HK",
+    "name": "CK Infrastructure",
+    "finnhubIndustry": "Utilities",
+    "sector": "Utilities",
+    "correlation": "Énergie HK — CK Infrastructure",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "1093.HK",
+    "name": "CSPC Pharmaceutical",
+    "finnhubIndustry": "Drug Manufacturers",
+    "sector": "Drug Manufacturers",
+    "correlation": "Pharma Chine — CSPC",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "1177.HK",
+    "name": "Sino Biopharmaceutical",
+    "finnhubIndustry": "Drug Manufacturers",
+    "sector": "Drug Manufacturers",
+    "correlation": "Pharma Chine — Sino Biopharma",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "1299.HK",
+    "name": "AIA Group",
+    "finnhubIndustry": "Insurance",
+    "sector": "Insurance",
+    "correlation": "Asie, yields — AIA Group",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "1398.HK",
+    "name": "ICBC",
+    "finnhubIndustry": "Banks",
+    "sector": "Banks",
+    "correlation": "Banque Chine — ICBC",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "1COV.DE",
+    "name": "Covestro",
+    "finnhubIndustry": "Chemicals",
+    "sector": "Chemicals",
+    "correlation": "Cycle industriel — Covestro, polymères",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "2269.HK",
+    "name": "WuXi Biologics",
+    "finnhubIndustry": "Biotechnology",
+    "sector": "Biotechnology",
+    "correlation": "Pharma Chine — WuXi Biologics",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "2318.HK",
+    "name": "Ping An Insurance",
+    "finnhubIndustry": "Insurance",
+    "sector": "Insurance",
+    "correlation": "Chine, yields — Ping An",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "2382.HK",
+    "name": "Sunny Optical",
+    "finnhubIndustry": "Electronic Components",
+    "sector": "Electronic Components",
+    "correlation": "Optique, smartphones — Sunny Optical",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "3382.T",
+    "name": "Seven & I Holdings",
+    "finnhubIndustry": "Retail",
+    "sector": "Retail",
+    "correlation": "Consommateur JP — Seven & i Holdings",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "3690.HK",
+    "name": "Meituan",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "E-commerce Chine — Meituan",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "4063.T",
+    "name": "Shin-Etsu Chemical",
+    "finnhubIndustry": "Chemicals",
+    "sector": "Chemicals",
+    "correlation": "Semi-conducteurs, silicone — Shin-Etsu Chemical",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "4502.T",
+    "name": "Takeda Pharmaceutical",
+    "finnhubIndustry": "Drug Manufacturers",
+    "sector": "Drug Manufacturers",
+    "correlation": "Pharma — Takeda",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "4507.T",
+    "name": "Shionogi",
+    "finnhubIndustry": "",
+    "sector": "",
+    "correlation": "",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "4519.T",
+    "name": "Chugai Pharmaceutical",
+    "finnhubIndustry": "Drug Manufacturers",
+    "sector": "Drug Manufacturers",
+    "correlation": "Pharma, oncologie — Chugai Pharma",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "4543.T",
+    "name": "Terumo",
+    "finnhubIndustry": "",
+    "sector": "",
+    "correlation": "",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "4568.T",
+    "name": "Daiichi Sankyo",
+    "finnhubIndustry": "Drug Manufacturers",
+    "sector": "Drug Manufacturers",
+    "correlation": "Pharma, vaccins — Daiichi Sankyo",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "4661.T",
+    "name": "Oriental Land",
+    "finnhubIndustry": "Hotels, Restaurants & Leisure",
+    "sector": "Hotels, Restaurants & Leisure",
+    "correlation": "Tokyo Disney — Oriental Land",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "4704.T",
+    "name": "Trend Micro",
+    "finnhubIndustry": "Software",
+    "sector": "Software",
+    "correlation": "Cybersécurité — Trend Micro",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "4911.T",
+    "name": "Shiseido",
+    "finnhubIndustry": "Consumer products",
+    "sector": "Consumer products",
+    "correlation": "Cosmétiques, Chine — Shiseido",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "5108.T",
+    "name": "Bridgestone",
+    "finnhubIndustry": "Auto Parts",
+    "sector": "Auto Parts",
+    "correlation": "Pneus, cycle auto — Bridgestone",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "6098.T",
+    "name": "Recruit Holdings",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "Recrutement, RH — Recruit Holdings",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "6273.T",
+    "name": "SMC Corporation",
+    "finnhubIndustry": "Machinery",
+    "sector": "Machinery",
+    "correlation": "Pelles mécaniques — SMC Corp",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "6367.T",
+    "name": "Daikin Industries",
+    "finnhubIndustry": "Industrial Conglomerates",
+    "sector": "Industrial Conglomerates",
+    "correlation": "Climatisation, industrie — Daikin",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "6501.T",
+    "name": "Hitachi",
+    "finnhubIndustry": "Industrial Conglomerates",
+    "sector": "Industrial Conglomerates",
+    "correlation": "Infrastructure, énergie — Hitachi",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "6752.T",
+    "name": "Panasonic",
+    "finnhubIndustry": "Consumer Electronics",
+    "sector": "Consumer Electronics",
+    "correlation": "Batteries EV, électronique — Panasonic",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "6758.T",
+    "name": "Sony Group",
+    "finnhubIndustry": "Consumer Electronics",
+    "sector": "Consumer Electronics",
+    "correlation": "Gaming, semi-conducteurs — Sony",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "6861.T",
+    "name": "Keyence",
+    "finnhubIndustry": "Electronic Components",
+    "sector": "Electronic Components",
+    "correlation": "Automatisation — Keyence",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "6902.T",
+    "name": "Denso",
+    "finnhubIndustry": "Auto Parts",
+    "sector": "Auto Parts",
+    "correlation": "Pièces auto, Toyota supplier — Denso",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "6954.T",
+    "name": "Fanuc",
+    "finnhubIndustry": "Industrial Conglomerates",
+    "sector": "Industrial Conglomerates",
+    "correlation": "Automatisation, robots — Fanuc",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "7011.T",
+    "name": "Mitsubishi Heavy Industries",
+    "finnhubIndustry": "Aerospace & Defense",
+    "sector": "Aerospace & Defense",
+    "correlation": "Défense JP, turbines — MHI",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "7203.T",
+    "name": "Toyota Motor",
+    "finnhubIndustry": "Automobiles",
+    "sector": "Automobiles",
+    "correlation": "JPY, tarifs — Toyota",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "7267.T",
+    "name": "Honda Motor",
+    "finnhubIndustry": "Automobiles",
+    "sector": "Automobiles",
+    "correlation": "JPY, tarifs — Honda",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "7733.T",
+    "name": "Olympus",
+    "finnhubIndustry": "Medical Devices",
+    "sector": "Medical Devices",
+    "correlation": "Endoscopie — Olympus",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "7741.T",
+    "name": "HOYA",
+    "finnhubIndustry": "Medical Devices",
+    "sector": "Medical Devices",
+    "correlation": "Endoscopie — HOYA",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "7832.T",
+    "name": "Bandai Namco",
+    "finnhubIndustry": "Consumer products",
+    "sector": "Consumer products",
+    "correlation": "Gaming, jouets — Bandai Namco",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "7974.T",
+    "name": "Nintendo",
+    "finnhubIndustry": "Consumer Electronics",
+    "sector": "Consumer Electronics",
+    "correlation": "Gaming, JPY — Nintendo",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "8031.T",
+    "name": "Mitsui & Co.",
+    "finnhubIndustry": "Trading Companies",
+    "sector": "Trading Companies",
+    "correlation": "Matières premières — Mitsui & Co",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "8035.T",
+    "name": "Tokyo Electron",
+    "finnhubIndustry": "Semiconductors",
+    "sector": "Semiconductors",
+    "correlation": "Équipement semi-conducteurs — Tokyo Electron",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "8053.T",
+    "name": "Sumitomo Corporation",
+    "finnhubIndustry": "Trading Companies",
+    "sector": "Trading Companies",
+    "correlation": "Matières premières — Sumitomo",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "8058.T",
+    "name": "Mitsubishi Corporation",
+    "finnhubIndustry": "Trading Companies",
+    "sector": "Trading Companies",
+    "correlation": "Matières premières diversifiées — Mitsubishi Corp",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "8306.T",
+    "name": "Mitsubishi UFJ Financial",
+    "finnhubIndustry": "Banks",
+    "sector": "Banks",
+    "correlation": "BOJ yields, JPY — MUFG",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "8316.T",
+    "name": "Sumitomo Mitsui Financial",
+    "finnhubIndustry": "Banks",
+    "sector": "Banks",
+    "correlation": "BOJ yields, JPY — SMFG",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "8801.T",
+    "name": "Mitsui Fudosan",
+    "finnhubIndustry": "Real Estate",
+    "sector": "Real Estate",
+    "correlation": "Immobilier JP, taux BOJ — Mitsui Fudosan",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "9020.T",
+    "name": "East Japan Railway",
+    "finnhubIndustry": "Road & Rail",
+    "sector": "Road & Rail",
+    "correlation": "Transport JP — East Japan Railway",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "9022.T",
+    "name": "Central Japan Railway",
+    "finnhubIndustry": "Road & Rail",
+    "sector": "Road & Rail",
+    "correlation": "Shinkansen — Central Japan Railway",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "9432.T",
+    "name": "NTT",
+    "finnhubIndustry": "Telecom Services",
+    "sector": "Telecom Services",
+    "correlation": "Défensif, dividendes — NTT",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "9433.T",
+    "name": "KDDI",
+    "finnhubIndustry": "Telecom Services",
+    "sector": "Telecom Services",
+    "correlation": "Défensif — KDDI",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "9613.T",
+    "name": "NTT Data",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "IT services JP — NTT Data",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "9618.HK",
+    "name": "JD.com",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "E-commerce Chine — JD.com",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "9984.T",
+    "name": "SoftBank Group",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "Tech VC, Alibaba — SoftBank",
+    "index": "NIKKEI50"
+  },
+  {
+    "symbol": "9988.HK",
+    "name": "Alibaba Group",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "E-commerce Chine, régulation — Alibaba",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "9999.HK",
+    "name": "NetEase",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "Gaming Chine — NetEase",
+    "index": "HSI30"
+  },
+  {
+    "symbol": "A",
+    "name": "Agilent Technologies Inc",
+    "finnhubIndustry": "Life Sciences Tools & Services",
+    "sector": "Life Sciences Tools & Services",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "AA",
+    "name": "Alcoa Corp",
+    "finnhubIndustry": "Metals & Mining",
+    "sector": "Metals & Mining",
+    "correlation": "GC=F, SI=F — corrélé aux métaux précieux",
+    "index": "SP500"
+  },
+  {
+    "symbol": "AAL",
+    "name": "American Airlines Group Inc",
+    "finnhubIndustry": "Airlines",
+    "sector": "Airlines",
+    "correlation": "CL=F (pétrole) ↓↓ — kérosène = 1er poste de coûts",
+    "index": "SP500"
+  },
+  {
+    "symbol": "AAL.L",
+    "name": "Anglo American",
+    "finnhubIndustry": "Metals & Mining",
+    "sector": "Metals & Mining",
+    "correlation": "Platine, diamants, cuivre — Anglo American",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "AAPL",
+    "name": "Apple Inc",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "^IXIC ↑, taux ↓↓",
+    "index": "SP500"
+  },
+  {
+    "symbol": "ABBV",
+    "name": "AbbVie Inc",
+    "finnhubIndustry": "Biotechnology",
+    "sector": "Biotechnology",
+    "correlation": "FDA, pipelines — très binaire (approbation ou rejet)",
+    "index": "SP500"
+  },
+  {
+    "symbol": "ABNB",
+    "name": "Airbnb Inc",
+    "finnhubIndustry": "Hotels, Restaurants & Leisure",
+    "sector": "Hotels, Restaurants & Leisure",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "ABT",
+    "name": "Abbott Laboratories",
+    "finnhubIndustry": "Health Care",
+    "sector": "Health Care",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "ACA.PA",
+    "name": "Crédit Agricole",
+    "finnhubIndustry": "Banks",
+    "sector": "Banks",
+    "correlation": "Yields ↑, spread 10Y-2Y ↑",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "ACN",
+    "name": "Accenture PLC",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "^IXIC ↑, taux ↓↓",
+    "index": "SP500"
+  },
+  {
+    "symbol": "ADI",
+    "name": "Analog Devices Inc",
+    "finnhubIndustry": "Semiconductors",
+    "sector": "Semiconductors",
+    "correlation": "^IXIC ↑, ^KS11 — supply chain asiatique",
+    "index": "SP500"
+  },
+  {
+    "symbol": "ADP",
+    "name": "Automatic Data Processing Inc",
+    "finnhubIndustry": "Professional Services",
+    "sector": "Professional Services",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "ADS.DE",
+    "name": "Adidas",
+    "finnhubIndustry": "Consumer products",
+    "sector": "Consumer products",
+    "correlation": "Consommateur sport, Chine",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "AFL",
+    "name": "Aflac Inc",
+    "finnhubIndustry": "Insurance",
+    "sector": "Insurance",
+    "correlation": "Yields ↑ — portefeuille obligataire",
+    "index": "SP500"
+  },
+  {
+    "symbol": "AI.PA",
+    "name": "Air Liquide",
+    "finnhubIndustry": "Chemicals",
+    "sector": "Chemicals",
+    "correlation": "Gaz industriels — cyclique, industrie mondiale",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "AIG",
+    "name": "American International Group Inc",
+    "finnhubIndustry": "Insurance",
+    "sector": "Insurance",
+    "correlation": "Yields ↑ — portefeuille obligataire",
+    "index": "SP500"
+  },
+  {
+    "symbol": "AIR.DE",
+    "name": "Airbus",
+    "finnhubIndustry": "Aerospace & Defense",
+    "sector": "Aerospace & Defense",
+    "correlation": "= AIR.PA Airbus — double listing",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "AIR.PA",
+    "name": "Airbus",
+    "finnhubIndustry": "Aerospace & Defense",
+    "sector": "Aerospace & Defense",
+    "correlation": "Géopolitique ↑, commandes aériennes, supply chain moteurs",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "ALB",
+    "name": "Albemarle Corp",
+    "finnhubIndustry": "Chemicals",
+    "sector": "Chemicals",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "ALK",
+    "name": "Alaska Air Group Inc",
+    "finnhubIndustry": "Airlines",
+    "sector": "Airlines",
+    "correlation": "CL=F (pétrole) ↓↓ — kérosène = 1er poste de coûts",
+    "index": "SP500"
+  },
+  {
+    "symbol": "ALL",
+    "name": "Allstate Corp",
+    "finnhubIndustry": "Insurance",
+    "sector": "Insurance",
+    "correlation": "Yields ↑ — portefeuille obligataire",
+    "index": "SP500"
+  },
+  {
+    "symbol": "ALV.DE",
+    "name": "Allianz",
+    "finnhubIndustry": "Insurance",
+    "sector": "Insurance",
+    "correlation": "Yields ↑ — Allianz, assurance/gestion actifs",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "AMAT",
+    "name": "Applied Materials Inc",
+    "finnhubIndustry": "Semiconductors",
+    "sector": "Semiconductors",
+    "correlation": "^IXIC ↑, ^KS11 — supply chain asiatique",
+    "index": "SP500"
+  },
+  {
+    "symbol": "AMD",
+    "name": "Advanced Micro Devices Inc",
+    "finnhubIndustry": "Semiconductors",
+    "sector": "Semiconductors",
+    "correlation": "^IXIC ↑, ^KS11 — supply chain asiatique",
+    "index": "SP500"
+  },
+  {
+    "symbol": "AME",
+    "name": "AMETEK Inc",
+    "finnhubIndustry": "Electrical Equipment",
+    "sector": "Electrical Equipment",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "AMGN",
+    "name": "Amgen Inc",
+    "finnhubIndustry": "Biotechnology",
+    "sector": "Biotechnology",
+    "correlation": "FDA, pipelines — très binaire (approbation ou rejet)",
+    "index": "SP500"
+  },
+  {
+    "symbol": "AMT",
+    "name": "American Tower Corp",
+    "finnhubIndustry": "Real Estate",
+    "sector": "Real Estate",
+    "correlation": "Taux ↓↓ — sensible aux taux hypothécaires",
+    "index": "SP500"
+  },
+  {
+    "symbol": "AMZN",
+    "name": "Amazon.com Inc",
+    "finnhubIndustry": "Retail",
+    "sector": "Retail",
+    "correlation": "Consommateur US, confiance, emploi",
+    "index": "SP500"
+  },
+  {
+    "symbol": "ANTO.L",
+    "name": "Antofagasta",
+    "finnhubIndustry": "Metals & Mining",
+    "sector": "Metals & Mining",
+    "correlation": "Cuivre, Chine — Antofagasta",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "APD",
+    "name": "Air Products and Chemicals Inc",
+    "finnhubIndustry": "Chemicals",
+    "sector": "Chemicals",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "APP",
+    "name": "Applovin Corp",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "^IXIC ↑, taux ↓↓",
+    "index": "SP500"
+  },
+  {
+    "symbol": "ARM",
+    "name": "Arm Holdings PLC",
+    "finnhubIndustry": "Semiconductors",
+    "sector": "Semiconductors",
+    "correlation": "^IXIC ↑, ^KS11 — supply chain asiatique",
+    "index": "SP500"
+  },
+  {
+    "symbol": "AVGO",
+    "name": "Broadcom Inc",
+    "finnhubIndustry": "Semiconductors",
+    "sector": "Semiconductors",
+    "correlation": "^IXIC ↑, ^KS11 — supply chain asiatique",
+    "index": "SP500"
+  },
+  {
+    "symbol": "AVY",
+    "name": "Avery Dennison Corp",
+    "finnhubIndustry": "Packaging",
+    "sector": "Packaging",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "AXA.PA",
+    "name": "AXA",
+    "finnhubIndustry": "Insurance",
+    "sector": "Insurance",
+    "correlation": "Yields ↑ — portefeuille obligataire",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "AXON",
+    "name": "Axon Enterprise Inc",
+    "finnhubIndustry": "Aerospace & Defense",
+    "sector": "Aerospace & Defense",
+    "correlation": "Géopolitique ↑↑ — tensions = commandes",
+    "index": "SP500"
+  },
+  {
+    "symbol": "AXP",
+    "name": "American Express Co",
+    "finnhubIndustry": "Financial Services",
+    "sector": "Financial Services",
+    "correlation": "Yields, ^GSPC",
+    "index": "SP500"
+  },
+  {
+    "symbol": "AZN.L",
+    "name": "AstraZeneca",
+    "finnhubIndustry": "Drug Manufacturers",
+    "sector": "Drug Manufacturers",
+    "correlation": "Pharma défensif — AstraZeneca",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "BA",
+    "name": "Boeing Co",
+    "finnhubIndustry": "Aerospace & Defense",
+    "sector": "Aerospace & Defense",
+    "correlation": "Géopolitique ↑↑ — tensions = commandes",
+    "index": "SP500"
+  },
+  {
+    "symbol": "BAC",
+    "name": "Bank of America Corp",
+    "finnhubIndustry": "Banking",
+    "sector": "Banking",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "BAS.DE",
+    "name": "BASF",
+    "finnhubIndustry": "Chemicals",
+    "sector": "Chemicals",
+    "correlation": "Cycle industriel, gaz naturel Europe — BASF",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "BAT.L",
+    "name": "British American Tobacco",
+    "finnhubIndustry": "Tobacco",
+    "sector": "Tobacco",
+    "correlation": "Défensif, dividendes — BAT",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "BATS.L",
+    "name": "BAE Systems",
+    "finnhubIndustry": "Tobacco",
+    "sector": "Tobacco",
+    "correlation": "Défensif, dividendes — British American Tobacco",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "BAYN.DE",
+    "name": "Bayer",
+    "finnhubIndustry": "Drug Manufacturers",
+    "sector": "Drug Manufacturers",
+    "correlation": "Pharma + agriculture — Bayer, litiges glyphosate",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "BDX",
+    "name": "Becton Dickinson and Co",
+    "finnhubIndustry": "Health Care",
+    "sector": "Health Care",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "BEI.DE",
+    "name": "Beiersdorf",
+    "finnhubIndustry": "Consumer products",
+    "sector": "Consumer products",
+    "correlation": "Consommation de base — Beiersdorf (Nivea)",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "BIO",
+    "name": "Bio Rad Laboratories Inc",
+    "finnhubIndustry": "Life Sciences Tools & Services",
+    "sector": "Life Sciences Tools & Services",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "BKNG",
+    "name": "Booking Holdings Inc",
+    "finnhubIndustry": "Hotels, Restaurants & Leisure",
+    "sector": "Hotels, Restaurants & Leisure",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "BKR",
+    "name": "Baker Hughes Co",
+    "finnhubIndustry": "Energy",
+    "sector": "Energy",
+    "correlation": "CL=F (pétrole) ↑↑",
+    "index": "SP500"
+  },
+  {
+    "symbol": "BLK",
+    "name": "BlackRock Inc",
+    "finnhubIndustry": "Financial Services",
+    "sector": "Financial Services",
+    "correlation": "Yields, ^GSPC",
+    "index": "SP500"
+  },
+  {
+    "symbol": "BMW.DE",
+    "name": "BMW",
+    "finnhubIndustry": "Automobiles",
+    "sector": "Automobiles",
+    "correlation": "EUR/USD, tarifs, transition EV — BMW",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "BN.PA",
+    "name": "Danone",
+    "finnhubIndustry": "Food Products",
+    "sector": "Food Products",
+    "correlation": "Défensif, consommation de base",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "BNP.PA",
+    "name": "BNP Paribas",
+    "finnhubIndustry": "Banks",
+    "sector": "Banks",
+    "correlation": "Yields ↑, spread 10Y-2Y ↑ — modèle bancaire",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "BNR.DE",
+    "name": "Brenntag",
+    "finnhubIndustry": "Chemicals",
+    "sector": "Chemicals",
+    "correlation": "Distribution chimique — Brenntag",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "BP.L",
+    "name": "BP",
+    "finnhubIndustry": "Oil & Gas Integrated",
+    "sector": "Oil & Gas Integrated",
+    "correlation": "CL=F ↑↑ — BP, major pétrolière",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "BRK-B",
+    "name": "Berkshire Hathaway Inc",
+    "finnhubIndustry": "Financial Services",
+    "sector": "Financial Services",
+    "correlation": "Yields, ^GSPC",
+    "index": "SP500"
+  },
+  {
+    "symbol": "BSX",
+    "name": "Boston Scientific Corp",
+    "finnhubIndustry": "Health Care",
+    "sector": "Health Care",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "BT-A.L",
+    "name": "BT Group",
+    "finnhubIndustry": "Telecom Services",
+    "sector": "Telecom Services",
+    "correlation": "Télécom UK — BT Group",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "C",
+    "name": "Citigroup Inc",
+    "finnhubIndustry": "Banking",
+    "sector": "Banking",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "CA.PA",
+    "name": "Carrefour",
+    "finnhubIndustry": "Retail",
+    "sector": "Retail",
+    "correlation": "Consommateur FR, inflation alimentaire",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "CAP.PA",
+    "name": "Capgemini",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "Services IT, ^IXIC ↑, transformation digitale",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "CAT",
+    "name": "Caterpillar Inc",
+    "finnhubIndustry": "Machinery",
+    "sector": "Machinery",
+    "correlation": "Prix agricoles (blé, maïs, soja) — santé économie agricole",
+    "index": "SP500"
+  },
+  {
+    "symbol": "CB",
+    "name": "Chubb Ltd",
+    "finnhubIndustry": "Insurance",
+    "sector": "Insurance",
+    "correlation": "Yields ↑ — portefeuille obligataire",
+    "index": "SP500"
+  },
+  {
+    "symbol": "CBK.DE",
+    "name": "Commerzbank",
+    "finnhubIndustry": "Banks",
+    "sector": "Banks",
+    "correlation": "Yields ↑ — Commerzbank",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "CCL",
+    "name": "Carnival Corp",
+    "finnhubIndustry": "Hotels, Restaurants & Leisure",
+    "sector": "Hotels, Restaurants & Leisure",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "CE",
+    "name": "Celanese Corp",
+    "finnhubIndustry": "Chemicals",
+    "sector": "Chemicals",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "CF",
+    "name": "CF Industries Holdings Inc",
+    "finnhubIndustry": "Chemicals",
+    "sector": "Chemicals",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "CHTR",
+    "name": "Charter Communications Inc",
+    "finnhubIndustry": "Media",
+    "sector": "Media",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "CI",
+    "name": "Cigna Group",
+    "finnhubIndustry": "Health Care",
+    "sector": "Health Care",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "CLF",
+    "name": "Cleveland-Cliffs Inc",
+    "finnhubIndustry": "Metals & Mining",
+    "sector": "Metals & Mining",
+    "correlation": "GC=F, SI=F — corrélé aux métaux précieux",
+    "index": "SP500"
+  },
+  {
+    "symbol": "CMCSA",
+    "name": "Comcast Corp",
+    "finnhubIndustry": "Telecommunication",
+    "sector": "Telecommunication",
+    "correlation": "Défensif, dividendes",
+    "index": "SP500"
+  },
+  {
+    "symbol": "CME",
+    "name": "CME Group Inc",
+    "finnhubIndustry": "Financial Services",
+    "sector": "Financial Services",
+    "correlation": "Yields, ^GSPC",
+    "index": "SP500"
+  },
+  {
+    "symbol": "CMG",
+    "name": "Chipotle Mexican Grill Inc",
+    "finnhubIndustry": "Hotels, Restaurants & Leisure",
+    "sector": "Hotels, Restaurants & Leisure",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "CNA.L",
+    "name": "Centrica",
+    "finnhubIndustry": "Utilities",
+    "sector": "Utilities",
+    "correlation": "Gaz UK — Centrica",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "CNC",
+    "name": "Centene Corp",
+    "finnhubIndustry": "Health Care",
+    "sector": "Health Care",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "COF",
+    "name": "Capital One Financial Corp",
+    "finnhubIndustry": "Financial Services",
+    "sector": "Financial Services",
+    "correlation": "Yields, ^GSPC",
+    "index": "SP500"
+  },
+  {
+    "symbol": "COIN",
+    "name": "Coinbase Global Inc",
+    "finnhubIndustry": "Financial Services",
+    "sector": "Financial Services",
+    "correlation": "Yields, ^GSPC",
+    "index": "SP500"
+  },
+  {
+    "symbol": "CON.DE",
+    "name": "Continental",
+    "finnhubIndustry": "Auto Parts",
+    "sector": "Auto Parts",
+    "correlation": "Cycle auto, pneus, capteurs",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "COP",
+    "name": "ConocoPhillips",
+    "finnhubIndustry": "Energy",
+    "sector": "Energy",
+    "correlation": "CL=F (pétrole) ↑↑",
+    "index": "SP500"
+  },
+  {
+    "symbol": "COST",
+    "name": "Costco Wholesale Corp",
+    "finnhubIndustry": "Retail",
+    "sector": "Retail",
+    "correlation": "Consommateur US, confiance, emploi",
+    "index": "SP500"
+  },
+  {
+    "symbol": "CPG.L",
+    "name": "Compass Group",
+    "finnhubIndustry": "Consumer products",
+    "sector": "Consumer products",
+    "correlation": "Défensif — Compass Group",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "CRM",
+    "name": "Salesforce Inc",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "^IXIC ↑, taux ↓↓",
+    "index": "SP500"
+  },
+  {
+    "symbol": "CRWD",
+    "name": "CrowdStrike Holdings Inc",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "^IXIC ↑, taux ↓↓",
+    "index": "SP500"
+  },
+  {
+    "symbol": "CSCO",
+    "name": "Cisco Systems Inc",
+    "finnhubIndustry": "Communications",
+    "sector": "Communications",
+    "correlation": "Défensif, dividendes",
+    "index": "SP500"
+  },
+  {
+    "symbol": "CTAS",
+    "name": "Cintas Corp",
+    "finnhubIndustry": "Commercial Services & Supplies",
+    "sector": "Commercial Services & Supplies",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "CVX",
+    "name": "Chevron Corp",
+    "finnhubIndustry": "Energy",
+    "sector": "Energy",
+    "correlation": "CL=F (pétrole) ↑↑",
+    "index": "SP500"
+  },
+  {
+    "symbol": "D",
+    "name": "Dominion Energy Inc",
+    "finnhubIndustry": "Utilities",
+    "sector": "Utilities",
+    "correlation": "Taux ↓ — défensif, proxy obligataire",
+    "index": "SP500"
+  },
+  {
+    "symbol": "DAL",
+    "name": "Delta Air Lines Inc",
+    "finnhubIndustry": "Airlines",
+    "sector": "Airlines",
+    "correlation": "CL=F (pétrole) ↓↓ — kérosène = 1er poste de coûts",
+    "index": "SP500"
+  },
+  {
+    "symbol": "DASH",
+    "name": "DoorDash Inc",
+    "finnhubIndustry": "Hotels, Restaurants & Leisure",
+    "sector": "Hotels, Restaurants & Leisure",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "DB1.DE",
+    "name": "Deutsche Börse",
+    "finnhubIndustry": "Financial Services",
+    "sector": "Financial Services",
+    "correlation": "Volumes de marché — Deutsche Börse",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "DBK.DE",
+    "name": "Deutsche Bank",
+    "finnhubIndustry": "Banks",
+    "sector": "Banks",
+    "correlation": "Yields ↑, spread — Deutsche Bank",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "DD",
+    "name": "Dupont De Nemours Inc",
+    "finnhubIndustry": "Chemicals",
+    "sector": "Chemicals",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "DDOG",
+    "name": "Datadog Inc",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "^IXIC ↑, taux ↓↓",
+    "index": "SP500"
+  },
+  {
+    "symbol": "DE",
+    "name": "Deere & Co",
+    "finnhubIndustry": "Machinery",
+    "sector": "Machinery",
+    "correlation": "Prix agricoles (blé, maïs, soja) — santé économie agricole",
+    "index": "SP500"
+  },
+  {
+    "symbol": "DELL",
+    "name": "Dell Technologies Inc",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "^IXIC ↑, taux ↓↓",
+    "index": "SP500"
+  },
+  {
+    "symbol": "DG.PA",
+    "name": "Vinci",
+    "finnhubIndustry": "Construction",
+    "sector": "Construction",
+    "correlation": "Infrastructure, concessions autoroutières, taux",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "DGE.L",
+    "name": "Diageo",
+    "finnhubIndustry": "Beverages",
+    "sector": "Beverages",
+    "correlation": "Défensif, spiritueux — Diageo",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "DHER.DE",
+    "name": "Delivery Hero",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "Delivery, e-commerce — Delivery Hero",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "DHI",
+    "name": "D.R. Horton Inc",
+    "finnhubIndustry": "Consumer products",
+    "sector": "Consumer products",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "DHL.DE",
+    "name": "DHL Group",
+    "finnhubIndustry": "Air Freight & Logistics",
+    "sector": "Air Freight & Logistics",
+    "correlation": "Commerce mondial, CL=F ↓ — DHL/Deutsche Post",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "DHR",
+    "name": "Danaher Corp",
+    "finnhubIndustry": "Life Sciences Tools & Services",
+    "sector": "Life Sciences Tools & Services",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "DIS",
+    "name": "Walt Disney Co",
+    "finnhubIndustry": "Media",
+    "sector": "Media",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "DOW",
+    "name": "Dow Inc",
+    "finnhubIndustry": "Chemicals",
+    "sector": "Chemicals",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "DSY.PA",
+    "name": "Dassault Systèmes",
+    "finnhubIndustry": "Software",
+    "sector": "Software",
+    "correlation": "^IXIC ↑, taux ↓↓ — valorisation tech",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "DTE.DE",
+    "name": "Deutsche Telekom",
+    "finnhubIndustry": "Telecom Services",
+    "sector": "Telecom Services",
+    "correlation": "Défensif, T-Mobile US — Deutsche Telekom",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "DUK",
+    "name": "Duke Energy Corp",
+    "finnhubIndustry": "Utilities",
+    "sector": "Utilities",
+    "correlation": "Taux ↓ — défensif, proxy obligataire",
+    "index": "SP500"
+  },
+  {
+    "symbol": "DVN",
+    "name": "Devon Energy Corp",
+    "finnhubIndustry": "Energy",
+    "sector": "Energy",
+    "correlation": "CL=F (pétrole) ↑↑",
+    "index": "SP500"
+  },
+  {
+    "symbol": "ECL",
+    "name": "Ecolab Inc",
+    "finnhubIndustry": "Chemicals",
+    "sector": "Chemicals",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "EL.PA",
+    "name": "EssilorLuxottica",
+    "finnhubIndustry": "Medical Devices",
+    "sector": "Medical Devices",
+    "correlation": "Défensif, optique/santé visuelle",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "ELV",
+    "name": "Elevance Health Inc",
+    "finnhubIndustry": "Health Care",
+    "sector": "Health Care",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "EMR",
+    "name": "Emerson Electric Co",
+    "finnhubIndustry": "Electrical Equipment",
+    "sector": "Electrical Equipment",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "EN.PA",
+    "name": "Bouygues",
+    "finnhubIndustry": "Construction",
+    "sector": "Construction",
+    "correlation": "Bouygues — construction, télécom, médias",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "ENGI.PA",
+    "name": "Engie",
+    "finnhubIndustry": "Utilities",
+    "sector": "Utilities",
+    "correlation": "Gaz naturel, défensif, transition énergétique",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "ENR.DE",
+    "name": "Siemens Energy",
+    "finnhubIndustry": "Utilities",
+    "sector": "Utilities",
+    "correlation": "Transition énergétique — Siemens Energy",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "EOAN.DE",
+    "name": "E.ON",
+    "finnhubIndustry": "Utilities",
+    "sector": "Utilities",
+    "correlation": "Gaz naturel, transition énergétique — E.ON",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "EOG",
+    "name": "EOG Resources Inc",
+    "finnhubIndustry": "Energy",
+    "sector": "Energy",
+    "correlation": "CL=F (pétrole) ↑↑",
+    "index": "SP500"
+  },
+  {
+    "symbol": "EQIX",
+    "name": "Equinix Inc",
+    "finnhubIndustry": "Real Estate",
+    "sector": "Real Estate",
+    "correlation": "Taux ↓↓ — sensible aux taux hypothécaires",
+    "index": "SP500"
+  },
+  {
+    "symbol": "ERF.PA",
+    "name": "Eurofins Scientific",
+    "finnhubIndustry": "Life Sciences Tools & Services",
+    "sector": "Life Sciences Tools & Services",
+    "correlation": "Tests labo, pharma — Eurofins",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "ETN",
+    "name": "Eaton Corporation PLC",
+    "finnhubIndustry": "Electrical Equipment",
+    "sector": "Electrical Equipment",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "EXC",
+    "name": "Exelon Corp",
+    "finnhubIndustry": "Utilities",
+    "sector": "Utilities",
+    "correlation": "Taux ↓ — défensif, proxy obligataire",
+    "index": "SP500"
+  },
+  {
+    "symbol": "EXPN.L",
+    "name": "Experian",
+    "finnhubIndustry": "Financial Services",
+    "sector": "Financial Services",
+    "correlation": "Données crédit — Experian",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "EZJ.L",
+    "name": "easyJet",
+    "finnhubIndustry": "Airlines",
+    "sector": "Airlines",
+    "correlation": "CL=F ↓↓ — easyJet, low cost",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "F",
+    "name": "Ford Motor Co",
+    "finnhubIndustry": "Automobiles",
+    "sector": "Automobiles",
+    "correlation": "EUR/USD, tarifs douaniers",
+    "index": "SP500"
+  },
+  {
+    "symbol": "FANG",
+    "name": "Diamondback Energy Inc",
+    "finnhubIndustry": "Energy",
+    "sector": "Energy",
+    "correlation": "CL=F (pétrole) ↑↑",
+    "index": "SP500"
+  },
+  {
+    "symbol": "FAST",
+    "name": "Fastenal Co",
+    "finnhubIndustry": "Trading Companies & Distributors",
+    "sector": "Trading Companies & Distributors",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "FCX",
+    "name": "Freeport-McMoRan Inc",
+    "finnhubIndustry": "Metals & Mining",
+    "sector": "Metals & Mining",
+    "correlation": "GC=F, SI=F — corrélé aux métaux précieux",
+    "index": "SP500"
+  },
+  {
+    "symbol": "FDS",
+    "name": "Factset Research Systems Inc",
+    "finnhubIndustry": "Financial Services",
+    "sector": "Financial Services",
+    "correlation": "Yields, ^GSPC",
+    "index": "SP500"
+  },
+  {
+    "symbol": "FDX",
+    "name": "FedEx Corp",
+    "finnhubIndustry": "Logistics & Transportation",
+    "sector": "Logistics & Transportation",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "FERG.L",
+    "name": "Ferguson",
+    "finnhubIndustry": "Building Products",
+    "sector": "Building Products",
+    "correlation": "Plomberie, construction — Ferguson",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "FLTR.L",
+    "name": "Flutter Entertainment",
+    "finnhubIndustry": "Gambling",
+    "sector": "Gambling",
+    "correlation": "Paris sportifs — Flutter (FanDuel)",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "FRE.DE",
+    "name": "Fresenius",
+    "finnhubIndustry": "Medical Devices",
+    "sector": "Medical Devices",
+    "correlation": "Défensif, dialyse — Fresenius",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "FTV",
+    "name": "Fortive Corp",
+    "finnhubIndustry": "Machinery",
+    "sector": "Machinery",
+    "correlation": "Prix agricoles (blé, maïs, soja) — santé économie agricole",
+    "index": "SP500"
+  },
+  {
+    "symbol": "GD",
+    "name": "General Dynamics Corp",
+    "finnhubIndustry": "Aerospace & Defense",
+    "sector": "Aerospace & Defense",
+    "correlation": "Géopolitique ↑↑ — tensions = commandes",
+    "index": "SP500"
+  },
+  {
+    "symbol": "GE",
+    "name": "General Electric Co",
+    "finnhubIndustry": "Aerospace & Defense",
+    "sector": "Aerospace & Defense",
+    "correlation": "Géopolitique ↑↑ — tensions = commandes",
+    "index": "SP500"
+  },
+  {
+    "symbol": "GILD",
+    "name": "Gilead Sciences Inc",
+    "finnhubIndustry": "Biotechnology",
+    "sector": "Biotechnology",
+    "correlation": "FDA, pipelines — très binaire (approbation ou rejet)",
+    "index": "SP500"
+  },
+  {
+    "symbol": "GLE.PA",
+    "name": "Société Générale",
+    "finnhubIndustry": "Banks",
+    "sector": "Banks",
+    "correlation": "Yields ↑, spread 10Y-2Y ↑",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "GLEN.L",
+    "name": "Glencore",
+    "finnhubIndustry": "Metals & Mining",
+    "sector": "Metals & Mining",
+    "correlation": "Matières premières diversifiées — Glencore",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "GM",
+    "name": "General Motors Co",
+    "finnhubIndustry": "Automobiles",
+    "sector": "Automobiles",
+    "correlation": "EUR/USD, tarifs douaniers",
+    "index": "SP500"
+  },
+  {
+    "symbol": "GOOG",
+    "name": "Alphabet Inc",
+    "finnhubIndustry": "Media",
+    "sector": "Media",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "GOOGL",
+    "name": "Alphabet Inc",
+    "finnhubIndustry": "Media",
+    "sector": "Media",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "GS",
+    "name": "Goldman Sachs Group Inc",
+    "finnhubIndustry": "Financial Services",
+    "sector": "Financial Services",
+    "correlation": "Yields, ^GSPC",
+    "index": "SP500"
+  },
+  {
+    "symbol": "GSK.L",
+    "name": "GSK",
+    "finnhubIndustry": "Drug Manufacturers",
+    "sector": "Drug Manufacturers",
+    "correlation": "Pharma défensif — GSK",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "GWW",
+    "name": "WW Grainger Inc",
+    "finnhubIndustry": "Trading Companies & Distributors",
+    "sector": "Trading Companies & Distributors",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "H",
+    "name": "Hyatt Hotels Corp",
+    "finnhubIndustry": "Hotels, Restaurants & Leisure",
+    "sector": "Hotels, Restaurants & Leisure",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "HAL",
+    "name": "Halliburton Co",
+    "finnhubIndustry": "Energy",
+    "sector": "Energy",
+    "correlation": "CL=F (pétrole) ↑↑",
+    "index": "SP500"
+  },
+  {
+    "symbol": "HCA",
+    "name": "HCA Healthcare Inc",
+    "finnhubIndustry": "Health Care",
+    "sector": "Health Care",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "HD",
+    "name": "Home Depot Inc",
+    "finnhubIndustry": "Retail",
+    "sector": "Retail",
+    "correlation": "Consommateur US, confiance, emploi",
+    "index": "SP500"
+  },
+  {
+    "symbol": "HEI.DE",
+    "name": "HeidelbergMaterials",
+    "finnhubIndustry": "Utilities",
+    "sector": "Utilities",
+    "correlation": "Gaz naturel, ciment — HeidelbergCement",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "HFG.DE",
+    "name": "HelloFresh",
+    "finnhubIndustry": "Food Products",
+    "sector": "Food Products",
+    "correlation": "Meal kits, consommateur — HelloFresh",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "HII",
+    "name": "Huntington Ingalls Industries Inc",
+    "finnhubIndustry": "Aerospace & Defense",
+    "sector": "Aerospace & Defense",
+    "correlation": "Géopolitique ↑↑ — tensions = commandes",
+    "index": "SP500"
+  },
+  {
+    "symbol": "HLN.L",
+    "name": "Haleon",
+    "finnhubIndustry": "Consumer products",
+    "sector": "Consumer products",
+    "correlation": "Santé consommateur, OTC — Haleon",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "HLT",
+    "name": "Hilton Worldwide Holdings Inc",
+    "finnhubIndustry": "Hotels, Restaurants & Leisure",
+    "sector": "Hotels, Restaurants & Leisure",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "HNR1.DE",
+    "name": "Hannover Re",
+    "finnhubIndustry": "Utilities",
+    "sector": "Utilities",
+    "correlation": "Énergie — Hannover Rück",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "HO.PA",
+    "name": "Thales",
+    "finnhubIndustry": "Aerospace & Defense",
+    "sector": "Aerospace & Defense",
+    "correlation": "Géopolitique ↑↑, défense, cybersécurité",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "HON",
+    "name": "Honeywell International Inc",
+    "finnhubIndustry": "Industrial Conglomerates",
+    "sector": "Industrial Conglomerates",
+    "correlation": "Cycle économique, PMI Manufacturing",
+    "index": "SP500"
+  },
+  {
+    "symbol": "HPE",
+    "name": "Hewlett Packard Enterprise Co",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "^IXIC ↑, taux ↓↓",
+    "index": "SP500"
+  },
+  {
+    "symbol": "HPQ",
+    "name": "HP Inc",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "^IXIC ↑, taux ↓↓",
+    "index": "SP500"
+  },
+  {
+    "symbol": "HSBA.L",
+    "name": "HSBC",
+    "finnhubIndustry": "Banks",
+    "sector": "Banks",
+    "correlation": "Yields ↑, Asie — HSBC",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "HUM",
+    "name": "Humana Inc",
+    "finnhubIndustry": "Health Care",
+    "sector": "Health Care",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "IAG.L",
+    "name": "IAG",
+    "finnhubIndustry": "Airlines",
+    "sector": "Airlines",
+    "correlation": "CL=F ↓↓ — British Airways, Iberia",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "IBM",
+    "name": "International Business Machines Corp",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "^IXIC ↑, taux ↓↓",
+    "index": "SP500"
+  },
+  {
+    "symbol": "ICE",
+    "name": "Intercontinental Exchange Inc",
+    "finnhubIndustry": "Financial Services",
+    "sector": "Financial Services",
+    "correlation": "Yields, ^GSPC",
+    "index": "SP500"
+  },
+  {
+    "symbol": "IDXX",
+    "name": "IDEXX Laboratories Inc",
+    "finnhubIndustry": "Health Care",
+    "sector": "Health Care",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "IFF",
+    "name": "International Flavors & Fragrances Inc",
+    "finnhubIndustry": "Chemicals",
+    "sector": "Chemicals",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "IFX.DE",
+    "name": "Infineon Technologies",
+    "finnhubIndustry": "Semiconductors",
+    "sector": "Semiconductors",
+    "correlation": "^IXIC ↑, auto EV — Infineon",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "IHG.L",
+    "name": "InterContinental Hotels",
+    "finnhubIndustry": "Hotels, Restaurants & Leisure",
+    "sector": "Hotels, Restaurants & Leisure",
+    "correlation": "Tourisme, voyage — InterContinental",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "III.L",
+    "name": "3i Group",
+    "finnhubIndustry": "Financial Services",
+    "sector": "Financial Services",
+    "correlation": "Gestion actifs — 3i Group",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "ILMN",
+    "name": "Illumina Inc",
+    "finnhubIndustry": "Life Sciences Tools & Services",
+    "sector": "Life Sciences Tools & Services",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "IMB.L",
+    "name": "Imperial Brands",
+    "finnhubIndustry": "Tobacco",
+    "sector": "Tobacco",
+    "correlation": "Défensif, dividendes — Imperial Brands",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "INTC",
+    "name": "Intel Corp",
+    "finnhubIndustry": "Semiconductors",
+    "sector": "Semiconductors",
+    "correlation": "^IXIC ↑, ^KS11 — supply chain asiatique",
+    "index": "SP500"
+  },
+  {
+    "symbol": "INTU",
+    "name": "Intuit Inc",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "^IXIC ↑, taux ↓↓",
+    "index": "SP500"
+  },
+  {
+    "symbol": "IP",
+    "name": "International Paper Co",
+    "finnhubIndustry": "Packaging",
+    "sector": "Packaging",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "IQV",
+    "name": "IQVIA Holdings Inc",
+    "finnhubIndustry": "Life Sciences Tools & Services",
+    "sector": "Life Sciences Tools & Services",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "IR",
+    "name": "Ingersoll Rand Inc",
+    "finnhubIndustry": "Machinery",
+    "sector": "Machinery",
+    "correlation": "Prix agricoles (blé, maïs, soja) — santé économie agricole",
+    "index": "SP500"
+  },
+  {
+    "symbol": "ISRG",
+    "name": "Intuitive Surgical Inc",
+    "finnhubIndustry": "Health Care",
+    "sector": "Health Care",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "ITW",
+    "name": "Illinois Tool Works Inc",
+    "finnhubIndustry": "Machinery",
+    "sector": "Machinery",
+    "correlation": "Prix agricoles (blé, maïs, soja) — santé économie agricole",
+    "index": "SP500"
+  },
+  {
+    "symbol": "JNJ",
+    "name": "Johnson & Johnson",
+    "finnhubIndustry": "Pharmaceuticals",
+    "sector": "Pharmaceuticals",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "JPM",
+    "name": "JPMorgan Chase & Co",
+    "finnhubIndustry": "Banking",
+    "sector": "Banking",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "KER.PA",
+    "name": "Kering",
+    "finnhubIndustry": "Luxury Goods",
+    "sector": "Luxury Goods",
+    "correlation": "Chine ↑↑, EUR/USD — Gucci, Saint-Laurent",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "KEYS",
+    "name": "Keysight Technologies Inc",
+    "finnhubIndustry": "Electrical Equipment",
+    "sector": "Electrical Equipment",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "KKR",
+    "name": "KKR & Co Inc",
+    "finnhubIndustry": "Financial Services",
+    "sector": "Financial Services",
+    "correlation": "Yields, ^GSPC",
+    "index": "SP500"
+  },
+  {
+    "symbol": "KLAC",
+    "name": "KLA Corp",
+    "finnhubIndustry": "Semiconductors",
+    "sector": "Semiconductors",
+    "correlation": "^IXIC ↑, ^KS11 — supply chain asiatique",
+    "index": "SP500"
+  },
+  {
+    "symbol": "KO",
+    "name": "Coca-Cola Co",
+    "finnhubIndustry": "Beverages",
+    "sector": "Beverages",
+    "correlation": "Défensif, consommation de base",
+    "index": "SP500"
+  },
+  {
+    "symbol": "LDOS",
+    "name": "Leidos Holdings Inc",
+    "finnhubIndustry": "Professional Services",
+    "sector": "Professional Services",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "LEN",
+    "name": "Lennar Corp",
+    "finnhubIndustry": "Consumer products",
+    "sector": "Consumer products",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "LGEN.L",
+    "name": "Legal & General",
+    "finnhubIndustry": "Insurance",
+    "sector": "Insurance",
+    "correlation": "Yields ↑, retraites — Legal & General",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "LHX",
+    "name": "L3Harris Technologies Inc",
+    "finnhubIndustry": "Aerospace & Defense",
+    "sector": "Aerospace & Defense",
+    "correlation": "Géopolitique ↑↑ — tensions = commandes",
+    "index": "SP500"
+  },
+  {
+    "symbol": "LIN",
+    "name": "Linde PLC",
+    "finnhubIndustry": "Chemicals",
+    "sector": "Chemicals",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "LLOY.L",
+    "name": "Lloyds Banking Group",
+    "finnhubIndustry": "Banks",
+    "sector": "Banks",
+    "correlation": "Yields ↑, immobilier UK — Lloyds",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "LLY",
+    "name": "Eli Lilly and Co",
+    "finnhubIndustry": "Pharmaceuticals",
+    "sector": "Pharmaceuticals",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "LMT",
+    "name": "Lockheed Martin Corp",
+    "finnhubIndustry": "Aerospace & Defense",
+    "sector": "Aerospace & Defense",
+    "correlation": "Géopolitique ↑↑ — tensions = commandes",
+    "index": "SP500"
+  },
+  {
+    "symbol": "LOW",
+    "name": "Lowe's Companies Inc",
+    "finnhubIndustry": "Retail",
+    "sector": "Retail",
+    "correlation": "Consommateur US, confiance, emploi",
+    "index": "SP500"
+  },
+  {
+    "symbol": "LR.PA",
+    "name": "Legrand",
+    "finnhubIndustry": "Electrical Equipment",
+    "sector": "Electrical Equipment",
+    "correlation": "Construction, rénovation bâtiment",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "LRCX",
+    "name": "Lam Research Corp",
+    "finnhubIndustry": "Semiconductors",
+    "sector": "Semiconductors",
+    "correlation": "^IXIC ↑, ^KS11 — supply chain asiatique",
+    "index": "SP500"
+  },
+  {
+    "symbol": "LUV",
+    "name": "Southwest Airlines Co",
+    "finnhubIndustry": "Airlines",
+    "sector": "Airlines",
+    "correlation": "CL=F (pétrole) ↓↓ — kérosène = 1er poste de coûts",
+    "index": "SP500"
+  },
+  {
+    "symbol": "LVS",
+    "name": "Las Vegas Sands Corp",
+    "finnhubIndustry": "Hotels, Restaurants & Leisure",
+    "sector": "Hotels, Restaurants & Leisure",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "LYB",
+    "name": "LyondellBasell Industries NV",
+    "finnhubIndustry": "Chemicals",
+    "sector": "Chemicals",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "LYFT",
+    "name": "Lyft Inc",
+    "finnhubIndustry": "Road & Rail",
+    "sector": "Road & Rail",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "MA",
+    "name": "Mastercard Inc",
+    "finnhubIndustry": "Financial Services",
+    "sector": "Financial Services",
+    "correlation": "Yields, ^GSPC",
+    "index": "SP500"
+  },
+  {
+    "symbol": "MAR",
+    "name": "Marriott International Inc",
+    "finnhubIndustry": "Hotels, Restaurants & Leisure",
+    "sector": "Hotels, Restaurants & Leisure",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "MBG.DE",
+    "name": "Mercedes-Benz",
+    "finnhubIndustry": "Automobiles",
+    "sector": "Automobiles",
+    "correlation": "EUR/USD, tarifs — Mercedes-Benz",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "MC.PA",
+    "name": "LVMH",
+    "finnhubIndustry": "Luxury Goods",
+    "sector": "Luxury Goods",
+    "correlation": "Chine ↑↑, EUR/USD — LVMH Louis Vuitton, Dior",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "MCD",
+    "name": "McDonald's Corp",
+    "finnhubIndustry": "Hotels, Restaurants & Leisure",
+    "sector": "Hotels, Restaurants & Leisure",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "MCO",
+    "name": "Moody's Corp",
+    "finnhubIndustry": "Financial Services",
+    "sector": "Financial Services",
+    "correlation": "Yields, ^GSPC",
+    "index": "SP500"
+  },
+  {
+    "symbol": "MDT",
+    "name": "Medtronic PLC",
+    "finnhubIndustry": "Health Care",
+    "sector": "Health Care",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "MET",
+    "name": "MetLife Inc",
+    "finnhubIndustry": "Insurance",
+    "sector": "Insurance",
+    "correlation": "Yields ↑ — portefeuille obligataire",
+    "index": "SP500"
+  },
+  {
+    "symbol": "META",
+    "name": "Meta Platforms Inc",
+    "finnhubIndustry": "Media",
+    "sector": "Media",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "MGM",
+    "name": "MGM Resorts International",
+    "finnhubIndustry": "Hotels, Restaurants & Leisure",
+    "sector": "Hotels, Restaurants & Leisure",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "ML.PA",
+    "name": "Michelin",
+    "finnhubIndustry": "Metals & Mining",
+    "sector": "Metals & Mining",
+    "correlation": "Manganèse, nickel — métaux industriels",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "MMC",
+    "name": "Marsh & McLennan",
+    "finnhubIndustry": "Insurance",
+    "sector": "Insurance",
+    "correlation": "Courtage assurance — Marsh McLennan",
+    "index": "SP500"
+  },
+  {
+    "symbol": "MMM",
+    "name": "3M Co",
+    "finnhubIndustry": "Industrial Conglomerates",
+    "sector": "Industrial Conglomerates",
+    "correlation": "Cycle économique, PMI Manufacturing",
+    "index": "SP500"
+  },
+  {
+    "symbol": "MNDI.L",
+    "name": "Mondi",
+    "finnhubIndustry": "Packaging",
+    "sector": "Packaging",
+    "correlation": "Cycle industriel — Mondi",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "MNG.L",
+    "name": "M&G",
+    "finnhubIndustry": "Financial Services",
+    "sector": "Financial Services",
+    "correlation": "Gestion actifs — M&G",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "MO",
+    "name": "Altria Group Inc",
+    "finnhubIndustry": "Tobacco",
+    "sector": "Tobacco",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "MOS",
+    "name": "Mosaic Co",
+    "finnhubIndustry": "Chemicals",
+    "sector": "Chemicals",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "MPC",
+    "name": "Marathon Petroleum Corp",
+    "finnhubIndustry": "Energy",
+    "sector": "Energy",
+    "correlation": "CL=F (pétrole) ↑↑",
+    "index": "SP500"
+  },
+  {
+    "symbol": "MRK",
+    "name": "Merck & Co Inc",
+    "finnhubIndustry": "Pharmaceuticals",
+    "sector": "Pharmaceuticals",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "MRK.DE",
+    "name": "Merck KGaA",
+    "finnhubIndustry": "Drug Manufacturers",
+    "sector": "Drug Manufacturers",
+    "correlation": "Pharma, semi-conducteurs — Merck KGaA",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "MS",
+    "name": "Morgan Stanley",
+    "finnhubIndustry": "Financial Services",
+    "sector": "Financial Services",
+    "correlation": "Yields, ^GSPC",
+    "index": "SP500"
+  },
+  {
+    "symbol": "MSCI",
+    "name": "MSCI Inc",
+    "finnhubIndustry": "Financial Services",
+    "sector": "Financial Services",
+    "correlation": "Yields, ^GSPC",
+    "index": "SP500"
+  },
+  {
+    "symbol": "MSFT",
+    "name": "Microsoft Corp",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "^IXIC ↑, taux ↓↓",
+    "index": "SP500"
+  },
+  {
+    "symbol": "MT.AS",
+    "name": "ArcelorMittal",
+    "finnhubIndustry": "Metals & Mining",
+    "sector": "Metals & Mining",
+    "correlation": "Acier, ArcelorMittal — cycle industriel mondial",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "MTD",
+    "name": "Mettler-Toledo International Inc",
+    "finnhubIndustry": "Life Sciences Tools & Services",
+    "sector": "Life Sciences Tools & Services",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "MTX.DE",
+    "name": "MTU Aero Engines",
+    "finnhubIndustry": "Chemicals",
+    "sector": "Chemicals",
+    "correlation": "Gaz spéciaux — MTU Aero Engines",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "MU",
+    "name": "Micron Technology Inc",
+    "finnhubIndustry": "Semiconductors",
+    "sector": "Semiconductors",
+    "correlation": "^IXIC ↑, ^KS11 — supply chain asiatique",
+    "index": "SP500"
+  },
+  {
+    "symbol": "MUV2.DE",
+    "name": "Munich Re",
+    "finnhubIndustry": "Insurance",
+    "sector": "Insurance",
+    "correlation": "Yields ↑, catastrophes naturelles — Munich Re",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "NCLH",
+    "name": "Norwegian Cruise Line Holdings Ltd",
+    "finnhubIndustry": "Hotels, Restaurants & Leisure",
+    "sector": "Hotels, Restaurants & Leisure",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "NEE",
+    "name": "Nextera Energy Inc",
+    "finnhubIndustry": "Utilities",
+    "sector": "Utilities",
+    "correlation": "Taux ↓ — défensif, proxy obligataire",
+    "index": "SP500"
+  },
+  {
+    "symbol": "NEM",
+    "name": "Newmont Corporation",
+    "finnhubIndustry": "Metals & Mining",
+    "sector": "Metals & Mining",
+    "correlation": "GC=F, SI=F — corrélé aux métaux précieux",
+    "index": "SP500"
+  },
+  {
+    "symbol": "NET",
+    "name": "Cloudflare Inc",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "^IXIC ↑, taux ↓↓",
+    "index": "SP500"
+  },
+  {
+    "symbol": "NFLX",
+    "name": "Netflix Inc",
+    "finnhubIndustry": "Media",
+    "sector": "Media",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "NG.L",
+    "name": "National Grid",
+    "finnhubIndustry": "Utilities",
+    "sector": "Utilities",
+    "correlation": "Gaz, électricité UK — National Grid",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "NKE",
+    "name": "Nike Inc",
+    "finnhubIndustry": "Textiles, Apparel & Luxury Goods",
+    "sector": "Textiles, Apparel & Luxury Goods",
+    "correlation": "Chine, EUR/USD",
+    "index": "SP500"
+  },
+  {
+    "symbol": "NOC",
+    "name": "Northrop Grumman Corp",
+    "finnhubIndustry": "Aerospace & Defense",
+    "sector": "Aerospace & Defense",
+    "correlation": "Géopolitique ↑↑ — tensions = commandes",
+    "index": "SP500"
+  },
+  {
+    "symbol": "NOW",
+    "name": "ServiceNow Inc",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "^IXIC ↑, taux ↓↓",
+    "index": "SP500"
+  },
+  {
+    "symbol": "NSC",
+    "name": "Norfolk Southern Corp",
+    "finnhubIndustry": "Road & Rail",
+    "sector": "Road & Rail",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "NUE",
+    "name": "Nucor Corp",
+    "finnhubIndustry": "Metals & Mining",
+    "sector": "Metals & Mining",
+    "correlation": "GC=F, SI=F — corrélé aux métaux précieux",
+    "index": "SP500"
+  },
+  {
+    "symbol": "NVDA",
+    "name": "NVIDIA Corp",
+    "finnhubIndustry": "Semiconductors",
+    "sector": "Semiconductors",
+    "correlation": "^IXIC ↑, ^KS11 — supply chain asiatique",
+    "index": "SP500"
+  },
+  {
+    "symbol": "NVR",
+    "name": "NVR Inc",
+    "finnhubIndustry": "Consumer products",
+    "sector": "Consumer products",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "NWG.L",
+    "name": "NatWest Group",
+    "finnhubIndustry": "Banks",
+    "sector": "Banks",
+    "correlation": "Yields ↑, retail banking UK — NatWest",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "OKE",
+    "name": "ONEOK Inc",
+    "finnhubIndustry": "Energy",
+    "sector": "Energy",
+    "correlation": "CL=F (pétrole) ↑↑",
+    "index": "SP500"
+  },
+  {
+    "symbol": "OKTA",
+    "name": "Okta Inc",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "^IXIC ↑, taux ↓↓",
+    "index": "SP500"
+  },
+  {
+    "symbol": "OR.PA",
+    "name": "L'Oréal",
+    "finnhubIndustry": "Consumer products",
+    "sector": "Consumer products",
+    "correlation": "Consommateur mondial, Chine, cosmétiques",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "ORA.PA",
+    "name": "Orange",
+    "finnhubIndustry": "Telecom Services",
+    "sector": "Telecom Services",
+    "correlation": "Défensif, dividendes, régulation télécom",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "ORCL",
+    "name": "Oracle Corp",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "^IXIC ↑, taux ↓↓",
+    "index": "SP500"
+  },
+  {
+    "symbol": "P911.DE",
+    "name": "Porsche AG",
+    "finnhubIndustry": "Automobiles",
+    "sector": "Automobiles",
+    "correlation": "Luxe auto, Chine — Porsche AG",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "PAH3.DE",
+    "name": "Porsche SE",
+    "finnhubIndustry": "Automobiles",
+    "sector": "Automobiles",
+    "correlation": "Volkswagen, Porsche, Bugatti — holding auto",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "PANW",
+    "name": "Palo Alto Networks Inc",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "^IXIC ↑, taux ↓↓",
+    "index": "SP500"
+  },
+  {
+    "symbol": "PEP",
+    "name": "PepsiCo Inc",
+    "finnhubIndustry": "Beverages",
+    "sector": "Beverages",
+    "correlation": "Défensif, consommation de base",
+    "index": "SP500"
+  },
+  {
+    "symbol": "PG",
+    "name": "Procter & Gamble Co",
+    "finnhubIndustry": "Consumer products",
+    "sector": "Consumer products",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "PGR",
+    "name": "Progressive Corp",
+    "finnhubIndustry": "Insurance",
+    "sector": "Insurance",
+    "correlation": "Yields ↑ — portefeuille obligataire",
+    "index": "SP500"
+  },
+  {
+    "symbol": "PH",
+    "name": "Parker-Hannifin Corp",
+    "finnhubIndustry": "Machinery",
+    "sector": "Machinery",
+    "correlation": "Prix agricoles (blé, maïs, soja) — santé économie agricole",
+    "index": "SP500"
+  },
+  {
+    "symbol": "PHM",
+    "name": "Pultegroup Inc",
+    "finnhubIndustry": "Consumer products",
+    "sector": "Consumer products",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "PKG",
+    "name": "Packaging Corp of America",
+    "finnhubIndustry": "Packaging",
+    "sector": "Packaging",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "PLD",
+    "name": "Prologis Inc",
+    "finnhubIndustry": "Real Estate",
+    "sector": "Real Estate",
+    "correlation": "Taux ↓↓ — sensible aux taux hypothécaires",
+    "index": "SP500"
+  },
+  {
+    "symbol": "PLTR",
+    "name": "Palantir Technologies Inc",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "^IXIC ↑, taux ↓↓",
+    "index": "SP500"
+  },
+  {
+    "symbol": "PM",
+    "name": "Philip Morris International Inc",
+    "finnhubIndustry": "Tobacco",
+    "sector": "Tobacco",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "PNC",
+    "name": "PNC Financial Services Group Inc",
+    "finnhubIndustry": "Banking",
+    "sector": "Banking",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "PRU",
+    "name": "Prudential Financial Inc",
+    "finnhubIndustry": "Insurance",
+    "sector": "Insurance",
+    "correlation": "Yields ↑ — portefeuille obligataire",
+    "index": "SP500"
+  },
+  {
+    "symbol": "PRU.L",
+    "name": "Prudential",
+    "finnhubIndustry": "Insurance",
+    "sector": "Insurance",
+    "correlation": "Asie, yields — Prudential",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "PSON.L",
+    "name": "Pearson",
+    "finnhubIndustry": "Media",
+    "sector": "Media",
+    "correlation": "Éducation — Pearson",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "PSX",
+    "name": "Phillips 66",
+    "finnhubIndustry": "Energy",
+    "sector": "Energy",
+    "correlation": "CL=F (pétrole) ↑↑",
+    "index": "SP500"
+  },
+  {
+    "symbol": "PUB.PA",
+    "name": "Publicis Groupe",
+    "finnhubIndustry": "Media",
+    "sector": "Media",
+    "correlation": "Publicité, cycle économique",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "PXD",
+    "name": "Pioneer Natural Resources",
+    "finnhubIndustry": "Oil & Gas E&P",
+    "sector": "Oil & Gas E&P",
+    "correlation": "CL=F ↑↑ — Pioneer Natural Resources",
+    "index": "SP500"
+  },
+  {
+    "symbol": "PYPL",
+    "name": "PayPal Holdings Inc",
+    "finnhubIndustry": "Financial Services",
+    "sector": "Financial Services",
+    "correlation": "Yields, ^GSPC",
+    "index": "SP500"
+  },
+  {
+    "symbol": "QCOM",
+    "name": "Qualcomm Inc",
+    "finnhubIndustry": "Semiconductors",
+    "sector": "Semiconductors",
+    "correlation": "^IXIC ↑, ^KS11 — supply chain asiatique",
+    "index": "SP500"
+  },
+  {
+    "symbol": "QGEN.DE",
+    "name": "Qiagen",
+    "finnhubIndustry": "Life Sciences Tools & Services",
+    "sector": "Life Sciences Tools & Services",
+    "correlation": "Diagnostics moléculaires — Qiagen",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "RCL",
+    "name": "Royal Caribbean Cruises Ltd",
+    "finnhubIndustry": "Hotels, Restaurants & Leisure",
+    "sector": "Hotels, Restaurants & Leisure",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "REGN",
+    "name": "Regeneron Pharmaceuticals Inc",
+    "finnhubIndustry": "Biotechnology",
+    "sector": "Biotechnology",
+    "correlation": "FDA, pipelines — très binaire (approbation ou rejet)",
+    "index": "SP500"
+  },
+  {
+    "symbol": "REL.L",
+    "name": "RELX",
+    "finnhubIndustry": "Media",
+    "sector": "Media",
+    "correlation": "Édition scientifique — RELX",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "RHM.DE",
+    "name": "Rheinmetall",
+    "finnhubIndustry": "Aerospace & Defense",
+    "sector": "Aerospace & Defense",
+    "correlation": "Géopolitique ↑↑, défense Europe — Rheinmetall",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "RI.PA",
+    "name": "Pernod Ricard",
+    "finnhubIndustry": "Beverages",
+    "sector": "Beverages",
+    "correlation": "Défensif, consommation de base — Pernod Ricard",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "RIO.L",
+    "name": "Rio Tinto",
+    "finnhubIndustry": "Metals & Mining",
+    "sector": "Metals & Mining",
+    "correlation": "Fer, cuivre, Chine — Rio Tinto",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "RKT.L",
+    "name": "Reckitt",
+    "finnhubIndustry": "Consumer products",
+    "sector": "Consumer products",
+    "correlation": "Consommation de base — Reckitt",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "RMS.PA",
+    "name": "Hermès",
+    "finnhubIndustry": "Luxury Goods",
+    "sector": "Luxury Goods",
+    "correlation": "Chine ↑↑, EUR/USD, tourisme asiatique",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "RNO.PA",
+    "name": "Renault",
+    "finnhubIndustry": "Automobiles",
+    "sector": "Automobiles",
+    "correlation": "EUR/USD, tarifs, transition EV",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "ROK",
+    "name": "Rockwell Automation Inc",
+    "finnhubIndustry": "Electrical Equipment",
+    "sector": "Electrical Equipment",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "RR.L",
+    "name": "Rolls-Royce",
+    "finnhubIndustry": "Aerospace & Defense",
+    "sector": "Aerospace & Defense",
+    "correlation": "Moteurs d'avion, défense — Rolls-Royce",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "RSG",
+    "name": "Republic Services Inc",
+    "finnhubIndustry": "Commercial Services & Supplies",
+    "sector": "Commercial Services & Supplies",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "RTX",
+    "name": "RTX Corp",
+    "finnhubIndustry": "Aerospace & Defense",
+    "sector": "Aerospace & Defense",
+    "correlation": "Géopolitique ↑↑ — tensions = commandes",
+    "index": "SP500"
+  },
+  {
+    "symbol": "RWE.DE",
+    "name": "RWE",
+    "finnhubIndustry": "Utilities",
+    "sector": "Utilities",
+    "correlation": "Énergie renouvelable, charbon, gaz — RWE",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "SAF.PA",
+    "name": "Safran",
+    "finnhubIndustry": "Aerospace & Defense",
+    "sector": "Aerospace & Defense",
+    "correlation": "Aéronautique, défense, moteurs — corrélé AIR.PA",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "SAIC",
+    "name": "Science Applications International Corp",
+    "finnhubIndustry": "Professional Services",
+    "sector": "Professional Services",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "SAN.PA",
+    "name": "Sanofi",
+    "finnhubIndustry": "Drug Manufacturers",
+    "sector": "Drug Manufacturers",
+    "correlation": "FDA, pipelines R&D, pharma défensif",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "SAP.DE",
+    "name": "SAP",
+    "finnhubIndustry": "Software",
+    "sector": "Software",
+    "correlation": "^IXIC ↑, taux ↓↓ — ERP, cloud",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "SBUX",
+    "name": "Starbucks Corp",
+    "finnhubIndustry": "Hotels, Restaurants & Leisure",
+    "sector": "Hotels, Restaurants & Leisure",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "SCHW",
+    "name": "Charles Schwab Corp",
+    "finnhubIndustry": "Financial Services",
+    "sector": "Financial Services",
+    "correlation": "Yields, ^GSPC",
+    "index": "SP500"
+  },
+  {
+    "symbol": "SDR.L",
+    "name": "Schroders",
+    "finnhubIndustry": "Financial Services",
+    "sector": "Financial Services",
+    "correlation": "Gestion actifs — Schroders",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "SGE.L",
+    "name": "Sage Group",
+    "finnhubIndustry": "Software",
+    "sector": "Software",
+    "correlation": "ERP PME — Sage Group",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "SGO.PA",
+    "name": "Saint-Gobain",
+    "finnhubIndustry": "Building Products",
+    "sector": "Building Products",
+    "correlation": "Construction, immobilier, taux",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "SHEL.L",
+    "name": "Shell",
+    "finnhubIndustry": "Oil & Gas Integrated",
+    "sector": "Oil & Gas Integrated",
+    "correlation": "CL=F ↑↑ — Shell, major pétrolière",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "SHL.DE",
+    "name": "Siemens Healthineers",
+    "finnhubIndustry": "Medical Devices",
+    "sector": "Medical Devices",
+    "correlation": "Défensif, dialyse — Siemens Healthineers",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "SHOP",
+    "name": "Shopify Inc",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "^IXIC ↑, taux ↓↓",
+    "index": "SP500"
+  },
+  {
+    "symbol": "SHW",
+    "name": "Sherwin-Williams Co",
+    "finnhubIndustry": "Chemicals",
+    "sector": "Chemicals",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "SIE.DE",
+    "name": "Siemens",
+    "finnhubIndustry": "Industrial Conglomerates",
+    "sector": "Industrial Conglomerates",
+    "correlation": "Cycle industriel, automatisation — Siemens",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "SKG.L",
+    "name": "Smurfit Kappa",
+    "finnhubIndustry": "Packaging",
+    "sector": "Packaging",
+    "correlation": "Emballage, cycle industriel — Smurfit Kappa",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "SLB",
+    "name": "Slb NV",
+    "finnhubIndustry": "Energy",
+    "sector": "Energy",
+    "correlation": "CL=F (pétrole) ↑↑",
+    "index": "SP500"
+  },
+  {
+    "symbol": "SMCI",
+    "name": "Super Micro Computer Inc",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "^IXIC ↑, taux ↓↓",
+    "index": "SP500"
+  },
+  {
+    "symbol": "SNAP",
+    "name": "Snap Inc",
+    "finnhubIndustry": "Media",
+    "sector": "Media",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "SNOW",
+    "name": "Snowflake Inc",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "^IXIC ↑, taux ↓↓",
+    "index": "SP500"
+  },
+  {
+    "symbol": "SNPS",
+    "name": "Synopsys Inc",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "^IXIC ↑, taux ↓↓",
+    "index": "SP500"
+  },
+  {
+    "symbol": "SO",
+    "name": "Southern Co",
+    "finnhubIndustry": "Utilities",
+    "sector": "Utilities",
+    "correlation": "Taux ↓ — défensif, proxy obligataire",
+    "index": "SP500"
+  },
+  {
+    "symbol": "SPG",
+    "name": "Simon Property Group Inc",
+    "finnhubIndustry": "Real Estate",
+    "sector": "Real Estate",
+    "correlation": "Taux ↓↓ — sensible aux taux hypothécaires",
+    "index": "SP500"
+  },
+  {
+    "symbol": "SPGI",
+    "name": "S&P Global Inc",
+    "finnhubIndustry": "Financial Services",
+    "sector": "Financial Services",
+    "correlation": "Yields, ^GSPC",
+    "index": "SP500"
+  },
+  {
+    "symbol": "SQ",
+    "name": "Block (Square)",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "Fintech, crypto — Block (Square)",
+    "index": "SP500"
+  },
+  {
+    "symbol": "SRT3.DE",
+    "name": "Sartorius",
+    "finnhubIndustry": "Life Sciences Tools & Services",
+    "sector": "Life Sciences Tools & Services",
+    "correlation": "Biopharma equipment — Sartorius",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "SSE.L",
+    "name": "SSE",
+    "finnhubIndustry": "Utilities",
+    "sector": "Utilities",
+    "correlation": "Énergie renouvelable UK — SSE",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "STAN.L",
+    "name": "Standard Chartered",
+    "finnhubIndustry": "Banks",
+    "sector": "Banks",
+    "correlation": "Yields, Asie — Standard Chartered",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "STLAM.MI",
+    "name": "Stellantis",
+    "finnhubIndustry": "Automobiles",
+    "sector": "Automobiles",
+    "correlation": "EUR/USD, tarifs — Stellantis (Peugeot/Fiat/Chrysler)",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "STMPA.PA",
+    "name": "STMicroelectronics",
+    "finnhubIndustry": "Semiconductors",
+    "sector": "Semiconductors",
+    "correlation": "^IXIC ↑, ^KS11 — semi-conducteurs européens",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "SU.PA",
+    "name": "Schneider Electric",
+    "finnhubIndustry": "Electrical Equipment",
+    "sector": "Electrical Equipment",
+    "correlation": "Automatisation, transition énergétique, industrie",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "SVNL.L",
+    "name": "Serco",
+    "finnhubIndustry": "",
+    "sector": "",
+    "correlation": "",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "SVT.L",
+    "name": "Severn Trent",
+    "finnhubIndustry": "Utilities",
+    "sector": "Utilities",
+    "correlation": "Eau UK — Severn Trent",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "SW.PA",
+    "name": "Sodexo",
+    "finnhubIndustry": "Hotels, Restaurants & Leisure",
+    "sector": "Hotels, Restaurants & Leisure",
+    "correlation": "Restauration collective, services",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "SY1.DE",
+    "name": "Symrise",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "Semi-conducteurs, Infineon spin-off — Siemens Energy",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "SYK",
+    "name": "Stryker Corp",
+    "finnhubIndustry": "Health Care",
+    "sector": "Health Care",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "T",
+    "name": "AT&T Inc",
+    "finnhubIndustry": "Telecommunication",
+    "sector": "Telecommunication",
+    "correlation": "Défensif, dividendes",
+    "index": "SP500"
+  },
+  {
+    "symbol": "TDG",
+    "name": "TransDigm Group Inc",
+    "finnhubIndustry": "Aerospace & Defense",
+    "sector": "Aerospace & Defense",
+    "correlation": "Géopolitique ↑↑ — tensions = commandes",
+    "index": "SP500"
+  },
+  {
+    "symbol": "TEP.PA",
+    "name": "Teleperformance",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "Services BPO, externalisation, emploi",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "TGT",
+    "name": "Target Corp",
+    "finnhubIndustry": "Retail",
+    "sector": "Retail",
+    "correlation": "Consommateur US, confiance, emploi",
+    "index": "SP500"
+  },
+  {
+    "symbol": "TJX",
+    "name": "TJX Companies Inc",
+    "finnhubIndustry": "Retail",
+    "sector": "Retail",
+    "correlation": "Consommateur US, confiance, emploi",
+    "index": "SP500"
+  },
+  {
+    "symbol": "TMO",
+    "name": "Thermo Fisher Scientific Inc",
+    "finnhubIndustry": "Life Sciences Tools & Services",
+    "sector": "Life Sciences Tools & Services",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "TMUS",
+    "name": "T-Mobile US Inc",
+    "finnhubIndustry": "Telecommunication",
+    "sector": "Telecommunication",
+    "correlation": "Défensif, dividendes",
+    "index": "SP500"
+  },
+  {
+    "symbol": "TOL",
+    "name": "Toll Brothers Inc",
+    "finnhubIndustry": "Consumer products",
+    "sector": "Consumer products",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "TRMB",
+    "name": "Trimble Inc",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "^IXIC ↑, taux ↓↓",
+    "index": "SP500"
+  },
+  {
+    "symbol": "TRV",
+    "name": "Travelers Companies Inc",
+    "finnhubIndustry": "Insurance",
+    "sector": "Insurance",
+    "correlation": "Yields ↑ — portefeuille obligataire",
+    "index": "SP500"
+  },
+  {
+    "symbol": "TSCO.L",
+    "name": "Tesco",
+    "finnhubIndustry": "Retail",
+    "sector": "Retail",
+    "correlation": "Consommateur UK — Tesco",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "TSLA",
+    "name": "Tesla Inc",
+    "finnhubIndustry": "Automobiles",
+    "sector": "Automobiles",
+    "correlation": "EUR/USD, tarifs douaniers",
+    "index": "SP500"
+  },
+  {
+    "symbol": "TTE.PA",
+    "name": "TotalEnergies",
+    "finnhubIndustry": "Oil & Gas Integrated",
+    "sector": "Oil & Gas Integrated",
+    "correlation": "CL=F (pétrole) ↑↑ — major pétrolière",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "TXN",
+    "name": "Texas Instruments Inc",
+    "finnhubIndustry": "Semiconductors",
+    "sector": "Semiconductors",
+    "correlation": "^IXIC ↑, ^KS11 — supply chain asiatique",
+    "index": "SP500"
+  },
+  {
+    "symbol": "UAL",
+    "name": "United Airlines Holdings Inc",
+    "finnhubIndustry": "Airlines",
+    "sector": "Airlines",
+    "correlation": "CL=F (pétrole) ↓↓ — kérosène = 1er poste de coûts",
+    "index": "SP500"
+  },
+  {
+    "symbol": "UBER",
+    "name": "Uber Technologies Inc",
+    "finnhubIndustry": "Road & Rail",
+    "sector": "Road & Rail",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "ULVR.L",
+    "name": "Unilever",
+    "finnhubIndustry": "Consumer products",
+    "sector": "Consumer products",
+    "correlation": "Défensif, consommation de base — Unilever",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "UNH",
+    "name": "UnitedHealth Group Inc",
+    "finnhubIndustry": "Health Care",
+    "sector": "Health Care",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "UNP",
+    "name": "Union Pacific Corp",
+    "finnhubIndustry": "Road & Rail",
+    "sector": "Road & Rail",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "UPS",
+    "name": "United Parcel Service Inc",
+    "finnhubIndustry": "Logistics & Transportation",
+    "sector": "Logistics & Transportation",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "URW.AS",
+    "name": "Unibail-Rodamco-Westfield",
+    "finnhubIndustry": "Real Estate",
+    "sector": "Real Estate",
+    "correlation": "Taux ↓↓, centres commerciaux, commerce physique",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "USB",
+    "name": "US Bancorp",
+    "finnhubIndustry": "Banking",
+    "sector": "Banking",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "UU.L",
+    "name": "United Utilities",
+    "finnhubIndustry": "Utilities",
+    "sector": "Utilities",
+    "correlation": "Eau UK — United Utilities",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "V",
+    "name": "Visa Inc",
+    "finnhubIndustry": "Financial Services",
+    "sector": "Financial Services",
+    "correlation": "Yields, ^GSPC",
+    "index": "SP500"
+  },
+  {
+    "symbol": "VIE.PA",
+    "name": "Veolia",
+    "finnhubIndustry": "Utilities",
+    "sector": "Utilities",
+    "correlation": "Eau, déchets, transition écologique — défensif",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "VIV.PA",
+    "name": "Vivendi",
+    "finnhubIndustry": "Media",
+    "sector": "Media",
+    "correlation": "Médias, streaming, Canal+",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "VLO",
+    "name": "Valero Energy Corp",
+    "finnhubIndustry": "Energy",
+    "sector": "Energy",
+    "correlation": "CL=F (pétrole) ↑↑",
+    "index": "SP500"
+  },
+  {
+    "symbol": "VNA.DE",
+    "name": "Vonovia",
+    "finnhubIndustry": "Real Estate",
+    "sector": "Real Estate",
+    "correlation": "Taux ↓↓, immobilier DE — Vonovia",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "VOD.L",
+    "name": "Vodafone",
+    "finnhubIndustry": "Telecom Services",
+    "sector": "Telecom Services",
+    "correlation": "Défensif, dividendes — Vodafone",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "VOW3.DE",
+    "name": "Volkswagen",
+    "finnhubIndustry": "Automobiles",
+    "sector": "Automobiles",
+    "correlation": "EUR/USD, tarifs, transition EV — Volkswagen",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "VRSK",
+    "name": "Verisk Analytics Inc",
+    "finnhubIndustry": "Professional Services",
+    "sector": "Professional Services",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "VRTX",
+    "name": "Vertex Pharmaceuticals Inc",
+    "finnhubIndustry": "Biotechnology",
+    "sector": "Biotechnology",
+    "correlation": "FDA, pipelines — très binaire (approbation ou rejet)",
+    "index": "SP500"
+  },
+  {
+    "symbol": "VZ",
+    "name": "Verizon Communications Inc",
+    "finnhubIndustry": "Telecommunication",
+    "sector": "Telecommunication",
+    "correlation": "Défensif, dividendes",
+    "index": "SP500"
+  },
+  {
+    "symbol": "WAT",
+    "name": "Waters Corp",
+    "finnhubIndustry": "Life Sciences Tools & Services",
+    "sector": "Life Sciences Tools & Services",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "WBA",
+    "name": "Walgreens Holding Co",
+    "finnhubIndustry": "Retail",
+    "sector": "Retail",
+    "correlation": "Consommateur US, confiance, emploi",
+    "index": "SP500"
+  },
+  {
+    "symbol": "WEIR.L",
+    "name": "Weir Group",
+    "finnhubIndustry": "Machinery",
+    "sector": "Machinery",
+    "correlation": "Équipement minier — Weir Group",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "WFC",
+    "name": "Wells Fargo & Co",
+    "finnhubIndustry": "Banking",
+    "sector": "Banking",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "WIZZ.L",
+    "name": "Wizz Air",
+    "finnhubIndustry": "Airlines",
+    "sector": "Airlines",
+    "correlation": "CL=F ↓↓ — low cost européen",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "WLN.PA",
+    "name": "Worldline",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "Paiements digitaux, fintech",
+    "index": "CAC40"
+  },
+  {
+    "symbol": "WM",
+    "name": "Waste Management Inc",
+    "finnhubIndustry": "Commercial Services & Supplies",
+    "sector": "Commercial Services & Supplies",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "WMT",
+    "name": "Walmart Inc",
+    "finnhubIndustry": "Retail",
+    "sector": "Retail",
+    "correlation": "Consommateur US, confiance, emploi",
+    "index": "SP500"
+  },
+  {
+    "symbol": "WPP.L",
+    "name": "WPP",
+    "finnhubIndustry": "Media",
+    "sector": "Media",
+    "correlation": "Publicité mondiale — WPP",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "WYNN",
+    "name": "Wynn Resorts Ltd",
+    "finnhubIndustry": "Hotels, Restaurants & Leisure",
+    "sector": "Hotels, Restaurants & Leisure",
+    "correlation": "",
+    "index": "SP500"
+  },
+  {
+    "symbol": "X",
+    "name": "United States Steel Corp",
+    "finnhubIndustry": "Metals & Mining",
+    "sector": "Metals & Mining",
+    "correlation": "GC=F, SI=F — corrélé aux métaux précieux",
+    "index": "SP500"
+  },
+  {
+    "symbol": "XOM",
+    "name": "Exxon Mobil Corp",
+    "finnhubIndustry": "Energy",
+    "sector": "Energy",
+    "correlation": "CL=F (pétrole) ↑↑",
+    "index": "SP500"
+  },
+  {
+    "symbol": "XRX.L",
+    "name": "Xaar",
+    "finnhubIndustry": "",
+    "sector": "",
+    "correlation": "",
+    "index": "FTSE100"
+  },
+  {
+    "symbol": "ZAL.DE",
+    "name": "Zalando",
+    "finnhubIndustry": "Retail",
+    "sector": "Retail",
+    "correlation": "E-commerce mode, consommateur EU — Zalando",
+    "index": "DAX40"
+  },
+  {
+    "symbol": "ZS",
+    "name": "Zscaler Inc",
+    "finnhubIndustry": "Technology",
+    "sector": "Technology",
+    "correlation": "^IXIC ↑, taux ↓↓",
+    "index": "SP500"
+  },
+  {
+    "symbol": "ZTS",
+    "name": "Zoetis Inc",
+    "finnhubIndustry": "Pharmaceuticals",
+    "sector": "Pharmaceuticals",
+    "correlation": "",
+    "index": "SP500"
+  }
+]

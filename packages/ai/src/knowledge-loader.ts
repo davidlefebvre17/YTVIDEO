@@ -33,6 +33,10 @@ export function loadKnowledge(snapshot: DailySnapshot): string {
   const macro = readKnowledgeFile("macro-indicators.md");
   if (macro) sections.push(macro);
 
+  // Always inject geopolitical context (causal chains, region profiles)
+  const geopolitics = readKnowledgeFile("geopolitics.md");
+  if (geopolitics) sections.push(geopolitics);
+
   // Conditional: central banks (if we have the file and there's a rate event)
   const hasCentralBankEvent = snapshot.events.some(
     (e) =>

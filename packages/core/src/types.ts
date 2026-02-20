@@ -14,16 +14,15 @@ export type EpisodeType = "daily_recap" | "chart_analysis";
 export type Language = "fr" | "en";
 
 export type SectionType =
-  | "intro"
-  | "previously_on"
-  | "market_overview"
-  | "deep_dive"
-  | "news"
-  | "predictions"
-  | "outro";
+  | "hook" | "title_card" | "previously_on" | "thread"
+  | "segment" | "closing"
+  // legacy (backward compatibility)
+  | "intro" | "market_overview" | "deep_dive" | "news" | "predictions" | "outro"
+  | "synthesis" | "watchlist" | "recap_cta" | "suivi";
 
 export interface VisualCue {
-  type: "highlight_asset" | "show_chart" | "show_level" | "direction_arrow" | "flash" | "transition";
+  type: "highlight_asset" | "show_chart" | "show_level" | "direction_arrow" | "flash" | "transition"
+    | "sector_heatmap" | "macro_stat" | "comparison";
   asset?: string;
   value?: number;
   label?: string;
@@ -39,6 +38,9 @@ export interface ScriptSection {
   durationSec: number;
   visualCues: VisualCue[];
   data?: Record<string, unknown>;
+  depth?: "flash" | "focus" | "deep";
+  topic?: string;
+  assets?: string[];
 }
 
 export interface EpisodeScript {
@@ -50,6 +52,9 @@ export interface EpisodeScript {
   description: string;
   sections: ScriptSection[];
   totalDurationSec: number;
+  threadSummary?: string;
+  segmentCount?: number;
+  coverageTopics?: string[];
 }
 
 export interface MultiTimeframeAnalysis {
@@ -207,6 +212,61 @@ export interface PolymarketMarket {
   liquidity: number;
 }
 
+export interface SectorCluster {
+  sector: string;
+  movers: Array<{ symbol: string; name: string; changePct: number }>;
+  avgChangePct: number;
+  direction: "up" | "down";
+}
+
+export interface ActiveCausalChain {
+  id: string;
+  name: string;
+  confidence: number;       // 0-1
+  confirmedSteps: string[];
+  suggestedNarration: string;
+  relatedAssets: string[];
+}
+
+export interface EventSurprise {
+  eventName: string;
+  actual: number;
+  forecast: number;
+  surprisePct: number;
+  magnitude: "neutral" | "minor" | "notable" | "major";
+  direction: "above" | "below" | "inline";
+  relatedAssets: string[];
+}
+
+export interface Theme {
+  id: string;
+  label: { fr: string; en: string };
+  editorialScore: number;
+  buzzScore: number;
+  assets: string[];          // symbols
+  events: string[];          // event names
+  newsItems: string[];       // article titles
+  causalChain?: string[];    // active causal links
+  sectorClusters?: SectorCluster[];
+  breakdown: {
+    amplitude: number;
+    breadth: number;
+    surprise: number;
+    causalDepth: number;
+    symbolic: number;
+    newsFrequency: number;
+    regimeCoherence: number;
+  };
+}
+
+export interface ThemesDuJour {
+  themes: Theme[];
+  causalChains: ActiveCausalChain[];
+  sectorClusters: SectorCluster[];
+  eventSurprises: EventSurprise[];
+  marketRegime: string;
+}
+
 export interface DailySnapshot {
   date: string;
   assets: AssetSnapshot[];
@@ -220,6 +280,7 @@ export interface DailySnapshot {
   earnings?: EarningsEvent[];
   stockScreen?: StockScreenResult[];
   polymarket?: PolymarketMarket[];
+  themesDuJour?: ThemesDuJour;
 }
 
 export interface EpisodeManifestEntry {

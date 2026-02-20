@@ -14,6 +14,7 @@ import {
   formatSnapshotForPrompt,
   getDailyRecapSystemPrompt,
   loadKnowledge,
+  buildThemesDuJour,
 } from "@yt-maker/ai";
 import type { DailySnapshot, EpisodeScript, Language } from "@yt-maker/core";
 
@@ -55,6 +56,13 @@ async function main() {
   const snapshot: DailySnapshot = JSON.parse(fs.readFileSync(dataPath, "utf-8"));
   console.log(`Date: ${snapshot.date}`);
   console.log(`Assets: ${snapshot.assets.length} | News: ${snapshot.news.length} | Events: ${snapshot.events.length}`);
+
+  // Build editorial themes (pre-digested analysis) before formatting
+  if (!snapshot.themesDuJour) {
+    const tdj = buildThemesDuJour(snapshot, snapshot.news, lang);
+    snapshot.themesDuJour = tdj;
+    console.log(`Themes du jour: ${tdj.themes.length} themes, regime=${tdj.marketRegime}, ${tdj.causalChains.length} causal chains, ${tdj.sectorClusters.length} sector clusters`);
+  }
 
   // Get system prompt with knowledge context and format snapshot
   const knowledgeContext = loadKnowledge(snapshot);

@@ -103,7 +103,7 @@ La VARIATION sur 7 jours est plus significative que la valeur absolue :
 
 ### Presentation des events a venir
 
-Format pour le teaser (zones a surveiller + outro) :
+Format pour le teaser (closing) :
 "Demain 14h30, on a le CPI americain. Le consensus attend [X]% contre [Y]% le mois dernier. Si c'est en dessous, ca pourrait relancer les espoirs de baisse de taux. Si c'est au-dessus, attention au dollar et aux taux."
 
 Toujours presenter avec : QUOI + QUAND + CONSENSUS + SCENARIOS CONDITIONNELS.

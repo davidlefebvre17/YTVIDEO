@@ -3,7 +3,7 @@ import type { Language } from "@yt-maker/core";
 
 // ── Source tiers ────────────────────────────────────────────────────────────
 // Higher = more reliable, more market-relevant
-const SOURCE_TIER: Record<string, number> = {
+export const SOURCE_TIER: Record<string, number> = {
   "ZoneBourse": 7,
   "TradingSat/BFM": 7,
   "Les Echos Marchés": 7,
@@ -26,7 +26,7 @@ const SOURCE_TIER: Record<string, number> = {
 
 // ── Asset keywords (lowercase) ───────────────────────────────────────────────
 // Used to detect which news articles relate to which watchlist assets
-const ASSET_KEYWORDS: Record<string, string[]> = {
+export const ASSET_KEYWORDS: Record<string, string[]> = {
   "SI=F":       ["silver", "argent métal", "métal blanc", "silver futures", "argent métal précieux"],
   "^FCHI":      ["cac 40", "cac40", "bourse de paris", "indice parisien", "paris bourse"],
   "BTC-USD":    ["bitcoin", "btc"],
