@@ -14,7 +14,7 @@ import { generateScript, getNextEpisodeNumber } from "@yt-maker/ai";
 import type { DailySnapshot, Language } from "@yt-maker/core";
 import type { PrevEntry, PrevContext } from "@yt-maker/ai";
 
-const PORT = 3032;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3032;
 const ROOT = path.resolve(__dirname, "..");
 const DATA_DIR = path.join(ROOT, "data");
 
