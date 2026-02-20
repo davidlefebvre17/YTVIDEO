@@ -1,12 +1,30 @@
 import type { MarketSentiment } from "@yt-maker/core";
 
-export async function fetchMarketSentiment(): Promise<MarketSentiment | undefined> {
+async function fetchWithRetry(
+  url: string,
+  headers: Record<string, string>,
+  maxRetries = 2,
+): Promise<Response> {
+  for (let i = 0; i <= maxRetries; i++) {
+    const res = await fetch(url, { headers });
+    if (res.status === 429 && i < maxRetries) {
+      await new Promise((r) => setTimeout(r, 2000 * (i + 1)));
+      continue;
+    }
+    return res;
+  }
+  throw new Error("Max retries exceeded");
+}
+
+export async function fetchMarketSentiment(targetDate?: string): Promise<MarketSentiment | undefined> {
   console.log("  Fetching market sentiment...");
   try {
+    const isHistorical = targetDate && targetDate < new Date().toISOString().split("T")[0];
     const [fearGreed, globalData, trending] = await Promise.all([
-      fetchFearGreed(),
+      fetchFearGreed(isHistorical ? targetDate : undefined),
       fetchCoinGeckoGlobal(),
-      fetchTrendingCoins(),
+      // Trending coins are always live — no historical endpoint
+      isHistorical ? Promise.resolve(undefined) : fetchTrendingCoins(),
     ]);
 
     if (!fearGreed) {
@@ -30,12 +48,29 @@ export async function fetchMarketSentiment(): Promise<MarketSentiment | undefine
   }
 }
 
-async function fetchFearGreed(): Promise<{ value: number; label: string } | null> {
+async function fetchFearGreed(targetDate?: string): Promise<{ value: number; label: string } | null> {
   try {
-    const res = await fetch("https://api.alternative.me/fng/?limit=1");
+    // For historical dates, fetch last 90 days and find the matching entry
+    const limit = targetDate ? 90 : 1;
+    const res = await fetch(`https://api.alternative.me/fng/?limit=${limit}&date_format=iso`);
     if (!res.ok) return null;
     const data = await res.json();
-    const entry = data.data?.[0];
+
+    let entry: { value: string; value_classification: string; timestamp: string } | undefined;
+    if (targetDate) {
+      // Find the entry whose date matches targetDate (format: "YYYY-MM-DD")
+      entry = data.data?.find((d: { timestamp: string }) => d.timestamp.startsWith(targetDate));
+      // Fallback: closest prior day (weekend/holiday gaps)
+      if (!entry) {
+        const sorted = (data.data ?? []).filter(
+          (d: { timestamp: string }) => d.timestamp <= targetDate,
+        );
+        entry = sorted[0];
+      }
+    } else {
+      entry = data.data?.[0];
+    }
+
     if (!entry) return null;
     return {
       value: parseInt(entry.value, 10),
@@ -53,7 +88,7 @@ async function fetchCoinGeckoGlobal(): Promise<{ btcDominance: number } | null> 
     if (apiKey) {
       headers["x-cg-demo-key"] = apiKey;
     }
-    const res = await fetch("https://api.coingecko.com/api/v3/global", { headers });
+    const res = await fetchWithRetry("https://api.coingecko.com/api/v3/global", headers);
     if (!res.ok) return null;
     const data = await res.json();
     return {
@@ -71,7 +106,7 @@ async function fetchTrendingCoins(): Promise<Array<{ name: string; symbol: strin
     if (apiKey) {
       headers["x-cg-demo-key"] = apiKey;
     }
-    const res = await fetch("https://api.coingecko.com/api/v3/search/trending", { headers });
+    const res = await fetchWithRetry("https://api.coingecko.com/api/v3/search/trending", headers);
     if (!res.ok) return undefined;
     const data = await res.json();
     return (data.coins || []).slice(0, 5).map(

@@ -1,4 +1,4 @@
-import type { Candle, TechnicalIndicators } from "@yt-maker/core";
+import type { Candle, TechnicalIndicators, MultiTimeframeAnalysis } from "@yt-maker/core";
 
 /**
  * Compute EMA (Exponential Moving Average) over closing prices.
@@ -64,6 +64,111 @@ function findRoundNumbers(price: number): number[] {
 }
 
 /**
+ * Compute SMA (Simple Moving Average) over closing prices.
+ */
+function computeSMA(candles: Candle[], period: number): number {
+  if (candles.length < period) return candles[candles.length - 1]?.c ?? 0;
+  const slice = candles.slice(-period);
+  return slice.reduce((sum, c) => sum + c.c, 0) / period;
+}
+
+function detectMTFTrend(candles: Candle[], period: number): "bull" | "bear" | "range" {
+  if (candles.length < period) return "range";
+  const recent = candles.slice(-period);
+  const first = recent[0].c;
+  const last = recent[recent.length - 1].c;
+  const change = (last - first) / first;
+  if (change > 0.05) return "bull";
+  if (change < -0.05) return "bear";
+  return "range";
+}
+
+/**
+ * Compute multi-timeframe analysis from weekly 10y + daily 3y candles.
+ * Returns null if not enough data.
+ */
+export function computeMultiTFAnalysis(
+  weeklyCandles: Candle[],
+  daily3yCandles: Candle[],
+  currentPrice: number,
+): MultiTimeframeAnalysis | null {
+  if (weeklyCandles.length < 104 || daily3yCandles.length < 200) return null;
+
+  // ── Weekly 10y ──────────────────────────────────────────────────
+  const athPrice = Math.max(...weeklyCandles.map((c) => c.h));
+  const atlPrice = Math.min(...weeklyCandles.map((c) => c.l));
+  const ema52w = computeEMA(weeklyCandles, 52);
+  const weeklyTrend = detectMTFTrend(weeklyCandles, 52);
+
+  // Major support/resistance from last 2 years (104 weekly candles)
+  const last104w = weeklyCandles.slice(-104);
+  const majorResistance = Math.max(...last104w.map((c) => c.h));
+  const majorSupport = Math.min(...last104w.map((c) => c.l));
+
+  // ── Daily 3y ────────────────────────────────────────────────────
+  const sma200 = computeSMA(daily3yCandles, 200);
+  const sma50 = computeSMA(daily3yCandles, 50);
+  const rsi14Daily = computeRSI(daily3yCandles, 14);
+  const daily3yTrend = detectMTFTrend(daily3yCandles, 50);
+
+  // ── Daily 1y (last 252 trading days slice of 3y) ─────────────────
+  const daily1y = daily3yCandles.slice(-252);
+  const high52w = Math.max(...daily1y.map((c) => c.h));
+  const low52w = Math.min(...daily1y.map((c) => c.l));
+  const daily1yTrend = detectMTFTrend(daily1y, 20);
+
+  // Volatility 20d: annualized std dev of daily returns
+  const last21 = daily3yCandles.slice(-21);
+  const returns: number[] = [];
+  for (let i = 1; i < last21.length; i++) {
+    returns.push((last21[i].c - last21[i - 1].c) / last21[i - 1].c);
+  }
+  const avgReturn = returns.reduce((s, r) => s + r, 0) / returns.length;
+  const variance = returns.reduce((s, r) => s + (r - avgReturn) ** 2, 0) / returns.length;
+  const volatility20d = Math.sqrt(variance) * Math.sqrt(252) * 100;
+
+  // Volume vs 20d average — require 10+ non-zero days for reliable signal
+  // Futures roll days and forex (no volume) are excluded from the calculation
+  const last20d = daily3yCandles.slice(-20);
+  const validVols20 = last20d.filter((c) => c.v > 0);
+  const avgVol20 =
+    validVols20.length >= 10
+      ? validVols20.reduce((s, c) => s + c.v, 0) / validVols20.length
+      : 0;
+  const lastVol = daily3yCandles[daily3yCandles.length - 1].v;
+  const volumeVsAvg = avgVol20 > 0 ? Math.min(lastVol / avgVol20, 20) : 1;
+
+  const recentBreakout = currentPrice >= high52w * 0.99;
+
+  return {
+    weekly10y: {
+      trend: weeklyTrend,
+      distanceFromATH: ((currentPrice - athPrice) / athPrice) * 100,
+      distanceFromATL: ((currentPrice - atlPrice) / atlPrice) * 100,
+      majorSupport,
+      majorResistance,
+      ema52w,
+    },
+    daily3y: {
+      trend: daily3yTrend,
+      sma200,
+      sma50,
+      rsi14: rsi14Daily,
+      aboveSma200: currentPrice > sma200,
+      goldenCross: sma50 > sma200,
+    },
+    daily1y: {
+      trend: daily1yTrend,
+      high52w,
+      low52w,
+      volatility20d,
+      volumeVsAvg,
+      recentBreakout,
+    },
+  };
+}
+
+/**
  * Compute all technical indicators for an asset given its daily candles.
  * Expects at least 21 daily candles for meaningful results.
  */
@@ -72,6 +177,7 @@ export function computeTechnicals(
   price: number,
   changePct: number,
   newsCount: number,
+  symbol?: string,
 ): TechnicalIndicators {
   const ema9 = computeEMA(dailyCandles, 9);
   const ema21 = computeEMA(dailyCandles, 21);
@@ -83,12 +189,24 @@ export function computeTechnicals(
   else if (price < ema9 && ema9 < ema21) trend = "bearish";
 
   // Volume anomaly: latest volume vs 20-day average
-  const recentCandles = dailyCandles.slice(-21);
-  const avgVolume =
-    recentCandles.slice(0, -1).reduce((sum, c) => sum + c.v, 0) /
-    Math.max(recentCandles.length - 1, 1);
-  const latestVolume = recentCandles[recentCandles.length - 1]?.v ?? 0;
-  const volumeAnomaly = avgVolume > 0 ? latestVolume / avgVolume : 1;
+  // Futures (=F suffix): Yahoo Finance daily volume is unreliable — front-month rollover days
+  // create artificial 30-100x spikes that have no market significance. Always neutral for futures.
+  // Forex pairs also have no meaningful volume data. Set to 1 (neutral) for both.
+  const isFutures = symbol?.endsWith("=F") ?? false;
+  const isForex = symbol?.endsWith("=X") ?? false;
+  let volumeAnomaly = 1;
+  if (!isFutures && !isForex) {
+    const recentCandles = dailyCandles.slice(-21);
+    const prevCandles = recentCandles.slice(0, -1).filter((c) => c.v > 0);
+    const avgVolume =
+      prevCandles.length >= 10
+        ? prevCandles.reduce((sum, c) => sum + c.v, 0) / prevCandles.length
+        : 0;
+    const latestVolume = recentCandles[recentCandles.length - 1]?.v ?? 0;
+    // latestVolume === 0 means Yahoo returned no volume data (common for indices in historical mode)
+    // Treat as missing data → neutral (1), not as -100% volume
+    volumeAnomaly = (avgVolume > 0 && latestVolume > 0) ? Math.min(latestVolume / avgVolume, 20) : 1;
+  }
 
   // Support/Resistance: 20d low/high + round numbers
   const last20 = dailyCandles.slice(-20);
@@ -107,7 +225,9 @@ export function computeTechnicals(
   const isNear52wHigh = price >= high20d * 0.98;
   const isNear52wLow = price <= low20d * 1.02;
 
-  // Drama Score
+  // Drama Score — each term capped to prevent single signal from dominating
+  // changePct: max contribution ~30 (10% move), volumeAnomaly: max 20x → *2=40
+  // newsCount: cap at 5 relevant articles to avoid high-coverage assets (BTC, CAC) dominating
   const breakingLevel =
     (isNear52wHigh ? 5 : 0) +
     (isNear52wLow ? 5 : 0) +
@@ -116,7 +236,7 @@ export function computeTechnicals(
     Math.abs(changePct) * 3 +
     volumeAnomaly * 2 +
     breakingLevel +
-    newsCount * 3;
+    Math.min(newsCount, 5) * 3;
 
   return {
     ema9,

@@ -12,9 +12,11 @@
     "script": "npx tsx scripts/write-script.ts",
     "prompt-test": "npx tsx scripts/prompt-test.ts",
     "studio": "npx tsx scripts/prompt-studio.ts",
+    "market-studio": "npx tsx scripts/market-studio.ts",
     "render": "npx tsx scripts/render.ts",
     "preview": "npm run dev -w @yt-maker/remotion-app",
     "dev": "npm run dev -w @yt-maker/remotion-app",
+    "backfill-news": "npx tsx scripts/backfill-news.ts",
     "typecheck": "tsc --build tsconfig.json"
   },
   "keywords": [

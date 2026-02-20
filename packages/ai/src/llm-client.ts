@@ -21,7 +21,7 @@ const FREE_MODELS = [
 // ─── Anthropic config ────────────────────────────────────────────
 
 const ANTHROPIC_BASE = "https://api.anthropic.com/v1/messages";
-const ANTHROPIC_DEFAULT_MODEL = "claude-sonnet-4-20250514";
+const ANTHROPIC_DEFAULT_MODEL = "claude-sonnet-4-6";
 
 function getAnthropicModel(): string {
   return process.env.ANTHROPIC_MODEL || ANTHROPIC_DEFAULT_MODEL;
@@ -142,13 +142,21 @@ export async function generateStructuredJSON<T>(
   let lastError: Error | null = null;
 
   if (config.provider === "anthropic") {
-    // Anthropic: single model, retry on rate-limit
+    // Anthropic: single model, retry on rate-limit or malformed JSON
     for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
       try {
         const model = getAnthropicModel();
         console.log(`  LLM: ${model} (attempt ${attempt + 1}/${MAX_RETRIES})`);
         const text = await callAnthropic(config.apiKey, systemPrompt, userMessage);
-        return JSON.parse(extractJSON(text)) as T;
+        const jsonStr = extractJSON(text);
+        try {
+          return JSON.parse(jsonStr) as T;
+        } catch {
+          console.warn(`  Malformed JSON (attempt ${attempt + 1}), retrying... Preview: ${jsonStr.slice(0, 200)}`);
+          lastError = new Error(`JSON parse failed on attempt ${attempt + 1}`);
+          await sleep(RETRY_DELAY_MS);
+          continue;
+        }
       } catch (err) {
         lastError = err as Error;
         const msg = lastError.message;
@@ -176,7 +184,15 @@ export async function generateStructuredJSON<T>(
       try {
         console.log(`  LLM: ${model} (attempt ${attempt + 1}/${MAX_RETRIES})`);
         const text = await callOpenRouter(config.apiKey, model, systemPrompt, userMessage);
-        return JSON.parse(extractJSON(text)) as T;
+        const jsonStr = extractJSON(text);
+        try {
+          return JSON.parse(jsonStr) as T;
+        } catch {
+          console.warn(`  Malformed JSON from ${model} (attempt ${attempt + 1}), retrying... Preview: ${jsonStr.slice(0, 200)}`);
+          lastError = new Error(`JSON parse failed on ${model} attempt ${attempt + 1}`);
+          await sleep(RETRY_DELAY_MS);
+          continue;
+        }
       } catch (err) {
         lastError = err as Error;
         const msg = lastError.message;

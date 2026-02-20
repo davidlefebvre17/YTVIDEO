@@ -12,7 +12,10 @@ import { fetchMarketSnapshot } from "@yt-maker/data";
 
 async function main() {
   const args = process.argv.slice(2);
-  let date = new Date().toISOString().split("T")[0];
+  // Default to yesterday — videos are morning recaps of the previous trading day
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  let date = yesterday.toISOString().split("T")[0];
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === "--date" && args[i + 1]) {

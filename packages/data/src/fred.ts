@@ -2,8 +2,13 @@ import type { BondYields } from "@yt-maker/core";
 
 const FRED_BASE = "https://api.stlouisfed.org/fred/series/observations";
 
-async function fetchSeries(seriesId: string, apiKey: string): Promise<number | null> {
-  const url = `${FRED_BASE}?series_id=${seriesId}&api_key=${apiKey}&file_type=json&sort_order=desc&limit=5`;
+async function fetchSeries(seriesId: string, apiKey: string, targetDate?: string): Promise<number | null> {
+  // For historical dates, set a 7-day window ending on targetDate to handle weekends/holidays
+  // FRED skips non-trading days (value="."), so we fetch the nearest prior value
+  const dateParams = targetDate
+    ? `&observation_start=${prevWeekday(targetDate, 7)}&observation_end=${targetDate}&sort_order=desc&limit=10`
+    : `&sort_order=desc&limit=10`;
+  const url = `${FRED_BASE}?series_id=${seriesId}&api_key=${apiKey}&file_type=json${dateParams}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`FRED ${seriesId}: ${res.status}`);
   const data = await res.json();
@@ -12,7 +17,14 @@ async function fetchSeries(seriesId: string, apiKey: string): Promise<number | n
   return obs ? parseFloat(obs.value) : null;
 }
 
-export async function fetchBondYields(): Promise<BondYields | undefined> {
+/** Returns a date string N calendar days before the given date (to cover weekends/holidays). */
+function prevWeekday(date: string, days: number): string {
+  const d = new Date(date + "T12:00:00Z");
+  d.setDate(d.getDate() - days);
+  return d.toISOString().split("T")[0];
+}
+
+export async function fetchBondYields(targetDate?: string): Promise<BondYields | undefined> {
   const apiKey = process.env.FRED_API_KEY;
   if (!apiKey) {
     console.log("  FRED: skipped (no FRED_API_KEY)");
@@ -22,9 +34,9 @@ export async function fetchBondYields(): Promise<BondYields | undefined> {
   console.log("  Fetching bond yields from FRED...");
   try {
     const [us10y, us2y, spread] = await Promise.all([
-      fetchSeries("DGS10", apiKey),
-      fetchSeries("DGS2", apiKey),
-      fetchSeries("T10Y2Y", apiKey),
+      fetchSeries("DGS10", apiKey, targetDate),
+      fetchSeries("DGS2", apiKey, targetDate),
+      fetchSeries("T10Y2Y", apiKey, targetDate),
     ]);
 
     if (us10y === null || us2y === null) {

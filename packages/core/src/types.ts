@@ -52,6 +52,33 @@ export interface EpisodeScript {
   totalDurationSec: number;
 }
 
+export interface MultiTimeframeAnalysis {
+  weekly10y: {
+    trend: "bull" | "bear" | "range";
+    distanceFromATH: number;    // % from ATH (negative = below, e.g. -5.2)
+    distanceFromATL: number;    // % above ATL (positive, e.g. +340)
+    majorSupport: number;
+    majorResistance: number;
+    ema52w: number;
+  };
+  daily3y: {
+    trend: "bull" | "bear" | "range";
+    sma200: number;
+    sma50: number;
+    rsi14: number;
+    aboveSma200: boolean;
+    goldenCross: boolean;       // SMA50 > SMA200
+  };
+  daily1y: {
+    trend: "bull" | "bear" | "range";
+    high52w: number;
+    low52w: number;
+    volatility20d: number;      // annualized %
+    volumeVsAvg: number;        // ratio vs 20d avg
+    recentBreakout: boolean;    // price within 1% of 52w high
+  };
+}
+
 export interface AssetSnapshot {
   symbol: string;
   name: string;
@@ -64,6 +91,8 @@ export interface AssetSnapshot {
   // Enriched fields (populated by computeTechnicals)
   dailyCandles?: Candle[];
   technicals?: TechnicalIndicators;
+  // Multi-timeframe analysis (weekly 10y + daily 3y)
+  multiTF?: MultiTimeframeAnalysis;
 }
 
 export interface TechnicalIndicators {
@@ -87,6 +116,8 @@ export interface NewsItem {
   url: string;
   publishedAt: string;
   summary?: string;
+  category?: string;
+  lang?: "fr" | "en";
 }
 
 export interface EconomicEvent {
@@ -136,6 +167,46 @@ export interface EarningsEvent {
   hour: "bmo" | "amc" | "dmh";
 }
 
+export interface EarningsQuarter {
+  period: string;             // "2025-09-30"
+  quarter: number;            // 1-4
+  year: number;
+  epsActual?: number;
+  epsEstimate?: number;
+  surprisePct?: number;       // % beat (+) or miss (-)
+}
+
+export interface EarningsDetail {
+  lastFourQuarters: EarningsQuarter[];  // most recent first
+  currentQtrEpsEstimate?: number;       // from EarningsEvent already fetched
+  publishingToday: boolean;
+}
+
+export interface StockScreenResult {
+  symbol: string;
+  name: string;
+  index: string;              // "SP500" | "CAC40" | "DAX40" | "FTSE100" | "NIKKEI50" | "HSI30"
+  price: number;
+  changePct: number;
+  volume: number;
+  avgVolume: number;
+  high52w: number;
+  low52w: number;
+  reason: string[];           // ["mover_up", "volume_spike", "52w_high"]
+  technicals?: TechnicalIndicators;
+  earningsDetail?: EarningsDetail;
+}
+
+export interface PolymarketMarket {
+  id: string;
+  question: string;
+  category: string;
+  endDate: string;
+  probabilities: Record<string, number>;  // { "Yes": 68, "No": 32 } — values in %
+  volume24h: number;
+  liquidity: number;
+}
+
 export interface DailySnapshot {
   date: string;
   assets: AssetSnapshot[];
@@ -147,6 +218,8 @@ export interface DailySnapshot {
   sentiment?: MarketSentiment;
   topMovers?: TopMovers;
   earnings?: EarningsEvent[];
+  stockScreen?: StockScreenResult[];
+  polymarket?: PolymarketMarket[];
 }
 
 export interface EpisodeManifestEntry {

@@ -758,6 +758,36 @@ Les 2-3 assets avec les plus hauts drama scores obtiennent un deep dive. Les aut
 > QUESTION : les coefficients sont arbitraires. Il faudra les calibrer apres quelques episodes reels.
 > Prevoir un fichier de config editable (`drama-weights.json`) plutot que des constantes hardcodees.
 
+**Probleme identifie (audit fev. 2026 — comparaison vs Bondin/ZoneBourse) : le drama score ne capture pas l'importance editoriale**
+
+Le drama score est purement quantitatif (amplitude × volume × breakout). Il est aveugle a la market cap et a la signification editoriale. Resultat observe :
+
+- Solana +7.6% → drama=32.9 → deep dive #1 (210s)
+- Apple -5% → drama~15 (dans le stockScreen SP500) → non cite
+- Cisco -12% → non detecte (hors watchlist 38 assets)
+
+Pourtant editorialement, Apple qui perd plus que la fortune de Bernard Arnault (200Md$) EST la story du jour — et Solana n'en est que la consequence indirecte.
+
+**Pistes de solution a explorer avant Bloc C :**
+
+Piste A — Ponderation par market cap :
+```
+dramaScore += log10(marketCap / 1e9) * 1.5   // Apple(3000Md) >> Solana(40Md)
+```
+Necessite de stocker la market cap dans AssetSnapshot (deja disponible depuis Yahoo Finance).
+
+Piste B — Categorie editoriale dans les weights :
+- Assets "phares" (SPX, NDX, CAC, Gold, BTC) : multiplicateur x1.3
+- Crypto altcoins : multiplicateur x0.7 (volatils mais editorialement secondaires pour audience FR)
+- Forex mineurs : multiplicateur x0.6
+
+Piste C — Score d'importance contextuelle (heuristique) :
+- Si l'asset est cite dans >5 news du jour → boost +4
+- Si l'asset est le top mover du stockScreen par valeur absolue de perte marche → boost +6
+- Si l'asset est dans un indice majeur avec >50Md$ de market cap → boost +3
+
+**Decision : ne pas implementer avant d'avoir 5-10 episodes de reference.** Observer le pattern sur plusieurs episodes, puis calibrer. Documenter les cas ou le drama score "rate" la story principale pour alimenter le calibrage.
+
 #### A.5 Type EnrichedSnapshot
 
 Nouveau type dans `core/types.ts` qui ETEND `DailySnapshot` :
@@ -1205,6 +1235,41 @@ Segments disponibles :
 | Recap 3 points | 15-20s | Oui |
 | Outro + teaser | 10-15s | Oui — CTA + "demain on surveille..." |
 
+#### C.3b Injection du stockScreen dans le prompt — probleme de densite
+
+**Probleme identifie (audit fev. 2026 — comparaison vs Bondin/ZoneBourse) :**
+
+Le stockScreen detecte 77 movers par jour mais le prompt n'en injecte que 15 (`slice(0, 15)` dans `formatSnapshotForPrompt`). Meme avec ces 15, le LLM n'en utilise que 2-3 dans le script final. Resultat : une richesse d'information gachee.
+
+Bondin en revanche cite 30+ societes en 9 minutes, dont beaucoup en flux rapide (5-10 secondes chacune). Son format "actu societes" correspond a ce qu'on appelle "dashboard flash" dans notre structure.
+
+**Pourquoi le LLM sous-utilise le stockScreen :**
+
+1. Les 15 movers arrivent sous forme de liste a la fin du prompt — apres les 38 assets watchlist, le calendrier, les news. Le LLM a deja "decide" de sa structure narrative avant de les lire.
+2. Le format de chaque ligne est dense (`name (symbol, index): +X% | RSI=Y trend=Z | reason`) mais sans contexte explicite sur pourquoi cela compte editorialement.
+3. Le prompt n'assigne pas de "budget temps" pour le dashboard flash.
+
+**Solutions a implementer dans Bloc C :**
+
+Solution 1 — Remonter le stockScreen en tete du user message (avant la watchlist 38 assets) :
+- Les top 5 movers par amplitude → en evidence comme "urgences du jour"
+- Logique : si Cisco fait -12%, c'est plus important que la watchlist reguliere
+
+Solution 2 — Augmenter le slice de 15 a 30 movers injectes, mais groupes par indice :
+```
+## Top movers par indice (screening 763 actions)
+### SP500 (top 8 movers)
+### CAC40 (top 5 movers)
+### DAX (top 3 movers)
+...
+```
+Avec une instruction explicite : "Le dashboard flash DOIT mentionner au moins 8 de ces movers en narration rapide (5-8 secondes chacun, comme un flash info)."
+
+Solution 3 — Section "actu societes" separee dans le script (nouveau type de section) :
+Equivalent du bloc "actu societes" de Bondin : 60-90s de narration rapide, 8-12 societes, format "X fait +Y% apres ses resultats / parce que Z".
+
+**Decision : concevoir Solution 2 + Solution 3 lors du Bloc C. Ne pas implementer avant car ca change le format JSON de sortie (nouveau type de section).** En attendant, ajuster le slice de 15 → 25 dans `formatSnapshotForPrompt` comme fix rapide (5 minutes, zero risque).
+
 #### C.4 Type EnrichedEpisodeScript
 
 Nouveau type dans `core/types.ts` :
@@ -1348,13 +1413,27 @@ Etape 1 — Ingest (a chaque fetch, 0$/jour — code pur)
 
 Etape 2 — Research (avant chaque script, 0$/jour — SQL queries)
   DailySnapshot → identifier top movers
-  → query SQLite par asset + theme (7-14 derniers jours)
+  → query SQLite par asset + theme (fenetres variables : 7j pour contexte immédiat, 90j pour themes recurrents)
   → formatResearchContext() construit le contexte en code
   → Le contexte est injecte dans le prompt du Writer (Opus)
 ```
 
 Resultat : le LLM peut ecrire "L'or franchit les $5000, 3eme seance consecutive de hausse
 depuis que les tensions US-Iran se sont intensifiees le 12 fevrier" au lieu de juste constater le prix.
+
+**Retention cible : 6 mois minimum (180 jours)**
+
+Pourquoi 6 mois et pas 7 jours :
+- 7 jours : contexte de la semaine uniquement (momentum tres court terme)
+- 30 jours : un cycle macro Fed (reunions toutes les 6 semaines), une earnings saison
+- 90 jours : tendances geopolitiques (tensions Iran qui durent 3 mois), rotations sectorielles
+- 6 mois : deux earnings seasons, comparaisons saisonnieres (or en debut d'annee, crypto apres halving)
+- 1 an : "il y a un an Bitcoin etait a X" — references temporelles dans la narration
+
+A 600 articles/jour x 180 jours = ~108 000 articles. SQLite + FTS5 gere facilement 500K+ lignes
+avec des queries < 10ms. Stockage : ~80-100 Mo. Aucune raison de se limiter a 7 jours.
+
+Nettoyage : DELETE articles WHERE published_at < date('now', '-180 days') — cron mensuel.
 
 #### D2.2 Tagging rules-based (CODE, pas LLM)
 
@@ -1415,7 +1494,9 @@ Couche 3 — Metadata source (couvre le reste) :
 
 #### D2.3 Storage : SQLite + FTS5
 
-Un seul fichier : `data/news-memory.db`. Pas de vector DB (overkill a ~7000 articles/an).
+Un seul fichier : `data/news-memory.db`. Pas de vector DB (overkill a ~219K articles/an).
+Volume reel avec retention 6 mois : ~108K articles en DB a tout moment (600/jour × 180 jours).
+SQLite + FTS5 gere facilement 500K+ lignes avec queries < 10ms, stockage ~80-100 Mo.
 
 ```sql
 CREATE TABLE articles (
@@ -1452,12 +1533,13 @@ CREATE TABLE article_themes (
 ```
 
 Queries principales :
-- `searchByAsset(symbol, { days: 7 })` — articles recents liés a un asset
+- `searchByAsset(symbol, { days: 7 })` — contexte immédiat d'un asset (7j)
+- `searchByAsset(symbol, { days: 90 })` — themes recurrents sur un asset (90j)
 - `searchByTheme(theme, { days: 14 })` — articles recents par theme macro
 - `searchFullText(query)` — recherche BM25 dans title+summary+digest
 - `getHighImpactRecent(days)` — articles a fort impact
 
-Performance : <10ms sur 50K+ documents avec FTS5.
+Performance : <10ms sur 100K+ documents avec FTS5.
 
 > UPGRADE PATH : si la recherche semantique devient necessaire, ajouter `sqlite-vec`
 > pour des embeddings sans changer le schema ni l'infra.
@@ -1469,7 +1551,9 @@ historique par **queries SQL + formatage code**. Pas d'appel LLM — les donnees
 suffisent, c'est Opus qui fait la synthese narrative.
 
 1. Identifie les top movers du snapshot (drama score > seuil ou |changePct| > 0.5%)
-2. Pour chaque mover : `SELECT title, published_at FROM articles JOIN article_assets ... WHERE symbol = ? AND published_at > date(-7 days) ORDER BY published_at DESC LIMIT 5`
+2. Pour chaque mover, deux queries en parallele :
+   - `... WHERE symbol = ? AND published_at > date(-7 days)` → contexte immédiat (top 5)
+   - `... WHERE symbol = ? AND published_at > date(-90 days)` → themes recurrents (top 3 par theme)
 3. Query themes dominants : `SELECT theme, COUNT(*) FROM article_themes WHERE ... GROUP BY theme ORDER BY count DESC LIMIT 5`
 4. Charge les 3-5 derniers episode summaries (Bloc D)
 5. Formate le tout en texte structure (pas de type complexe — juste du markdown/texte)
@@ -1477,12 +1561,16 @@ suffisent, c'est Opus qui fait la synthese narrative.
 **Format injecte dans le prompt Opus** (section `## Contexte historique`) :
 
 ```
-## Contexte historique (7 derniers jours)
+## Contexte historique
 
-### XAUUSD (or) — 5 articles recents
+### XAUUSD (or) — 7 derniers jours
 - 2026-02-18 : "Fed signals pause, gold rallies to $5050" (source: CNBC)
 - 2026-02-17 : "Gold extends gains for 3rd session" (source: Yahoo Finance)
 - 2026-02-15 : "US-Iran tensions boost safe havens" (source: Reuters via EasyBourse)
+
+### XAUUSD (or) — tendances 90 derniers jours
+- monetary_policy (8 articles) : plusieurs signaux de pause Fed depuis janv.
+- geopolitics (5 articles) : tensions US-Iran recurrentes depuis dec.
 
 ### Themes dominants cette semaine
 - monetary_policy : 12 articles (Fed pause, ECB signal)
@@ -1502,19 +1590,27 @@ Pas de `ResearchBrief` type — le formatage texte est plus flexible et moins fr
 **Multi-asset impact** : un article "Fed rate pause" tague 4-5 assets via les regles causales (couche 2).
 Gere par la relation many-to-many `article_assets`.
 
-**Decay temporel** : les articles recents comptent plus. Approche simple : limiter les queries SQL
-a 7-14 jours. Pas de fonction de decay complexe en V1.
+**Decay temporel** : les articles recents comptent plus. Approche simple : fenetres variables
+par contexte (7j pour momentum immédiat, 90j pour themes macro recurrents). Pas de fonction
+de decay complexe en V1 — les fenetres SQL suffisent.
 
 **Narrative threads** : detection implicite via groupement par theme + fenetre temporelle.
-Les articles partageant le meme theme dans les 7 derniers jours forment un "fil narratif".
+Les articles partageant le meme theme dans les 7-90 derniers jours forment un "fil narratif".
 C'est Opus (le scripteur) qui synthetise l'evolution a partir de la liste chronologique formatee.
 
 #### D2.6 Bootstrapping
 
+Accumulation organique (strategie principale) :
 - **Jour 1-3** : DB vide → Research brief vide → le Writer fonctionne comme aujourd'hui (pas de regression)
 - **Jour 7+** : contexte commence a emerger (1-2 articles par asset)
 - **Jour 14+** : narrative threads detectables ("3eme seance de hausse consecutive")
-- **Backfill possible** : tagger les news des snapshots existants dans `data/snapshot-*.json`
+- **Mois 3+** : base solide pour tous les themes macro recurrents
+
+Backfill optionnel (voir D2.12 pour les sources) :
+- Snapshots existants (`data/snapshot-*.json`) : tagger et stocker les news deja fetches
+- Finnhub `/company-news` : 1 an d'historique pour les equity symbols — **deja integre** dans la pipeline historique
+- Marketaux : 100 req/jour gratuit, backfill ~1 mois de news multilingues en quelques jours
+- Strategie recommandee : lancer le backfill Marketaux sur les 30 derniers jours apres implementation D2
 
 #### D2.7 Package structure
 
@@ -1606,6 +1702,58 @@ Le endpoint FMP `/stock_market/gainers|losers` necessite un plan payant et retou
 individuelles US. Hors scope — on le remplace par notre propre stock screening (Bloc A, A.1e)
 qui scanne 763 actions et detecte les movers quotidiennement.
 Le champ `topMovers` dans `DailySnapshot` sera calcule a partir du screening.
+
+#### D2.12 Sources de news historiques — Etat des lieux (audit fev. 2026)
+
+**Probleme** : les flux RSS ont une fenetre de ~48h. Pour des dates > J-2, zero articles RSS cibles.
+La SQLite archive accumule going forward, mais le bootstrapping et les dates passees necessitent
+des sources avec profondeur historique.
+
+**Etat de la pipeline actuelle** :
+- RSS (toutes sources) : ~48h seulement — live uniquement
+- Finnhub `/news` general : live uniquement (date params silencieusement ignores — confirme)
+- Finnhub `/company-news` : 1 an d'historique, `from`/`to` supportes — **DEJA INTEGRE** en mode historique
+  - Limitation : equities US/EU uniquement (skipe indices ^, futures =F, forex =X, crypto -USD)
+  - Max 5 articles/symbole/jour, 60 req/min rate limit
+- FRED (yields) : historique complet, `observation_start`/`observation_end` — **DEJA INTEGRE**
+- Alternative.me F&G : 90 jours d'historique via `?limit=90` — **DEJA INTEGRE**
+
+**Providers avec profondeur historique — comparatif** :
+
+| Provider | Profondeur | Gratuit | Params date | Langues | Notes |
+|----------|-----------|---------|-------------|---------|-------|
+| **Marketaux** | ~1 an | 100 req/j | `published_before/after` | 30+ dont FR | **Recommande** — 5000+ sources |
+| **GDELT** | 3+ mois garanti | Illimite | `startdatetime` | EN majoritaire | Complexe a parser, format propre |
+| **NewsAPI.org** | 24 mois | 500 req/j (dev only) | `from/to` | EN majoritaire | Plan dev interdit en prod ($40/mois prod) |
+| **The Guardian** | 25+ ans | 5000 req/j | `from-date/to-date` | EN uniquement | Surtout UK/macro global |
+| **NewsData.io** | 6 mois (Basic) | 200 credits/j | `timeframe` | FR + EN | Upgrade payant pour 2 ans |
+| **Finnhub /company-news** | 1 an | 60 req/min | `from/to` | EN | Deja integre, equities only |
+
+**Recommandation : Marketaux comme source de backfill principale**
+
+Raisons :
+1. Sources financieres FR/EN : Les Echos, BFM Business, Capital, Reuters FR inclus
+2. `published_before` / `published_after` avec granularite minute
+3. Gratuit 100 req/jour = ~3000 articles/jour en backfill (30 articles/req)
+4. API simple : `GET /v1/news?published_after=2026-01-01&published_before=2026-01-02&language=fr,en`
+5. Env : `MARKETAUX_API_KEY` (signup gratuit sur marketaux.com)
+
+**Strategie de backfill Marketaux** (a implementer apres D2 SQLite) :
+```typescript
+// scripts/backfill-news.ts
+// Pour chaque jour des 30 derniers jours (3 req/jour — FR, EN, crypto)
+// → store dans news-memory.db avec tagging rules
+// Total : 30 jours × 3 req = 90 req sur 1 jour de quota gratuit
+```
+
+**Ce qu'on ne peut PAS recuperer facilement** :
+- News ZoneBourse / TradingSat (pas d'API, scraping fragile)
+- Contenu derriere paywall (Les Echos complet, L'Agefi premium)
+- News intraday en temps reel (webhooks payants partout)
+
+**Conclusion** : la SQLite accumule going forward (strategy principale). Marketaux permet un
+backfill utile sur 30 jours pour le bootstrapping. Au-dela, les snapshots historiques ne sont
+pas critiques — le pipeline fonctionne sans memoire historique (degradation gracieuse).
 
 #### Livrable Bloc D2
 Dans `@yt-maker/ai/memory/` : `tagArticles()` (rules), `NewsMemoryDB` (SQLite), `buildResearchContext()` (SQL + format).
@@ -1701,6 +1849,40 @@ Scenes V1 fonctionnelles avec EnrichedEpisodeScript + DisclaimerBar + assets de 
 - Un appel TTS par section du script
 - Word-level timestamps → sous-titres animes dans Remotion
 - `AudioManifest` (type existant dans `core/types.ts`) contient les segments + timing
+
+#### F.2b Architecture narration / TTS — Decision critique (2026-02-19)
+
+**Probleme** : le champ `narration` sert actuellement deux roles incompatibles :
+1. Texte affiche a l'ecran dans Remotion (AnimatedText en bas de scene)
+2. Texte envoye a ElevenLabs pour synthese vocale
+
+Ces deux usages ont des contraintes contradictoires :
+
+| Symbole dans `narration` | ElevenLabs lirait | Ce qu'on veut |
+|---|---|---|
+| `→` | "fleche" | "vers" |
+| `EMA9` | "emaneuf" | "E-M-A 9" |
+| `RSI=68` | "RSI egal 68" | "le RSI est a 68" |
+| `+5,53%` | OK en FR | OK |
+| `$` | variable | "dollars" |
+
+**Solution retenue : un seul champ `narration` + sanitizer TTS**
+
+Le champ `narration` reste la source de verite unique (ecrit en prose lisible par un humain).
+Un module `sanitizeForTTS(text, lang)` dans `packages/ai/src/tts-sanitizer.ts` transforme le texte avant envoi a ElevenLabs. Le prompt impose deja la prose sans fleches ni symboles — le sanitizer est un filet de securite.
+
+**Probleme du texte a l'ecran — AnimatedText actuel**
+
+L'`AnimatedText` actuel affiche 200-300 mots en bas de l'ecran → illisible sur YouTube.
+Les vraies chaines finance n'affichent pas la narration complete en bas — elles utilisent soit des sous-titres synchronises, soit des visuels seuls.
+
+Options :
+- **V1 (immediat)** : supprimer `AnimatedText` des scenes, remplacer par `DisclaimerBar` permanent en bas. La voix raconte, les visuels montrent.
+- **V2** : sous-titres synchronises depuis les word timestamps ElevenLabs → SRT → Remotion. C'est ce que font les chaines pro.
+- **Non retenu** : `displayText` court par section — ajoute de la complexite LLM pour un resultat inferieur aux sous-titres auto.
+
+**Decision V1** : supprimer AnimatedText, DisclaimerBar permanent (voir Bloc E).
+**Decision V2** : sous-titres word-level depuis ElevenLabs timestamps (voir F.2 ci-dessus).
 
 #### F.3 Anti-robot (imperfections volontaires)
 
@@ -1815,6 +1997,8 @@ Check automatique du script genere :
 - Pas de vocabulaire interdit (regex sur les termes AMF)
 - `suiviJ1` present si ce n'est pas l'episode 1
 - JSON bien forme et conforme au type attendu
+- **Narration non tronquee** : chaque section doit se terminer par un signe de ponctuation final (`.`, `!`, `?`). Une narration se terminant par une virgule, deux-points, ou une conjonction ("et", "mais", "car", "ce soir") est rejetee — c'est le signal d'une phrase coupee (ex: "les Minutes de la Fed sont tombees ce soir." est OK, "les Minutes de la Fed" ne l'est pas).
+- **volumeAnomaly valide** : toute valeur `< 0.01` dans les technicals est un artefact (Yahoo retourne v=0 sur les indices en mode historique). Le quality gate doit logger un warning et forcer `volumeAnomaly = 1` (neutre) avant generation du script. Ne jamais laisser "-100%" atteindre le LLM.
 - Si fail → re-generation (1 retry max) ou alerte humaine
 
 #### Livrable Bloc H

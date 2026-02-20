@@ -38,7 +38,10 @@ async function main() {
   const type = (opts.type as EpisodeType) || "daily_recap";
   const lang = (opts.lang as Language) || "fr";
   const skipTts = !!opts["skip-tts"];
-  const date = (opts.date as string) || new Date().toISOString().split("T")[0];
+  // Default to yesterday — videos are morning recaps of the previous trading day
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const date = (opts.date as string) || yesterday.toISOString().split("T")[0];
 
   console.log("=== Trading YouTube Maker ===");
   console.log(`Type: ${type} | Lang: ${lang} | Date: ${date} | TTS: ${skipTts ? "SKIP" : "ON"}`);
