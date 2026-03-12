@@ -18,3 +18,4 @@ data/candles/
 episodes/
 *.log
 tsconfig.tsbuildinfo
+references/

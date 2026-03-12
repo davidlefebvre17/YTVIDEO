@@ -57,7 +57,7 @@ REGLE ABSOLUE : les metadonnees internes (drama score, editorial score, buzz sco
 
 PRINCIPE FONDAMENTAL : chaque sujet est traite UNE SEULE FOIS, dans UN SEUL segment. Le segment contient TOUT sur ce sujet : la news, le mouvement, l'analyse technique, les niveaux a surveiller, le scenario. On ne revient JAMAIS sur un sujet deja couvert.
 
-L'episode se compose de 7 a 11 sections :
+L'episode se compose de 6 a 10 sections :
 
 ---
 
@@ -69,12 +69,13 @@ Ex: "Moins 98 milliards. Le trou commercial americain n'avait jamais ete aussi p
 ### 2. GENERIQUE (3-5s) — type: "title_card"
 Visuel pur, animation titre + date. PAS de narration. Le champ narration doit etre une chaine vide "".
 
-### 3. SUIVI J-1 (20-40s) — type: "previously_on"
-TOUJOURS present, meme au premier episode. Episode 1 = "C'est notre premier episode, alors on pose les bases."
-Si des predictions precedentes sont fournies, presente honnetement les resultats. Correct = celebre brievement. Faux = admets clairement.
-REGLE ANTI-REDONDANCE : le suivi J-1 ne repete AUCUN chiffre qui sera detaille dans les segments suivants. Il dit "Hier je vous parlais de l'or et des 5000 — on y reviendra dans un instant" et passe au suivant. Pas de mini-analyse ici.
+MEMOIRE CONTEXTUELLE :
+Si un bloc "Memoire contextuelle" est present dans les donnees, il contient l'historique des episodes precedents.
+UTILISE-LE comme connaissance de fond : "3eme seance consecutive de hausse", "hier je surveillais X et c'est exactement la que le prix a reagi".
+NE MENTIONNE le passe QUE s'il y a un lien de cause a effet avec les donnees du jour. Sinon, ignore-le completement.
+Les references au passe s'integrent naturellement dans les segments concernes — PAS dans une section dediee.
 
-### 4. FIL CONDUCTEUR (15-25s) — type: "thread"
+### 3. FIL CONDUCTEUR (15-25s) — type: "thread"
 C'est le theme qui CONNECTE le plus de sujets entre eux — pas forcement le sujet #1 en volatilite.
 
 Le fil conducteur :
@@ -106,7 +107,7 @@ TISSAGE DU FIL :
 - Si un segment n'a PAS de lien avec le fil, ne pas forcer — utiliser le contraste : "A cote de cette tension, il y a des entreprises qui vivent leur vie..."
 - Le fil CHANGE L'ORDRE des segments : l'ordre suit la logique narrative du fil, pas l'ordre d'importance brut des themes
 
-### 5. SEGMENTS THEMATIQUES (le coeur de l'episode) — type: "segment" x N
+### 4. SEGMENTS THEMATIQUES (le coeur de l'episode) — type: "segment" x N
 4 a 7 segments de profondeur variable. Chaque segment couvre UN sujet editorial distinct.
 Chaque segment est AUTO-CONTENU : la news, le mouvement, l'analyse, les niveaux a surveiller, le scenario — TOUT est dedans.
 On ne cree PAS de section separee pour les news, les zones a surveiller, ou un recap.
@@ -163,7 +164,7 @@ REGLES D'ENCHAINEMENT :
   "Le petrole en hausse, ca ne touche pas que les prix a la pompe — ca touche directement les marges d'un secteur entier."
   "A cote de toute cette tension, il y a des entreprises qui vivent tres bien — Deere en tete."
 
-### 6. CLOSING (20-30s) — type: "closing"
+### 5. CLOSING (20-30s) — type: "closing"
 Retour au fil rouge en UNE phrase de synthese (pas un recap point par point). Puis :
 - Teaser demain (1 phrase) : l'evenement ou le chiffre cle du lendemain
 - Question CTA precise et debattable (1 phrase)
@@ -173,14 +174,15 @@ JAMAIS de question vague comme "Qu'en pensez-vous ?" ou "Dites-moi ce que vous e
 
 ---
 
-TOTAL : 420-540 secondes (7-9 minutes).
-Minimum : 7 sections. Maximum : 11 sections.
+TOTAL : 390-520 secondes (6.5-8.5 minutes).
+Minimum : 6 sections. Maximum : 10 sections.
 
 CE QUI N'EXISTE PAS DANS CETTE STRUCTURE :
 - PAS de section "synthese" ou "market overview" separee — les indices non couverts en segment sont omis ou mentionnes en 1 phrase de transition
 - PAS de section "zones a surveiller" separee — chaque segment contient ses propres niveaux
 - PAS de section "recap" avec 3 points — le closing fait UNE phrase de retour au fil, pas un resume
-- PAS de section "news" separee — les news sont integrees dans les segments thematiques concernes`
+- PAS de section "news" separee — les news sont integrees dans les segments thematiques concernes
+- PAS de section "previously_on" ou "suivi J-1" separee — les references au passe s'integrent naturellement dans les segments concernes`
       : `EPISODE STRUCTURE — THEMATIC v3:
 
 You receive market data with pre-computed technical indicators (EMA, RSI, S/R, volume).
@@ -190,7 +192,7 @@ ABSOLUTE RULE: internal metadata (drama score, editorial score, buzz score, z-sc
 
 CORE PRINCIPLE: each subject is covered ONCE, in ONE segment. The segment contains EVERYTHING about that subject: the news, the move, the technical analysis, the levels to watch, the scenario. You NEVER revisit a subject already covered.
 
-The episode has 7 to 11 sections:
+The episode has 6 to 10 sections:
 
 ---
 
@@ -201,12 +203,13 @@ FORBIDDEN: "Welcome", "Good morning", "Hello" — the cold open ENDS on tension,
 ### 2. TITLE CARD (3-5s) — type: "title_card"
 Pure visual, title animation + date. NO narration. The narration field must be an empty string "".
 
-### 3. YESTERDAY FOLLOW-UP (20-40s) — type: "previously_on"
-ALWAYS present, even on episode 1. Episode 1 = "This is our first episode, so let's set the baseline."
-If previous predictions are provided, honestly present results. Correct = celebrate briefly. Wrong = admit clearly.
-ANTI-REDUNDANCY RULE: the follow-up does NOT repeat any number that will be detailed in upcoming segments.
+CONTEXTUAL MEMORY:
+If a "Contextual memory" block is present in the data, it contains the history of previous episodes.
+USE IT as background knowledge: "3rd consecutive session of gains", "yesterday I was watching X and that is exactly where price reacted".
+ONLY mention the past if there is a cause-and-effect link with today's data. Otherwise, ignore it completely.
+Past references integrate naturally into the relevant segments — NOT in a dedicated section.
 
-### 4. THREAD (15-25s) — type: "thread"
+### 3. THREAD (15-25s) — type: "thread"
 The theme that CONNECTS the most subjects — not necessarily the #1 volatile asset.
 - Names the dominant theme in one sentence
 - Announces the cascade: "And this has knock-on effects on X, Y, Z"
@@ -214,7 +217,7 @@ The theme that CONNECTS the most subjects — not necessarily the #1 volatile as
 - Does NOT list assets one by one
 - Does NOT explain the why — that is the segments' job
 
-### 5. THEMATIC SEGMENTS (core of the episode) — type: "segment" x N
+### 4. THEMATIC SEGMENTS (core of the episode) — type: "segment" x N
 4 to 7 segments of variable depth. Each covers ONE distinct editorial topic.
 Each segment is SELF-CONTAINED: the news, the move, the analysis, the levels to watch, the scenario — ALL in one place.
 There is NO separate section for news, watchlist, or recap.
@@ -227,7 +230,7 @@ THREE DEPTH LEVELS:
 BUDGET RULES: Max 2 DEEP, min 2 FLASH. Total segments = 300-420 seconds.
 First segment = most important topic. Last segment = always FLASH (accelerated rhythm before closing).
 
-### 6. CLOSING (20-30s) — type: "closing"
+### 5. CLOSING (20-30s) — type: "closing"
 Return to the thread in ONE synthesis sentence (not a point-by-point recap). Then:
 - Tomorrow teaser (1 sentence): the key event or number coming up
 - Precise debatable CTA question (1 sentence)
@@ -235,14 +238,15 @@ Return to the thread in ONE synthesis sentence (not a point-by-point recap). The
 
 ---
 
-TOTAL: 420-540 seconds (7-9 minutes).
-Minimum: 7 sections. Maximum: 11 sections.
+TOTAL: 390-520 seconds (6.5-8.5 minutes).
+Minimum: 6 sections. Maximum: 10 sections.
 
 WHAT DOES NOT EXIST IN THIS STRUCTURE:
 - NO separate "synthesis" or "market overview" section
 - NO separate "watchlist" or "zones to watch" section — each segment contains its own levels
 - NO separate "recap" section with 3 points — the closing makes ONE thread-return sentence
-- NO separate "news" section — news are integrated into the relevant thematic segments`;
+- NO separate "news" section — news are integrated into the relevant thematic segments
+- NO separate "previously_on" or "yesterday follow-up" section — past references integrate into relevant segments`;
 
   const antiRedundancy =
     lang === "fr"
@@ -309,7 +313,6 @@ Each segment MUST contain at least one piece of information that appears in NO o
       ? `REGLE DE PACING CRITIQUE :
 Debit cible = 150 mots par 60 secondes. C'est NON NEGOCIABLE.
 - Hook 8s = ~20 mots
-- Previously_on 30s = ~75 mots
 - Thread 20s = ~50 mots
 - FLASH 25s = ~62 mots
 - FOCUS 50s = ~125 mots
@@ -319,7 +322,6 @@ Si ta narration est trop courte pour la duree, DEVELOPPE : ajoute du contexte, d
       : `CRITICAL PACING RULE:
 Target speech rate = 150 words per 60 seconds. This is NON-NEGOTIABLE.
 - Hook 8s = ~20 words
-- Previously_on 30s = ~75 words
 - Thread 20s = ~50 words
 - FLASH 25s = ~62 words
 - FOCUS 50s = ~125 words
@@ -351,15 +353,6 @@ If narration is too short, EXPAND. NEVER leave a word/duration ratio below 0.7x.
       "title": "Generique",
       "narration": "",
       "durationSec": 4,
-      "visualCues": [],
-      "data": {}
-    },
-    {
-      "id": "previously_on",
-      "type": "previously_on",
-      "title": "Suivi J-1",
-      "narration": "string — 20-40s, honest review of yesterday's calls",
-      "durationSec": 30,
       "visualCues": [],
       "data": {}
     },
@@ -438,16 +431,17 @@ If narration is too short, EXPAND. NEVER leave a word/duration ratio below 0.7x.
 }
 
 RULES:
-- Total duration 420-540 seconds (7-9 minutes).
+- Total duration 390-520 seconds (6.5-8.5 minutes).
 - segmentCount = number of sections with type "segment" (must be 4-7).
-- coverageTopics = list of all topic slugs from segments (for validation).
+- coverageTopics = list of all topic slugs from segments (for validation). REQUIRED.
+- threadSummary = the thread summarized in 1 sentence. REQUIRED — used for episode memory.
 - depth is REQUIRED on every section with type "segment". Must be "flash", "focus", or "deep".
 - topic is REQUIRED on every section with type "segment". Use lowercase-slug format.
 - assets is REQUIRED on every section with type "segment". List the asset symbols covered.
 - predictions is REQUIRED in data for segments with depth "deep" or "focus". Not needed for "flash".
 - Maximum 2 segments with depth "deep". Minimum 2 segments with depth "flash".
 - The title_card section always has narration = "" (empty string).
-- There is NO "synthesis", "watchlist", "recap_cta", or "news" section. Only: hook, title_card, previously_on, thread, segment (x4-7), closing.
+- There is NO "synthesis", "watchlist", "recap_cta", "previously_on", or "news" section. Only: hook, title_card, thread, segment (x4-7), closing.
 - Be SPECIFIC: exact prices, percentages, level numbers. Never vague.
 - NEVER invent causes, events, or news that are NOT in the provided data. If you don't know WHY a move happened, say "le marche a reagit sans catalyseur clair" or speculate ONLY with "une hypothese serait...". Hallucinating fake geopolitical events is a CRITICAL failure.
 - When a price level sounds unusual or historic (e.g. gold above $5000, Bitcoin below $20k), ALWAYS add a quick contextualizing phrase: "l'or qui teste des niveaux historiques" or "un seuil jamais vu depuis...". Don't just state the number — anchor it for the listener.

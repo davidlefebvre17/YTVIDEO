@@ -111,6 +111,24 @@ function parseCandles(json: any): Candle[] {
       v: q.volume[i] || 0,
     });
   }
+
+  // Fix Yahoo volume unit mismatch: on some exchanges (Shanghai, Shenzhen, etc.)
+  // the last candle (live/intraday) reports volume in raw units while historical
+  // candles use lots (thousands). Detect and normalize.
+  if (candles.length >= 5) {
+    const last = candles[candles.length - 1];
+    const prevVolumes = candles.slice(-21, -1).filter(c => c.v > 0).map(c => c.v);
+    if (prevVolumes.length >= 3 && last.v > 0) {
+      const sorted = [...prevVolumes].sort((a, b) => a - b);
+      const median = sorted[Math.floor(sorted.length / 2)];
+      // If last volume is >50x the median, it's a unit mismatch — scale it down
+      if (median > 0 && last.v / median > 50) {
+        const scaleFactor = Math.round(last.v / median);
+        last.v = Math.round(last.v / scaleFactor);
+      }
+    }
+  }
+
   return candles;
 }
 
@@ -196,6 +214,19 @@ export async function fetchDaily3yCandles(
   }
 }
 
+export async function fetchDailyMaxCandles(
+  symbol: string,
+): Promise<import("@yt-maker/core").Candle[]> {
+  // Yahoo caps daily candles at ~10y; "max" may return monthly data
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=10y`;
+  try {
+    const json = await fetchYahoo(url);
+    return parseCandles(json);
+  } catch {
+    return [];
+  }
+}
+
 /**
  * Fetch changePct for a list of symbols using the Yahoo Finance spark endpoint.
  * Max 20 symbols per call (free, no auth required).
@@ -242,12 +273,6 @@ export async function fetchSparkChanges(symbols: string[]): Promise<Array<{ symb
   return results;
 }
 
-/**
- * @deprecated Yahoo Finance v7/quote requires auth. Use fetchSparkChanges() instead.
- */
-export async function fetchBatchQuote(symbols: string[]): Promise<any[]> {
-  return [];
-}
 
 /**
  * Build an AssetSnapshot from daily candles for a specific historical date.

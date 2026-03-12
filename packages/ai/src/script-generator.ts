@@ -6,6 +6,9 @@ import { loadKnowledge } from "./knowledge-loader";
 import { selectRelevantNews } from "./news-selector";
 import { buildThemesDuJour } from "./editorial-score";
 import { getCompanyProfile, getProfileContext } from "./company-profiles";
+import { buildMarketMemoryContext } from "@yt-maker/data";
+import type { NewsMemoryDB } from "./memory";
+import { buildResearchContext } from "./memory";
 
 export interface PrevEntry {
   snapshot: DailySnapshot;
@@ -15,10 +18,24 @@ export interface PrevEntry {
 /**
  * Multi-day history context (ordered oldest → most recent).
  * entries[last] = J-1, entries[last-1] = J-2, etc.
- * Max 5 entries to avoid bloating the prompt.
+ * Max 15 entries with degraded detail over time.
  */
 export interface PrevContext {
   entries: PrevEntry[];
+}
+
+/** Compact digest of a past episode for contextual memory. */
+interface EpisodeDigest {
+  date: string;
+  label: string;             // "J-1", "J-5", etc.
+  tier: "detailed" | "summary" | "thread";
+  movers: string;            // compact top-5 movers line
+  regime?: string;           // risk-on / risk-off / incertain / rotation
+  thread?: string;           // threadSummary from script
+  topics?: string[];         // coverageTopics from script
+  trendIdeas?: string[];     // direction ideas (non-chiffered) extracted from predictions
+  yields?: string;           // compact yields line
+  sentiment?: string;        // compact sentiment line
 }
 
 /** Top movers summary for a snapshot (5 lines max). */
@@ -34,67 +51,136 @@ function formatMovers(snapshot: DailySnapshot): string {
 }
 
 /**
- * Build multi-day history block.
+ * Build an EpisodeDigest from a PrevEntry.
+ * Extracts compact, structured data for contextual memory.
+ */
+function buildDigest(entry: PrevEntry, label: string, tier: "detailed" | "summary" | "thread"): EpisodeDigest {
+  const snap = entry.snapshot;
+  const script = entry.script;
+
+  const digest: EpisodeDigest = {
+    date: snap.date,
+    label,
+    tier,
+    movers: formatMovers(snap),
+  };
+
+  // Yields (compact)
+  if (snap.yields) {
+    const y = snap.yields;
+    digest.yields = `10Y:${y.us10y}% spread:${y.spread10y2y > 0 ? "+" : ""}${y.spread10y2y}%`;
+  }
+
+  // Sentiment (compact)
+  if (snap.sentiment) {
+    digest.sentiment = `F&G:${snap.sentiment.cryptoFearGreed.value}/100`;
+  }
+
+  // From script metadata
+  if (script) {
+    digest.thread = script.threadSummary;
+    digest.topics = script.coverageTopics;
+
+    // Extract mood from script (moodMarche field — added by LLM, not in strict type)
+    const moodField = (script as unknown as Record<string, unknown>).moodMarche;
+    if (typeof moodField === "string") {
+      digest.regime = moodField;
+    }
+
+    // Extract trend ideas from segment predictions (direction only, no numbers)
+    const ideas: string[] = [];
+    for (const section of script.sections) {
+      if (section.type === "segment" && section.data) {
+        const preds = section.data.predictions as Array<{ asset: string; direction: string; reasoning?: string }> | undefined;
+        if (preds) {
+          for (const p of preds) {
+            ideas.push(`${p.asset}: ${p.direction}`);
+          }
+        }
+      }
+    }
+    if (ideas.length > 0) digest.trendIdeas = ideas.slice(0, 8);
+  }
+
+  return digest;
+}
+
+/**
+ * Format contextual memory from episode digests.
  *
- * For each past episode (oldest first):
- *   - Show top movers
- *   - Show predictions made that day (from script)
- *   - If the NEXT day's snapshot is available → show what actually happened (accountability)
+ * Degraded tiers:
+ *   - J-1 → J-3: DETAILED — full movers, yields, sentiment, thread, topics, trend ideas, key events
+ *   - J-4 → J-7: SUMMARY — thread, topics, top 3 movers, regime
+ *   - J-8 → J-15: THREAD — thread + regime only (1 line each)
  *
- * The LLM uses this to:
- *   1. Build factual suivi J-1 ("hier le VIX explosait, l'argent tenait les 75$")
- *   2. Verify older predictions ("il y a 2 jours je surveillais X, hier ça a...")
- *   3. Build narrative continuity ("3ème séance consécutive de...")
+ * The LLM uses this as CONTEXTUAL KNOWLEDGE, not as a mandatory section.
+ * It mentions past episodes ONLY when there is a narrative link with today's data.
  */
 function formatPrevContext(prev: PrevContext): string {
   if (prev.entries.length === 0) return "";
 
-  let text = `# Historique récent (${prev.entries.length} séance${prev.entries.length > 1 ? "s" : ""})\n\n`;
+  const digests: EpisodeDigest[] = [];
+  const total = prev.entries.length;
 
-  for (let i = 0; i < prev.entries.length; i++) {
+  for (let i = 0; i < total; i++) {
     const entry = prev.entries[i];
-    const nextEntry = prev.entries[i + 1]; // entry after this one (closer to today)
-    const isYesterday = i === prev.entries.length - 1;
-    const label = isYesterday ? "J-1" : `J-${prev.entries.length - i}`;
+    const daysAgo = total - i; // J-1 for last entry, J-2 for second-to-last, etc.
+    const label = `J-${daysAgo}`;
+    const tier = daysAgo <= 3 ? "detailed" : daysAgo <= 7 ? "summary" : "thread";
+    digests.push(buildDigest(entry, label, tier));
+  }
 
-    text += `## ${label} — ${entry.snapshot.date}\n`;
+  let text = `# Mémoire contextuelle (${total} séance${total > 1 ? "s" : ""})\n\n`;
+  text += `> INSTRUCTION : cette mémoire est un OUTIL de connaissance, pas un script obligatoire.\n`;
+  text += `> Mentionne un épisode passé UNIQUEMENT s'il y a un lien de cause à effet avec les données du jour.\n`;
+  text += `> Exemples valides : "3ème séance consécutive de hausse pour l'or", "hier je surveillais les 5000 — et c'est exactement là que le prix a réagi".\n`;
+  text += `> Si aucun lien pertinent → ignore complètement cette section.\n\n`;
 
-    // Key movers
-    text += `**Mouvements**\n${formatMovers(entry.snapshot)}\n`;
-
-    // Macro snapshot
-    if (entry.snapshot.yields) {
-      const y = entry.snapshot.yields;
-      text += `10Y: ${y.us10y}% | Spread: ${y.spread10y2y > 0 ? "+" : ""}${y.spread10y2y}%`;
+  // Detailed tier (J-1 → J-3)
+  const detailed = digests.filter((d) => d.tier === "detailed");
+  if (detailed.length > 0) {
+    for (const d of detailed) {
+      text += `## ${d.label} — ${d.date}`;
+      if (d.regime) text += ` [${d.regime}]`;
+      text += "\n";
+      text += `Mouvements:\n${d.movers}\n`;
+      if (d.yields) text += `${d.yields}`;
+      if (d.sentiment) text += ` | ${d.sentiment}`;
+      if (d.yields || d.sentiment) text += "\n";
+      if (d.thread) text += `Fil conducteur: "${d.thread}"\n`;
+      if (d.topics?.length) text += `Sujets couverts: ${d.topics.join(", ")}\n`;
+      if (d.trendIdeas?.length) text += `Idées de tendance: ${d.trendIdeas.join(" | ")}\n`;
+      text += "\n";
     }
-    if (entry.snapshot.sentiment) {
-      text += ` | F&G: ${entry.snapshot.sentiment.cryptoFearGreed.value}`;
+  }
+
+  // Summary tier (J-4 → J-7)
+  const summary = digests.filter((d) => d.tier === "summary");
+  if (summary.length > 0) {
+    text += `## Semaine précédente (résumé)\n`;
+    for (const d of summary) {
+      text += `**${d.label}** ${d.date}`;
+      if (d.regime) text += ` [${d.regime}]`;
+      if (d.thread) text += ` — "${d.thread}"`;
+      text += "\n";
+      // Only top 3 movers (first 3 lines of movers string)
+      const moverLines = d.movers.split("\n").slice(0, 3);
+      text += `${moverLines.join("\n")}\n`;
+      if (d.topics?.length) text += `Sujets: ${d.topics.join(", ")}\n`;
     }
     text += "\n";
+  }
 
-    // Key events with actuals
-    const withActuals = (entry.snapshot.events ?? []).filter((e) => e.actual).slice(0, 3);
-    if (withActuals.length > 0) {
-      text += `Événements: ${withActuals.map((e) => `${e.name} → ${e.actual} (vs ${e.forecast ?? "?"})`).join(" | ")}\n`;
+  // Thread tier (J-8 → J-15)
+  const threads = digests.filter((d) => d.tier === "thread");
+  if (threads.length > 0) {
+    text += `## Deux semaines précédentes (fils)\n`;
+    for (const d of threads) {
+      text += `${d.label} ${d.date}`;
+      if (d.regime) text += ` [${d.regime}]`;
+      if (d.thread) text += ` — "${d.thread}"`;
+      text += "\n";
     }
-
-    // Script predictions for this day
-    if (entry.script) {
-      const preds = entry.script.sections.find((s: ScriptSection) => s.type === "predictions");
-      if (preds?.narration) {
-        text += `\n**Prédictions faites ce jour-là**\n${preds.narration}\n`;
-      }
-    }
-
-    // Accountability: what happened the next day (if we have it)
-    if (entry.script && nextEntry) {
-      text += `\n**Résultat le lendemain (${nextEntry.snapshot.date})**\n`;
-      text += `${formatMovers(nextEntry.snapshot)}\n`;
-      text += `→ Utilise ces données pour évaluer honnêtement les prédictions ci-dessus.\n`;
-    } else if (entry.script && isYesterday) {
-      text += `\n→ C'est la séance d'AUJOURD'HUI qui répond à ces prédictions. Vérifie-les dans ton suivi.\n`;
-    }
-
     text += "\n";
   }
 
@@ -200,8 +286,34 @@ export function formatSnapshotForPrompt(
   snapshot: DailySnapshot,
   lang: Language = "fr",
   prevContext?: PrevContext,
+  newsDb?: NewsMemoryDB,
 ): string {
   let text = prevContext ? formatPrevContext(prevContext) : "";
+
+  // ── Research Context (News Memory — D2) ──
+  if (newsDb) {
+    try {
+      const researchContext = buildResearchContext(snapshot, newsDb);
+      if (researchContext.trim()) {
+        text += researchContext;
+        text += `\n---\n\n`;
+      }
+    } catch (err) {
+      console.warn(`[script-generator] Research context error: ${(err as Error).message.slice(0, 80)}`);
+    }
+  }
+
+  // ── MarketMemory context (zones, indicators, regime per asset) ──
+  const snapshotSymbols = snapshot.assets.map((a) => a.symbol);
+  const memoryContext = buildMarketMemoryContext(snapshotSymbols);
+  if (memoryContext.trim()) {
+    text += `# Mémoire technique MarketMemory\n\n`;
+    text += `> Zones S/R, indicateurs et événements récents pour les actifs du jour.\n`;
+    text += `> Utilise ces niveaux pour contextualiser les mouvements — "le prix a testé le support à X", "cassure confirmée de la résistance Y".\n\n`;
+    text += memoryContext;
+    text += `\n---\n\n`;
+  }
+
   text += `# Market Data — ${snapshot.date}\n\n`;
 
   // ── Macro context ─────────────────────────────────────────────────
@@ -245,7 +357,7 @@ export function formatSnapshotForPrompt(
     if (asset.technicals) {
       const t = asset.technicals;
       text += `Court terme (1 mois):\n`;
-      text += `  EMA9: ${fmt(t.ema9)} | EMA21: ${fmt(t.ema21)} | Prix ${asset.price > t.ema9 ? "AU-DESSUS" : "EN-DESSOUS"} de l'EMA\n`;
+      text += `  SMA20: ${fmt(t.ema9)} | SMA50: ${fmt(t.ema21)} | Prix ${asset.price > t.ema9 ? "AU-DESSUS" : "EN-DESSOUS"} de la SMA\n`;
       text += `  RSI14: ${t.rsi14.toFixed(0)}${t.rsi14 < 30 ? " ⚠️ SURVENTE" : t.rsi14 > 70 ? " ⚠️ SURACHAT" : ""}\n`;
       text += `  Trend: ${t.trend.toUpperCase()} | Volume: ${t.volumeAnomaly > 1.2 ? `+${(t.volumeAnomaly * 100 - 100).toFixed(0)}% vs moy.20j` : t.volumeAnomaly < 0.8 ? `-${(100 - t.volumeAnomaly * 100).toFixed(0)}% vs moy.20j` : "normal"}\n`;
       text += `  Supports: ${t.supports.map(fmt).join(", ") || "—"} | Résistances: ${t.resistances.map(fmt).join(", ") || "—"}\n`;
@@ -407,6 +519,48 @@ export function formatSnapshotForPrompt(
     text += "\n";
   }
 
+  // ── COT Positioning — positionnement institutionnel (données mardi, publiées vendredi) ──
+  if (snapshot.cotPositioning && snapshot.cotPositioning.contracts.length > 0) {
+    text += `## Positionnement institutionnel COT (rapport CFTC du ${snapshot.cotPositioning.reportDate})\n`;
+    text += `Données du mardi, publiées le vendredi suivant. Le COT est un indicateur CONTRARIAN de positionnement — voir la fiche knowledge pour les règles d'interprétation.\n\n`;
+
+    // Show notable signals first (extremes + flips)
+    const notable = snapshot.cotPositioning.contracts.filter(
+      (c) => c.current.signals && (c.current.signals.bias.includes("extreme") || c.current.signals.flipDetected),
+    );
+    if (notable.length > 0) {
+      text += `### Signaux notables\n`;
+      for (const c of notable) {
+        const s = c.current.signals!;
+        const netFmt = c.current.assetManagers.netPosition > 0 ? "+" : "";
+        if (s.flipDetected) {
+          text += `- **FLIP** ${c.name}: les spéculateurs ont retourné leur position (net ${netFmt}${c.current.assetManagers.netPosition}). Signal de conviction fort.\n`;
+        } else if (s.bias === "extreme_long") {
+          text += `- **EXTREME LONG** ${c.name}: net ${netFmt}${c.current.assetManagers.netPosition} (percentile ${s.percentileRank}/100 sur 10 semaines). Signal contrarian potentiel — complaisance ?\n`;
+        } else if (s.bias === "extreme_short") {
+          text += `- **EXTREME SHORT** ${c.name}: net ${netFmt}${c.current.assetManagers.netPosition} (percentile ${s.percentileRank}/100 sur 10 semaines). Signal contrarian potentiel — excès de pessimisme ?\n`;
+        }
+      }
+      text += "\n";
+    }
+
+    // Then show all contracts in compact format
+    text += `### Positionnement complet\n`;
+    text += `| Contrat | Net spéculateurs | % OI | Bias | P-rank | Δ semaine | Semaines |\n`;
+    text += `|---------|-----------------|------|------|--------|-----------|----------|\n`;
+    for (const c of snapshot.cotPositioning.contracts) {
+      const am = c.current.assetManagers;
+      const s = c.current.signals;
+      const netFmt = am.netPosition > 0 ? `+${am.netPosition}` : `${am.netPosition}`;
+      const bias = s?.bias ?? "?";
+      const pRank = s ? `P${s.percentileRank}` : "?";
+      const chg = s ? (s.netChangeSpeculators > 0 ? `+${s.netChangeSpeculators}` : `${s.netChangeSpeculators}`) : "?";
+      const wks = s ? `${s.weeksInDirection}` : "?";
+      text += `| ${c.name} | ${netFmt} | ${am.pctOfOI}% | ${bias} | ${pRank} | ${chg} | ${wks} |\n`;
+    }
+    text += "\n";
+  }
+
   return text;
 }
 
@@ -436,6 +590,15 @@ const DISCLAIMER_PATTERNS = [
 
 function postProcessScript(script: EpisodeScript): void {
   const warnings: string[] = [];
+
+  // Strip previously_on sections (LLM sometimes generates despite explicit instruction not to)
+  script.sections = script.sections.filter((section) => {
+    if (section.type === "previously_on") {
+      warnings.push(`  [quality] Stripped unexpected "previously_on" section`);
+      return false;
+    }
+    return true;
+  });
 
   for (const section of script.sections) {
     if (!section.narration) continue;
@@ -473,6 +636,7 @@ export async function generateScript(
     lang: Language;
     episodeNumber: number;
     prevContext?: PrevContext;
+    newsDb?: NewsMemoryDB;
   },
 ): Promise<EpisodeScript> {
   console.log(`\nGenerating ${options.type} script in ${options.lang}...`);
@@ -500,7 +664,7 @@ export async function generateScript(
       ? getChartAnalysisSystemPrompt(options.lang)
       : getDailyRecapSystemPrompt(options.lang, knowledgeContext);
 
-  const userMessage = formatSnapshotForPrompt(snapshot, options.lang, options.prevContext);
+  const userMessage = formatSnapshotForPrompt(snapshot, options.lang, options.prevContext, options.newsDb);
 
   console.log(`System prompt: ${systemPrompt.length} chars`);
   console.log(`User message: ${userMessage.length} chars`);

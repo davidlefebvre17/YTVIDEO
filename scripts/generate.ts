@@ -10,8 +10,12 @@ import "dotenv/config";
 import * as fs from "fs";
 import * as path from "path";
 import { execSync } from "child_process";
-import { fetchMarketSnapshot } from "@yt-maker/data";
-import { generateScript, getNextEpisodeNumber, appendToManifest } from "@yt-maker/ai";
+import { fetchMarketSnapshot, updateAllMarketMemory, isWeeklyJobDay, applyHaikuEnrichment, loadMemory } from "@yt-maker/data";
+import type { ZoneEvent, HaikuEnrichmentResult } from "@yt-maker/data";
+import { generateScript, getNextEpisodeNumber, appendToManifest, getMarketMemoryHaikuPrompt, generateStructuredJSON, NewsMemoryDB, initTagger, tagArticleAuto } from "@yt-maker/ai";
+import { runPipeline, toEpisodeScript } from "@yt-maker/ai";
+import type { PrevContext } from "@yt-maker/ai";
+import { runWeeklyJob } from "@yt-maker/ai";
 import type { EpisodeType, Language, EpisodeManifestEntry } from "@yt-maker/core";
 
 // Parse CLI args
@@ -46,6 +50,14 @@ async function main() {
   console.log("=== Trading YouTube Maker ===");
   console.log(`Type: ${type} | Lang: ${lang} | Date: ${date} | TTS: ${skipTts ? "SKIP" : "ON"}`);
 
+  // Initialize News Memory tagger (one-time at boot)
+  console.log("\n--- Initializing News Memory tagger ---");
+  try {
+    initTagger();
+  } catch (err) {
+    console.warn(`  Tagger initialization warning: ${(err as Error).message}`);
+  }
+
   // 1. Fetch market data
   console.log("\n--- Step 1: Fetching market data ---");
   const snapshot = await fetchMarketSnapshot(date);
@@ -57,10 +69,114 @@ async function main() {
   fs.writeFileSync(snapshotPath, JSON.stringify(snapshot, null, 2));
   console.log(`Snapshot saved: ${snapshotPath}`);
 
+  // 1a. Tag & store news in SQLite (D2)
+  console.log("\n--- Step 1a: Tagging and storing news (D2 News Memory) ---");
+  const newsDb = new NewsMemoryDB(path.join(dataDir, "news-memory.db"));
+  try {
+    const articles = snapshot.news.map((n) => ({
+      article: {
+        title: n.title,
+        source: n.source,
+        url: n.url,
+        published_at: n.publishedAt,
+        summary: n.summary,
+        category: n.category,
+        lang: n.lang,
+        snapshot_date: date,
+      },
+      tags: tagArticleAuto({
+        title: n.title,
+        summary: n.summary || "",
+        source: n.source,
+      }),
+    }));
+
+    const stored = newsDb.storeArticles(articles);
+    console.log(`  NewsMemory: ${stored} articles tagged and stored`);
+
+    // Sync economic events if available
+    if (snapshot.events && snapshot.events.length > 0) {
+      const ecoEvents = snapshot.events.map((e) => ({
+        id: `${date}-${e.name}`,
+        name: e.name,
+        currency: e.currency,
+        event_date: date,
+        strength: (e.impact === "high" ? "Strong" : e.impact === "medium" ? "Moderate" : "Weak") as "Strong" | "Moderate" | "Weak",
+        forecast: e.forecast ? Number(e.forecast) : undefined,
+        previous: e.previous ? Number(e.previous) : undefined,
+        actual: e.actual ? Number(e.actual) : undefined,
+        outcome: "pending" as const,
+        source: "forexfactory",
+      }));
+      newsDb.syncEconomicEvents(ecoEvents);
+      console.log(`  Economic events synced: ${ecoEvents.length} events`);
+    }
+  } catch (err) {
+    console.warn(`  NewsMemory error: ${(err as Error).message.slice(0, 100)}`);
+  }
+
+  // 1b. Update MarketMemory (D3)
+  console.log("\n--- Step 1b: Updating MarketMemory ---");
+  const memoryUpdates = await updateAllMarketMemory(date);
+  const triggeredAssets = memoryUpdates.filter((u) => u.events.length > 0);
+  if (triggeredAssets.length > 0) {
+    console.log(`  Zone events on: ${triggeredAssets.map((u) => u.symbol).join(", ")}`);
+  }
+
+  // Weekly Sonnet job (Monday only)
+  if (isWeeklyJobDay(date)) {
+    console.log("  Monday detected — running weekly Sonnet job...");
+    const weeklyResult = await runWeeklyJob();
+    console.log(`  Weekly job: ${weeklyResult.success ? "OK" : "FAILED"} (${weeklyResult.assets_processed} assets)`);
+  }
+
+  // Haiku enrichment for triggered assets
+  if (triggeredAssets.length > 0) {
+    console.log(`  Haiku enrichment for ${triggeredAssets.length} triggered assets...`);
+    const enrichments: HaikuEnrichmentResult[] = [];
+
+    for (const update of triggeredAssets) {
+      const memory = loadMemory(update.symbol);
+      if (!memory) continue;
+
+      try {
+        const { system, user } = getMarketMemoryHaikuPrompt(memory, update.events);
+        const result = await generateStructuredJSON<HaikuEnrichmentResult>(system, user, { role: "fast" });
+        enrichments.push(result);
+        console.log(`    ${update.symbol}: ${result.tactical_note}`);
+      } catch (err) {
+        console.warn(`    ${update.symbol}: Haiku failed — ${(err as Error).message.slice(0, 60)}`);
+      }
+    }
+
+    if (enrichments.length > 0) {
+      applyHaikuEnrichment(enrichments);
+      console.log(`  ${enrichments.length} assets enriched by Haiku`);
+    }
+  }
+
   // 2. Generate script via Claude
-  console.log("\n--- Step 2: Generating script via Claude ---");
+  console.log("\n--- Step 2: Generating script ---");
   const episodeNumber = getNextEpisodeNumber();
-  const script = await generateScript(snapshot, { type, lang, episodeNumber });
+  const useLegacy = !!opts["legacy"];
+
+  let script;
+  if (useLegacy) {
+    // Legacy monolith (single LLM call)
+    console.log("  Mode: LEGACY (monolithe)");
+    script = await generateScript(snapshot, { type, lang, episodeNumber, newsDb });
+  } else {
+    // New pipeline C1→C5
+    console.log("  Mode: PIPELINE C1→C5");
+    const result = await runPipeline({
+      snapshot,
+      lang,
+      episodeNumber,
+      newsDb,
+    });
+    script = toEpisodeScript(result.directedEpisode, episodeNumber, lang);
+    console.log(`  Pipeline stats: ${result.stats.llmCalls} LLM calls, ${result.stats.retries} retries, ${(result.stats.totalDurationMs / 1000).toFixed(1)}s`);
+  }
 
   // 3. TTS (Phase 3 — skipped for now)
   if (!skipTts) {
@@ -119,6 +235,13 @@ async function main() {
   } catch (err) {
     console.error("Render failed:", err);
     process.exit(1);
+  }
+
+  // Close NewsMemory DB
+  try {
+    newsDb.close();
+  } catch (err) {
+    console.warn(`  NewsMemory close warning: ${(err as Error).message}`);
   }
 
   console.log("\n=== Done! ===");

@@ -2,7 +2,6 @@ import React from "react";
 import { Series, useVideoConfig } from "remotion";
 import type { EpisodeScript, AssetSnapshot, NewsItem } from "@yt-maker/core";
 import { IntroScene } from "../scenes/IntroScene";
-import { PreviouslyOnScene } from "../scenes/PreviouslyOnScene";
 import { MarketOverviewScene } from "../scenes/MarketOverviewScene";
 import { ChartDeepDiveScene } from "../scenes/ChartDeepDiveScene";
 import { NewsScene } from "../scenes/NewsScene";
@@ -40,9 +39,6 @@ export const DailyRecapEpisode: React.FC<DailyRecapEpisodeProps> = ({
                 episodeNumber={script.episodeNumber}
                 date={script.date}
               />
-            )}
-            {section.type === "previously_on" && (
-              <PreviouslyOnScene section={section} />
             )}
             {section.type === "market_overview" && (
               <MarketOverviewScene section={section} assets={assets} />

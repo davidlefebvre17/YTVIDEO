@@ -10,58 +10,215 @@ function readKnowledgeFile(filename: string): string {
   return fs.readFileSync(filePath, "utf-8");
 }
 
+// ── Signal detection ─────────────────────────────────────────────────────────
+
+/** Central bank event in calendar or significant CB news buzz */
+function hasCentralBankSignal(snapshot: DailySnapshot): boolean {
+  const kw = [
+    "fomc", "ecb", "boj", "boe", "interest rate", "taux directeur",
+    "rate decision", "décision de taux", "monetary policy", "politique monétaire",
+    "fed funds", "banque centrale",
+  ];
+  const check = (text: string) => kw.some((k) => text.toLowerCase().includes(k));
+
+  return (
+    snapshot.events.some((e) => check(e.name)) ||
+    (snapshot.upcomingEvents || []).some((e) => check(e.name)) ||
+    snapshot.news.slice(0, 30).filter((n) => check(n.title)).length >= 3
+  );
+}
+
+/** 3+ geopolitical news items = significant geopolitical buzz */
+function hasGeopoliticalSignal(snapshot: DailySnapshot): boolean {
+  const kw = [
+    "war", "guerre", "conflict", "conflit", "sanction", "tariff", "tarif",
+    "military", "militaire", "iran", "russia", "russie", "ukraine",
+    "china", "chine", "taiwan", "houthi", "missile", "frappe", "strike",
+    "invasion", "otan", "nato", "tension", "escalad", "cease", "cessez",
+  ];
+  const geoCount = snapshot.news
+    .slice(0, 50)
+    .filter((n) => kw.some((k) => n.title.toLowerCase().includes(k))).length;
+  return geoCount >= 3;
+}
+
+/** High-impact macro event in calendar OR VIX spike */
+function hasMacroSignal(snapshot: DailySnapshot): boolean {
+  const kw = [
+    "cpi", "ppi", "gdp", "pib", "nfp", "non-farm", "payroll", "pmi", "ism",
+    "retail sales", "inflation", "unemployment", "chômage", "chomage",
+    "consumer confidence", "confiance", "jolts", "pce",
+  ];
+  const macroEvent = snapshot.events.some(
+    (e) => e.impact === "high" && kw.some((k) => e.name.toLowerCase().includes(k)),
+  );
+
+  // VIX spike (>10% daily change)
+  const vix = snapshot.assets.find((a) => a.symbol === "^VIX");
+  const vixSpike = vix ? Math.abs(vix.changePct) > 10 : false;
+
+  return macroEvent || vixSpike;
+}
+
+/** 5+ assets moving >1.5% = active cross-market day */
+function hasIntermarketSignal(snapshot: DailySnapshot): boolean {
+  const bigMovers = snapshot.assets.filter((a) => Math.abs(a.changePct) > 1.5).length;
+  return bigMovers >= 5;
+}
+
+// ── Asset profiles: extract only relevant sections ───────────────────────────
+
+/** Maps asset symbols to patterns found in asset-profiles.md ## headers */
+const SYMBOL_PROFILE_PATTERNS: Record<string, string[]> = {
+  "GC=F": ["## Or ("],
+  "SI=F": ["## Argent"],
+  "CL=F": ["## Pétrole"],
+  "BZ=F": ["## Pétrole"],
+  "BTC-USD": ["## Bitcoin"],
+  "ETH-USD": ["## Ethereum"],
+  "^GSPC": ["## S&P 500"],
+  "^FCHI": ["## CAC 40"],
+  "DX-Y.NYB": ["## Dollar Index"],
+  "EURUSD=X": ["## EUR/USD"],
+  "^VIX": ["## VIX"],
+  "HG=F": ["## Cuivre"],
+  "NG=F": ["## Gaz naturel"],
+  "JPY=X": ["## Yen japonais"],
+  "GBPUSD=X": ["## GBP"],
+  "AUDUSD=X": ["## Dollar australien"],
+  "NZDUSD=X": ["## Dollar néo-zélandais"],
+};
+
+/**
+ * Extract only the asset profile sections for the top 5 drama-score assets.
+ * Includes Carry Trade if JPY/AUD/NZD are in play, Yields if yield data exists,
+ * and always appends the narration rules.
+ */
+function buildAssetProfilesContext(snapshot: DailySnapshot): string {
+  const fullContent = readKnowledgeFile("asset-profiles.md");
+  if (!fullContent) return "";
+
+  // Split into sections by ## headers
+  const rawSections = fullContent.split(/(?=^## )/m);
+
+  // Get top 5 assets by drama score
+  const topSymbols = [...snapshot.assets]
+    .sort((a, b) => (b.technicals?.dramaScore ?? 0) - (a.technicals?.dramaScore ?? 0))
+    .slice(0, 5)
+    .map((a) => a.symbol);
+
+  const matched = new Set<string>();
+  const result: string[] = [];
+
+  // Match top assets to profile sections
+  for (const symbol of topSymbols) {
+    const patterns = SYMBOL_PROFILE_PATTERNS[symbol];
+    if (!patterns) continue;
+    for (const section of rawSections) {
+      const firstLine = section.split("\n")[0];
+      if (patterns.some((p) => firstLine.includes(p)) && !matched.has(firstLine)) {
+        matched.add(firstLine);
+        result.push(section.trim());
+        break;
+      }
+    }
+  }
+
+  // Include Carry Trade if JPY/AUD/NZD are in top assets
+  if (topSymbols.some((s) => s.includes("JPY") || s.includes("AUD") || s.includes("NZD"))) {
+    const carry = rawSections.find((s) => s.startsWith("## Carry Trade"));
+    if (carry) {
+      result.push(carry.trim());
+    }
+  }
+
+  // Include Yields section if yields data exists
+  if (snapshot.yields) {
+    const yields = rawSections.find((s) => s.startsWith("## Yields US"));
+    if (yields) {
+      result.push(yields.trim());
+    }
+  }
+
+  // Always include narration rules if we have any profiles
+  if (result.length > 0) {
+    const rules = rawSections.find((s) => s.includes("Règles de narration"));
+    if (rules) result.push(rules.trim());
+  }
+
+  if (!result.length) return "";
+  return `# Profils fondamentaux — Assets du jour\n\n${result.join("\n\n")}`;
+}
+
+// ── Main loader ──────────────────────────────────────────────────────────────
+
 /**
  * Load relevant knowledge context based on the day's market snapshot.
  * Returns formatted text for injection into the LLM system prompt.
- * Target: 500-1500 tokens of highly relevant context.
+ *
+ * Three-tier injection strategy:
+ * - Tier 1 (always): tone + narrative patterns + technical analysis (~4000 tokens)
+ * - Tier 2 (conditional): central banks / macro / geopolitics / intermarket
+ *   Injected only when the snapshot signals relevance (0-4 files, ~1500-3000 tokens each)
+ * - Tier 3 (filtered): asset profiles for top 5 drama assets + active seasonality (~500-1000 tokens)
+ *
+ * Quiet day: ~5000 tokens. Active day: ~7000-9000 tokens. Max (all triggers): ~13000 tokens.
  */
 export function loadKnowledge(snapshot: DailySnapshot): string {
   const sections: string[] = [];
 
-  // Always inject: intermarket relationships + narrative patterns
-  const intermarket = readKnowledgeFile("intermarket.md");
-  if (intermarket) sections.push(intermarket);
+  // ── Tier 1: Always inject (define HOW to write and analyze) ──
+
+  const tone = readKnowledgeFile("tone-references.md");
+  if (tone) sections.push(tone);
 
   const narrative = readKnowledgeFile("narrative-patterns.md");
   if (narrative) sections.push(narrative);
 
-  // Always inject technical analysis guide (needed for deep dives)
   const technical = readKnowledgeFile("technical-analysis.md");
   if (technical) sections.push(technical);
 
-  // Always inject macro indicators (VIX, yields, F&G context)
-  const macro = readKnowledgeFile("macro-indicators.md");
-  if (macro) sections.push(macro);
+  // ── Tier 2: Conditional inject based on snapshot signals ──
 
-  // Always inject geopolitical context (causal chains, region profiles)
-  const geopolitics = readKnowledgeFile("geopolitics.md");
-  if (geopolitics) sections.push(geopolitics);
-
-  // Conditional: central banks (if we have the file and there's a rate event)
-  const hasCentralBankEvent = snapshot.events.some(
-    (e) =>
-      e.name.toLowerCase().includes("fomc") ||
-      e.name.toLowerCase().includes("ecb") ||
-      e.name.toLowerCase().includes("boj") ||
-      e.name.toLowerCase().includes("interest rate"),
-  );
-  if (hasCentralBankEvent) {
-    const centralBanks = readKnowledgeFile("central-banks.md");
-    if (centralBanks) sections.push(centralBanks);
+  if (hasCentralBankSignal(snapshot)) {
+    const cb = readKnowledgeFile("central-banks.md");
+    if (cb) sections.push(cb);
   }
 
-  // Conditional: asset profiles (if we have the file)
-  const assetProfiles = readKnowledgeFile("asset-profiles.md");
-  if (assetProfiles) sections.push(assetProfiles);
+  if (hasMacroSignal(snapshot)) {
+    const macro = readKnowledgeFile("macro-indicators.md");
+    if (macro) sections.push(macro);
+  }
 
-  // Conditional: seasonality — inject only active windows for the snapshot date
+  if (hasGeopoliticalSignal(snapshot)) {
+    const geo = readKnowledgeFile("geopolitics.md");
+    if (geo) sections.push(geo);
+  }
+
+  if (hasIntermarketSignal(snapshot)) {
+    const inter = readKnowledgeFile("intermarket.md");
+    if (inter) sections.push(inter);
+  }
+
+  // ── Tier 2b: COT positioning (inject when data is available) ──
+
+  if (snapshot.cotPositioning && snapshot.cotPositioning.contracts.length > 0) {
+    const cotKnowledge = readKnowledgeFile("cot-positioning.md");
+    if (cotKnowledge) sections.push(cotKnowledge);
+  }
+
+  // ── Tier 3: Filtered inject ──
+
+  const assetContext = buildAssetProfilesContext(snapshot);
+  if (assetContext) sections.push(assetContext);
+
   const seasonalityContext = buildSeasonalityContext(snapshot.date);
   if (seasonalityContext) sections.push(seasonalityContext);
 
-  return sections.join("\n\n---\n\n");
+  return sections.filter(Boolean).join("\n\n---\n\n");
 }
 
-// ── Seasonality selection ──────────────────────────────────────────────────────
+// ── Seasonality selection ────────────────────────────────────────────────────
 
 interface SeasonalPattern {
   assets: string[];          // ticker symbols from the watchlist

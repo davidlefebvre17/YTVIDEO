@@ -6,15 +6,16 @@ import {
   interpolate,
   spring,
 } from "remotion";
-import type { ScriptSection, Prediction } from "@yt-maker/core";
+import type { ScriptSection, Prediction, Language } from "@yt-maker/core";
 import { BRAND, fadeIn, staggerDelay, computeLayout } from "@yt-maker/core";
 import { AnimatedText } from "./shared/AnimatedText";
 
 interface PredictionsSceneProps {
   section: ScriptSection;
+  lang?: Language;
 }
 
-export const PredictionsScene: React.FC<PredictionsSceneProps> = ({ section }) => {
+export const PredictionsScene: React.FC<PredictionsSceneProps> = ({ section, lang = "fr" }) => {
   const frame = useCurrentFrame();
   const { fps, width, height } = useVideoConfig();
   const layout = computeLayout(width, height);
@@ -34,6 +35,11 @@ export const PredictionsScene: React.FC<PredictionsSceneProps> = ({ section }) =
   };
 
   const confidenceLabel = (c: string) => {
+    if (lang === "en") {
+      if (c === "high") return "HIGH";
+      if (c === "medium") return "MEDIUM";
+      return "LOW";
+    }
     if (c === "high") return "HAUTE";
     if (c === "medium") return "MOYENNE";
     return "FAIBLE";

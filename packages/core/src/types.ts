@@ -14,11 +14,11 @@ export type EpisodeType = "daily_recap" | "chart_analysis";
 export type Language = "fr" | "en";
 
 export type SectionType =
-  | "hook" | "title_card" | "previously_on" | "thread"
+  | "hook" | "title_card" | "thread"
   | "segment" | "closing"
   // legacy (backward compatibility)
   | "intro" | "market_overview" | "deep_dive" | "news" | "predictions" | "outro"
-  | "synthesis" | "watchlist" | "recap_cta" | "suivi";
+  | "synthesis" | "watchlist" | "recap_cta" | "previously_on" | "suivi";
 
 export interface VisualCue {
   type: "highlight_asset" | "show_chart" | "show_level" | "direction_arrow" | "flash" | "transition"
@@ -52,9 +52,9 @@ export interface EpisodeScript {
   description: string;
   sections: ScriptSection[];
   totalDurationSec: number;
-  threadSummary?: string;
-  segmentCount?: number;
-  coverageTopics?: string[];
+  threadSummary: string;
+  segmentCount: number;
+  coverageTopics: string[];
 }
 
 export interface MultiTimeframeAnalysis {
@@ -101,8 +101,8 @@ export interface AssetSnapshot {
 }
 
 export interface TechnicalIndicators {
-  ema9: number;
-  ema21: number;
+  ema9: number;   // SMA20
+  ema21: number;  // SMA50
   rsi14: number;
   trend: "bullish" | "bearish" | "neutral";
   volumeAnomaly: number; // ratio vs 20d average
@@ -157,19 +157,16 @@ export interface MarketSentiment {
   trendingCoins?: Array<{ name: string; symbol: string; rank: number }>;
 }
 
-export interface TopMovers {
-  gainers: Array<{ symbol: string; name: string; changePct: number; price: number }>;
-  losers: Array<{ symbol: string; name: string; changePct: number; price: number }>;
-}
-
 export interface EarningsEvent {
   symbol: string;
+  name?: string;
   date: string;
   epsEstimate?: number;
   epsActual?: number;
   revenueEstimate?: number;
   revenueActual?: number;
   hour: "bmo" | "amc" | "dmh";
+  reported?: boolean;
 }
 
 export interface EarningsQuarter {
@@ -267,6 +264,39 @@ export interface ThemesDuJour {
   marketRegime: string;
 }
 
+export interface COTCategoryData {
+  netPosition: number;
+  long: number;
+  short: number;
+  pctOfOI: number;          // net as % of open interest
+}
+
+export interface COTContractData {
+  reportDate: string;        // YYYY-MM-DD (Tuesday snapshot date)
+  openInterest: number;
+  assetManagers: COTCategoryData;   // TFF: Asset Managers / Disagg: Managed Money
+  leveragedFunds: COTCategoryData;  // TFF: Leveraged Funds / Disagg: Swap Dealers
+  dealers: COTCategoryData;         // TFF: Dealers / Disagg: Producers
+  signals?: {
+    netChangeSpeculators: number;   // week-over-week change in speculator net
+    percentileRank: number;         // 0-100, current net vs 10-week range
+    bias: "extreme_long" | "extreme_short" | "long" | "short" | "neutral";
+    flipDetected: boolean;          // sign change in speculator net position
+    weeksInDirection: number;       // consecutive weeks same direction
+  };
+}
+
+export interface COTPositioning {
+  reportDate: string;
+  contracts: Array<{
+    symbol: string;
+    name: string;
+    reportType: "tff" | "disaggregated";
+    current: COTContractData;
+    history: COTContractData[];      // previous weeks (oldest last)
+  }>;
+}
+
 export interface DailySnapshot {
   date: string;
   assets: AssetSnapshot[];
@@ -276,10 +306,11 @@ export interface DailySnapshot {
   upcomingEvents?: EconomicEvent[];
   yields?: BondYields;
   sentiment?: MarketSentiment;
-  topMovers?: TopMovers;
   earnings?: EarningsEvent[];
+  earningsUpcoming?: EarningsEvent[];  // J+1 to J+21
   stockScreen?: StockScreenResult[];
   polymarket?: PolymarketMarket[];
+  cotPositioning?: COTPositioning;
   themesDuJour?: ThemesDuJour;
 }
 

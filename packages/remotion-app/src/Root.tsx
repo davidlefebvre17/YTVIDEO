@@ -2,7 +2,6 @@ import React from "react";
 import { Composition, Folder, AbsoluteFill } from "remotion";
 import { DailyRecapEpisode } from "./compositions/DailyRecapEpisode";
 import { IntroScene } from "./scenes/IntroScene";
-import { PreviouslyOnScene } from "./scenes/PreviouslyOnScene";
 import { MarketOverviewScene } from "./scenes/MarketOverviewScene";
 import { ChartDeepDiveScene } from "./scenes/ChartDeepDiveScene";
 import { NewsScene } from "./scenes/NewsScene";
@@ -15,12 +14,6 @@ import type { EpisodeScript, ScriptSection, AssetSnapshot } from "@yt-maker/core
 const IntroSceneWrapper: React.FC<{ section: ScriptSection; episodeNumber: number; date: string }> = (props) => (
   <AbsoluteFill>
     <IntroScene {...props} />
-  </AbsoluteFill>
-);
-
-const PreviouslyOnSceneWrapper: React.FC<{ section: ScriptSection }> = (props) => (
-  <AbsoluteFill>
-    <PreviouslyOnScene {...props} />
   </AbsoluteFill>
 );
 
@@ -57,7 +50,6 @@ const OutroSceneWrapper: React.FC<{ section: ScriptSection }> = (props) => (
 export const RemotionRoot: React.FC = () => {
   // Get sections from fixture data
   const introSection = SAMPLE_SCRIPT.sections.find(s => s.type === "intro")!;
-  const previouslyOnSection = SAMPLE_SCRIPT.sections.find(s => s.type === "previously_on");
   const marketOverviewSection = SAMPLE_SCRIPT.sections.find(s => s.type === "market_overview")!;
   const deepDiveSection1 = SAMPLE_SCRIPT.sections.find(s => s.type === "deep_dive");
   const deepDiveSection2 = SAMPLE_SCRIPT.sections.filter(s => s.type === "deep_dive")[1];
@@ -115,20 +107,6 @@ export const RemotionRoot: React.FC = () => {
             date: SAMPLE_SCRIPT.date,
           }}
         />
-
-        {previouslyOnSection && (
-          <Composition
-            id="PreviouslyOn"
-            component={PreviouslyOnSceneWrapper}
-            durationInFrames={previouslyOnSection.durationSec * 30}
-            fps={30}
-            width={1920}
-            height={1080}
-            defaultProps={{
-              section: previouslyOnSection,
-            }}
-          />
-        )}
 
         <Composition
           id="MarketOverview"

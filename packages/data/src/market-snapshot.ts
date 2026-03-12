@@ -1,4 +1,4 @@
-import type { DailySnapshot, NewsItem } from "@yt-maker/core";
+import type { DailySnapshot, EarningsEvent, NewsItem } from "@yt-maker/core";
 import { fetchAllAssets, fetchDailyCandles, fetchWeeklyCandles, fetchDaily3yCandles, DEFAULT_ASSETS } from "./yahoo";
 import { fetchNews } from "./news";
 import { fetchEconomicCalendar } from "./calendar";
@@ -9,6 +9,39 @@ import { fetchEarningsCalendar, fetchFinnhubNews, fetchFinnhubCompanyNews, fetch
 import { fetchMarketauxNews } from "./marketaux";
 import { screenStocks } from "./screening";
 import { fetchPolymarketData } from "./polymarket";
+import { fetchCOTPositioning } from "./cot";
+import { readFileSync, existsSync } from "fs";
+import { join } from "path";
+
+/**
+ * Load all index constituents as a symbol→name map.
+ * Used to enrich earnings with company names and filter small caps.
+ */
+function loadIndexConstituents(): Map<string, string> {
+  const map = new Map<string, string>();
+  const indicesDir = join(process.cwd(), "data", "indices");
+  for (const file of ["sp500.json", "cac40.json", "dax40.json", "ftse100.json", "nikkei50.json", "hsi30.json"]) {
+    const path = join(indicesDir, file);
+    if (!existsSync(path)) continue;
+    try {
+      const data: Array<{ symbol: string; name: string }> = JSON.parse(readFileSync(path, "utf-8"));
+      for (const entry of data) {
+        map.set(entry.symbol.toUpperCase(), entry.name);
+      }
+    } catch { /* skip */ }
+  }
+  return map;
+}
+
+/**
+ * Enrich earnings with company names from index constituents.
+ */
+function enrichEarningsNames(earnings: EarningsEvent[], constituents: Map<string, string>): void {
+  for (const e of earnings) {
+    const name = constituents.get(e.symbol.toUpperCase());
+    if (name) e.name = name;
+  }
+}
 
 export async function fetchMarketSnapshot(
   date?: string,
@@ -30,11 +63,29 @@ export async function fetchMarketSnapshot(
     fetchMarketSentiment(snapshotDate),
     fetchEarningsCalendar(snapshotDate),
   ]);
+
+  // Fetch upcoming earnings (J+1 to J+21) for editorial context
+  const futureDate = new Date(snapshotDate + "T12:00:00Z");
+  futureDate.setDate(futureDate.getDate() + 21);
+  const nextDay = new Date(snapshotDate + "T12:00:00Z");
+  nextDay.setDate(nextDay.getDate() + 1);
+  let earningsUpcoming: typeof earnings = [];
+  try {
+    earningsUpcoming = await fetchEarningsCalendar(
+      nextDay.toISOString().split("T")[0],
+      futureDate.toISOString().split("T")[0],
+    );
+  } catch (err) {
+    console.warn(`  Upcoming earnings fetch failed: ${err}`);
+  }
   const finnhubNews = isHistorical ? [] : await fetchFinnhubNews(snapshotDate);
 
-  // Phase 1b — Polymarket with event context (calendar now available → targeted keywords)
+  // Phase 1b — Polymarket + COT (independent of each other)
   const allCalendarEvents = [...calendar.yesterday, ...calendar.today, ...calendar.upcoming];
-  const polymarket = await fetchPolymarketData(allCalendarEvents);
+  const [polymarket, cotPositioning] = await Promise.all([
+    fetchPolymarketData(allCalendarEvents),
+    fetchCOTPositioning(),
+  ]);
 
   // In historical mode, RSS feeds are stale (live-only). Supplement with:
   // - Finnhub /company-news: date-filtered, equity symbols only, 1 year depth
@@ -73,28 +124,34 @@ export async function fetchMarketSnapshot(
 
       if (dailyCandles.length >= 10) {
         asset.dailyCandles = dailyCandles;
+
+        // Multi-TF FIRST (provides true 52w range + ATH + SMA200 for drama score)
+        const multiTF = computeMultiTFAnalysis(weeklyCandles, daily3yCandles, asset.price);
+        if (multiTF) {
+          asset.multiTF = multiTF;
+        }
+
         const newsForAsset = news.filter(
           (n) =>
             n.title.toLowerCase().includes(asset.name.toLowerCase()) ||
             n.title.toLowerCase().includes(asset.symbol.toLowerCase()),
         ).length;
+
+        // Use 3y candles for robust EMA/RSI (750+ candles), fallback to 1-month
+        const candlesForTechnicals = daily3yCandles.length >= 50 ? daily3yCandles : dailyCandles;
         asset.technicals = computeTechnicals(
-          dailyCandles,
+          candlesForTechnicals,
           asset.price,
           asset.changePct,
           newsForAsset,
           asset.symbol,
+          multiTF,
         );
         const t = asset.technicals;
         let line = `  ${asset.name}: RSI=${t.rsi14.toFixed(0)} trend=${t.trend} drama=${t.dramaScore.toFixed(1)}`;
-
-        // Multi-TF (requires enough history)
-        const multiTF = computeMultiTFAnalysis(weeklyCandles, daily3yCandles, asset.price);
         if (multiTF) {
-          asset.multiTF = multiTF;
           line += ` | SMA200=${multiTF.daily3y.sma200.toFixed(0)} ATH=${multiTF.weekly10y.distanceFromATH.toFixed(1)}%`;
         }
-
         console.log(line);
       }
     } catch (err) {
@@ -154,18 +211,44 @@ export async function fetchMarketSnapshot(
     }
   }
 
+  // Dedup events by name+currency (timezone dupes)
+  const dedupEvents = (events: typeof calendar.today) => {
+    const seen = new Set<string>();
+    return events.filter((e) => {
+      const key = `${e.name}|${e.currency}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  };
+  const dedupedToday = dedupEvents(calendar.today);
+  const dedupedYesterday = dedupEvents(calendar.yesterday ?? []);
+
+  // Enrich earnings with company names from index constituents
+  const indexConstituents = loadIndexConstituents();
+  enrichEarningsNames(earnings, indexConstituents);
+  enrichEarningsNames(earningsUpcoming, indexConstituents);
+
+  // Filter upcoming earnings: only keep companies in our tracked indices (J+1 to J+21)
+  const filteredUpcoming = earningsUpcoming.filter(e => indexConstituents.has(e.symbol.toUpperCase()));
+  if (earningsUpcoming.length > 0) {
+    console.log(`  Earnings upcoming filtered: ${earningsUpcoming.length} → ${filteredUpcoming.length} (index constituents only)`);
+  }
+
   const snapshot: DailySnapshot = {
     date: snapshotDate,
     assets,
     news,
-    events: calendar.today,
-    yesterdayEvents: calendar.yesterday,
+    events: dedupedToday,
+    yesterdayEvents: dedupedYesterday,
     upcomingEvents: calendar.upcoming,
     yields,
     sentiment,
     earnings,
+    earningsUpcoming: filteredUpcoming.length > 0 ? filteredUpcoming : undefined,
     stockScreen,
     polymarket: polymarket.length > 0 ? polymarket : undefined,
+    cotPositioning,
   };
 
   console.log(`\nSnapshot complete:`);
@@ -182,9 +265,11 @@ export async function fetchMarketSnapshot(
   if (calendar.upcoming.length > 0) console.log(`  Upcoming (7d): ${calendar.upcoming.length} events`);
   if (yields) console.log(`  Yields: 10Y=${yields.us10y}% 2Y=${yields.us2y}% spread=${yields.spread10y2y}%`);
   if (sentiment) console.log(`  Sentiment: F&G=${sentiment.cryptoFearGreed.value} BTC dom=${sentiment.btcDominance.toFixed(1)}%`);
-  if (earnings.length > 0) console.log(`  Earnings: ${earnings.length} reports`);
+  if (earnings.length > 0) console.log(`  Earnings today: ${earnings.length} reports`);
+  if (earningsUpcoming.length > 0) console.log(`  Earnings upcoming (21d): ${earningsUpcoming.length} reports`);
   if (stockScreen && stockScreen.length > 0) console.log(`  Stock screening: ${stockScreen.length} flagged movers`);
   if (polymarket.length > 0) console.log(`  Polymarket: ${polymarket.length} prediction markets`);
+  if (cotPositioning) console.log(`  COT: ${cotPositioning.contracts.length} contracts (${cotPositioning.reportDate})`);
 
   return snapshot;
 }

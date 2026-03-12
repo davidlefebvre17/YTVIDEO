@@ -1,4 +1,5 @@
 export { getLLMClient, generateStructuredJSON } from "./llm-client";
+export type { LLMRole, LLMOptions } from "./llm-client";
 export { generateScript, formatSnapshotForPrompt } from "./script-generator";
 export type { PrevContext, PrevEntry } from "./script-generator";
 export { getDailyRecapSystemPrompt } from "./prompts/daily-recap";
@@ -14,3 +15,34 @@ export { analyzeEventSurprises, matchEventsToReaction } from "./event-analyzer";
 export type { EventReaction } from "./event-analyzer";
 export { getCompanyProfile, getCompaniesForAsset, getProfileContext, isCorrelatedTo, getAllProfiles } from "./company-profiles";
 export type { CompanyProfile } from "./company-profiles";
+export { getMarketMemoryHaikuPrompt } from "./prompts/market-memory-haiku";
+export { getWeeklySonnetPrompt } from "./prompts/market-memory-sonnet-weekly";
+export type { SonnetWeeklyOutput } from "./prompts/market-memory-sonnet-weekly";
+export { runWeeklyJob } from "./market-memory-weekly-job";
+export type { WeeklyJobResult } from "./market-memory-weekly-job";
+
+// Pipeline C1→C5 (Bloc C)
+export { runPipeline, toEpisodeScript, flagAssets, runC1Editorial, runC2Analysis, runC3Writing, runValidation, runC5Direction } from "./pipeline";
+export { computeWordBudget, buildEpisodeSummaries, buildCausalBrief, buildBriefingPack, formatBriefingPack } from "./pipeline";
+export type { BriefingPack, PoliticalTrigger, ScreenMover, EarningsBucket, COTHighlight, COTDivergence, SentimentTrend } from "./pipeline";
+export type {
+  PipelineOptions, PipelineResult, PipelineStats,
+  EditorialPlan, AnalysisBundle, DraftScript, DirectedEpisode,
+  ValidationResult, SnapshotFlagged, FlaggedAsset, WordBudget, CausalBrief,
+  SegmentDepth, ConfidenceLevel, MoodTag,
+} from "./pipeline";
+
+// News Memory (D2)
+export {
+  NewsMemoryDB,
+  initTagger,
+  tagArticleAuto,
+  normalizeText,
+  buildResearchContext,
+} from "./memory";
+export type {
+  MacroTheme,
+  NewsTags,
+  StoredArticle,
+  EconomicEvent,
+} from "./memory";

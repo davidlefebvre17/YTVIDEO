@@ -5,6 +5,7 @@
   "main": "src/index.ts",
   "types": "src/index.ts",
   "dependencies": {
-    "@yt-maker/core": "*"
+    "@yt-maker/core": "*",
+    "trading-signals": "^7.4.3"
   }
 }

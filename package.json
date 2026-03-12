@@ -17,6 +17,8 @@
     "preview": "npm run dev -w @yt-maker/remotion-app",
     "dev": "npm run dev -w @yt-maker/remotion-app",
     "backfill-news": "npx tsx scripts/backfill-news.ts",
+    "weekly-job": "npx tsx packages/ai/src/market-memory-weekly-job.ts",
+    "init-market-memory": "npx tsx scripts/init-market-memory.ts",
     "typecheck": "tsc --build tsconfig.json"
   },
   "keywords": [
@@ -29,11 +31,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
     "tsx": "^4.7.0",
     "turbo": "^2.0.0",
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "better-sqlite3": "^12.6.2",
     "dotenv": "^17.3.1"
   }
 }

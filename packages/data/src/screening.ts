@@ -106,6 +106,8 @@ async function enrichMovers(movers: StockScreenResult[]): Promise<void> {
         if (mover.price <= mover.low52w * 1.01) mover.reason.push("52w_low");
 
         if (candles.length >= 10) {
+          // Note: newsCount is 0 since we don't have news data for individual screened stocks
+          // This is acceptable — stock screening movers don't have associated news yet
           mover.technicals = computeTechnicals(candles, mover.price, mover.changePct, 0, mover.symbol);
         }
       }

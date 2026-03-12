@@ -90,6 +90,7 @@ export async function fetchEarningsCalendar(
         revenueEstimate: e.revenueEstimate ?? undefined,
         revenueActual: e.revenueActual ?? undefined,
         hour: mapHour(e.hour),
+        reported: e.epsActual != null,
       }),
     );
 

@@ -1,0 +1,367 @@
+import { existsSync, mkdirSync, writeFileSync } from "fs";
+import { join } from "path";
+import type { EpisodeScript, ScriptSection, Language } from "@yt-maker/core";
+import { loadWeeklyBrief as loadWeeklyBriefRaw } from "@yt-maker/data";
+import { buildResearchContext } from "../memory";
+import { loadKnowledge } from "../knowledge-loader";
+import { flagAssets } from "./p1-flagging";
+import { runC1Editorial } from "./p2-editorial";
+import { runC2Analysis } from "./p3-analysis";
+import { runC3Writing } from "./p4-writing";
+import { runValidation } from "./p5-validation";
+import { runC5Direction } from "./p6-direction";
+import { computeWordBudget } from "./helpers/word-budget";
+import { buildEpisodeSummaries, formatRecentScriptsForC3 } from "./helpers/episode-summary";
+import { buildCausalBrief } from "./helpers/causal-brief";
+import { buildBriefingPack } from "./helpers/briefing-pack";
+import type {
+  PipelineOptions,
+  PipelineResult,
+  PipelineStats,
+  DirectedEpisode,
+  DraftScript,
+  NarrationBlock,
+  NarrationSegment,
+} from "./types";
+
+// Re-export everything
+export * from "./types";
+export { flagAssets } from "./p1-flagging";
+export { runC1Editorial, validateEditorialPlan } from "./p2-editorial";
+export { runC2Analysis } from "./p3-analysis";
+export { runC3Writing } from "./p4-writing";
+export { runValidation, validateMechanical } from "./p5-validation";
+export { runC5Direction } from "./p6-direction";
+export { computeWordBudget, durationFromWords } from "./helpers/word-budget";
+export { buildEpisodeSummaries, formatRecentScriptsForC3 } from "./helpers/episode-summary";
+export { buildCausalBrief } from "./helpers/causal-brief";
+export { buildBriefingPack, formatBriefingPack } from "./helpers/briefing-pack";
+export type { BriefingPack, PoliticalTrigger, ScreenMover, EarningsBucket, COTHighlight, COTDivergence, SentimentTrend } from "./helpers/briefing-pack";
+
+/**
+ * Format weekly brief as string for C1 prompt.
+ */
+function formatWeeklyBrief(): string {
+  try {
+    const brief = loadWeeklyBriefRaw();
+    if (!brief) return "";
+    let text = `Régime: ${brief.regime_summary}\n`;
+    if (brief.notable_zones.length) {
+      text += "Zones notables:\n";
+      for (const z of brief.notable_zones) {
+        text += `  ${z.symbol} ${z.type} ${z.level}: ${z.event}\n`;
+      }
+    }
+    if (brief.watchlist_next_week.length) {
+      text += "Watchlist:\n";
+      for (const w of brief.watchlist_next_week) {
+        text += `  ${w.symbol}: ${w.reason}\n`;
+      }
+    }
+    return text;
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * Save intermediate pipeline result for debugging.
+ */
+function saveIntermediate(date: string, name: string, data: unknown): void {
+  try {
+    const dir = join(process.cwd(), "data", "pipeline", date);
+    if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, `${name}.json`), JSON.stringify(data, null, 2));
+  } catch {
+    // Non-critical — skip silently
+  }
+}
+
+/**
+ * Convert DirectedEpisode to EpisodeScript for Remotion compatibility.
+ */
+export function toEpisodeScript(
+  directed: DirectedEpisode,
+  episodeNumber: number,
+  lang: Language = "fr"
+): EpisodeScript {
+  const { script } = directed;
+
+  const blockToSection = (block: NarrationBlock): ScriptSection => ({
+    id: block.type,
+    type:
+      block.type === "hook"
+        ? "hook"
+        : block.type === "title_card"
+          ? "title_card"
+          : block.type === "thread"
+            ? "thread"
+            : "closing",
+    title: block.title,
+    narration: block.narration,
+    durationSec: block.durationSec,
+    visualCues: block.visualCues ?? [],
+  });
+
+  const segToSection = (seg: NarrationSegment): ScriptSection => ({
+    id: seg.segmentId,
+    type: "segment",
+    title: seg.title,
+    narration: seg.narration,
+    durationSec: seg.durationSec,
+    visualCues: seg.visualCues ?? [],
+    depth: seg.depth.toLowerCase() as "flash" | "focus" | "deep",
+    topic: seg.topic,
+    assets: seg.assets,
+    data: {
+      depth: seg.depth,
+      topic: seg.topic,
+      predictions: seg.predictions,
+    },
+  });
+
+  const sections: ScriptSection[] = [
+    blockToSection(script.coldOpen),
+    blockToSection(script.titleCard),
+    blockToSection(script.thread),
+    ...script.segments.map(segToSection),
+    blockToSection(script.closing),
+  ];
+
+  return {
+    episodeNumber,
+    date: script.date,
+    type: "daily_recap",
+    lang,
+    title: script.title,
+    description: script.description,
+    sections,
+    totalDurationSec: script.metadata.totalDurationSec,
+    threadSummary: script.metadata.threadSummary,
+    segmentCount: script.metadata.segmentCount,
+    coverageTopics: script.metadata.coverageTopics,
+  };
+}
+
+/**
+ * Run the full C1→C5 pipeline.
+ */
+export async function runPipeline(
+  options: PipelineOptions
+): Promise<PipelineResult> {
+  const { snapshot, lang, episodeNumber, newsDb, prevContext } = options;
+  const stats: PipelineStats = {
+    totalDurationMs: 0,
+    llmCalls: 0,
+    retries: 0,
+    cost: 0,
+  };
+  const t0 = Date.now();
+
+  console.log(`\n═══ Pipeline C1→C5 — ${snapshot.date} ═══\n`);
+
+  // ── P1: Pré-filtrage mécanique (code pur) ──────────────
+  console.log("P1 — Pré-filtrage mécanique...");
+  const flagged = flagAssets(snapshot);
+  console.log(
+    `  ${flagged.assets.length} assets scorés, top: ${flagged.assets
+      .slice(0, 3)
+      .map((a) => `${a.symbol}(${a.materialityScore})`)
+      .join(", ")}`
+  );
+  saveIntermediate(snapshot.date, "snapshot_flagged", flagged);
+
+  // ── Prepare parallel inputs ────────────────────────────
+  const episodeSummaries = buildEpisodeSummaries(prevContext, 15);
+  const recentScripts = formatRecentScriptsForC3(prevContext, 5);
+
+  let researchContext = "";
+  if (newsDb) {
+    try {
+      researchContext = buildResearchContext(snapshot, newsDb);
+    } catch (err) {
+      console.warn(
+        `  Research context error: ${(err as Error).message.slice(0, 80)}`
+      );
+    }
+  }
+
+  const weeklyBrief = formatWeeklyBrief();
+  const causalBrief = buildCausalBrief(flagged);
+  const briefingPack = buildBriefingPack(flagged, snapshot);
+  if (briefingPack.politicalTriggers.length) {
+    console.log(`  Triggers: ${briefingPack.politicalTriggers.map(t => `${t.actor}(${t.action})`).join(', ')}`);
+  }
+  if (briefingPack.topScreenMovers.length) {
+    console.log(`  Screen movers: ${briefingPack.topScreenMovers.slice(0, 5).map(m => `${m.symbol}(${m.changePct.toFixed(1)}%)`).join(', ')}`);
+  }
+  const knowledgeTier1 = loadKnowledge(snapshot);
+
+  if (options.stopAt === "p1") {
+    return {
+      directedEpisode: null as unknown as DirectedEpisode,
+      intermediates: { flagged } as any,
+      stats,
+    };
+  }
+
+  // ── P2: C1 Haiku — Sélection éditoriale ────────────────
+  console.log("\nP2 — C1 Haiku (sélection éditoriale)...");
+  const editorial = await runC1Editorial({
+    flagged,
+    episodeSummaries,
+    researchContext,
+    weeklyBrief,
+    briefingPack,
+    lang,
+  });
+  stats.llmCalls++;
+  console.log(
+    `  ${editorial.totalSegments} segments: ${editorial.segments
+      .map((s) => `${s.id}[${s.depth}]`)
+      .join(", ")}`
+  );
+  saveIntermediate(snapshot.date, "editorial", editorial);
+
+  if (options.stopAt === "p2") {
+    return {
+      directedEpisode: null as unknown as DirectedEpisode,
+      intermediates: { flagged, editorial } as any,
+      stats,
+    };
+  }
+
+  // ── Word budget (depends on C1) ────────────────────────
+  const budget = computeWordBudget(editorial);
+  console.log(`  Budget: ${budget.totalTarget} mots cible`);
+
+  // ── P3: C2 Sonnet — Analyse ────────────────────────────
+  console.log("\nP3 — C2 Sonnet (analyse)...");
+  const analysis = await runC2Analysis({
+    editorial,
+    flagged,
+    causalBrief,
+    researchContext,
+    snapshot,
+    briefingPack,
+    lang,
+  });
+  stats.llmCalls++;
+  console.log(
+    `  ${analysis.segments.length} analyses, mood: ${analysis.globalContext.marketMood}`
+  );
+  saveIntermediate(snapshot.date, "analysis", analysis);
+
+  if (options.stopAt === "p3") {
+    return {
+      directedEpisode: null as unknown as DirectedEpisode,
+      intermediates: { flagged, editorial, analysis } as any,
+      stats,
+    };
+  }
+
+  // ── P4: C3 Opus — Rédaction ────────────────────────────
+  console.log("\nP4 — C3 Opus (rédaction)...");
+  let draft = await runC3Writing({
+    editorial,
+    analysis,
+    budget,
+    recentScripts,
+    knowledgeTier1,
+    lang,
+  });
+  stats.llmCalls++;
+  saveIntermediate(snapshot.date, "episode_draft", draft);
+
+  if (options.stopAt === "p4") {
+    return {
+      directedEpisode: null as unknown as DirectedEpisode,
+      intermediates: { flagged, editorial, analysis, draft } as any,
+      stats,
+    };
+  }
+
+  // ── P5: C4 Validation (seule boucle) ──────────────────
+  console.log("\nP5 — C4 Validation...");
+  let validation = await runValidation(draft, editorial, analysis, budget);
+  stats.llmCalls++;
+
+  if (validation.status === "needs_revision") {
+    const blockers = validation.issues.filter((i) => i.severity === "blocker");
+    console.log(`  ⚠ ${blockers.length} blockers — retry C3...`);
+
+    // Retry C3 with feedback
+    draft = await runC3Writing({
+      editorial,
+      analysis,
+      budget,
+      recentScripts,
+      knowledgeTier1,
+      lang,
+      feedback: blockers,
+    });
+    stats.llmCalls++;
+    stats.retries++;
+
+    // Re-validate
+    validation = await runValidation(draft, editorial, analysis, budget);
+    stats.llmCalls++;
+
+    if (validation.status === "needs_revision") {
+      const remainingBlockers = validation.issues.filter(
+        (i) => i.severity === "blocker"
+      );
+      console.warn(
+        `  ⚠ Still ${remainingBlockers.length} blockers after retry — continuing with best result`
+      );
+    }
+  }
+
+  const validatedScript = validation.validatedScript;
+  console.log(
+    `  Validation: ${validation.status} (${validation.issues.length} issues)`
+  );
+  saveIntermediate(snapshot.date, "episode_validated", validatedScript);
+
+  if (options.stopAt === "p5") {
+    return {
+      directedEpisode: null as unknown as DirectedEpisode,
+      intermediates: { flagged, editorial, analysis, draft, validation } as any,
+      stats,
+    };
+  }
+
+  // ── P6: C5 Sonnet — Direction ──────────────────────────
+  console.log("\nP6 — C5 Sonnet (direction)...");
+  const directed = await runC5Direction({
+    draft: validatedScript,
+    editorial,
+    analysis,
+    lang,
+  });
+  stats.llmCalls++;
+  console.log(
+    `  Arc: ${directed.arc
+      .map((a) => `${a.segmentId}:${a.role}(${a.tensionLevel})`)
+      .join(", ")}`
+  );
+  console.log(
+    `  Mood: ${directed.moodMusic} | Thumbnail: ${directed.thumbnailMoment.segmentId}`
+  );
+  saveIntermediate(snapshot.date, "episode_directed", directed);
+
+  // ── Stats ──────────────────────────────────────────────
+  stats.totalDurationMs = Date.now() - t0;
+  // Cost estimation (rough)
+  stats.cost = stats.llmCalls * 0.04 + stats.retries * 0.15; // rough average
+
+  console.log(
+    `\n═══ Pipeline terminé en ${(stats.totalDurationMs / 1000).toFixed(1)}s — ${stats.llmCalls} appels LLM, ${stats.retries} retries ═══\n`
+  );
+
+  return {
+    directedEpisode: directed,
+    intermediates: { flagged, editorial, analysis, draft, validation },
+    stats,
+  };
+}

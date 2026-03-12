@@ -1,16 +1,29 @@
 // ─── Provider types ──────────────────────────────────────────────
 
 type LLMProvider = "openrouter" | "anthropic";
+export type LLMRole = "fast" | "balanced" | "quality";
 
 interface ProviderConfig {
   provider: LLMProvider;
   apiKey: string;
 }
 
+export interface LLMOptions {
+  role?: LLMRole;
+  maxTokens?: number;
+}
+
 // ─── OpenRouter config ───────────────────────────────────────────
 
 const OPENROUTER_BASE = "https://openrouter.ai/api/v1/chat/completions";
 
+const OPENROUTER_MODELS: Record<LLMRole, string[]> = {
+  fast: ["qwen/qwen3-4b:free", "google/gemini-2.0-flash-lite-001"],
+  balanced: ["qwen/qwen3-235b-a22b-thinking-2507", "meta-llama/llama-3.3-70b-instruct:free"],
+  quality: ["meta-llama/llama-3.3-70b-instruct:free", "qwen/qwen3-235b-a22b-thinking-2507"],
+};
+
+// Legacy fallback list (used when no role specified in openrouter mode)
 const FREE_MODELS = [
   "meta-llama/llama-3.3-70b-instruct:free",
   "qwen/qwen3-235b-a22b-thinking-2507",
@@ -21,12 +34,14 @@ const FREE_MODELS = [
 // ─── Anthropic config ────────────────────────────────────────────
 
 const ANTHROPIC_BASE = "https://api.anthropic.com/v1/messages";
-const ANTHROPIC_DEFAULT_MODEL = "claude-sonnet-4-6";
 
-function getAnthropicModel(): string {
-  return process.env.ANTHROPIC_MODEL || ANTHROPIC_DEFAULT_MODEL;
-}
-const ANTHROPIC_MAX_TOKENS = 8192;
+const ANTHROPIC_MODELS: Record<LLMRole, string> = {
+  fast: "claude-haiku-4-5-20251001",
+  balanced: "claude-sonnet-4-6",
+  quality: "claude-opus-4-6",
+};
+
+const ANTHROPIC_MAX_TOKENS_DEFAULT = 8192;
 const ANTHROPIC_VERSION = "2023-06-01";
 
 // ─── Shared ──────────────────────────────────────────────────────
@@ -98,9 +113,13 @@ async function callOpenRouter(
 
 async function callAnthropic(
   apiKey: string,
+  model: string,
   systemPrompt: string,
   userMessage: string,
+  maxTokens: number = ANTHROPIC_MAX_TOKENS_DEFAULT,
 ): Promise<string> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 300_000); // 5 min timeout
   const response = await fetch(ANTHROPIC_BASE, {
     method: "POST",
     headers: {
@@ -109,16 +128,17 @@ async function callAnthropic(
       "content-type": "application/json",
     },
     body: JSON.stringify({
-      model: getAnthropicModel(),
-      max_tokens: ANTHROPIC_MAX_TOKENS,
+      model,
+      max_tokens: maxTokens,
       system: systemPrompt,
       messages: [{ role: "user", content: userMessage }],
     }),
-  });
+    signal: controller.signal,
+  }).finally(() => clearTimeout(timeoutId));
 
   if (!response.ok) {
     const errorBody = await response.text();
-    throw new Error(`Anthropic ${response.status}: ${errorBody}`);
+    throw new Error(`Anthropic ${response.status} [${model}]: ${errorBody}`);
   }
 
   const data = await response.json();
@@ -137,17 +157,19 @@ function extractJSON(text: string): string {
 export async function generateStructuredJSON<T>(
   systemPrompt: string,
   userMessage: string,
+  options?: LLMOptions,
 ): Promise<T> {
   const config = getProviderConfig();
+  const role: LLMRole = options?.role ?? "quality";
+  const maxTokens = options?.maxTokens ?? ANTHROPIC_MAX_TOKENS_DEFAULT;
   let lastError: Error | null = null;
 
   if (config.provider === "anthropic") {
-    // Anthropic: single model, retry on rate-limit or malformed JSON
+    const model = ANTHROPIC_MODELS[role];
     for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
       try {
-        const model = getAnthropicModel();
-        console.log(`  LLM: ${model} (attempt ${attempt + 1}/${MAX_RETRIES})`);
-        const text = await callAnthropic(config.apiKey, systemPrompt, userMessage);
+        console.log(`  LLM: ${model} [${role}] (attempt ${attempt + 1}/${MAX_RETRIES})`);
+        const text = await callAnthropic(config.apiKey, model, systemPrompt, userMessage, maxTokens);
         const jsonStr = extractJSON(text);
         try {
           return JSON.parse(jsonStr) as T;
@@ -175,14 +197,15 @@ export async function generateStructuredJSON<T>(
         break;
       }
     }
-    throw new Error(`Anthropic failed after ${MAX_RETRIES} attempts. Last error: ${lastError?.message}`);
+    throw new Error(`Anthropic [${model}] failed after ${MAX_RETRIES} attempts. Last error: ${lastError?.message}`);
   }
 
-  // OpenRouter: cascade through free models
-  for (const model of FREE_MODELS) {
+  // OpenRouter: cascade through models for the role
+  const models = OPENROUTER_MODELS[role] ?? FREE_MODELS;
+  for (const model of models) {
     for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
       try {
-        console.log(`  LLM: ${model} (attempt ${attempt + 1}/${MAX_RETRIES})`);
+        console.log(`  LLM: ${model} [${role}] (attempt ${attempt + 1}/${MAX_RETRIES})`);
         const text = await callOpenRouter(config.apiKey, model, systemPrompt, userMessage);
         const jsonStr = extractJSON(text);
         try {
@@ -210,5 +233,5 @@ export async function generateStructuredJSON<T>(
     }
   }
 
-  throw new Error(`All models exhausted. Last error: ${lastError?.message}`);
+  throw new Error(`All models exhausted [${role}]. Last error: ${lastError?.message}`);
 }

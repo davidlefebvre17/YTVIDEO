@@ -1,19 +1,6 @@
 import type { Candle, TechnicalIndicators, MultiTimeframeAnalysis } from "@yt-maker/core";
 
 /**
- * Compute EMA (Exponential Moving Average) over closing prices.
- */
-function computeEMA(candles: Candle[], period: number): number {
-  if (candles.length < period) return candles[candles.length - 1]?.c ?? 0;
-  const k = 2 / (period + 1);
-  let ema = candles.slice(0, period).reduce((sum, c) => sum + c.c, 0) / period;
-  for (let i = period; i < candles.length; i++) {
-    ema = candles[i].c * k + ema * (1 - k);
-  }
-  return ema;
-}
-
-/**
  * Compute RSI (Relative Strength Index) over closing prices.
  */
 function computeRSI(candles: Candle[], period = 14): number {
@@ -97,7 +84,7 @@ export function computeMultiTFAnalysis(
   // ── Weekly 10y ──────────────────────────────────────────────────
   const athPrice = Math.max(...weeklyCandles.map((c) => c.h));
   const atlPrice = Math.min(...weeklyCandles.map((c) => c.l));
-  const ema52w = computeEMA(weeklyCandles, 52);
+  const ema52w = computeSMA(weeklyCandles, 52);
   const weeklyTrend = detectMTFTrend(weeklyCandles, 52);
 
   // Major support/resistance from last 2 years (104 weekly candles)
@@ -170,7 +157,8 @@ export function computeMultiTFAnalysis(
 
 /**
  * Compute all technical indicators for an asset given its daily candles.
- * Expects at least 21 daily candles for meaningful results.
+ * Pass daily3yCandles for robust EMA/RSI (fallback: 1-month candles).
+ * Pass multiTF for true 52w high/low and enriched drama score.
  */
 export function computeTechnicals(
   dailyCandles: Candle[],
@@ -178,15 +166,16 @@ export function computeTechnicals(
   changePct: number,
   newsCount: number,
   symbol?: string,
+  multiTF?: MultiTimeframeAnalysis | null,
 ): TechnicalIndicators {
-  const ema9 = computeEMA(dailyCandles, 9);
-  const ema21 = computeEMA(dailyCandles, 21);
+  const sma20 = computeSMA(dailyCandles, 20);
+  const sma50 = computeSMA(dailyCandles, 50);
   const rsi14 = computeRSI(dailyCandles);
 
-  // Trend based on price vs EMAs
+  // Trend based on price vs SMAs
   let trend: "bullish" | "bearish" | "neutral" = "neutral";
-  if (price > ema9 && ema9 > ema21) trend = "bullish";
-  else if (price < ema9 && ema9 < ema21) trend = "bearish";
+  if (price > sma20 && sma20 > sma50) trend = "bullish";
+  else if (price < sma20 && sma20 < sma50) trend = "bearish";
 
   // Volume anomaly: latest volume vs 20-day average
   // Futures (=F suffix): Yahoo Finance daily volume is unreliable — front-month rollover days
@@ -205,7 +194,7 @@ export function computeTechnicals(
     const latestVolume = recentCandles[recentCandles.length - 1]?.v ?? 0;
     // latestVolume === 0 means Yahoo returned no volume data (common for indices in historical mode)
     // Treat as missing data → neutral (1), not as -100% volume
-    volumeAnomaly = (avgVolume > 0 && latestVolume > 0) ? Math.min(latestVolume / avgVolume, 20) : 1;
+    volumeAnomaly = (avgVolume > 0 && latestVolume > 0) ? latestVolume / avgVolume : 1;
   }
 
   // Support/Resistance: 20d low/high + round numbers
@@ -221,26 +210,50 @@ export function computeTechnicals(
     (a, b) => a - b,
   );
 
-  // 52-week proximity (using available data — approximate with 20d range)
-  const isNear52wHigh = price >= high20d * 0.98;
-  const isNear52wLow = price <= low20d * 1.02;
+  // 52-week proximity: use true 52w range from multiTF if available, else return false (no fallback)
+  const true52wHigh = multiTF?.daily1y.high52w;
+  const true52wLow = multiTF?.daily1y.low52w;
+  const isNear52wHigh = true52wHigh ? price >= true52wHigh * 0.98 : false;
+  const isNear52wLow = true52wLow ? price <= true52wLow * 1.02 : false;
 
-  // Drama Score — each term capped to prevent single signal from dominating
-  // changePct: max contribution ~30 (10% move), volumeAnomaly: max 20x → *2=40
-  // newsCount: cap at 5 relevant articles to avoid high-coverage assets (BTC, CAC) dominating
+  // Drama Score — enriched with multiTF signals when available
   const breakingLevel =
     (isNear52wHigh ? 5 : 0) +
     (isNear52wLow ? 5 : 0) +
     (roundLevels.some((l) => Math.abs(l - price) / price < 0.005) ? 3 : 0);
+
+  // MultiTF-enriched signals (0 if multiTF unavailable)
+  let multiTFBonus = 0;
+  if (multiTF) {
+    // RSI extreme (oversold < 30 or overbought > 70) — use 3y RSI for robustness
+    const rsi3y = multiTF.daily3y.rsi14;
+    if (rsi3y < 30 || rsi3y > 70) multiTFBonus += 4;
+
+    // Near ATH (within 3%) — major narrative signal
+    if (Math.abs(multiTF.weekly10y.distanceFromATH) < 3) multiTFBonus += 5;
+
+    // Near ATL (within 5%) — rare, very dramatic
+    if (multiTF.weekly10y.distanceFromATL < 5) multiTFBonus += 5;
+
+    // SMA200 cross: price near SMA200 (within 1%) — major technical event
+    const sma200 = multiTF.daily3y.sma200;
+    if (sma200 > 0 && Math.abs(price - sma200) / sma200 < 0.01) multiTFBonus += 5;
+
+    // Golden/Death cross — structural shift
+    // (no previous day data, so just flag presence as mild bonus)
+    if (multiTF.daily3y.goldenCross && multiTF.daily3y.trend === "bull") multiTFBonus += 2;
+  }
+
   const dramaScore =
     Math.abs(changePct) * 3 +
     volumeAnomaly * 2 +
     breakingLevel +
-    Math.min(newsCount, 5) * 3;
+    Math.min(newsCount, 5) * 3 +
+    multiTFBonus;
 
   return {
-    ema9,
-    ema21,
+    ema9: sma20,
+    ema21: sma50,
     rsi14,
     trend,
     volumeAnomaly,
