@@ -15,6 +15,32 @@ import type { ZoneEvent, HaikuEnrichmentResult } from "@yt-maker/data";
 import { generateScript, getNextEpisodeNumber, appendToManifest, getMarketMemoryHaikuPrompt, generateStructuredJSON, NewsMemoryDB, initTagger, tagArticleAuto } from "@yt-maker/ai";
 import { runPipeline, toEpisodeScript } from "@yt-maker/ai";
 import type { PrevContext } from "@yt-maker/ai";
+
+/**
+ * Load recent episodes from episodes/ into PrevContext.
+ * Each episode file has { script: EpisodeScript, snapshot: DailySnapshot }.
+ * Orders oldest→newest so entries[last] = J-1.
+ */
+function loadPrevContextFromEpisodes(currentDate: string, maxEntries = 15): PrevContext {
+  const manifestPath = path.resolve(__dirname, "..", "episodes", "manifest.json");
+  if (!fs.existsSync(manifestPath)) return { entries: [] };
+
+  const manifest: Array<{ date: string; filePath: string }> = JSON.parse(fs.readFileSync(manifestPath, "utf-8"));
+  const relevant = manifest
+    .filter(e => e.date < currentDate)
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .slice(-maxEntries);
+
+  const entries: PrevContext["entries"] = [];
+  for (const entry of relevant) {
+    if (!fs.existsSync(entry.filePath)) continue;
+    const data = JSON.parse(fs.readFileSync(entry.filePath, "utf-8"));
+    if (data.snapshot && data.script) {
+      entries.push({ snapshot: data.snapshot, script: data.script });
+    }
+  }
+  return { entries };
+}
 import { runWeeklyJob } from "@yt-maker/ai";
 import type { EpisodeType, Language, EpisodeManifestEntry } from "@yt-maker/core";
 
@@ -160,11 +186,14 @@ async function main() {
   const episodeNumber = getNextEpisodeNumber();
   const useLegacy = !!opts["legacy"];
 
+  const prevContext = loadPrevContextFromEpisodes(date);
+  console.log(`  PrevContext: ${prevContext.entries.length} épisodes précédents chargés`);
+
   let script;
   if (useLegacy) {
     // Legacy monolith (single LLM call)
     console.log("  Mode: LEGACY (monolithe)");
-    script = await generateScript(snapshot, { type, lang, episodeNumber, newsDb });
+    script = await generateScript(snapshot, { type, lang, episodeNumber, newsDb, prevContext });
   } else {
     // New pipeline C1→C5
     console.log("  Mode: PIPELINE C1→C5");
@@ -173,6 +202,7 @@ async function main() {
       lang,
       episodeNumber,
       newsDb,
+      prevContext,
     });
     script = toEpisodeScript(result.directedEpisode, episodeNumber, lang);
     console.log(`  Pipeline stats: ${result.stats.llmCalls} LLM calls, ${result.stats.retries} retries, ${(result.stats.totalDurationMs / 1000).toFixed(1)}s`);

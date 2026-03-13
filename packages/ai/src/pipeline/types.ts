@@ -254,6 +254,8 @@ export interface EpisodeSummary {
     resolved: boolean;
     outcome?: 'correct' | 'incorrect' | 'pending';
   }>;
+  /** Events/earnings announced as upcoming in this episode — to be followed up in future episodes */
+  forwardLooking: string[];
   angles: string[];
   dominantTheme: string;
   moodMarche: string;

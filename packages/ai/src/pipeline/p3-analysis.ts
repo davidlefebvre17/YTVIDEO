@@ -166,10 +166,21 @@ RÈGLES :
 - Le globalContext identifie les liens ENTRE segments, pas un résumé de chaque segment
 - ZÉRO narration. Analyse brute uniquement.
 - Si l'editorial plan contient un trigger (acteur politique, événement), la chaîne causale DOIT commencer par ce trigger
+- Si aucun trigger n'est défini pour un segment, NE PAS en inventer — commence la causalChain par le fait de marché ou l'événement le plus saillant du segment
 - Pour chaque segment, renseigne sourcesUsed : liste des données utilisées (type + detail)
   Types valides : snapshot_price, news_article, knowledge_base, market_memory, causal_brief, inference
 - Maximum 2 niveaux techniques clés par asset dans technicalReading — les plus pertinents pour la narration, pas tous les indicateurs disponibles
-- Les niveaux supplémentaires vont dans chartInstructions (affichage visuel, pas narration)`;
+- Les niveaux supplémentaires vont dans chartInstructions (affichage visuel, pas narration)
+
+RÈGLES COT (positionnement CFTC — lag structurel de 9-11 jours) :
+Le COT reflète les positions AVANT le move du jour, jamais pendant. Trois règles absolues :
+1. JAMAIS utiliser le COT comme confirmation d'un move du jour ("le COT confirme la hausse d'aujourd'hui" → INTERDIT)
+2. JAMAIS citer le netChange comme explication d'un move récent si daysOld ≥ 7
+3. SEULS usages valides :
+   a. Signal prospectif de risque : "les spéculateurs étaient extreme_long avant le spike → risque de capitulation si le move se retourne"
+   b. Divergence structurelle : "COT bearish sur DXY malgré la hausse → divergence spéculateurs/prix, à surveiller"
+   c. Signal de fond neutre : "pas de capitulation structurelle visible dans le COT" (sans relier au move du jour)
+Si le COT est cité dans un segment, le sourcesUsed DOIT noter "market_memory" avec le daysOld exact.`;
 }
 
 function buildC2UserPrompt(
@@ -242,8 +253,8 @@ Retourne un JSON avec cette structure exacte :
       "fundamentalContext": "Contexte macro/fondamental",
       "causalChain": "Optionnel — chaîne causale si applicable",
       "scenarios": {
-        "bullish": { "target": "niveau cible", "condition": "condition de déclenchement" },
-        "bearish": { "target": "niveau invalidation", "condition": "condition de déclenchement" }
+        "bullish": { "target": "niveau cible", "condition": "condition de déclenchement", "probability": 0.6 },
+        "bearish": { "target": "niveau invalidation", "condition": "condition de déclenchement", "probability": 0.4 }
       },
       "narrativeHook": "L'accroche suggérée pour le rédacteur",
       "chartInstructions": [

@@ -23,7 +23,7 @@ export type { WeeklyJobResult } from "./market-memory-weekly-job";
 
 // Pipeline C1→C5 (Bloc C)
 export { runPipeline, toEpisodeScript, flagAssets, runC1Editorial, runC2Analysis, runC3Writing, runValidation, runC5Direction } from "./pipeline";
-export { computeWordBudget, buildEpisodeSummaries, buildCausalBrief, buildBriefingPack, formatBriefingPack } from "./pipeline";
+export { computeWordBudget, buildEpisodeSummaries, formatRecentScriptsForC3, buildCausalBrief, buildBriefingPack, formatBriefingPack } from "./pipeline";
 export type { BriefingPack, PoliticalTrigger, ScreenMover, EarningsBucket, COTHighlight, COTDivergence, SentimentTrend } from "./pipeline";
 export type {
   PipelineOptions, PipelineResult, PipelineStats,

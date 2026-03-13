@@ -5,6 +5,7 @@ import type {
 import type { Language } from "@yt-maker/core";
 import type { BriefingPack } from "./helpers/briefing-pack";
 import { formatBriefingPack } from "./helpers/briefing-pack";
+import { buildTemporalAnchors } from "./helpers/temporal-anchors";
 
 /**
  * Format flagged assets as compact lines for C1 prompt.
@@ -19,8 +20,8 @@ function formatAssetsCompact(flagged: SnapshotFlagged): string {
     .join('\n');
 }
 
-function formatEventsCompact(flagged: SnapshotFlagged): string {
-  if (!flagged.events.length) return 'Aucun événement économique aujourd\'hui.';
+function formatEventsCompact(flagged: SnapshotFlagged, snapDayName?: string): string {
+  if (!flagged.events.length) return `Aucun événement économique ce ${snapDayName ?? 'jour'}.`;
   return flagged.events
     .map(e => `${e.time} ${e.name} (${e.currency}, ${e.impact})${e.forecast ? ` consensus:${e.forecast}` : ''}${e.actual ? ` résultat:${e.actual}` : ''}`)
     .join('\n');
@@ -38,6 +39,7 @@ function formatEpisodeSummariesCompact(summaries: EpisodeSummary[]): string {
       line += `\n  Prédictions: ${preds}`;
     }
     if (s.angles.length) line += `\n  Angles: ${s.angles.filter(Boolean).join(', ')}`;
+    if (s.forwardLooking?.length) line += `\n  À venir: ${s.forwardLooking.join(' | ')}`;
     return line;
   }).join('\n\n');
 }
@@ -76,6 +78,8 @@ CONTRAINTES STRUCTURELLES (STRICTES) :
 - MOVERS HORS WATCHLIST : les top movers du stock screening peuvent être inclus comme FLASH si leur mouvement est narrativement lié au thème dominant
 - RÔLE NARRATIF : le dernier FLASH doit idéalement BOUCLER l'histoire du jour (narrativeRole = "closer")
 - ACTIFS PONT : si un actif relie deux segments (ex: DXY relie pétrole et or), il peut être mentionné dans les deux segments ou avoir un rôle "bridge"
+- DÉDUPLICATION ASSETS : chaque symbole ne peut apparaître qu'en PROPRIÉTAIRE dans un seul segment. Si CL=F est DEEP dans seg_1, il ne peut pas être asset principal dans seg_3 — référencer seulement via le contexte narratif, pas dans la liste assets[]
+- COT (CFTC) : les données de positionnement sont toujours décalées de 7-11 jours. Tu peux t'en servir comme contexte de fond ("les spéculateurs étaient déjà positionés long avant le move") mais JAMAIS comme cause directe du move du jour. Ne pas écrire "la COT flip explique/confirme le +X% d'aujourd'hui".
 
 PROFONDEURS :
 - DEEP : chaîne causale complète, 2 scénarios, technique + fondamental (70-90s, 175-225 mots)
@@ -94,9 +98,12 @@ function buildC1UserPrompt(
 ): string {
   let prompt = '';
 
+  const anchors = buildTemporalAnchors(flagged.date);
+  prompt += `${anchors.block}\n\n`;
+
   prompt += `## THÈMES DU JOUR\n${formatThemesCompact(flagged)}\n\n`;
   prompt += `## ASSETS SCORÉS (${flagged.assets.length} total)\n${formatAssetsCompact(flagged)}\n\n`;
-  prompt += `## CALENDRIER ÉCO\n${formatEventsCompact(flagged)}\n\n`;
+  prompt += `## CALENDRIER ÉCO\n${formatEventsCompact(flagged, anchors.snapDayName)}\n\n`;
 
   // Briefing Pack (raw editorial facts)
   if (briefingPack) {

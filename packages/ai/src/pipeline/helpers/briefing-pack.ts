@@ -148,16 +148,33 @@ const POLITICAL_ACTORS: Record<string, ActorConfig> = {
   },
 };
 
-// Action keywords for political triggers
-const ACTION_KEYWORDS: Record<string, string[]> = {
+// Action keywords for political triggers.
+// Short single-word English keywords (≤4 chars) use word-boundary regex to avoid false
+// substring matches (e.g. 'war' inside "Warsh", 'deal' inside "ideal").
+const ACTION_KEYWORDS: Record<string, Array<string | RegExp>> = {
   'tarif': ['tariff', 'tarifs', 'tariffs', 'droits de douane', 'customs', 'surtaxe'],
-  'guerre': ['war', 'guerre', 'conflit', 'conflict', 'escalade', 'escalation', 'invasion', 'frappe', 'strike', 'bombardement', 'missile'],
-  'paix': ['peace', 'paix', 'ceasefire', 'cessez-le-feu', 'accord', 'deal', 'négociation', 'désescalade', 'de-escalation', 'trêve'],
+  'guerre': [/\bwar\b/, 'guerre', 'conflit', 'conflict', 'escalade', 'escalation', 'invasion', 'frappe', 'strike', 'bombardement', 'missile'],
+  'paix': ['peace', 'paix', 'ceasefire', 'cessez-le-feu', 'accord', /\bdeal\b/, 'négociation', 'désescalade', 'de-escalation', 'trêve'],
   'sanctions': ['sanction', 'sanctions', 'embargo', 'restriction'],
   'taux': ['rate cut', 'rate hike', 'taux directeur', 'hausse des taux', 'baisse des taux', 'pivot', 'pause monétaire'],
   'réserves': ['reserve', 'réserves', 'strategic petroleum', 'SPR', 'réserves stratégiques'],
   'stimulus': ['stimulus', 'relance', 'quantitative easing', 'injection', 'spending', 'dépenses publiques'],
 };
+
+// Financial vocabulary required for 'déclaration' fallback triggers (no specific action keyword matched).
+// Without this, peripheral actor mentions in non-financial articles create false triggers.
+const FINANCIAL_RELEVANCE_TERMS = [
+  '%', 'bourse', 'marché', 'marchés', 'wall street', 'cac', 'dax', 'nasdaq', 's&p', 'dow',
+  'pétrole', 'baril', 'dollar', 'euro', 'livre sterling', 'yen', 'bitcoin', 'crypto',
+  'obligation', 'indice', 'cours du', 'taux', 'inflation', 'récession', 'banque centrale',
+  'hausse', 'baisse', 'chute', 'rally', 'crash', 'sell-off', 'selloff',
+  'milliards', 'rendement', 'spread', 'yield', 'points de base', 'banque',
+];
+
+function matchesKeyword(text: string, keyword: string | RegExp): boolean {
+  if (keyword instanceof RegExp) return keyword.test(text);
+  return text.includes(keyword);
+}
 
 function actorMatchesText(config: ActorConfig, text: string): boolean {
   // Check simple aliases (substring match)
@@ -177,16 +194,23 @@ function detectPoliticalTriggers(news: { title: string; summary?: string }[]): P
     for (const [actor, config] of Object.entries(POLITICAL_ACTORS)) {
       if (!actorMatchesText(config, text)) continue;
 
-      // Find what action
+      // Find what action keyword matches
       let action = '';
       for (const [actionLabel, keywords] of Object.entries(ACTION_KEYWORDS)) {
-        if (keywords.some(k => text.includes(k))) {
+        if (keywords.some(k => matchesKeyword(text, k))) {
           action = actionLabel;
           break;
         }
       }
 
-      if (!action) action = 'déclaration';
+      if (!action) {
+        // Fallback 'déclaration': only keep if article has explicit financial vocabulary.
+        // This prevents peripheral actor mentions (e.g. Poutine in a crypto article) from
+        // creating false triggers.
+        const hasFinancialContext = FINANCIAL_RELEVANCE_TERMS.some(t => text.includes(t));
+        if (!hasFinancialContext) continue;
+        action = 'déclaration';
+      }
 
       const key = `${actor}:${action}`;
       if (seen.has(key)) continue;
@@ -222,7 +246,7 @@ export function buildBriefingPack(
     }
     // Boost: action keywords
     for (const keywords of Object.values(ACTION_KEYWORDS)) {
-      if (keywords.some(k => title.includes(k))) score += 5;
+      if (keywords.some(k => matchesKeyword(title, k))) score += 5;
     }
     // Boost: mentions watchlist assets
     for (const asset of flagged.assets.slice(0, 10)) {
@@ -267,18 +291,34 @@ export function buildBriefingPack(
     .map(e => `${e.time ?? '?'} ${e.name} (${e.currency}, ${e.impact})${e.actual ? ` résultat:${e.actual}` : ` consensus:${e.forecast ?? '?'}`}`);
 
   // ── Earnings in 3 buckets ──
+  // Priority score: watchlist asset > named company > large EPS surprise > default
+  function earningsPriority(e: { symbol: string; name?: string; epsActual?: number; epsEstimate?: number }): number {
+    let score = 0;
+    if (watchlistSymbols.has(e.symbol)) score += 100;
+    if (e.name) score += 10; // named = known company (microcaps often have name=undefined)
+    if (e.epsActual != null && e.epsEstimate && e.epsEstimate !== 0) {
+      const surprisePct = Math.abs((e.epsActual - e.epsEstimate) / Math.abs(e.epsEstimate) * 100);
+      if (surprisePct > 20) score += 8;
+      else if (surprisePct > 10) score += 4;
+    }
+    return score;
+  }
+
   const todayEarnings = snapshot.earnings ?? [];
   const reported = todayEarnings
     .filter(e => e.epsActual != null)
-    .slice(0, 8)
+    .sort((a, b) => earningsPriority(b) - earningsPriority(a))
+    .slice(0, 10)
     .map(e => {
       const surprise = e.epsEstimate && e.epsEstimate !== 0
         ? ` (${((e.epsActual! - e.epsEstimate) / Math.abs(e.epsEstimate) * 100).toFixed(0)}% surprise)`
         : '';
-      return `${e.symbol} EPS=${e.epsActual}${surprise} [${e.hour}]`;
+      const label = e.name ? `${e.symbol} (${e.name.split(' ')[0]})` : e.symbol;
+      return `${label} EPS=${e.epsActual}${surprise} [${e.hour}]`;
     });
   const pending = todayEarnings
     .filter(e => e.epsActual == null)
+    .sort((a, b) => earningsPriority(b) - earningsPriority(a))
     .slice(0, 8)
     .map(e => `${e.symbol} est=${e.epsEstimate ?? '?'} [${e.hour}]`);
   const tomorrowDate = new Date(snapshot.date);
@@ -318,11 +358,20 @@ export function buildBriefingPack(
   }
 
   // ── COT divergences vs price direction ──
-  // Map COT contract symbols to watchlist asset symbols
+  // Map COT contract symbols to watchlist asset symbols.
+  // Includes both standard contract codes (ES, NQ...) and already-mapped FX symbols
+  // that may appear inverted in COT data (CADUSD=X → USDCAD=X, etc.).
   const COT_TO_ASSET: Record<string, string> = {
+    // Futures contract codes
     'GC': 'GC=F', 'SI': 'SI=F', 'CL': 'CL=F', 'NG': 'NG=F', 'HG': 'HG=F',
-    'DX': 'DX-Y.NYB', 'ES': '^GSPC', '6E': 'EURUSD=X', '6J': 'USDJPY=X', '6B': 'GBPUSD=X',
-    'NQ': '^IXIC', 'BTC': 'BTC-USD',
+    'PL': 'PL=F', 'ZW': 'ZW=F',
+    'DX': 'DX-Y.NYB', 'ES': '^GSPC', 'NQ': '^IXIC', 'YM': '^DJI',
+    '6E': 'EURUSD=X', '6J': 'USDJPY=X', '6B': 'GBPUSD=X',
+    '6A': 'AUDUSD=X', '6C': 'USDCAD=X', '6S': 'USDCHF=X', '6N': 'NZDUSD=X',
+    'BTC': 'BTC-USD', 'ETH': 'ETH-USD',
+    // Inverted FX symbols from COT data (e.g. CADUSD=X → USDCAD=X)
+    'CADUSD=X': 'USDCAD=X', 'CHFUSD=X': 'USDCHF=X',
+    'JPY=X': 'USDJPY=X', 'NZDUSD=X': 'NZDUSD=X',
   };
   const cotDivergences: COTDivergence[] = [];
   for (const cot of cotHighlights) {
@@ -331,8 +380,9 @@ export function buildBriefingPack(
     if (!asset || Math.abs(asset.changePct ?? 0) < 1) continue;
 
     const priceUp = (asset.changePct ?? 0) > 0;
-    const cotBullish = cot.bias.includes('bullish') || cot.bias.includes('haussier');
-    const cotBearish = cot.bias.includes('bearish') || cot.bias.includes('baissier') || cot.bias.includes('short');
+    // COT bias values: 'long', 'extreme_long', 'short', 'extreme_short', 'neutral'
+    const cotBullish = cot.bias.includes('long');
+    const cotBearish = cot.bias.includes('short');
 
     if ((priceUp && cotBearish) || (!priceUp && cotBullish)) {
       cotDivergences.push({
@@ -490,17 +540,24 @@ export function formatBriefingPack(pack: BriefingPack): string {
   }
 
   if (pack.cotHighlights.length) {
-    const daysOld = pack.cotHighlights[0]?.daysOld ?? '?';
-    text += `## POSITIONNEMENT COT (⚠️ données de J-${daysOld}, contexte structurel uniquement)\n`;
+    const daysOld = pack.cotHighlights[0]?.daysOld ?? 99;
+    const ageLabel = `J-${daysOld}`;
+    // Stale (≥7j) = structural signal only, never cite as confirmation of today's move
+    // Fresh (<7j) = can be used more directly, but still with caution
+    const usageNote = daysOld >= 7
+      ? `⚠️ DONNÉES STRUCTURELLES UNIQUEMENT (rapport du ${ageLabel}) — NE PAS citer comme confirmation d'un move du jour. Usage valide : risque prospectif (capitulation si retournement) ou divergence de fond.`
+      : `données du ${ageLabel} — signal frais, mais toujours positionnel (pas intra-day).`;
+    text += `## POSITIONNEMENT COT (${usageNote})\n`;
     for (const c of pack.cotHighlights) {
-      const flipTag = c.flip ? ' 🔄 FLIP' : '';
-      text += `- ${c.symbol} (${c.name}): ${c.bias} | net chg: ${c.netChange}${flipTag}\n`;
+      const flipTag = c.flip ? ' [FLIP DE CAMP]' : '';
+      text += `- ${c.symbol} (${c.name}): ${c.bias} | net chg: ${c.netChange}${flipTag} | daysOld: ${daysOld}\n`;
     }
     text += '\n';
   }
 
   if (pack.cotDivergences.length) {
-    text += `## DIVERGENCES COT vs PRIX (⚠️ signal contrarian)\n`;
+    const cotDaysOld = pack.cotHighlights[0]?.daysOld ?? 99;
+    text += `## DIVERGENCES COT vs PRIX (signal contrarian prospectif — positionnement J-${cotDaysOld} AVANT le move du jour)\n`;
     for (const d of pack.cotDivergences) {
       text += `- ${d.symbol} (${d.name}): ${d.note}\n`;
     }

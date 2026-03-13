@@ -3,7 +3,7 @@ import type { EditorialPlan, WordBudget, SegmentDepth } from "../types";
 const WORDS_PER_SEC = 150 / 60; // 2.5 words/sec
 
 const DEPTH_WORDS: Record<SegmentDepth, { min: number; target: number; max: number }> = {
-  DEEP:  { min: 175, target: 200, max: 225 },
+  DEEP:  { min: 225, target: 275, max: 325 },
   FOCUS: { min: 100, target: 130, max: 150 },
   FLASH: { min: 50,  target: 62,  max: 75 },
 };

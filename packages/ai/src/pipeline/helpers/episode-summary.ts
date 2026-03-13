@@ -1,4 +1,27 @@
 import type { EpisodeSummary, PrevContext } from "../types";
+import type { DailySnapshot } from "@yt-maker/core";
+
+/**
+ * Extract forward-looking items from a snapshot:
+ * upcoming earnings (next 21 days) + upcoming high-impact economic events.
+ */
+function buildForwardLooking(snapshot: DailySnapshot | undefined): string[] {
+  if (!snapshot) return [];
+  const items: string[] = [];
+
+  for (const e of snapshot.earningsUpcoming ?? []) {
+    const label = e.name ? `${e.name} (${e.symbol})` : e.symbol;
+    items.push(`Résultats ${label} attendus le ${e.date}`);
+  }
+
+  for (const ev of snapshot.upcomingEvents ?? []) {
+    if (ev.impact === 'high') {
+      items.push(`${ev.name} (${ev.currency}) prévu le ${ev.date}`);
+    }
+  }
+
+  return items;
+}
 
 /**
  * Build compact episode summaries for C1 (editorial selection).
@@ -39,6 +62,7 @@ export function buildEpisodeSummaries(
           resolved: false,
           outcome: undefined as 'correct' | 'incorrect' | 'pending' | undefined,
         })) ?? [],
+      forwardLooking: buildForwardLooking(entry.snapshot),
       angles: script?.sections
         ?.filter(s => s.type === 'segment')
         .map(s => (s.data?.topic as string) ?? s.topic ?? '') ?? [],

@@ -3,15 +3,67 @@
  * Usage: npx tsx scripts/test-layer-by-layer.ts --layer p1|p2|p3|p4|p5|p6
  */
 import "dotenv/config";
-import { readFileSync, writeFileSync, existsSync } from "fs";
+import { readFileSync, writeFileSync, existsSync, readdirSync } from "fs";
 import { join } from "path";
 import type { DailySnapshot } from "@yt-maker/core";
+import type { PrevContext } from "@yt-maker/ai";
+
+/**
+ * Load previous pipeline runs as PrevContext for C1/C3.
+ * Reads data/pipeline/YYYY-MM-DD/draft.json + data/snapshot-*.json
+ * Orders oldest→newest so entries[last] = J-1.
+ */
+function loadPrevContextFromPipelineRuns(currentDate: string): PrevContext {
+  const pipelineDir = join(process.cwd(), "data", "pipeline");
+  if (!existsSync(pipelineDir)) return { entries: [] };
+
+  const dirs = readdirSync(pipelineDir)
+    .filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d) && d < currentDate)
+    .sort(); // oldest first → last entry = J-1
+
+  const entries: PrevContext["entries"] = [];
+
+  for (const dir of dirs) {
+    // Support both naming conventions (draft.json and episode_draft.json)
+    const draftPath = existsSync(join(pipelineDir, dir, "draft.json"))
+      ? join(pipelineDir, dir, "draft.json")
+      : join(pipelineDir, dir, "episode_draft.json");
+    const snapPath = join(process.cwd(), "data", `snapshot-${dir}.json`);
+    if (!existsSync(draftPath) || !existsSync(snapPath)) continue;
+
+    const draft = JSON.parse(readFileSync(draftPath, "utf-8"));
+    const snap = JSON.parse(readFileSync(snapPath, "utf-8"));
+
+    // Convert DraftScript → minimal EpisodeScript shape expected by buildEpisodeSummaries / formatRecentScriptsForC3
+    const script = {
+      threadSummary: draft.metadata?.dominantTheme ?? "",
+      moodMarche: draft.metadata?.moodMarche ?? "",
+      sections: (draft.segments ?? []).map((seg: Record<string, unknown>) => ({
+        type: "segment" as const,
+        title: seg.title ?? "",
+        narration: seg.narration ?? "",
+        depth: seg.depth ?? "FOCUS",
+        assets: seg.assets ?? [],
+        data: {
+          topic: seg.title ?? "",
+          predictions: seg.predictions ?? [],
+        },
+      })),
+    };
+
+    entries.push({ snapshot: snap, script: script as never });
+  }
+
+  return { entries };
+}
 
 const args = process.argv.slice(2);
 const layerIdx = args.indexOf("--layer");
 const layer = layerIdx >= 0 ? args[layerIdx + 1] : "p1";
+const dateIdx = args.indexOf("--date");
+const date = dateIdx >= 0 ? args[dateIdx + 1] : "2026-03-10";
 
-const snapshotPath = join(process.cwd(), "data", "snapshot-2026-03-10.json");
+const snapshotPath = join(process.cwd(), "data", `snapshot-${date}.json`);
 const snapshot: DailySnapshot = JSON.parse(readFileSync(snapshotPath, "utf-8"));
 
 console.log(`\n=== Layer: ${layer.toUpperCase()} === (snapshot ${snapshot.date})\n`);
@@ -107,7 +159,7 @@ async function main() {
     console.log(causalBrief || '(empty)');
 
     // Save for next layers
-    const outDir = join(process.cwd(), "data", "pipeline", "layer-test");
+    const outDir = join(process.cwd(), "data", "pipeline", date);
     if (!existsSync(outDir)) {
       const { mkdirSync } = await import("fs");
       mkdirSync(outDir, { recursive: true });
@@ -115,18 +167,23 @@ async function main() {
     writeFileSync(join(outDir, "flagged.json"), JSON.stringify(flagged, null, 2));
     writeFileSync(join(outDir, "briefing-pack.json"), JSON.stringify(briefingPack, null, 2));
     writeFileSync(join(outDir, "causal-brief.json"), JSON.stringify(causalBrief, null, 2));
-    console.log(`\nSaved to data/pipeline/layer-test/`);
+    console.log(`\nSaved to data/pipeline/${date}/`);
   }
 
   if (layer === "p2") {
     const { runC1Editorial } = await import("@yt-maker/ai");
-    const flagged = JSON.parse(readFileSync(join(process.cwd(), "data/pipeline/layer-test/flagged.json"), "utf-8"));
-    const briefingPack = JSON.parse(readFileSync(join(process.cwd(), "data/pipeline/layer-test/briefing-pack.json"), "utf-8"));
+    const flagged = JSON.parse(readFileSync(join(process.cwd(), "data", "pipeline", date, "flagged.json"), "utf-8"));
+    const briefingPack = JSON.parse(readFileSync(join(process.cwd(), "data", "pipeline", date, "briefing-pack.json"), "utf-8"));
 
     console.log(`--- P2 C1 HAIKU (sélection éditoriale) ---`);
+    const { buildEpisodeSummaries } = await import("@yt-maker/ai");
+    const prevContext = loadPrevContextFromPipelineRuns(date);
+    const episodeSummaries = buildEpisodeSummaries(prevContext, 15);
+    console.log(`  PrevContext: ${prevContext.entries.length} épisodes chargés (${episodeSummaries.length} summaries)`);
+
     const editorial = await runC1Editorial({
       flagged,
-      episodeSummaries: [],
+      episodeSummaries,
       researchContext: "",
       weeklyBrief: "",
       briefingPack,
@@ -149,17 +206,17 @@ async function main() {
     }
     console.log(`\nThread: ${editorial.threadSummary}`);
 
-    const outDir = join(process.cwd(), "data", "pipeline", "layer-test");
+    const outDir = join(process.cwd(), "data", "pipeline", date);
     writeFileSync(join(outDir, "editorial.json"), JSON.stringify(editorial, null, 2));
-    console.log(`\nSaved to data/pipeline/layer-test/editorial.json`);
+    console.log(`\nSaved to data/pipeline/${date}/editorial.json`);
   }
 
   if (layer === "p3") {
     const { runC2Analysis } = await import("@yt-maker/ai");
-    const flagged = JSON.parse(readFileSync(join(process.cwd(), "data/pipeline/layer-test/flagged.json"), "utf-8"));
-    const editorial = JSON.parse(readFileSync(join(process.cwd(), "data/pipeline/layer-test/editorial.json"), "utf-8"));
-    const briefingPack = JSON.parse(readFileSync(join(process.cwd(), "data/pipeline/layer-test/briefing-pack.json"), "utf-8"));
-    const causalBrief = JSON.parse(readFileSync(join(process.cwd(), "data/pipeline/layer-test/causal-brief.json"), "utf-8"));
+    const flagged = JSON.parse(readFileSync(join(process.cwd(), "data", "pipeline", date, "flagged.json"), "utf-8"));
+    const editorial = JSON.parse(readFileSync(join(process.cwd(), "data", "pipeline", date, "editorial.json"), "utf-8"));
+    const briefingPack = JSON.parse(readFileSync(join(process.cwd(), "data", "pipeline", date, "briefing-pack.json"), "utf-8"));
+    const causalBrief = JSON.parse(readFileSync(join(process.cwd(), "data", "pipeline", date, "causal-brief.json"), "utf-8"));
 
     console.log(`--- P3 C2 SONNET (analyse) ---`);
     const analysis = await runC2Analysis({
@@ -188,15 +245,15 @@ async function main() {
       }
     }
 
-    const outDir = join(process.cwd(), "data", "pipeline", "layer-test");
+    const outDir = join(process.cwd(), "data", "pipeline", date);
     writeFileSync(join(outDir, "analysis.json"), JSON.stringify(analysis, null, 2));
-    console.log(`\nSaved to data/pipeline/layer-test/analysis.json`);
+    console.log(`\nSaved to data/pipeline/${date}/analysis.json`);
   }
 
   if (layer === "p4") {
     const { runC3Writing, computeWordBudget, loadKnowledge } = await import("@yt-maker/ai");
-    const editorial = JSON.parse(readFileSync(join(process.cwd(), "data/pipeline/layer-test/editorial.json"), "utf-8"));
-    const analysis = JSON.parse(readFileSync(join(process.cwd(), "data/pipeline/layer-test/analysis.json"), "utf-8"));
+    const editorial = JSON.parse(readFileSync(join(process.cwd(), "data", "pipeline", date, "editorial.json"), "utf-8"));
+    const analysis = JSON.parse(readFileSync(join(process.cwd(), "data", "pipeline", date, "analysis.json"), "utf-8"));
 
     console.log(`--- P4 C3 OPUS (rédaction narrative) ---`);
 
@@ -209,11 +266,16 @@ async function main() {
     // Load Tier1 knowledge (tone + narrative patterns)
     const knowledgeTier1 = loadKnowledge(snapshot);
 
+    const { formatRecentScriptsForC3 } = await import("@yt-maker/ai");
+    const prevContext = loadPrevContextFromPipelineRuns(date);
+    const recentScripts = formatRecentScriptsForC3(prevContext, 5);
+    console.log(`  PrevContext: ${prevContext.entries.length} épisodes chargés pour C3`);
+
     const draft = await runC3Writing({
       editorial,
       analysis,
       budget,
-      recentScripts: "",
+      recentScripts,
       knowledgeTier1,
       lang: "fr",
     });
@@ -244,16 +306,16 @@ async function main() {
     console.log(`\n[CLOSING] (${draft.closing?.wordCount} mots)`);
     console.log(draft.closing?.narration);
 
-    const outDir = join(process.cwd(), "data", "pipeline", "layer-test");
+    const outDir = join(process.cwd(), "data", "pipeline", date);
     writeFileSync(join(outDir, "draft.json"), JSON.stringify(draft, null, 2));
-    console.log(`\nSaved to data/pipeline/layer-test/draft.json`);
+    console.log(`\nSaved to data/pipeline/${date}/draft.json`);
   }
 
   if (layer === "p5") {
     const { runValidation, computeWordBudget } = await import("@yt-maker/ai");
-    const editorial = JSON.parse(readFileSync(join(process.cwd(), "data/pipeline/layer-test/editorial.json"), "utf-8"));
-    const analysis = JSON.parse(readFileSync(join(process.cwd(), "data/pipeline/layer-test/analysis.json"), "utf-8"));
-    const draft = JSON.parse(readFileSync(join(process.cwd(), "data/pipeline/layer-test/draft.json"), "utf-8"));
+    const editorial = JSON.parse(readFileSync(join(process.cwd(), "data", "pipeline", date, "editorial.json"), "utf-8"));
+    const analysis = JSON.parse(readFileSync(join(process.cwd(), "data", "pipeline", date, "analysis.json"), "utf-8"));
+    const draft = JSON.parse(readFileSync(join(process.cwd(), "data", "pipeline", date, "draft.json"), "utf-8"));
 
     console.log(`--- P5 VALIDATION (Code + C4 Haiku) ---`);
 
@@ -275,17 +337,17 @@ async function main() {
       console.log(`\n❌ Révision requise — ${result.issues.filter(i => i.severity === 'blocker').length} blocker(s)`);
     }
 
-    const outDir = join(process.cwd(), "data", "pipeline", "layer-test");
+    const outDir = join(process.cwd(), "data", "pipeline", date);
     writeFileSync(join(outDir, "validated.json"), JSON.stringify(result, null, 2));
-    console.log(`\nSaved to data/pipeline/layer-test/validated.json`);
+    console.log(`\nSaved to data/pipeline/${date}/validated.json`);
   }
 
   // p5b: force C4 Haiku semantic validation even if mechanical blockers exist
   if (layer === "p5b") {
     const { generateStructuredJSON } = await import("@yt-maker/ai");
-    const editorial = JSON.parse(readFileSync(join(process.cwd(), "data/pipeline/layer-test/editorial.json"), "utf-8"));
-    const analysis = JSON.parse(readFileSync(join(process.cwd(), "data/pipeline/layer-test/analysis.json"), "utf-8"));
-    const draft = JSON.parse(readFileSync(join(process.cwd(), "data/pipeline/layer-test/draft.json"), "utf-8"));
+    const editorial = JSON.parse(readFileSync(join(process.cwd(), "data", "pipeline", date, "editorial.json"), "utf-8"));
+    const analysis = JSON.parse(readFileSync(join(process.cwd(), "data", "pipeline", date, "analysis.json"), "utf-8"));
+    const draft = JSON.parse(readFileSync(join(process.cwd(), "data", "pipeline", date, "draft.json"), "utf-8"));
 
     console.log(`--- P5b C4 HAIKU (validation sémantique directe) ---`);
 

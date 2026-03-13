@@ -3,6 +3,7 @@ import type {
   EditorialPlan, AnalysisBundle, DraftScript, WordBudget, ValidationIssue,
 } from "./types";
 import type { Language } from "@yt-maker/core";
+import { buildTemporalAnchors } from "./helpers/temporal-anchors";
 
 function buildC3SystemPrompt(lang: Language, knowledgeTier1: string): string {
   // French persona for now (lang param for future EN support)
@@ -25,7 +26,10 @@ COMPLIANCE AMF/MiFID II (STRICT) :
 
 PACING (NON-NÉGOCIABLE) :
 - 150 mots par 60 secondes
-- Respecte le budget mots par segment (donné dans les données)
+- Le budget mots est une LIMITE ABSOLUE, pas une cible indicative
+- DEEP : ne jamais dépasser 325 mots. FOCUS : ne jamais dépasser 150 mots. FLASH : ne jamais dépasser 75 mots.
+- Si un segment dépasse sa limite, COUPER — jamais déborder sur la limite suivante
+- Astuce : pour un FLASH (75 mots max), compte tes mots avant de finaliser. 75 mots = ~5-6 phrases courtes.
 
 ÉCRITURE :
 - Cold open : max 15 mots, télégraphique, ZÉRO salutation ("Bienvenue", "Bonjour")
@@ -35,7 +39,7 @@ PACING (NON-NÉGOCIABLE) :
 - Transitions entre segments : liens thématiques naturels, JAMAIS "Passons maintenant à"
 - Si confidenceLevel = speculative → langage plus conditionnel ("on pourrait imaginer", "si l'hypothèse se confirme")
 - Si confidenceLevel = high → affirmations directes acceptées
-- Closing : 1 phrase retour au fil conducteur + teaser demain + question d'engagement
+- Closing : 1 phrase retour au fil conducteur + teaser prochain épisode (utilise le jour de semaine exact fourni dans les ancres temporelles) + question d'engagement
 
 VISUAL CUES :
 - Pour chaque segment, produis 1-3 visualCues abstraites
@@ -55,9 +59,12 @@ function buildC3UserPrompt(
 ): string {
   let prompt = '';
 
+  // Temporal anchors — injected first so LLM anchors all temporal refs
+  const anchors = buildTemporalAnchors(editorial.date);
+  prompt += `${anchors.block}\n\n`;
+
   // Editorial plan
   prompt += `## PLAN ÉDITORIAL\n`;
-  prompt += `Date: ${editorial.date}\n`;
   prompt += `Thème dominant: ${editorial.dominantTheme}\n`;
   prompt += `Fil conducteur: "${editorial.threadSummary}"\n`;
   prompt += `Mood: ${editorial.moodMarche}\n`;
