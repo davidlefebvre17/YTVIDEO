@@ -3,8 +3,8 @@ import type { EditorialPlan, WordBudget, SegmentDepth } from "../types";
 const WORDS_PER_SEC = 150 / 60; // 2.5 words/sec
 
 const DEPTH_WORDS: Record<SegmentDepth, { min: number; target: number; max: number }> = {
-  DEEP:  { min: 225, target: 275, max: 325 },
-  FOCUS: { min: 100, target: 130, max: 150 },
+  DEEP:  { min: 225, target: 300, max: 380 },
+  FOCUS: { min: 120, target: 155, max: 200 },
   FLASH: { min: 50,  target: 62,  max: 75 },
 };
 
@@ -21,9 +21,9 @@ export function computeWordBudget(plan: EditorialPlan): WordBudget {
   return {
     hook: 25,
     titleCard: 0 as const,
-    thread: 50,
+    thread: 60,
     segments,
-    closing: 60,
+    closing: 70,
     totalTarget: 25 + 0 + 50 + segTotal + 60,
   };
 }

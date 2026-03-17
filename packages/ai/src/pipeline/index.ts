@@ -140,6 +140,13 @@ export function toEpisodeScript(
     threadSummary: script.metadata.threadSummary,
     segmentCount: script.metadata.segmentCount,
     coverageTopics: script.metadata.coverageTopics,
+    direction: {
+      arc: directed.arc,
+      transitions: directed.transitions,
+      chartTimings: directed.chartTimings,
+      moodMusic: directed.moodMusic,
+      thumbnailMoment: directed.thumbnailMoment,
+    },
   };
 }
 
@@ -169,10 +176,13 @@ export async function runPipeline(
       .map((a) => `${a.symbol}(${a.materialityScore})`)
       .join(", ")}`
   );
+  if (flagged.newsClusters.length) {
+    console.log(`  News clusters: ${flagged.newsClusters.map(c => `${c.name}(${c.articleCount} articles)`).join(', ')}`);
+  }
   saveIntermediate(snapshot.date, "snapshot_flagged", flagged);
 
   // ── Prepare parallel inputs ────────────────────────────
-  const episodeSummaries = buildEpisodeSummaries(prevContext, 15);
+  const episodeSummaries = buildEpisodeSummaries(prevContext, 15, snapshot.date);
   const recentScripts = formatRecentScriptsForC3(prevContext, 5);
 
   let researchContext = "";
@@ -283,7 +293,7 @@ export async function runPipeline(
 
   // ── P5: C4 Validation (seule boucle) ──────────────────
   console.log("\nP5 — C4 Validation...");
-  let validation = await runValidation(draft, editorial, analysis, budget);
+  let validation = await runValidation(draft, editorial, analysis, budget, flagged);
   stats.llmCalls++;
 
   if (validation.status === "needs_revision") {
@@ -304,7 +314,7 @@ export async function runPipeline(
     stats.retries++;
 
     // Re-validate
-    validation = await runValidation(draft, editorial, analysis, budget);
+    validation = await runValidation(draft, editorial, analysis, budget, flagged);
     stats.llmCalls++;
 
     if (validation.status === "needs_revision") {

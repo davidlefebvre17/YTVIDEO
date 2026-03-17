@@ -1,6 +1,8 @@
+import * as fs from "fs";
+import * as path from "path";
 import type { DailySnapshot, AssetSnapshot, EconomicEvent } from "@yt-maker/core";
 import { loadMemory } from "@yt-maker/data";
-import type { SnapshotFlagged, FlaggedAsset, MaterialityFlag } from "./types";
+import type { SnapshotFlagged, FlaggedAsset, MaterialityFlag, NewsCluster } from "./types";
 
 // ── News alias map for NEWS_LINKED matching ──
 // Key = asset symbol, Value = additional search terms in news titles
@@ -68,6 +70,127 @@ function getPrevClose(asset: AssetSnapshot): number | undefined {
     return asset.price / (1 + asset.changePct / 100);
   }
   return undefined;
+}
+
+// ── News cluster detection for stocks outside watchlist ──
+
+const INDICES_DIR = path.resolve(process.cwd(), "data", "indices");
+
+interface IndexConstituent { symbol: string; name: string; }
+
+function loadAllConstituents(): IndexConstituent[] {
+  const all: IndexConstituent[] = [];
+  try {
+    const files = fs.readdirSync(INDICES_DIR).filter(f => f.endsWith(".json"));
+    for (const file of files) {
+      const data = JSON.parse(fs.readFileSync(path.join(INDICES_DIR, file), "utf-8")) as IndexConstituent[];
+      all.push(...data);
+    }
+  } catch {
+    // indices not available
+  }
+  return all;
+}
+
+// Names too generic to match reliably as substrings in news titles
+const SKIP_NAMES = new Set([
+  "3M", "HP", "ON", "AT", "IT", "AES", "CF", "GE", "LG", "SK",
+  "Bio-Techne",  // "tech" matches too broadly
+]);
+// Minimum name length for substring match (shorter names use word-boundary match)
+const MIN_SUBSTRING_LEN = 6;
+
+function detectNewsClusters(snapshot: DailySnapshot): NewsCluster[] {
+  if (!snapshot.news?.length) return [];
+
+  const watchlistSymbols = new Set(snapshot.assets.map(a => a.symbol));
+  const constituents = loadAllConstituents();
+  // Only consider stocks NOT already in the 38-asset watchlist
+  const candidates = constituents.filter(c => !watchlistSymbols.has(c.symbol));
+
+  // Build matching: for each candidate, count articles where the company name appears in the title
+  const counts = new Map<string, { name: string; count: number; titles: string[] }>();
+
+  for (const candidate of candidates) {
+    const name = candidate.name;
+    if (SKIP_NAMES.has(name) || name.length < 4) continue;
+
+    const nameUp = name.toUpperCase();
+    const symbolUp = candidate.symbol.replace(/\..+$/, "").toUpperCase(); // Remove .PA, .DE etc.
+
+    // For short names (<6 chars), use word-boundary regex to avoid false positives
+    // e.g. "Meta" should match "Meta Platforms" but not "metadata" or "metaverse"
+    // For longer names (>=6 chars), substring match is safe enough
+    let nameRegex: RegExp | null = null;
+    if (nameUp.length < MIN_SUBSTRING_LEN) {
+      try {
+        nameRegex = new RegExp(`\\b${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i");
+      } catch {
+        continue; // Invalid regex — skip this candidate
+      }
+    }
+
+    const matched: string[] = [];
+    for (const article of snapshot.news) {
+      const title = article.title;
+      const titleUp = title.toUpperCase();
+
+      let nameMatch = false;
+      if (nameRegex) {
+        nameMatch = nameRegex.test(title);
+      } else {
+        nameMatch = titleUp.includes(nameUp);
+      }
+
+      // Ticker match: only for 4+ char symbols, word-boundary to avoid partial matches
+      let symbolMatch = false;
+      if (symbolUp.length >= 4) {
+        try {
+          symbolMatch = new RegExp(`\\b${symbolUp}\\b`).test(titleUp);
+        } catch {
+          // skip
+        }
+      }
+
+      if (nameMatch || symbolMatch) {
+        matched.push(title);
+      }
+    }
+
+    if (matched.length >= 3) {
+      const existing = counts.get(candidate.symbol);
+      if (!existing || matched.length > existing.count) {
+        counts.set(candidate.symbol, { name, count: matched.length, titles: matched });
+      }
+    }
+  }
+
+  // Get price data from screening if available
+  const screenData = snapshot.stockScreen ?? [];
+
+  // Deduplicate by company name (e.g. Airbus listed as AIR.PA and AIR.DE)
+  const seen = new Map<string, NewsCluster>();
+  for (const [symbol, data] of counts) {
+    const screen = screenData.find(s => s.symbol === symbol);
+    const cluster: NewsCluster = {
+      symbol,
+      name: data.name,
+      articleCount: data.count,
+      titles: data.titles.slice(0, 5),
+      changePct: screen?.changePct,
+    };
+    const existing = seen.get(data.name);
+    if (!existing || data.count > existing.articleCount) {
+      seen.set(data.name, cluster);
+    }
+  }
+
+  const clusters = Array.from(seen.values());
+
+  // Sort by article count descending
+  clusters.sort((a, b) => b.articleCount - a.articleCount);
+
+  return clusters.slice(0, 10); // Top 10 clusters
 }
 
 export function flagAssets(snapshot: DailySnapshot): SnapshotFlagged {
@@ -196,6 +319,9 @@ export function flagAssets(snapshot: DailySnapshot): SnapshotFlagged {
   // Sort by materiality score descending
   flagged.sort((a, b) => b.materialityScore - a.materialityScore);
 
+  // Detect news clusters on stocks outside watchlist
+  const newsClusters = detectNewsClusters(snapshot);
+
   return {
     date: snapshot.date ?? new Date().toISOString().slice(0, 10),
     assets: flagged,
@@ -206,5 +332,6 @@ export function flagAssets(snapshot: DailySnapshot): SnapshotFlagged {
     themesDuJour: snapshot.themesDuJour,
     screenResults: snapshot.stockScreen ?? [],
     news: snapshot.news ?? [],
+    newsClusters,
   };
 }

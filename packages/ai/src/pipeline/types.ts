@@ -30,6 +30,15 @@ export interface FlaggedAsset {
   snapshot: AssetSnapshot;
 }
 
+export interface NewsCluster {
+  symbol: string;
+  name: string;
+  articleCount: number;
+  titles: string[];
+  /** Price change if available from screening, undefined if not screened */
+  changePct?: number;
+}
+
 export interface SnapshotFlagged {
   date: string;
   assets: FlaggedAsset[];
@@ -40,6 +49,8 @@ export interface SnapshotFlagged {
   themesDuJour?: ThemesDuJour;
   screenResults: StockScreenResult[];
   news: NewsItem[];
+  /** Stocks with high news volume but not in 38-asset watchlist */
+  newsClusters: NewsCluster[];
 }
 
 // ── P2 C1 Editorial ─────────────────────────────────────
@@ -86,11 +97,41 @@ export interface EditorialPlan {
 export type ConfidenceLevel = 'high' | 'medium' | 'speculative';
 
 export interface ChartInstruction {
-  type: 'support_line' | 'resistance_line' | 'annotation' | 'zone_highlight'
-       | 'trend_line' | 'indicator_overlay' | 'price_label';
+  /** Semantic visual type — determines which Remotion component C7 will route to */
+  type:
+    // Price/level overlays (single asset, InkChart)
+    | 'price_line'       // prix spot animé
+    | 'support_line'     // niveau support horizontal
+    | 'resistance_line'  // niveau résistance horizontal
+    | 'trend_line'       // ligne de tendance
+    | 'zone_highlight'   // zone colorée entre 2 niveaux
+    | 'annotation'       // texte annoté sur le chart
+    | 'indicator_overlay'// RSI/MACD/BB overlay
+    | 'price_label'      // label prix statique
+    // Multi-asset visuals (need assets[] array)
+    | 'chart_comparaison'    // 2 barres J-1 vs J0 côte à côte
+    | 'chart_split'          // split screen 2 assets simultanés
+    | 'chart_correlation'    // overlay 2 courbes (corrélation/divergence)
+    | 'chart_spark'          // sparkline minimaliste 5j
+    // Data components
+    | 'yield_curve'          // courbe des taux 2Y/10Y
+    | 'gauge_rsi'            // gauge RSI animée (0-100)
+    | 'gauge_fear_greed'     // Fear & Greed index animé
+    | 'multi_badge'          // badges multiples assets (4 max)
+    | 'heatmap_sectorielle'  // heatmap 11 secteurs S&P
+    | 'countdown_event'      // countdown vers événement éco
+    // Infographic components
+    | 'causal_chain'         // chaîne causale animée (steps)
+    | 'scenario_fork'        // fork bullish/bearish animé
+    | 'stat_callout';        // chiffre géant animé (count-up)
+  /** Primary asset ticker */
   asset: string;
+  /** Secondary assets for multi-asset types (chart_split, chart_correlation, chart_comparaison) */
+  assets?: string[];
   value?: number;
+  value2?: number;       // second level for zone_highlight, or second asset value
   label?: string;
+  label2?: string;       // second label for split/correlation
   timeframe?: string;
   detail?: string;
 }
@@ -225,6 +266,38 @@ export interface ChartTiming {
   hideAtSec: number;
 }
 
+export type PacingTag =
+  | 'lent_martelé'   // cold open — lourd, dramatique
+  | 'pose_fluide'    // thread — fluide, posé
+  | 'rapide'         // info dense, urgent
+  | 'posé'           // analyse, pédagogique
+  | 'tension'        // build-up, suspense
+  | 'engagement'     // CTA, question finale
+  | 'analytique'     // données techniques
+  | 'synthèse'       // récap closing
+  | 'teaser';        // teaser lendemain
+
+export interface AudioBreakpoint {
+  /** ID du segment parent (seg_1, seg_2, etc.) */
+  segmentId: string;
+  /** Index du sous-segment (0=a, 1=b, 2=c) — pour seg_1_a, seg_1_b */
+  subIndex: number;
+  /** Mot de début dans la narration du segment (0-indexed) */
+  startWordIndex: number;
+  /** Mot de fin (exclusif) */
+  endWordIndex: number;
+  /** Tag de pacing pour cet extrait */
+  pacingTag: PacingTag;
+  /** Durée estimée en secondes */
+  durationSec: number;
+  /** Paramètres ElevenLabs pour ce sous-segment */
+  elevenLabsParams: {
+    speed: number;       // 0.75–1.15
+    stability: number;   // 0.60–0.90
+    style: number;       // 0.0–0.80
+  };
+}
+
 export interface ThumbnailMoment {
   segmentId: string;
   reason: string;
@@ -239,6 +312,7 @@ export interface DirectedEpisode {
   thumbnailMoment: ThumbnailMoment;
   moodMusic: MoodTag;
   chartTimings: ChartTiming[];
+  audioBreakpoints: AudioBreakpoint[];
   totalEstimatedDuration: number;
 }
 

@@ -15,7 +15,10 @@ function formatAssetsCompact(flagged: SnapshotFlagged): string {
   return flagged.assets
     .map(a => {
       const drama = a.snapshot.technicals?.dramaScore?.toFixed(0) ?? '?';
-      return `${a.symbol} | ${a.name} | ${a.changePct >= 0 ? '+' : ''}${a.changePct.toFixed(2)}% | score:${a.materialityScore} | flags:${a.flags.join(',') || 'none'} | drama:${drama}`;
+      const hi = a.snapshot.high24h;
+      const lo = a.snapshot.low24h;
+      const range = (hi && lo && Math.abs(hi - lo) > 0) ? ` | séance:[${lo.toFixed(2)}–${hi.toFixed(2)}]` : '';
+      return `${a.symbol} | ${a.name} | ${a.changePct >= 0 ? '+' : ''}${a.changePct.toFixed(2)}%${range} | score:${a.materialityScore} | flags:${a.flags.join(',') || 'none'} | drama:${drama}`;
     })
     .join('\n');
 }
@@ -77,9 +80,10 @@ CONTRAINTES STRUCTURELLES (STRICTES) :
 - COHÉRENCE THÉMATIQUE INVERSE : si le thème du jour est géopolitique, cherche les actifs en direction OPPOSÉE (défense si désescalade, refuges si escalade) — ces actifs ont valeur de "revers de médaille" même avec un drama score modéré
 - MOVERS HORS WATCHLIST : les top movers du stock screening peuvent être inclus comme FLASH si leur mouvement est narrativement lié au thème dominant
 - RÔLE NARRATIF : le dernier FLASH doit idéalement BOUCLER l'histoire du jour (narrativeRole = "closer")
-- ACTIFS PONT : si un actif relie deux segments (ex: DXY relie pétrole et or), il peut être mentionné dans les deux segments ou avoir un rôle "bridge"
-- DÉDUPLICATION ASSETS : chaque symbole ne peut apparaître qu'en PROPRIÉTAIRE dans un seul segment. Si CL=F est DEEP dans seg_1, il ne peut pas être asset principal dans seg_3 — référencer seulement via le contexte narratif, pas dans la liste assets[]
+- ACTIFS PONT : si un actif relie deux segments thématiquement, il peut être mentionné dans les deux segments ou avoir un rôle "bridge"
+- DÉDUPLICATION ASSETS : chaque symbole ne peut apparaître qu'en PROPRIÉTAIRE dans un seul segment. S'il est asset principal dans un DEEP, il ne peut pas être asset principal dans un autre segment — référencer seulement via le contexte narratif, pas dans la liste assets[]
 - COT (CFTC) : les données de positionnement sont toujours décalées de 7-11 jours. Tu peux t'en servir comme contexte de fond ("les spéculateurs étaient déjà positionés long avant le move") mais JAMAIS comme cause directe du move du jour. Ne pas écrire "la COT flip explique/confirme le +X% d'aujourd'hui".
+- DÉCISIONS À VENIR (banque centrale, politique, résultats) : tu CONSTATES qu'une décision approche et que le marché réagit, tu ne SPÉCULES PAS sur le résultat. "La Fed se réunit demain" = fait. "Le marché anticipe une baisse de taux" = spéculation INTERDITE sauf si des données chiffrées (futures, OIS, swaps) quantifient cette anticipation. Les angles et le threadSummary doivent rester factuels — l'interprétation éditoriale appartient aux étapes suivantes.
 
 PROFONDEURS :
 - DEEP : chaîne causale complète, 2 scénarios, technique + fondamental (70-90s, 175-225 mots)
@@ -116,6 +120,19 @@ function buildC1UserPrompt(
     prompt += `## EARNINGS DU JOUR\n`;
     for (const e of earningsToday) {
       prompt += `${e.symbol} (${e.name}) — ${e.reason.join(', ')}\n`;
+    }
+    prompt += '\n';
+  }
+
+  // News clusters — stocks with high news volume but not in watchlist
+  if (flagged.newsClusters?.length) {
+    prompt += `## ACTUALITÉS HORS WATCHLIST (stocks avec forte couverture médiatique)\n`;
+    prompt += `Ces actions ne sont pas dans la watchlist des 38 assets mais font l'objet d'un volume d'articles inhabuel. Elles peuvent être mentionnées en FLASH si narrativement pertinentes.\n`;
+    for (const cluster of flagged.newsClusters) {
+      prompt += `${cluster.symbol} (${cluster.name}) — ${cluster.articleCount} articles${cluster.changePct !== undefined ? `, var: ${cluster.changePct > 0 ? '+' : ''}${cluster.changePct.toFixed(1)}%` : ''}\n`;
+      for (const title of cluster.titles.slice(0, 3)) {
+        prompt += `  • ${title.slice(0, 120)}\n`;
+      }
     }
     prompt += '\n';
   }
