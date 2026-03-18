@@ -131,8 +131,10 @@ export function tagArticle(
   causalRules: CausalRule[],
   metadataRules: MetadataRule[]
 ): NewsTags {
-  // Normalize article text once
-  const text = normalizeText(`${article.title} ${article.summary ?? ""}`);
+  // Normalize: title only for Layer 1 (direct), full text for Layer 2/3
+  // Summary is noisy (RSS boilerplate "Google News", "Yahoo Finance") causing false matches
+  const titleText = normalizeText(article.title);
+  const fullText = normalizeText(`${article.title} ${article.summary ?? ""}`);
 
   // Cumulative results
   const assetTags: Map<string, AssetTag> = new Map();
@@ -140,12 +142,12 @@ export function tagArticle(
   const rulesMatched: string[] = [];
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // LAYER 1: Direct Asset Matching
+  // LAYER 1: Direct Asset Matching (title only — summary is too noisy)
   // ═══════════════════════════════════════════════════════════════════════════
 
   for (const rule of directRules) {
     for (const pattern of rule.patterns) {
-      if (matchPattern(text, pattern, rule.word_boundary)) {
+      if (matchPattern(titleText, pattern, rule.word_boundary)) {
         // Tag the main asset
         if (!assetTags.has(rule.asset)) {
           assetTags.set(rule.asset, {
@@ -178,13 +180,13 @@ export function tagArticle(
 
   for (const rule of causalRules) {
     // Skip if exclude patterns match
-    if (rule.exclude_patterns?.some((p) => text.includes(p))) {
+    if (rule.exclude_patterns?.some((p) => fullText.includes(p))) {
       continue;
     }
 
     // Count how many triggers match
     const matchedTriggers = rule.triggers.filter((t) =>
-      matchPattern(text, t, false)
+      matchPattern(fullText, t, false)
     );
     const minRequired = rule.min_triggers ?? 1;
 
@@ -194,10 +196,10 @@ export function tagArticle(
 
       if (rule.modifiers) {
         const hasBullish = rule.modifiers.bullish.some((m) =>
-          text.includes(m)
+          fullText.includes(m)
         );
         const hasBearish = rule.modifiers.bearish.some((m) =>
-          text.includes(m)
+          fullText.includes(m)
         );
 
         if (hasBullish && !hasBearish) {

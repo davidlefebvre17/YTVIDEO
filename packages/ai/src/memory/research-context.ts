@@ -40,74 +40,64 @@ export const CURRENCY_ASSET_MAP: Record<string, string[]> = {
 };
 
 // ============================================================
-// Research Context Builder (section 6)
+// Research Context Builder (v2)
 // ============================================================
 
-interface ResearchContextOptions {
-  maxTokensEstimate?: number;
-  shortTermDays?: number;
-  longTermDays?: number;
-  maxArticlesPerAsset?: number;
-  maxThemesLongTerm?: number;
+/**
+ * Construit le contexte historique pour les prompts C1/C2/C3.
+ *
+ * V2 changes:
+ * - 30 jours de fenêtre (au lieu de 7)
+ * - Exclut le jour du snapshot (les news du jour sont dans snapshot.news)
+ * - Titres complets (plus de troncature à 60 chars)
+ * - Tendances par asset (plus de tendances globales répétées)
+ * - Cadrage temporel explicite pour le LLM
+ */
+/** Extra stock symbols detected via news cluster (not in watchlist) */
+export interface ClusterSymbol {
+  symbol: string;
+  name: string;
 }
 
-/**
- * Construit le contexte historique pour le prompt du Writer (Opus).
- *
- * @param snapshot - Le DailySnapshot du jour
- * @param db - Instance NewsMemoryDB
- * @param options - Configuration optionnelle
- * @returns Texte markdown formaté, prêt à injecter dans le prompt
- */
 export function buildResearchContext(
   snapshot: DailySnapshot,
   db: NewsMemoryDB,
-  options?: ResearchContextOptions
+  clusterSymbols?: ClusterSymbol[],
 ): string {
-  const opts = {
-    maxTokensEstimate: options?.maxTokensEstimate || 2000,
-    shortTermDays: options?.shortTermDays || 7,
-    longTermDays: options?.longTermDays || 90,
-    maxArticlesPerAsset: options?.maxArticlesPerAsset || 5,
-    maxThemesLongTerm: options?.maxThemesLongTerm || 3,
-  };
-
-  // ============================================================
-  // 1. IDENTIFY TOP MOVERS
-  // ============================================================
+  const snapshotDate = snapshot.date;
 
   const topMovers = identifyTopMovers(snapshot, 8, 10);
 
-  if (topMovers.length === 0) {
-    // DB is empty or no significant movers
-    return (
-      "## Contexte historique (News Memory)\n\n" +
-      "Base de données en cours d'accumulation. Pas de contexte historique disponible.\n"
-    );
+  if (topMovers.length === 0 && (!clusterSymbols || clusterSymbols.length === 0)) {
+    return "";
   }
 
-  // ============================================================
-  // 2. BUILD MARKDOWN SECTIONS
-  // ============================================================
+  let markdown = `⚠️ ATTENTION : les articles ci-dessous sont ANTÉRIEURS au ${snapshotDate}. Ce sont des archives, PAS des news du jour.\n`;
+  markdown += `Utilise-les pour comprendre l'ARC NARRATIF d'une histoire (depuis quand un sujet est couvert, quelle est la trajectoire) et pour identifier des continuités avec le passé récent.\n`;
+  markdown += `Les news du jour sont dans la section ASSETS / NEWS séparée.\n\n`;
 
-  let markdown = "## Contexte historique (News Memory)\n\n";
-
-  // Section: Top movers
-  markdown += "### Top movers — contexte 7 jours\n\n";
+  // Section: Top movers with historical articles
+  markdown += `### Contexte historique par asset (J-1 à J-30)\n\n`;
+  const coveredSymbols = new Set<string>();
   for (const mover of topMovers) {
-    markdown += buildMoverSection(
-      mover,
-      db,
-      opts.shortTermDays,
-      opts.longTermDays,
-      opts.maxArticlesPerAsset,
-      opts.maxThemesLongTerm
-    );
+    markdown += buildMoverSection(mover, db, snapshotDate);
+    coveredSymbols.add(mover.symbol);
   }
 
-  // Section: Dominant themes
-  markdown += "### Thèmes dominants cette semaine\n";
-  const themeStats = db.countByTheme(7);
+  // Section: News cluster stocks (hors watchlist, forte couverture médiatique)
+  if (clusterSymbols?.length) {
+    const uncovered = clusterSymbols.filter(c => !coveredSymbols.has(c.symbol));
+    if (uncovered.length > 0) {
+      markdown += `### Stocks hors watchlist — contexte historique (J-1 à J-30)\n\n`;
+      for (const cluster of uncovered.slice(0, 5)) {
+        markdown += buildClusterSection(cluster, db, snapshotDate);
+      }
+    }
+  }
+
+  // Section: Dominant themes (global, 14 days)
+  markdown += `### Thèmes dominants (14 derniers jours)\n`;
+  const themeStats = db.countByTheme(14);
   const topThemes = themeStats.slice(0, 5);
   if (topThemes.length > 0) {
     for (const { theme, count } of topThemes) {
@@ -118,11 +108,11 @@ export function buildResearchContext(
   }
   markdown += "\n";
 
-  // Section: Recent economic events
-  markdown += "### Événements économiques récents (3j)\n";
+  // Section: Recent economic events (exclude snapshot day)
+  markdown += `### Événements économiques récents (J-1 à J-5)\n`;
   const recentEvents = db.getEconomicEvents({
-    from: subtractDays(snapshot.date, 3),
-    to: snapshot.date,
+    from: subtractDays(snapshotDate, 5),
+    to: subtractDays(snapshotDate, 1),
     strength: "Strong",
   });
 
@@ -136,23 +126,28 @@ export function buildResearchContext(
         outcome === "pending"
           ? "—"
           : `actual: ${event.actual} vs forecast: ${event.forecast} → ${outcome.toUpperCase()}`;
-      markdown += `- ${event.event_date} : ${event.name} ${outcomeStr} [${event.strength || "Strong"}]\n`;
+      markdown += `- ${event.event_date} : ${event.name} ${outcomeStr}\n`;
     }
   } else {
-    markdown += "- Pas d'événements économiques forts ces 3 derniers jours\n";
+    markdown += "- Pas d'événements économiques forts ces 5 derniers jours\n";
   }
   markdown += "\n";
 
-  // Section: High-impact articles
-  markdown += "### Articles high-impact récents (3j)\n";
-  const highImpactArticles = db.getHighImpactRecent(3, 5);
-  if (highImpactArticles.length > 0) {
-    for (const article of highImpactArticles) {
+  // Section: High-impact articles (J-1 to J-7, exclude snapshot day)
+  markdown += `### Articles high-impact récents (J-1 à J-7)\n`;
+  const highImpactArticles = db.getHighImpactRecent(7, 10);
+  const filteredHighImpact = highImpactArticles.filter(a => {
+    const pubDate = a.published_at.split("T")[0];
+    return pubDate < snapshotDate;
+  });
+  if (filteredHighImpact.length > 0) {
+    for (const article of filteredHighImpact.slice(0, 8)) {
       const pubDate = article.published_at.split("T")[0];
-      markdown += `- "${article.title}" (${article.source}, ${pubDate}) [HIGH]\n`;
+      const daysAgo = daysBetween(pubDate, snapshotDate);
+      markdown += `- [J-${daysAgo}] ${pubDate} : "${article.title}" (${article.source}) [HIGH]\n`;
     }
   } else {
-    markdown += "- Pas d'articles high-impact dans les 3 derniers jours\n";
+    markdown += "- Pas d'articles high-impact dans les 7 derniers jours\n";
   }
   markdown += "\n";
 
@@ -169,11 +164,11 @@ export function buildResearchContext(
  */
 function identifyTopMovers(
   snapshot: DailySnapshot,
-  minMoversForBudget: number,
+  _minMoversForBudget: number,
   maxMovers: number
 ): AssetSnapshot[] {
-  const CHANGE_THRESHOLD = 0.5; // 0.5%
-  const DRAMA_THRESHOLD = 40; // arbitrary drama score threshold
+  const CHANGE_THRESHOLD = 0.5;
+  const DRAMA_THRESHOLD = 40;
 
   const candidates = snapshot.assets.filter((asset) => {
     const absChange = Math.abs(asset.changePct);
@@ -181,58 +176,97 @@ function identifyTopMovers(
     return absChange > CHANGE_THRESHOLD || drama > DRAMA_THRESHOLD;
   });
 
-  // Sort by drama score descending
   candidates.sort(
     (a, b) => (b.technicals?.dramaScore || 0) - (a.technicals?.dramaScore || 0)
   );
 
-  // Cap at maxMovers
   return candidates.slice(0, maxMovers);
 }
 
 /**
  * Build the markdown section for a single mover.
+ * Uses searchByAssetBefore to exclude snapshot date articles.
  */
 function buildMoverSection(
   asset: AssetSnapshot,
   db: NewsMemoryDB,
-  shortTermDays: number,
-  longTermDays: number,
-  maxArticlesPerAsset: number,
-  maxThemesLongTerm: number
+  snapshotDate: string,
 ): string {
   let markdown = `#### ${asset.symbol} (${asset.name}) — ${asset.changePct > 0 ? "+" : ""}${asset.changePct.toFixed(1)}% aujourd'hui\n`;
 
-  // Short-term articles (7 days)
-  const articles = db.searchByAsset(asset.symbol, {
-    days: shortTermDays,
-    limit: maxArticlesPerAsset,
+  // Articles from J-1 to J-30 (excludes snapshot day)
+  const articles = db.searchByAssetBefore(asset.symbol, snapshotDate, {
+    days: 30,
+    limit: 8,
   });
 
   if (articles.length > 0) {
-    for (const article of articles.slice(0, maxArticlesPerAsset)) {
+    for (const article of articles) {
       const pubDate = article.published_at.split("T")[0];
+      const daysAgo = daysBetween(pubDate, snapshotDate);
       const impact = (article.impact || "medium").toUpperCase();
-      markdown += `- ${pubDate} : ${article.title.substring(0, 60)}... (${article.source}) [${impact}]\n`;
-    }
-    // Remaining articles count
-    if (articles.length > maxArticlesPerAsset) {
-      markdown += `- + ${articles.length - maxArticlesPerAsset} autres articles récents\n`;
+      markdown += `- [J-${daysAgo}] ${pubDate} : "${article.title}" (${article.source}) [${impact}]\n`;
     }
   } else {
-    markdown += `- Pas d'articles trouvés pour cet actif ces ${shortTermDays} jours\n`;
+    markdown += `- Pas d'articles trouvés pour cet actif ces 30 derniers jours\n`;
   }
 
-  // Long-term theme distribution (90 days)
-  const themeStats = db.countByTheme(longTermDays);
-  // Filter to themes where this asset was tagged
-  const relevantThemes = themeStats.slice(0, maxThemesLongTerm);
-
-  if (relevantThemes.length > 0) {
-    const themeStr = relevantThemes
-      .map((t) => `${t.theme} (${t.count} articles)`)
+  // Per-asset themes (30 days)
+  const assetThemes = db.countThemesByAsset(asset.symbol, 30, 3);
+  if (assetThemes.length > 0) {
+    const themeStr = assetThemes
+      .map((t) => `${t.theme} (${t.count})`)
       .join(", ");
-    markdown += `→ Tendances 90j : ${themeStr}\n`;
+    markdown += `→ Thèmes associés (30j) : ${themeStr}\n`;
+  }
+
+  markdown += "\n";
+  return markdown;
+}
+
+/**
+ * Post-query filter: check article title actually mentions the asset.
+ * Catches false positives from DB (e.g. "meta" matching "metals").
+ */
+function titleMentionsAsset(title: string, symbol: string, name: string): boolean {
+  const titleLow = title.toLowerCase();
+  const tickerClean = symbol.replace(/\..+$/, "").toLowerCase(); // NVDA, AIR, META
+  const nameLow = name.toLowerCase();
+  // Check ticker as word boundary (surround with spaces)
+  const paddedTitle = ` ${titleLow} `;
+  if (tickerClean.length >= 3 && paddedTitle.includes(` ${tickerClean} `)) return true;
+  // Check full name or first meaningful word (>5 chars)
+  if (titleLow.includes(nameLow)) return true;
+  const firstName = nameLow.split(/\s+/)[0];
+  if (firstName.length >= 5 && titleLow.includes(firstName)) return true;
+  return false;
+}
+
+/**
+ * Build section for a news cluster stock (not in watchlist).
+ */
+function buildClusterSection(
+  cluster: ClusterSymbol,
+  db: NewsMemoryDB,
+  snapshotDate: string,
+): string {
+  // Fetch more than needed, then filter for relevance
+  const rawArticles = db.searchByAssetBefore(cluster.symbol, snapshotDate, {
+    days: 30,
+    limit: 15,
+  });
+  const articles = rawArticles.filter(a =>
+    titleMentionsAsset(a.title, cluster.symbol, cluster.name)
+  );
+
+  if (articles.length === 0) return ""; // Skip entirely if no relevant articles
+
+  let markdown = `#### ${cluster.symbol} (${cluster.name}) — hors watchlist\n`;
+  for (const article of articles.slice(0, 6)) {
+    const pubDate = article.published_at.split("T")[0];
+    const daysAgo = daysBetween(pubDate, snapshotDate);
+    const impact = (article.impact || "medium").toUpperCase();
+    markdown += `- [J-${daysAgo}] ${pubDate} : "${article.title}" (${article.source}) [${impact}]\n`;
   }
 
   markdown += "\n";
@@ -241,7 +275,6 @@ function buildMoverSection(
 
 /**
  * Subtract days from a date string (YYYY-MM-DD).
- * Returns result in ISO string format.
  */
 function subtractDays(dateStr: string, days: number): string {
   const date = new Date(dateStr);
@@ -250,4 +283,13 @@ function subtractDays(dateStr: string, days: number): string {
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
+}
+
+/**
+ * Number of days between two YYYY-MM-DD dates.
+ */
+function daysBetween(from: string, to: string): number {
+  const d1 = new Date(from);
+  const d2 = new Date(to);
+  return Math.round((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
 }

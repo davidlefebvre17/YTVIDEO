@@ -245,7 +245,11 @@ function buildC2UserPrompt(
 
   // Research context
   if (researchContext) {
-    prompt += `## CONTEXTE RECHERCHE (NewsMemory 7j)\n${researchContext}\n\n`;
+    prompt += `## CONTEXTE HISTORIQUE (NewsMemory — articles ANTÉRIEURS au ${editorial.date})\n`;
+    prompt += `Ces articles sont des ARCHIVES. Les dates [J-N] indiquent l'ancienneté.\n`;
+    prompt += `Utilise-les pour calibrer ta confiance : un move confirmé par 2 semaines d'articles = high, un événement sans précédent récent = medium/speculative.\n`;
+    prompt += `Si un article ancien décrit un catalyst qui se matérialise aujourd'hui, cite-le dans sourcesUsed.\n\n`;
+    prompt += researchContext + '\n\n';
   }
 
   // Knowledge (conditional Tier 2/3)

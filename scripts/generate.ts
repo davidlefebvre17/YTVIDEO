@@ -121,6 +121,33 @@ async function main() {
     const stored = newsDb.storeArticles(articles);
     console.log(`  NewsMemory: ${stored} articles tagged and stored`);
 
+    // Patch dramaScore with tagger-based news counts (replaces basic title.includes matching)
+    const taggerCounts = new Map<string, number>();
+    for (const { tags } of articles) {
+      for (const tag of tags.assets) {
+        taggerCounts.set(tag.symbol, (taggerCounts.get(tag.symbol) ?? 0) + 1);
+      }
+    }
+    let dramaPatched = 0;
+    for (const asset of snapshot.assets) {
+      if (!asset.technicals) continue;
+      const basicCount = snapshot.news.filter(
+        (n) => n.title.toLowerCase().includes(asset.name.toLowerCase()) ||
+               n.title.toLowerCase().includes(asset.symbol.toLowerCase()),
+      ).length;
+      const taggerCount = taggerCounts.get(asset.symbol) ?? 0;
+      if (basicCount !== taggerCount) {
+        const delta = (Math.min(taggerCount, 5) - Math.min(basicCount, 5)) * 3;
+        asset.technicals.dramaScore += delta;
+        dramaPatched++;
+      }
+    }
+    if (dramaPatched > 0) {
+      console.log(`  DramaScore patched for ${dramaPatched} assets (tagger-based news counts)`);
+      // Re-save snapshot with updated dramaScores
+      fs.writeFileSync(snapshotPath, JSON.stringify(snapshot, null, 2));
+    }
+
     // Sync economic events if available
     if (snapshot.events && snapshot.events.length > 0) {
       const ecoEvents = snapshot.events.map((e) => ({

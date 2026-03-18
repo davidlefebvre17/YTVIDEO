@@ -140,7 +140,13 @@ function buildC1UserPrompt(
   prompt += `## ÉPISODES RÉCENTS (${episodeSummaries.length} jours)\n${formatEpisodeSummariesCompact(episodeSummaries)}\n\n`;
 
   if (researchContext) {
-    prompt += `## CONTEXTE RECHERCHE (NewsMemory)\n${researchContext}\n\n`;
+    prompt += `## CONTEXTE HISTORIQUE (NewsMemory — articles ANTÉRIEURS au ${flagged.date})\n`;
+    prompt += `Ces articles sont des ARCHIVES, pas des news du jour. Utilise-les pour :\n`;
+    prompt += `- Identifier les CONTINUITÉS : un sujet couvert depuis plusieurs jours mérite un angle "suivi"\n`;
+    prompt += `- Éviter de présenter comme NOUVEAU un fait déjà couvert\n`;
+    prompt += `- Repérer l'arc narratif d'une histoire (montée, pic, retombée)\n`;
+    prompt += `Les dates [J-N] indiquent l'ancienneté de chaque article.\n\n`;
+    prompt += researchContext + '\n\n';
   }
 
   if (weeklyBrief) {

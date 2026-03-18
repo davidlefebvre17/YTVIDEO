@@ -2,43 +2,8 @@ import * as fs from "fs";
 import * as path from "path";
 import type { DailySnapshot, AssetSnapshot, EconomicEvent } from "@yt-maker/core";
 import { loadMemory } from "@yt-maker/data";
+import { initTagger, tagArticleAuto } from "../memory/news-tagger";
 import type { SnapshotFlagged, FlaggedAsset, MaterialityFlag, NewsCluster } from "./types";
-
-// ── News alias map for NEWS_LINKED matching ──
-// Key = asset symbol, Value = additional search terms in news titles
-const NEWS_ALIASES: Record<string, string[]> = {
-  'CL=F':     ['oil', 'pétrole', 'petrole', 'crude', 'wti', 'brent', 'opec', 'opep'],
-  'BZ=F':     ['oil', 'pétrole', 'petrole', 'crude', 'brent', 'opec', 'opep'],
-  'GC=F':     ['gold', "l'or ", ' or ', "d'or", 'gold price'],
-  'SI=F':     ['silver', 'argent métal', "l'argent"],
-  'NG=F':     ['natural gas', 'gaz naturel'],
-  'HG=F':     ['copper', 'cuivre'],
-  'PL=F':     ['platinum', 'platine'],
-  'ZW=F':     ['wheat', 'blé'],
-  '^GSPC':    ['s&p 500', 's&p500', 'sp500', 'wall street'],
-  '^DJI':     ['dow jones', 'dow '],
-  '^IXIC':    ['nasdaq'],
-  '^FCHI':    ['cac 40', 'cac40', 'bourse de paris'],
-  '^GDAXI':   ['dax'],
-  '^FTSE':    ['ftse', 'bourse de londres'],
-  '^STOXX':   ['stoxx', 'marchés européens', 'bourses européennes'],
-  '^N225':    ['nikkei', 'bourse de tokyo'],
-  '^HSI':     ['hang seng', 'bourse de hong kong'],
-  '^KS11':    ['kospi', 'bourse de séoul'],
-  '000001.SS': ['shanghai'],
-  '399001.SZ': ['shenzhen'],
-  'DX-Y.NYB': ['dollar index', 'indice dollar', 'dxy', 'billet vert', 'greenback'],
-  'EURUSD=X': ['eur/usd', 'euro dollar', 'eurusd'],
-  'USDJPY=X': ['usd/jpy', 'dollar yen', 'usdjpy'],
-  'GBPUSD=X': ['gbp/usd', 'livre sterling', 'gbpusd'],
-  'BTC-USD':  ['bitcoin', 'btc'],
-  'ETH-USD':  ['ethereum', 'ether', 'eth '],
-  'SOL-USD':  ['solana'],
-  '^VIX':     ['vix', 'volatilité', 'fear index'],
-  'XLE':      ['energy sector', 'secteur énergie', 'energy etf'],
-  'XLF':      ['financial sector', 'secteur financier', 'bank etf'],
-  'XLK':      ['tech sector', 'secteur tech'],
-};
 
 // ── Flag weights for materiality score ──
 const FLAG_WEIGHT: Record<MaterialityFlag, number> = {
@@ -194,6 +159,18 @@ function detectNewsClusters(snapshot: DailySnapshot): NewsCluster[] {
 }
 
 export function flagAssets(snapshot: DailySnapshot): SnapshotFlagged {
+  // Pre-compute NEWS_LINKED using the unified tagger (single source of truth)
+  const newsLinkedSymbols = new Set<string>();
+  if (snapshot.news?.length) {
+    initTagger();
+    for (const article of snapshot.news) {
+      const tags = tagArticleAuto({ title: article.title, source: article.source });
+      for (const tag of tags.assets) {
+        newsLinkedSymbols.add(tag.symbol);
+      }
+    }
+  }
+
   const flagged: FlaggedAsset[] = [];
 
   for (const asset of snapshot.assets) {
@@ -255,18 +232,8 @@ export function flagAssets(snapshot: DailySnapshot): SnapshotFlagged {
         flags.push('SENTIMENT_EXTREME');
     }
 
-    // NEWS_LINKED: news title contains symbol, name, OR known aliases
-    if (snapshot.news?.length) {
-      const symbolUp = asset.symbol.toUpperCase();
-      const nameUp = asset.name.toUpperCase();
-      const aliases = (NEWS_ALIASES[asset.symbol] ?? []).map(a => a.toUpperCase());
-      const hasNews = snapshot.news.some(n => {
-        const titleUp = n.title.toUpperCase();
-        if (titleUp.includes(symbolUp) || titleUp.includes(nameUp)) return true;
-        return aliases.some(alias => titleUp.includes(alias));
-      });
-      if (hasNews) flags.push('NEWS_LINKED');
-    }
+    // NEWS_LINKED: tagger found this asset in at least one news article
+    if (newsLinkedSymbols.has(asset.symbol)) flags.push('NEWS_LINKED');
 
     // ZONE_EVENT: D3 MarketMemory zone event today
     try {

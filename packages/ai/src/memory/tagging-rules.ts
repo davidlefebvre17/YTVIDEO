@@ -80,13 +80,13 @@ export const DIRECT_MATCH_RULES: DirectMatchRule[] = [
   },
   {
     id: "direct_vix",
-    patterns: ["vix", "^vix", "indice de la peur", "fear index", "volatility index", "cboe volatility"],
+    patterns: ["vix", "^vix", "indice de la peur", "fear index", "volatility index", "cboe volatility", "volatilite"],
     asset: "^VIX",
     word_boundary: true,
   },
   {
     id: "direct_cac40",
-    patterns: ["cac 40", "cac40", "^fchi", "cac quarante"],
+    patterns: ["cac 40", "cac40", "^fchi", "cac quarante", "bourse de paris"],
     asset: "^FCHI",
     word_boundary: false,
   },
@@ -98,13 +98,13 @@ export const DIRECT_MATCH_RULES: DirectMatchRule[] = [
   },
   {
     id: "direct_ftse",
-    patterns: ["ftse 100", "ftse100", "^ftse", "footsie", "ftse"],
+    patterns: ["ftse 100", "ftse100", "^ftse", "footsie", "ftse", "bourse de londres"],
     asset: "^FTSE",
     word_boundary: true,
   },
   {
     id: "direct_stoxx",
-    patterns: ["stoxx 600", "stoxx600", "eurostoxx", "euro stoxx", "^stoxx"],
+    patterns: ["stoxx 600", "stoxx600", "eurostoxx", "euro stoxx", "^stoxx", "marches europeens", "bourses europeennes"],
     asset: "^STOXX",
     word_boundary: false,
   },
@@ -142,7 +142,7 @@ export const DIRECT_MATCH_RULES: DirectMatchRule[] = [
   // ==================== FOREX ====================
   {
     id: "direct_dxy",
-    patterns: ["dollar index", "dxy", "dx-y.nyb", "indice dollar", "usd index"],
+    patterns: ["dollar index", "dxy", "dx-y.nyb", "indice dollar", "usd index", "billet vert", "greenback"],
     asset: "DX-Y.NYB",
     word_boundary: false,
   },
@@ -160,7 +160,7 @@ export const DIRECT_MATCH_RULES: DirectMatchRule[] = [
   },
   {
     id: "direct_gbpusd",
-    patterns: ["gbp/usd", "gbpusd", "livre sterling dollar", "cable", "gbpusd=x"],
+    patterns: ["gbp/usd", "gbpusd", "livre sterling", "cable", "gbpusd=x"],
     asset: "GBPUSD=X",
     word_boundary: false,
   },
@@ -250,16 +250,25 @@ export const DIRECT_MATCH_RULES: DirectMatchRule[] = [
     patterns: [
       "wti", "cl=f", "west texas", "crude oil", "petrole wti", "wti crude",
       "oil futures", "cours du petrole", "prix du petrole", "baril de petrole",
-      "petrole brut"
+      "petrole brut", "oil prices", "oil price", "oil drops", "oil falls",
+      "oil surges", "oil rises", "oil slump", "oil rally", "oil market",
+      "cours du baril", "barrel price", "prix du baril",
+      "opec", "opep"
     ],
     asset: "CL=F",
     word_boundary: false,
   },
   {
     id: "direct_oil_brent",
-    patterns: ["brent", "bz=f", "brent crude", "brent oil", "petrole brent"],
+    patterns: [
+      "brent", "bz=f", "brent crude", "brent oil", "petrole brent",
+      "oil prices", "oil price", "oil drops", "oil falls",
+      "oil surges", "oil rises", "oil slump", "oil rally", "oil market",
+      "cours du baril", "barrel price", "prix du baril",
+      "opec", "opep", "crude"
+    ],
     asset: "BZ=F",
-    word_boundary: true,
+    word_boundary: false,
   },
   {
     id: "direct_natgas",
@@ -306,19 +315,19 @@ export const DIRECT_MATCH_RULES: DirectMatchRule[] = [
   // ==================== ETFs SECTORIELS ====================
   {
     id: "direct_xlk",
-    patterns: ["xlk", "tech sector etf", "technology select sector"],
+    patterns: ["xlk", "tech sector etf", "technology select sector", "tech sector", "secteur tech"],
     asset: "XLK",
     word_boundary: true,
   },
   {
     id: "direct_xlf",
-    patterns: ["xlf", "financial sector etf", "financial select sector"],
+    patterns: ["xlf", "financial sector etf", "financial select sector", "financial sector", "secteur financier", "bank etf"],
     asset: "XLF",
     word_boundary: true,
   },
   {
     id: "direct_xle",
-    patterns: ["xle", "energy sector etf", "energy select sector"],
+    patterns: ["xle", "energy sector etf", "energy select sector", "energy sector", "secteur energie", "energy etf"],
     asset: "XLE",
     word_boundary: true,
   },
@@ -1021,15 +1030,53 @@ export const STOCK_ALIAS_RULES: DirectMatchRule[] = [
  * Génère des DirectMatchRule pour chaque stock des company-profiles.
  * Appelé une fois au boot (pas à chaque article).
  */
+// Tickers that are common French/English words — skip as patterns, match by name only
+const SKIP_TICKER_PATTERNS = new Set([
+  // 2-char tickers that are common words
+  "de",  // Deere — French "de" (of/from)
+  "ce",  // Celanese — French "ce" (this/that)
+  "so",  // Southern Co — English "so"
+  "on",  // ON Semi — English/French "on"
+  "it",  // Gartner — English "it"
+  "at",  // — English "at"
+  "or",  // — French "or" (gold/or)
+  "an",  // — French "an" (year)
+  "ai",  // C3.ai — French "ai" (have)
+  "re",  // — French "re"
+  "el",  // — Spanish/French article
+  "hd",  // Home Depot — English "hd" (high definition)
+  "pm",  // Philip Morris — English "pm" (post meridiem)
+  // 3-char tickers that are ultra-common words
+  "all", // Allstate — English "all"
+  "are", // — English "are"
+  "les", // — French "les" (the)
+  "has", // — English "has"
+  "now", // ServiceNow — English "now"
+  "low", // Lowe's — English "low"
+  "ice", // ICE — English "ice"
+  "net", // Cloudflare — English "net/internet"
+  // 4-char tickers that are common financial words
+  "cost", // Costco — English "cost"
+  "fast", // Fastenal — English "fast"
+  // 5-char tickers that are substrings of common words
+  "googl", // Alphabet — substring of "google" everywhere
+]);
+
+// Company short names that are too common in financial context — skip as patterns
+const SKIP_NAME_PATTERNS = new Set([
+  "target",     // Target Corp — "price target" in every analyst article
+]);
+
 export function generateStockDirectRules(
   profiles: Array<{ symbol: string; name: string; index: string }>
 ): DirectMatchRule[] {
   return profiles.map((p) => {
     const patterns: string[] = [];
 
-    // 1. Ticker toujours (ex: "AAPL", "MSFT")
-    // Sauf tickers de 1 caractère
-    if (p.symbol.length > 1) {
+    // 1. Ticker (ex: "AAPL", "MSFT")
+    // Skip tickers ≤1 char and common-word tickers
+    const tickerClean = p.symbol.replace(/\..+$/, "").toLowerCase();
+    if (tickerClean.length > 1 && !SKIP_TICKER_PATTERNS.has(tickerClean)) {
       patterns.push(p.symbol.toLowerCase());
     }
 
@@ -1040,15 +1087,19 @@ export function generateStockDirectRules(
     // 3. Nom court (avant "inc", "corp", "ltd", "sa", "se", "plc", "ag", "nv", "group")
     const suffixes = /\s+(inc\.?|corp\.?|corporation|ltd\.?|limited|sa|se|plc|ag|nv|group|co\.?|& co\.?)$/i;
     const shortName = nameLower.replace(suffixes, "").trim();
-    if (shortName !== nameLower && shortName.length > 2) {
+    if (shortName !== nameLower && shortName.length > 2 && !SKIP_NAME_PATTERNS.has(shortName)) {
       patterns.push(shortName);
     }
+
+    // word_boundary for all tickers ≤4 chars AND short names <6 chars
+    // Prevents false positives: "meta" → "metals", "coin" → "bitcoin"
+    const needsWordBoundary = p.symbol.replace(/\..+$/, "").length <= 4 || shortName.length < 6;
 
     return {
       id: `direct_stock_${p.symbol.toLowerCase()}`,
       patterns,
       asset: p.symbol,
-      word_boundary: p.symbol.length <= 3,
+      word_boundary: needsWordBoundary,
       related_index: p.index === "SP500" ? "^GSPC"
                    : p.index === "CAC40" ? "^FCHI"
                    : p.index === "DAX40" ? "^GDAXI"

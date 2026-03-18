@@ -83,6 +83,7 @@ function buildC3UserPrompt(
   analysis: AnalysisBundle,
   budget: WordBudget,
   recentScripts: string,
+  researchContext?: string,
   feedback?: ValidationIssue[],
 ): string {
   let prompt = '';
@@ -142,6 +143,16 @@ function buildC3UserPrompt(
     prompt += `## SCRIPTS RÉCENTS (référence de style — NE PAS résumer)\n`;
     prompt += `Utilise pour varier ton style, éviter les mêmes transitions, faire des callbacks naturels.\n\n`;
     prompt += recentScripts + '\n\n';
+  }
+
+  // Research context (historical articles)
+  if (researchContext) {
+    prompt += `## CONTEXTE HISTORIQUE (NewsMemory — articles ANTÉRIEURS au ${editorial.date})\n`;
+    prompt += `Ces articles sont des ARCHIVES. Tu peux t'en servir pour :\n`;
+    prompt += `- Situer un move dans son arc narratif ("ça fait deux semaines que...", "depuis l'annonce de...")\n`;
+    prompt += `- Faire des callbacks naturels à des événements passés quand c'est pertinent\n`;
+    prompt += `- NE PAS les traiter comme des news fraîches du jour\n\n`;
+    prompt += researchContext + '\n\n';
   }
 
   // Feedback from C4 (retry case)
@@ -233,6 +244,7 @@ export async function runC3Writing(input: {
   budget: WordBudget;
   recentScripts: string;
   knowledgeTier1: string;
+  researchContext?: string;
   lang: Language;
   feedback?: ValidationIssue[];
 }): Promise<DraftScript> {
@@ -242,6 +254,7 @@ export async function runC3Writing(input: {
     input.analysis,
     input.budget,
     input.recentScripts,
+    input.researchContext,
     input.feedback,
   );
 

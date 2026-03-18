@@ -45,6 +45,8 @@ export class NewsMemoryDB {
   private highImpactStmt: Database.Statement;
   private countByThemeStmt: Database.Statement;
   private countByAssetStmt: Database.Statement;
+  private searchByAssetBeforeDateStmt: Database.Statement;
+  private countThemesByAssetStmt: Database.Statement;
   private upsertEcoEventStmt: Database.Statement;
   private getEcoEventsStmt: Database.Statement;
   private purgeOldStmt: Database.Statement;
@@ -154,6 +156,36 @@ export class NewsMemoryDB {
       JOIN articles a ON aa.article_id = a.id
       WHERE a.published_at > datetime('now', '-' || ? || ' days')
       GROUP BY aa.asset_symbol
+      ORDER BY count DESC
+      LIMIT ?
+    `);
+
+    // Layer 1, high/medium confidence only — for per-asset research context
+    // Excludes related_index tags (confidence='low') to avoid index pollution
+    this.searchByAssetBeforeDateStmt = this.db.prepare(`
+      SELECT DISTINCT
+        a.id, a.title, a.source, a.feed_url, a.url, a.published_at,
+        a.summary, a.lang, a.category, a.impact, a.snapshot_date,
+        aa.sentiment, aa.confidence
+      FROM articles a
+      JOIN article_assets aa ON a.id = aa.article_id
+      WHERE aa.asset_symbol = ?
+        AND a.published_at < ?
+        AND a.published_at > datetime(?, '-' || ? || ' days')
+        AND aa.source_layer = 1
+        AND aa.confidence != 'low'
+      ORDER BY a.published_at DESC
+      LIMIT ?
+    `);
+
+    this.countThemesByAssetStmt = this.db.prepare(`
+      SELECT at2.theme, COUNT(*) as count
+      FROM article_themes at2
+      JOIN articles a ON at2.article_id = a.id
+      JOIN article_assets aa ON a.id = aa.article_id
+      WHERE aa.asset_symbol = ?
+        AND a.published_at > datetime('now', '-' || ? || ' days')
+      GROUP BY at2.theme
       ORDER BY count DESC
       LIMIT ?
     `);
@@ -410,6 +442,39 @@ export class NewsMemoryDB {
       }
       return true;
     });
+  }
+
+  /**
+   * Articles par asset, AVANT une date donnée (exclut le jour du snapshot).
+   * Fenêtre: ]beforeDate - days, beforeDate[
+   */
+  searchByAssetBefore(
+    symbol: string,
+    beforeDate: string,
+    options: { days: number; limit?: number }
+  ): Array<StoredArticle & { sentiment?: string; confidence: string }> {
+    const limit = options.limit || 10;
+    return this.searchByAssetBeforeDateStmt.all(
+      symbol,
+      beforeDate,
+      beforeDate,
+      options.days,
+      limit
+    ) as Array<any>;
+  }
+
+  /**
+   * Thèmes macro filtrés par asset sur une période.
+   */
+  countThemesByAsset(
+    symbol: string,
+    days: number,
+    limit: number = 5
+  ): Array<{ theme: string; count: number }> {
+    return this.countThemesByAssetStmt.all(symbol, days, limit) as Array<{
+      theme: string;
+      count: number;
+    }>;
   }
 
   /**

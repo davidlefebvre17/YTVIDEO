@@ -188,7 +188,11 @@ export async function runPipeline(
   let researchContext = "";
   if (newsDb) {
     try {
-      researchContext = buildResearchContext(snapshot, newsDb);
+      const clusterSymbols = flagged.newsClusters.map(c => ({
+        symbol: c.symbol,
+        name: c.name,
+      }));
+      researchContext = buildResearchContext(snapshot, newsDb, clusterSymbols);
     } catch (err) {
       console.warn(
         `  Research context error: ${(err as Error).message.slice(0, 80)}`
@@ -278,6 +282,7 @@ export async function runPipeline(
     budget,
     recentScripts,
     knowledgeTier1,
+    researchContext,
     lang,
   });
   stats.llmCalls++;
@@ -307,6 +312,7 @@ export async function runPipeline(
       budget,
       recentScripts,
       knowledgeTier1,
+      researchContext,
       lang,
       feedback: blockers,
     });
