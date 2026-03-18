@@ -14,6 +14,7 @@ import { computeWordBudget } from "./helpers/word-budget";
 import { buildEpisodeSummaries, formatRecentScriptsForC3 } from "./helpers/episode-summary";
 import { buildCausalBrief } from "./helpers/causal-brief";
 import { buildBriefingPack } from "./helpers/briefing-pack";
+import { runNewsDigest } from "./p1b-news-digest";
 import type {
   PipelineOptions,
   PipelineResult,
@@ -36,6 +37,8 @@ export { computeWordBudget, durationFromWords } from "./helpers/word-budget";
 export { buildEpisodeSummaries, formatRecentScriptsForC3 } from "./helpers/episode-summary";
 export { buildCausalBrief } from "./helpers/causal-brief";
 export { buildBriefingPack, formatBriefingPack } from "./helpers/briefing-pack";
+export { runNewsDigest, formatNewsDigest } from "./p1b-news-digest";
+export type { NewsDigest, NewsDigestEvent } from "./p1b-news-digest";
 export type { BriefingPack, PoliticalTrigger, ScreenMover, EarningsBucket, COTHighlight, COTDivergence, SentimentTrend } from "./helpers/briefing-pack";
 
 /**
@@ -219,14 +222,27 @@ export async function runPipeline(
     };
   }
 
-  // ── P2: C1 Haiku — Sélection éditoriale ────────────────
-  console.log("\nP2 — C1 Haiku (sélection éditoriale)...");
+  // ── P1.5: News Digest — extraction événements structurels ──
+  const calendarHighlights = (snapshot.events ?? [])
+    .filter(e => e.impact === 'high')
+    .map(e => `${e.time ?? '?'} ${e.name} (${e.currency}) forecast:${e.forecast ?? '?'} actual:${e.actual ?? '?'}`);
+  const newsDigest = await runNewsDigest(snapshot.news ?? [], calendarHighlights);
+  stats.llmCalls++;
+  if (newsDigest.events.length) {
+    const gc = newsDigest.events.filter(e => e.importance === 'game_changer').length;
+    const sig = newsDigest.events.filter(e => e.importance === 'significant').length;
+    console.log(`  Digest: ${newsDigest.events.length} events (${gc} game-changers, ${sig} significant)`);
+  }
+
+  // ── P2: C1 Sonnet — Sélection éditoriale ────────────────
+  console.log("\nP2 — C1 Sonnet (sélection éditoriale)...");
   const editorial = await runC1Editorial({
     flagged,
     episodeSummaries,
     researchContext,
     weeklyBrief,
     briefingPack,
+    newsDigest,
     lang,
   });
   stats.llmCalls++;
