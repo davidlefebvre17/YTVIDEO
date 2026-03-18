@@ -5,6 +5,8 @@ import type {
 import type { Language } from "@yt-maker/core";
 import type { BriefingPack } from "./helpers/briefing-pack";
 import { formatBriefingPack } from "./helpers/briefing-pack";
+import type { NewsDigest } from "./p1b-news-digest";
+import { formatNewsDigest } from "./p1b-news-digest";
 import { buildTemporalAnchors } from "./helpers/temporal-anchors";
 
 /**
@@ -18,7 +20,8 @@ function formatAssetsCompact(flagged: SnapshotFlagged): string {
       const hi = a.snapshot.high24h;
       const lo = a.snapshot.low24h;
       const range = (hi && lo && Math.abs(hi - lo) > 0) ? ` | séance:[${lo.toFixed(2)}–${hi.toFixed(2)}]` : '';
-      return `${a.symbol} | ${a.name} | ${a.changePct >= 0 ? '+' : ''}${a.changePct.toFixed(2)}%${range} | score:${a.materialityScore} | flags:${a.flags.join(',') || 'none'} | drama:${drama}`;
+      const tag = a.promoted ? ' [PROMU — FOCUS/FLASH max]' : '';
+      return `${a.symbol} | ${a.name} | ${a.changePct >= 0 ? '+' : ''}${a.changePct.toFixed(2)}%${range} | score:${a.materialityScore} | flags:${a.flags.join(',') || 'none'} | drama:${drama}${tag}`;
     })
     .join('\n');
 }
@@ -67,6 +70,11 @@ Tu sélectionnes les sujets, leur profondeur, et l'ordre narratif.
 
 RÔLE : Décider QUOI couvrir et dans QUEL ORDRE. Tu ne rédiges pas, tu ne fais pas d'analyse technique détaillée.
 
+MÉTHODE ÉDITORIALE (dans cet ordre) :
+1. ÉVÉNEMENTS STRUCTURELS D'ABORD : avant de regarder les scores et les prix, parcours les titres de news et le calendrier éco pour identifier les événements qui CHANGENT LES RÈGLES DU JEU — nouvelles régulations, décisions institutionnelles, M&A majeur, rupture diplomatique, surprise macro. Ces événements méritent un segment même si l'asset n'a pas bougé (le marché peut ne pas avoir encore réagi, ou la réaction viendra demain).
+2. MOUVEMENTS DE PRIX ENSUITE : parmi les assets à fort materialityScore, identifie ceux dont le mouvement a un CATALYSEUR clair. Un +3% sans explication est moins intéressant qu'un +1% causé par un événement identifiable.
+3. FILS NARRATIFS : cherche les LIENS entre les événements et les mouvements. Un bon épisode raconte UNE histoire avec plusieurs facettes, pas une liste de sujets indépendants.
+
 CONTRAINTES STRUCTURELLES (STRICTES) :
 - Sélectionner 4 à 7 segments
 - Maximum 2 DEEP (analyse approfondie 70-90s)
@@ -78,7 +86,7 @@ CONTRAINTES STRUCTURELLES (STRICTES) :
 - Le fil conducteur (threadSummary) doit relier au moins 3 segments entre eux
 - DÉCLENCHEURS POLITIQUES : si un mouvement >3% est lié à une déclaration politique identifiable, le champ trigger est OBLIGATOIRE (actor + action + source)
 - COHÉRENCE THÉMATIQUE INVERSE : si le thème du jour est géopolitique, cherche les actifs en direction OPPOSÉE (défense si désescalade, refuges si escalade) — ces actifs ont valeur de "revers de médaille" même avec un drama score modéré
-- MOVERS HORS WATCHLIST : les top movers du stock screening peuvent être inclus comme FLASH si leur mouvement est narrativement lié au thème dominant
+- STOCKS PROMUS [PROMU] : ces actions hors-watchlist ont été promues par le scoring (earnings, buzz, mouvement extrême). Elles peuvent être FOCUS ou FLASH (jamais DEEP — données allégées). Intègre-les si leur histoire est narrativement forte.
 - RÔLE NARRATIF : le dernier FLASH doit idéalement BOUCLER l'histoire du jour (narrativeRole = "closer")
 - ACTIFS PONT : si un actif relie deux segments thématiquement, il peut être mentionné dans les deux segments ou avoir un rôle "bridge"
 - DÉDUPLICATION ASSETS : chaque symbole ne peut apparaître qu'en PROPRIÉTAIRE dans un seul segment. S'il est asset principal dans un DEEP, il ne peut pas être asset principal dans un autre segment — référencer seulement via le contexte narratif, pas dans la liste assets[]
@@ -99,11 +107,17 @@ function buildC1UserPrompt(
   researchContext: string,
   weeklyBrief: string,
   briefingPack?: BriefingPack,
+  newsDigest?: NewsDigest,
 ): string {
   let prompt = '';
 
   const anchors = buildTemporalAnchors(flagged.date);
   prompt += `${anchors.block}\n\n`;
+
+  // News digest FIRST — structural events before raw data
+  if (newsDigest?.events.length) {
+    prompt += formatNewsDigest(newsDigest);
+  }
 
   prompt += `## THÈMES DU JOUR\n${formatThemesCompact(flagged)}\n\n`;
   prompt += `## ASSETS SCORÉS (${flagged.assets.length} total)\n${formatAssetsCompact(flagged)}\n\n`;
@@ -277,6 +291,7 @@ export async function runC1Editorial(input: {
   researchContext: string;
   weeklyBrief: string;
   briefingPack?: BriefingPack;
+  newsDigest?: NewsDigest;
   lang: Language;
   feedback?: string[];
 }): Promise<EditorialPlan> {
@@ -287,6 +302,7 @@ export async function runC1Editorial(input: {
     input.researchContext,
     input.weeklyBrief,
     input.briefingPack,
+    input.newsDigest,
   );
 
   if (input.feedback?.length) {
@@ -299,7 +315,7 @@ export async function runC1Editorial(input: {
     const plan = await generateStructuredJSON<EditorialPlan>(
       systemPrompt,
       userPrompt,
-      { role: 'fast' },
+      { role: 'balanced' },
     );
 
     // Ensure counts are correct

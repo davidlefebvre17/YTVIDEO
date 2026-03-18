@@ -80,7 +80,7 @@ export interface BriefingPack {
 
 // Known political actors and their domains
 // Aliases use regex patterns for word-boundary matching where needed
-interface ActorConfig {
+export interface ActorConfig {
   // Simple substring aliases (matched literally)
   aliases: string[];
   // Regex patterns for aliases that need word boundaries (e.g. short words)
@@ -89,7 +89,7 @@ interface ActorConfig {
   linkedAssets: string[];
 }
 
-const POLITICAL_ACTORS: Record<string, ActorConfig> = {
+export const POLITICAL_ACTORS: Record<string, ActorConfig> = {
   'Trump': {
     aliases: ['trump', 'président américain', 'maison blanche', 'white house'],
     domain: 'US policy',
@@ -151,7 +151,7 @@ const POLITICAL_ACTORS: Record<string, ActorConfig> = {
 // Action keywords for political triggers.
 // Short single-word English keywords (≤4 chars) use word-boundary regex to avoid false
 // substring matches (e.g. 'war' inside "Warsh", 'deal' inside "ideal").
-const ACTION_KEYWORDS: Record<string, Array<string | RegExp>> = {
+export const ACTION_KEYWORDS: Record<string, Array<string | RegExp>> = {
   'tarif': ['tariff', 'tarifs', 'tariffs', 'droits de douane', 'customs', 'surtaxe'],
   'guerre': [/\bwar\b/, 'guerre', 'conflit', 'conflict', 'escalade', 'escalation', 'invasion', 'frappe', 'strike', 'bombardement', 'missile'],
   'paix': ['peace', 'paix', 'ceasefire', 'cessez-le-feu', 'accord', /\bdeal\b/, 'négociation', 'désescalade', 'de-escalation', 'trêve'],
@@ -171,12 +171,26 @@ const FINANCIAL_RELEVANCE_TERMS = [
   'milliards', 'rendement', 'spread', 'yield', 'points de base', 'banque',
 ];
 
-function matchesKeyword(text: string, keyword: string | RegExp): boolean {
+// COT contract symbols → watchlist asset symbols
+export const COT_TO_ASSET: Record<string, string> = {
+  // Futures contract codes
+  'GC': 'GC=F', 'SI': 'SI=F', 'CL': 'CL=F', 'NG': 'NG=F', 'HG': 'HG=F',
+  'PL': 'PL=F', 'ZW': 'ZW=F',
+  'DX': 'DX-Y.NYB', 'ES': '^GSPC', 'NQ': '^IXIC', 'YM': '^DJI',
+  '6E': 'EURUSD=X', '6J': 'USDJPY=X', '6B': 'GBPUSD=X',
+  '6A': 'AUDUSD=X', '6C': 'USDCAD=X', '6S': 'USDCHF=X', '6N': 'NZDUSD=X',
+  'BTC': 'BTC-USD', 'ETH': 'ETH-USD',
+  // Inverted FX symbols from COT data (e.g. CADUSD=X → USDCAD=X)
+  'CADUSD=X': 'USDCAD=X', 'CHFUSD=X': 'USDCHF=X',
+  'JPY=X': 'USDJPY=X', 'NZDUSD=X': 'NZDUSD=X',
+};
+
+export function matchesKeyword(text: string, keyword: string | RegExp): boolean {
   if (keyword instanceof RegExp) return keyword.test(text);
   return text.includes(keyword);
 }
 
-function actorMatchesText(config: ActorConfig, text: string): boolean {
+export function actorMatchesText(config: ActorConfig, text: string): boolean {
   // Check simple aliases (substring match)
   if (config.aliases.some(a => text.includes(a))) return true;
   // Check regex aliases (word boundary match)
@@ -358,21 +372,6 @@ export function buildBriefingPack(
   }
 
   // ── COT divergences vs price direction ──
-  // Map COT contract symbols to watchlist asset symbols.
-  // Includes both standard contract codes (ES, NQ...) and already-mapped FX symbols
-  // that may appear inverted in COT data (CADUSD=X → USDCAD=X, etc.).
-  const COT_TO_ASSET: Record<string, string> = {
-    // Futures contract codes
-    'GC': 'GC=F', 'SI': 'SI=F', 'CL': 'CL=F', 'NG': 'NG=F', 'HG': 'HG=F',
-    'PL': 'PL=F', 'ZW': 'ZW=F',
-    'DX': 'DX-Y.NYB', 'ES': '^GSPC', 'NQ': '^IXIC', 'YM': '^DJI',
-    '6E': 'EURUSD=X', '6J': 'USDJPY=X', '6B': 'GBPUSD=X',
-    '6A': 'AUDUSD=X', '6C': 'USDCAD=X', '6S': 'USDCHF=X', '6N': 'NZDUSD=X',
-    'BTC': 'BTC-USD', 'ETH': 'ETH-USD',
-    // Inverted FX symbols from COT data (e.g. CADUSD=X → USDCAD=X)
-    'CADUSD=X': 'USDCAD=X', 'CHFUSD=X': 'USDCHF=X',
-    'JPY=X': 'USDJPY=X', 'NZDUSD=X': 'NZDUSD=X',
-  };
   const cotDivergences: COTDivergence[] = [];
   for (const cot of cotHighlights) {
     const assetSymbol = COT_TO_ASSET[cot.symbol] ?? cot.symbol;

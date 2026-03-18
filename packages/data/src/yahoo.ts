@@ -77,6 +77,14 @@ export const DEFAULT_ASSETS = [
   { symbol: "BTC-USD", name: "Bitcoin" },
   { symbol: "ETH-USD", name: "Ethereum" },
   { symbol: "SOL-USD", name: "Solana" },
+  // Mega-caps (7) — Mag7, full data for DEEP-eligible segments
+  { symbol: "AAPL", name: "Apple" },
+  { symbol: "MSFT", name: "Microsoft" },
+  { symbol: "NVDA", name: "NVIDIA" },
+  { symbol: "AMZN", name: "Amazon" },
+  { symbol: "GOOGL", name: "Alphabet" },
+  { symbol: "META", name: "Meta Platforms" },
+  { symbol: "TSLA", name: "Tesla" },
   // Sector ETFs US (3)
   { symbol: "XLK", name: "Tech ETF" },
   { symbol: "XLF", name: "Financials ETF" },

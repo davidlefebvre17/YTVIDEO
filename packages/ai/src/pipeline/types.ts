@@ -8,17 +8,27 @@ import type { NewsMemoryDB } from "../memory";
 // ── P1 Flagging ─────────────────────────────────────────
 
 export type MaterialityFlag =
-  | 'PRICE_MOVE'
-  | 'EXTREME_MOVE'
-  | 'VOLUME_SPIKE'
-  | 'EMA_BREAK'
-  | 'RSI_EXTREME'
-  | 'EARNINGS_SURPRISE'
-  | 'SENTIMENT_EXTREME'
-  | 'NEWS_LINKED'
-  | 'ZONE_EVENT'
-  | 'ATH_PROXIMITY'
-  | 'SMA200_CROSS';
+  // ── Mouvement (~25%) ──
+  | 'PRICE_MOVE'           // >2% variation
+  | 'EXTREME_MOVE'         // >5% variation
+  | 'VOLUME_SPIKE'         // volume >150% avg 20d
+  // ── Structure (~20%) ──
+  | 'EMA_BREAK'            // SMA20/50 cross
+  | 'RSI_EXTREME'          // RSI <30 or >70
+  | 'ATH_PROXIMITY'        // <5% from ATH
+  | 'SMA200_CROSS'         // price crosses SMA200
+  | 'ZONE_EVENT'           // MarketMemory zone touched
+  // ── Narratif (~40%) ──
+  | 'EARNINGS_SURPRISE'    // beat/miss >10%
+  | 'EARNINGS_TODAY'       // publishes today, results pending (suspense)
+  | 'NEWS_LINKED'          // ≥1 article linked via tagger
+  | 'NEWS_CLUSTER'         // ≥3 articles linked (concentrated buzz)
+  | 'POLITICAL_TRIGGER'    // political actor + action keyword in news
+  | 'MACRO_SURPRISE'       // high-impact event, actual ≠ forecast
+  // ── Intermarché (~15%) ──
+  | 'SENTIMENT_EXTREME'    // F&G <20 or >80
+  | 'CAUSAL_CHAIN'         // asset in active intermarket correlation
+  | 'COT_DIVERGENCE';      // COT bias contradicts price direction
 
 export interface FlaggedAsset {
   symbol: string;
@@ -28,6 +38,8 @@ export interface FlaggedAsset {
   materialityScore: number;
   flags: MaterialityFlag[];
   snapshot: AssetSnapshot;
+  /** Stock promu depuis stockScreen/newsClusters — données allégées, FOCUS ou FLASH max */
+  promoted?: boolean;
 }
 
 export interface NewsCluster {
@@ -156,6 +168,8 @@ export interface SegmentAnalysis {
     type: 'snapshot_price' | 'news_article' | 'knowledge_base' | 'market_memory' | 'causal_brief' | 'inference';
     detail: string;
   }>;
+  /** Core mechanism the audience needs to understand (DEEP segments). Guides C3 pedagogy. */
+  coreMechanism?: string;
 }
 
 export interface GlobalContext {

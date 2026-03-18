@@ -185,6 +185,7 @@ RÈGLES :
   Types valides : snapshot_price, news_article, knowledge_base, market_memory, causal_brief, inference
 - Maximum 2 niveaux techniques clés par asset dans technicalReading — les plus pertinents pour la narration, pas tous les indicateurs disponibles
 - Les niveaux supplémentaires vont dans chartInstructions (affichage visuel, pas narration)
+- MÉCANISME FONDAMENTAL : pour chaque segment DEEP, identifier dans le champ coreMechanism le concept fondamental que le spectateur doit comprendre pour suivre l'analyse (ex: "relation taux directeurs / inflation", "carry trade", "divergence COT / prix"). Ce champ guide le rédacteur C3 pour intégrer un rappel pédagogique. Ne pas remplir si le segment ne repose sur aucun concept non-évident.
 - RIGUEUR FACTUELLE : High52w/Low52w sont des NIVEAUX DE RÉFÉRENCE pour calibrer les scénarios (résistance/support lointain), PAS des faits à narrer. Ne JAMAIS écrire "plus haut/bas de 52 semaines" dans narrativeHook ou keyFacts sauf si le prix actuel est à ±2% de ce niveau
 - DISTINCTION ACTIFS : ne jamais utiliser un terme générique ("le pétrole", "les cryptos", "les indices") quand un prix ou pourcentage est cité. Toujours nommer le contrat exact (WTI vs Brent, BTC vs ETH, S&P vs Nasdaq). Si un seuil est franchi par un seul des deux, nommer celui-ci.
 - TRAÇABILITÉ DES NIVEAUX : pour chaque niveau technique (support, résistance, SMA, pivot) cité dans technicalReading ou scenarios, indiquer la source entre crochets :
