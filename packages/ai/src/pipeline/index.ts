@@ -232,6 +232,29 @@ export async function runPipeline(
     const gc = newsDigest.events.filter(e => e.importance === 'game_changer').length;
     const sig = newsDigest.events.filter(e => e.importance === 'significant').length;
     console.log(`  Digest: ${newsDigest.events.length} events (${gc} game-changers, ${sig} significant)`);
+
+    // Reinject digest into materialityScore — max boost per asset (not cumulative)
+    const DIGEST_BOOST: Record<string, number> = { game_changer: 3, significant: 2, notable: 0 };
+    const maxBoostPerAsset = new Map<string, number>();
+    for (const event of newsDigest.events) {
+      const boost = DIGEST_BOOST[event.importance] ?? 0;
+      if (boost === 0) continue;
+      for (const sym of event.linkedAssets ?? []) {
+        maxBoostPerAsset.set(sym, Math.max(maxBoostPerAsset.get(sym) ?? 0, boost));
+      }
+    }
+    let boosted = 0;
+    for (const [sym, boost] of maxBoostPerAsset) {
+      const asset = flagged.assets.find(a => a.symbol === sym);
+      if (asset) {
+        asset.materialityScore = Math.round((asset.materialityScore + boost) * 10) / 10;
+        boosted++;
+      }
+    }
+    if (boosted > 0) {
+      flagged.assets.sort((a, b) => b.materialityScore - a.materialityScore);
+      console.log(`  Digest boost: ${boosted} assets adjusted (max per asset), re-sorted`);
+    }
   }
 
   // ── P2: C1 Sonnet — Sélection éditoriale ────────────────

@@ -49,6 +49,34 @@ async function main() {
     console.log(`     assets: ${(event.linkedAssets || []).join(', ') || '—'}`);
   }
 
+  // Reinject digest into materialityScore — max boost per asset (not cumulative)
+  const DIGEST_BOOST: Record<string, number> = { game_changer: 3, significant: 2, notable: 0 };
+  const maxBoostPerAsset = new Map<string, number>();
+  for (const event of newsDigest.events) {
+    const boost = DIGEST_BOOST[event.importance] ?? 0;
+    if (boost === 0) continue;
+    for (const sym of event.linkedAssets ?? []) {
+      maxBoostPerAsset.set(sym, Math.max(maxBoostPerAsset.get(sym) ?? 0, boost));
+    }
+  }
+  let boosted = 0;
+  for (const [sym, boost] of maxBoostPerAsset) {
+    const asset = flagged.assets.find(a => a.symbol === sym);
+    if (asset) {
+      asset.materialityScore = Math.round((asset.materialityScore + boost) * 10) / 10;
+      boosted++;
+    }
+  }
+  if (boosted > 0) {
+    flagged.assets.sort((a, b) => b.materialityScore - a.materialityScore);
+    console.log(`\nDigest boost: ${boosted} scores adjusted`);
+    console.log("Top 10 after boost:");
+    for (const [i, a] of flagged.assets.slice(0, 10).entries()) {
+      const tag = a.promoted ? " [PROMU]" : "";
+      console.log(`  ${String(i + 1).padStart(2)}. ${a.symbol.padEnd(14)} ${a.materialityScore.toFixed(1).padStart(5)}  ${a.flags.join(', ')}${tag}`);
+    }
+  }
+
   console.log(`\n═══ P2 Sonnet — sélection éditoriale ═══`);
   const briefingPack = buildBriefingPack(flagged, snapshot);
 
