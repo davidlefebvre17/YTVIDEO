@@ -1,0 +1,354 @@
+{
+  "episodeNumber": 2,
+  "date": "2026-03-10",
+  "type": "daily_recap",
+  "lang": "fr",
+  "title": "Pétrole -12%, Argent +6% : le Grand Repricing",
+  "description": "Le WTI s'effondre de 12% en une séance tandis que l'argent bondit de 6%. Ce n'est pas une panique — c'est une réallocation complète des portefeuilles face aux tensions iraniennes. Décryptage de la cascade.",
+  "sections": [
+    {
+      "id": "hook",
+      "type": "hook",
+      "title": "Cold Open",
+      "narration": "Le WTI lâche douze pour cent. L'argent bondit de six. Même journée, même cause — deux directions opposées.",
+      "durationSec": 8,
+      "visualCues": [
+        {
+          "type": "flash",
+          "asset": "CL=F"
+        },
+        {
+          "type": "direction_arrow",
+          "asset": "SI=F"
+        }
+      ]
+    },
+    {
+      "id": "title_card",
+      "type": "title_card",
+      "title": "TradingRecap",
+      "narration": "",
+      "durationSec": 4,
+      "visualCues": []
+    },
+    {
+      "id": "thread",
+      "type": "thread",
+      "title": "Fil conducteur",
+      "narration": "Aujourd'hui, un seul mot résume tout : repricing. Les tensions iraniennes ont déclenché une cascade qui redessine les gagnants et les perdants en temps réel. L'énergie s'effondre, les métaux précieux s'envolent, l'Asie en profite, et Wall Street — Wall Street attend. On va remonter chaque maillon de cette chaîne.",
+      "durationSec": 22,
+      "visualCues": [
+        {
+          "type": "sector_heatmap",
+          "asset": "GLOBAL"
+        }
+      ]
+    },
+    {
+      "id": "seg_1",
+      "type": "segment",
+      "title": "Le pétrole s'effondre — et c'est le marché qui a tiré",
+      "narration": "Hier encore, le consensus était unanimement haussier sur le pétrole. Confiance très haute, positions longues record, RSI à soixante-dix — en surachat. Aujourd'hui, le WTI clôture à 83,45 dollars. Moins douze pour cent en une seule séance. Le Brent suit à 87,80, moins onze. Et le paradoxe est là : un conflit au Moyen-Orient devrait théoriquement faire monter le brut — menace sur l'offre, prime de risque sur le détroit d'Ormuz. Sauf que le marché a pricé autre chose. Il a pricé la destruction de la demande. Un conflit prolongé, c'est une récession régionale, des disruptions logistiques, un ralentissement global. Et quand ce scénario percute des positions longues massivement leveragées, la mécanique est brutale : liquidation forcée en cascade, le prix dégringole et amplifie la panique. Ce n'est pas l'Iran qui a fait baisser le pétrole — c'est le marché qui a utilisé l'Iran pour liquider ses excès. Techniquement, le prix reste au-dessus de la SMA200 à 63,45 dollars, le golden cross est intact. La structure long terme est bull. C'est une correction dans un marché haussier, pas un retournement. Mais le vrai test est immédiat : si 83 dollars cède en clôture hebdomadaire, la zone 61 à 64 dollars — Fibonacci plus SMA200 — devient l'aimant naturel. Un gap de vingt-six pour cent entre les deux. À l'inverse, une désescalade iranienne dans les prochaines heures pourrait ramener le prix vers 87-88 dollars — le gap de soulagement classique de la phase un géopolitique.",
+      "durationSec": 82,
+      "visualCues": [
+        {
+          "type": "show_chart",
+          "asset": "CL=F"
+        },
+        {
+          "type": "show_level",
+          "asset": "CL=F"
+        },
+        {
+          "type": "direction_arrow",
+          "asset": "BZ=F"
+        }
+      ],
+      "depth": "deep",
+      "topic": "petrole-energy-crash-11-pct",
+      "assets": [
+        "CL=F",
+        "BZ=F",
+        "XLE"
+      ],
+      "data": {
+        "depth": "DEEP",
+        "topic": "petrole-energy-crash-11-pct",
+        "predictions": [
+          {
+            "asset": "CL=F",
+            "direction": "bearish",
+            "confidence": "medium",
+            "reasoning": "Cassure technique sous le consensus bullish avec liquidation forcée. La SMA200 à 63.45$ reste le support structurel. Scénario baissier court terme tant que 83$ ne tient pas en clôture hebdo, mais la structure long terme reste haussière."
+          }
+        ]
+      }
+    },
+    {
+      "id": "seg_2",
+      "type": "segment",
+      "title": "Or et argent — la même peur, deux histoires différentes",
+      "narration": "L'or gagne 2,7 pour cent à 5229 dollars. L'argent explose de six pour cent à 89,08. Les deux montent — mais ce n'est pas la même histoire. L'or, c'est le réflexe de peur classique : tensions Iran, flight to safety, le dollar qui recule de 0,4 pour cent amplifie mécaniquement l'attrait du métal pour les acheteurs non-américains. Rien de surprenant. La vraie surprise, c'est l'argent. Plus six pour cent, c'est le double de l'or. Et quand l'argent surperforme l'or à ce point, le marché ne dit pas uniquement « j'ai peur ». Il dit « la demande industrielle tient ». Rappelle-toi la double nature de l'argent : métal refuge et métal industriel critique — panneaux solaires, véhicules électriques, électronique. Sa surperformance signale que le marché ne price pas un scénario déflationniste mais une crise contenue, avec une reprise asiatique en toile de fond. Et c'est cohérent avec ce qu'on voit en Corée du Sud et en Chine aujourd'hui. Techniquement, l'or est à mi-chemin entre son EMA9 à 5150 et la résistance à 5300 dollars. RSI à 56 — de l'espace, pas de surachat. Si 5300 cède avec du volume, le précédent ATH à 5586 revient dans le radar. L'argent, lui, bute sur les 90 dollars — premier mur. Son RSI à 50 sur un mouvement de six pour cent trahit un gap de nouvelles, pas une accumulation organique. C'est puissant mais fragile. Si l'Iran désescalade, l'or pourrait rendre deux à trois pour cent en quelques heures — c'est le pattern classique de la phase trois géopolitique.",
+      "durationSec": 82,
+      "visualCues": [
+        {
+          "type": "show_chart",
+          "asset": "GC=F"
+        },
+        {
+          "type": "comparison",
+          "asset": "SI=F"
+        },
+        {
+          "type": "highlight_asset",
+          "asset": "NEM"
+        }
+      ],
+      "depth": "deep",
+      "topic": "or-argent-safe-haven-repricing",
+      "assets": [
+        "GC=F",
+        "SI=F",
+        "NEM"
+      ],
+      "data": {
+        "depth": "DEEP",
+        "topic": "or-argent-safe-haven-repricing",
+        "predictions": [
+          {
+            "asset": "GC=F",
+            "direction": "bullish",
+            "confidence": "high",
+            "reasoning": "Flux safe haven géopolitiques + dollar faible + RSI non suracheté + structure bull long terme. Résistance 5300$ à surveiller."
+          },
+          {
+            "asset": "SI=F",
+            "direction": "bullish",
+            "confidence": "medium",
+            "reasoning": "Surperformance vs or portée par la double thèse refuge + industriel. Mais RSI 50 sur +6% = mouvement newsdriven, fragile en cas de désescalade."
+          }
+        ]
+      }
+    },
+    {
+      "id": "seg_3",
+      "type": "segment",
+      "title": "L'Asie achète le pétrole bas — Séoul en tête",
+      "narration": "Le KOSPI bondit de 5,35 pour cent. C'est un mouvement exceptionnel. Et la logique est limpide : la Corée du Sud est un importateur net massif de pétrole. Quand le WTI perd douze pour cent, les marges de Samsung, POSCO, Hyundai s'améliorent mécaniquement. Le marché l'a compris en temps réel. Derrière, c'est la Chine qui intrigue. Shanghai gagne modestement — 0,65 pour cent — mais le volume est en hausse de mille neuf cents pour cent par rapport à la moyenne vingt jours. Shenzhen confirme à plus deux pour cent avec le même profil de volume. Quand deux places chinoises affichent simultanément des volumes aussi anormaux, ça signale une accumulation institutionnelle coordonnée — ou un stimulus qui ne dit pas encore son nom. Shanghai est à moins de deux pour cent de son ATH. Si ce volume se confirme, le test pourrait arriver très vite. Le Nikkei gagne 2,88 pour cent mais reste sous ses EMA9 et EMA21 — c'est un rebond dans une tendance baissière de moyen terme, pas un retournement.",
+      "durationSec": 55,
+      "visualCues": [
+        {
+          "type": "show_chart",
+          "asset": "^KS11"
+        },
+        {
+          "type": "macro_stat",
+          "asset": "000001.SS"
+        }
+      ],
+      "depth": "focus",
+      "topic": "asie-rotations-korea-china-rebound",
+      "assets": [
+        "^KS11",
+        "000001.SS",
+        "399001.SZ",
+        "^N225"
+      ],
+      "data": {
+        "depth": "FOCUS",
+        "topic": "asie-rotations-korea-china-rebound",
+        "predictions": [
+          {
+            "asset": "^KS11",
+            "direction": "bullish",
+            "confidence": "medium",
+            "reasoning": "Bénéficiaire structurel du pétrole bas. Mais +5.35% en une session = risque de mean reversion rapide."
+          },
+          {
+            "asset": "000001.SS",
+            "direction": "bullish",
+            "confidence": "medium",
+            "reasoning": "Volume +1900% + proximité ATH. Signal d'accumulation si confirmé, mais volume à vérifier."
+          }
+        ]
+      }
+    },
+    {
+      "id": "seg_4",
+      "type": "segment",
+      "title": "L'Europe rebondit — mais le DAX reste sous sa SMA200",
+      "narration": "Le DAX prend 2,39 pour cent, le CAC 1,79, le FTSE 1,59. L'Europe surperforme Wall Street — et ce n'est pas un hasard. Le pétrole qui s'effondre, c'est une baisse directe de la facture énergétique du continent. Et quand Lagarde affirme que l'inflation est sous contrôle, le marché y voit une porte ouverte aux baisses de taux de la BCE. Deux catalyseurs qui convergent. Mais la nuance est technique, et elle est importante. Le DAX clôture à 23 968 — toujours sous sa SMA200 à 24 167. Deux cents points d'écart. Tant que le prix reste en dessous, ce n'est pas une reprise — c'est un test de résistance. Le CAC, lui, est au-dessus de sa SMA200 à 7990 mais sous son EMA9 et son EMA21 — coincé dans un couloir de résistances descendantes. Le FTSE est le seul indice européen avec une dynamique propre : à moins de cinq pour cent de son ATH, avec une structure technique plus saine. Le rebond européen est réel, mais il repose sur deux piliers externes — pétrole bas et BCE dovish. Si l'un des deux se retourne, l'édifice vacille.",
+      "durationSec": 55,
+      "visualCues": [
+        {
+          "type": "show_chart",
+          "asset": "^GDAXI"
+        },
+        {
+          "type": "show_level",
+          "asset": "^FCHI"
+        },
+        {
+          "type": "highlight_asset",
+          "asset": "^FTSE"
+        }
+      ],
+      "depth": "focus",
+      "topic": "europe-indices-paradoxe-rebound",
+      "assets": [
+        "^FCHI",
+        "^GDAXI",
+        "^FTSE",
+        "^STOXX"
+      ],
+      "data": {
+        "depth": "FOCUS",
+        "topic": "europe-indices-paradoxe-rebound",
+        "predictions": [
+          {
+            "asset": "^GDAXI",
+            "direction": "bearish",
+            "confidence": "medium",
+            "reasoning": "Sous SMA200 à 24167$ : le rebond de +2.39% ne suffit pas à renverser la structure baissière moyen terme. Test de résistance majeur en cours."
+          },
+          {
+            "asset": "^FCHI",
+            "direction": "bullish",
+            "confidence": "medium",
+            "reasoning": "Au-dessus de SMA200, soutenu par la composition sectorielle (luxe/pharma). Mais sous EMA9/21 = progression bloquée à court terme."
+          }
+        ]
+      }
+    },
+    {
+      "id": "seg_5",
+      "type": "segment",
+      "title": "Bitcoin à 70 000 — le mur et le squeeze",
+      "narration": "Bitcoin gagne 2,2 pour cent à 69 926 dollars — juste sous la barre des 70 000. Et le Fear and Greed est à 15 sur 100. Peur extrême et prix qui monte — c'est une divergence classique d'accumulation institutionnelle pendant que le retail capitule. Le funding rate Ethereum est négatif, ce qui signifie que les shorts payent pour maintenir leurs positions. Si BTC franchit les 70 000 avec conviction, ces shorts se font éjecter — et le squeeze peut faire le reste.",
+      "durationSec": 28,
+      "visualCues": [
+        {
+          "type": "show_chart",
+          "asset": "BTC-USD"
+        },
+        {
+          "type": "highlight_asset",
+          "asset": "ETH-USD"
+        }
+      ],
+      "depth": "flash",
+      "topic": "crypto-bifurcation-btc-eth-stable",
+      "assets": [
+        "BTC-USD",
+        "ETH-USD"
+      ],
+      "data": {
+        "depth": "FLASH",
+        "topic": "crypto-bifurcation-btc-eth-stable",
+        "predictions": [
+          {
+            "asset": "BTC-USD",
+            "direction": "bullish",
+            "confidence": "medium",
+            "reasoning": "Fear & Greed 15 + prix en hausse = divergence classique. Résistance 70000$ = niveau de déclenchement de short squeeze potentiel. Mais F&G peut rester bas longtemps."
+          }
+        ]
+      }
+    },
+    {
+      "id": "seg_6",
+      "type": "segment",
+      "title": "Oracle ce soir — l'arbitre de la rotation",
+      "narration": "Oracle publie après la clôture, et le volume pré-marché est en spike — les institutionnels se positionnent. L'enjeu dépasse largement un earnings call. Si Oracle bat les attentes sur le cloud, la tech prouve qu'elle peut ignorer la géopolitique — et la rotation énergie vers tech s'accélère. Si Oracle déçoit, c'est la confirmation que même les valeurs enterprise ne sont pas à l'abri. Le Nasdaq à plus 0,01 pour cent aujourd'hui — parfaitement flat, en attente du verdict.",
+      "durationSec": 28,
+      "visualCues": [
+        {
+          "type": "highlight_asset",
+          "asset": "ORCL"
+        },
+        {
+          "type": "flash",
+          "asset": "ORCL"
+        }
+      ],
+      "depth": "flash",
+      "topic": "oracle-earnings-tech-spotlight",
+      "assets": [
+        "ORCL"
+      ],
+      "data": {
+        "depth": "FLASH",
+        "topic": "oracle-earnings-tech-spotlight",
+        "predictions": [
+          {
+            "asset": "ORCL",
+            "direction": "bullish",
+            "confidence": "medium",
+            "reasoning": "Volume spike pré-marché + momentum post Dell/Netflix. Mais risque de buy the rumor sell the news si le beat est modeste."
+          }
+        ]
+      }
+    },
+    {
+      "id": "seg_7",
+      "type": "segment",
+      "title": "Wall Street calcule — S&P quasi-flat malgré le chaos",
+      "narration": "Le S&P cède 0,21 pour cent. Le Nasdaq est flat. Le Dow perd 0,07. Un pétrole à moins douze, une géopolitique explosive, et Wall Street lâche un quart de pour cent. Ce n'est pas de la peur, ce n'est pas de l'euphorie — c'est du calcul. L'ADP à plus 15 500 emplois seulement signale un ralentissement — ce que le marché interprète comme un feu vert pour une Fed plus souple. Les ventes immobilières battent les attentes. La résultante est une neutralité calculée, en attente d'Oracle ce soir et du NFP vendredi.",
+      "durationSec": 28,
+      "visualCues": [
+        {
+          "type": "show_chart",
+          "asset": "^GSPC"
+        },
+        {
+          "type": "macro_stat",
+          "asset": "^GSPC"
+        }
+      ],
+      "depth": "flash",
+      "topic": "wall-street-divergence-surprise-economic",
+      "assets": [
+        "^GSPC",
+        "^IXIC",
+        "^DJI"
+      ],
+      "data": {
+        "depth": "FLASH",
+        "topic": "wall-street-divergence-surprise-economic",
+        "predictions": [
+          {
+            "asset": "^GSPC",
+            "direction": "bearish",
+            "confidence": "low",
+            "reasoning": "Neutralité de surface masquant une faiblesse potentielle. ADP faible = warning sur le NFP vendredi. Direction dépendra d'Oracle et de l'évolution iranienne."
+          }
+        ]
+      }
+    },
+    {
+      "id": "closing",
+      "type": "closing",
+      "title": "Closing",
+      "narration": "Un seul thème aujourd'hui : le repricing. Le pétrole finance la rotation, l'or et l'argent absorbent la peur, l'Asie arbitre le pétrole bas comme une opportunité, et Wall Street attend le verdict d'Oracle ce soir. Demain, on saura si la tech peut porter la prochaine jambe — ou si la géopolitique reprend la main. D'après toi, la surperformance de l'argent sur l'or est-elle un signal de reprise industrielle — ou simplement de la volatilité pure ?",
+      "durationSec": 27,
+      "visualCues": [
+        {
+          "type": "transition",
+          "asset": "GLOBAL"
+        }
+      ]
+    }
+  ],
+  "totalDurationSec": 502,
+  "threadSummary": "Les tensions iraniennes déclenchent un repricing global : l'énergie s'effondre sous le poids de positions longues sur-leveragées, les métaux précieux captent les flux refuges avec l'argent signalant aussi une reprise industrielle, l'Asie achète le pétrole bas comme une détente inflationniste, l'Europe rebondit sur sa facture énergétique réduite, et Wall Street reste en neutralité calculée en attente d'Oracle.",
+  "segmentCount": 7,
+  "coverageTopics": [
+    "petrole-energy-crash-11-pct",
+    "or-argent-safe-haven-repricing",
+    "asie-rotations-korea-china-rebound",
+    "europe-indices-paradoxe-rebound",
+    "crypto-bifurcation-btc-eth-stable",
+    "oracle-earnings-tech-spotlight",
+    "wall-street-divergence-surprise-economic"
+  ]
+}

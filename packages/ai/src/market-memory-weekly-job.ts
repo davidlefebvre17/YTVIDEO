@@ -40,7 +40,7 @@ async function callSonnetWeekly(
   const result = await generateStructuredJSON<SonnetWeeklyOutput>(
     system,
     user,
-    { role: "balanced" }, // Sonnet via OpenRouter or Anthropic
+    { role: "balanced", maxTokens: 16384 }, // 35 assets × zones/impression = large JSON
   );
 
   return result;

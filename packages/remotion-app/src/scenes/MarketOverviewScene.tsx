@@ -32,7 +32,7 @@ export const MarketOverviewScene: React.FC<MarketOverviewSceneProps> = ({
       <div
         style={{
           fontSize: layout.fontSize.sectionTitle,
-          color: BRAND.colors.overview,
+          color: BRAND.colors.accentBlue,
           fontWeight: 700,
           opacity: titleOpacity,
           marginTop: layout.padding.top,

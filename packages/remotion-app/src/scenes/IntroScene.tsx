@@ -55,7 +55,7 @@ export const IntroScene: React.FC<IntroSceneProps> = ({
           left: (width - lineWidth) / 2,
           width: lineWidth,
           height: 3,
-          background: BRAND.colors.gradient,
+          background: `linear-gradient(135deg, ${BRAND.colors.accentDefault}, ${BRAND.colors.accentBear})`,
           borderRadius: 2,
         }}
       />

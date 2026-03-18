@@ -51,13 +51,14 @@ RULES:
 ### Impression (2-3 sentences max)
 - Pure chartism — NO news, NO events, NO macro
 - Describe the technical setup, key levels to watch, and one likely scenario for next week
-- Example: "Gold in bull regime, testing previous resistance at 2085. SMA20 slope steep, RSI overbought. Watch for pullback to 2070-2075 before next leg up."
+- Example structure: "[ASSET] in [REGIME] regime, testing [ZONE_TYPE] at [LEVEL]. [INDICATOR_STATE]. Watch for [SCENARIO] before next [DIRECTION]."
+- Use ACTUAL values from the asset's data, not these placeholders.
 
 ### Weekly Brief (MarketWeeklyBrief)
 - regime_summary: 2-3 sentences on overall market condition (bull/bear/rotation/divergence between regions)
 - notable_zones: events from this week where a zone was touched, tested, or broken (max 5-7)
   - Each entry: { symbol, level, type, event: "what happened" }
-  - Example event: "S&P 500 rejected 5800 (resistance), pulled back 2.3%"
+  - Example structure: "[ASSET] [ACTION] [LEVEL] ([ZONE_TYPE]), [CONSEQUENCE]"
 - watchlist_next_week: 4-6 most important assets to monitor
   - Each entry: { symbol, reason: "one sentence on why it matters" }
   - Prioritize assets with upcoming zone tests, regime changes, or high volatility
@@ -69,7 +70,7 @@ Return ONLY valid JSON matching SonnetWeeklyOutput interface. No markdown, no co
     "generated": "ISO datetime string",
     "regime_summary": "2-3 sentences on market regime",
     "notable_zones": [
-      { "symbol": "SYMBOL", "level": 5800.50, "type": "resistance", "event": "description" }
+      { "symbol": "SYMBOL", "level": 0, "type": "resistance", "event": "description from this week" }
     ],
     "watchlist_next_week": [
       { "symbol": "SYMBOL", "reason": "one sentence" }
@@ -79,8 +80,8 @@ Return ONLY valid JSON matching SonnetWeeklyOutput interface. No markdown, no co
     {
       "symbol": "SYMBOL",
       "zones": [
-        { "level": 5800.50, "type": "resistance" },
-        { "level": 5650.00, "type": "support" }
+        { "level": 0, "type": "resistance" },
+        { "level": 0, "type": "support" }
       ],
       "regime": "bull",
       "impression": "2-3 sentences"

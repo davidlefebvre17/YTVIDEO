@@ -149,9 +149,30 @@ async function callAnthropic(
 // ─── Unified entry point ─────────────────────────────────────────
 
 function extractJSON(text: string): string {
-  // Handle markdown code blocks
-  const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-  return (jsonMatch?.[1]?.trim() || text.trim());
+  // 1. Try markdown code fences (``` or ````+)
+  const fenceMatch = text.match(/`{3,}(?:json)?\s*([\s\S]*?)`{3,}/);
+  if (fenceMatch?.[1]?.trim()) return fenceMatch[1].trim();
+
+  // 2. Truncated fence (no closing ```) — strip opening fence
+  const openFence = text.match(/^`{3,}(?:json)?\s*\n?([\s\S]*)$/);
+  if (openFence?.[1]?.trim()) {
+    const stripped = openFence[1].trim();
+    // Remove trailing ``` if partially present
+    return stripped.replace(/`{1,3}\s*$/, "").trim();
+  }
+
+  // 3. Find outermost { ... } or [ ... ] as fallback
+  const firstBrace = text.indexOf("{");
+  const firstBracket = text.indexOf("[");
+  const start = firstBrace >= 0 && (firstBracket < 0 || firstBrace < firstBracket) ? firstBrace : firstBracket;
+  if (start >= 0) {
+    const opener = text[start];
+    const closer = opener === "{" ? "}" : "]";
+    const lastClose = text.lastIndexOf(closer);
+    if (lastClose > start) return text.slice(start, lastClose + 1);
+  }
+
+  return text.trim();
 }
 
 export async function generateStructuredJSON<T>(

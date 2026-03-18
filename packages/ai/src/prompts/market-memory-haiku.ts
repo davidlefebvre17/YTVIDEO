@@ -49,22 +49,18 @@ For PULLBACK_RATE:
 
 OUTPUT REQUIREMENTS FOR EACH ZONE:
 1. level: the zone level (exact number from input)
-2. last_behavior: 40-60 chars max. Concise technical description. Examples:
-   - "Strong cassure with 2.1x volume, BB expanded to 92 pctile"
-   - "Weak rejection, close inside zone, vol 0.8x, ATR ratio 0.95"
-   - "PULLBACK_TENU: 38% retracement, RSI still > 60, hold intact"
-   - "3rd touch with larger wick, previous 2 were weak rejection"
+2. last_behavior: 40-60 chars max. Concise technical description using ACTUAL values from today's indicators.
+   Structure: "[EVENT_TYPE] with [VOL]x volume, BB [RANK] pctile, ATR [RATIO]"
+   Do NOT copy example values — extract real numbers from TODAY'S TECHNICAL INDICATORS above.
 3. cassure_confirmed: ONLY if event involves CASSURE or PULLBACK_TENU/PULLBACK_RATE. Otherwise omit.
    - Set to true: if technical signals confirm genuine breakout (vol >1.3x, ATR >1.1x, BB >60 pctile)
    - Set to false: if signals suggest false breakout (vol <1.0x, ATR <0.9x, BB <40 pctile, or quick pullback)
    - Leave null if event is TOUCH or REJET (no cassure decision needed)
 
 TACTICAL_NOTE:
-- 80-100 chars max. Free-form technical observation for the day. Examples:
-  - "BB squeeze resolving bearish, watch 6500 support for next cassure"
-  - "ATR spike 1.8x suggests volatility event, keep stops tight"
-  - "Zone held on 3rd touch, RSI not extreme, potential range-bound day"
-  - "Pullback retraced 62%, above 50% = cassure questionable, monitor close"
+- 80-100 chars max. Free-form technical observation for the day.
+- Structure: "[BB/ATR observation], [zone interaction], [key level from ZONES IN MEMORY to watch]"
+- Use ACTUAL indicator values and zone levels from the data above. Do NOT invent levels or copy generic examples.
 
 RULES:
 - Be SPECIFIC: use actual indicator values from input

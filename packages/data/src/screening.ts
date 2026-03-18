@@ -80,8 +80,9 @@ async function enrichMovers(movers: StockScreenResult[]): Promise<void> {
   const deepDiveLimit = 30;
   const targets = movers.slice(0, deepDiveLimit);
 
-  // Sequential to avoid rate-limit after spark batches
-  for (const mover of targets) {
+  // Sequential with throttle to avoid Yahoo rate-limit after spark batches
+  for (let mi = 0; mi < targets.length; mi++) {
+    const mover = targets[mi];
     try {
       // Use 3y candles to get accurate 52w high/low (1mo candles were insufficient)
       const candles = await fetchDaily3yCandles(mover.symbol);
@@ -113,6 +114,10 @@ async function enrichMovers(movers: StockScreenResult[]): Promise<void> {
       }
     } catch {
       // non-blocking
+    }
+    // Throttle between mover enrichment requests
+    if (mi < targets.length - 1) {
+      await new Promise((r) => setTimeout(r, 300));
     }
   }
 }

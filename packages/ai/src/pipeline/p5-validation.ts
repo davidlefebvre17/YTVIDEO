@@ -2,7 +2,9 @@ import { generateStructuredJSON } from "../llm-client";
 import type {
   DraftScript, EditorialPlan, AnalysisBundle, WordBudget,
   SnapshotFlagged, ValidationResult, ValidationIssue,
+  FlaggedAsset,
 } from "./types";
+import { loadMemory } from "@yt-maker/data";
 
 // ── Known bad patterns ──────────────────────────────────
 
@@ -36,10 +38,90 @@ function getAllNarration(draft: DraftScript): string {
   return parts.join(' ');
 }
 
+/**
+ * Build a whitelist of known numeric values from all data sources.
+ * Any number > 10 in the narration not in this set is potentially hallucinated.
+ */
+function buildKnownNumbers(flagged?: SnapshotFlagged): Set<number> {
+  const known = new Set<number>();
+  if (!flagged) return known;
+
+  for (const a of flagged.assets) {
+    // Snapshot prices
+    known.add(Math.round(a.price * 100) / 100);
+    if (a.snapshot.high24h) known.add(Math.round(a.snapshot.high24h * 100) / 100);
+    if (a.snapshot.low24h) known.add(Math.round(a.snapshot.low24h * 100) / 100);
+    // changePct (rounded to 1 or 2 decimals)
+    known.add(Math.round(Math.abs(a.changePct) * 10) / 10);
+    known.add(Math.round(Math.abs(a.changePct) * 100) / 100);
+    // Technicals
+    const t = a.snapshot.technicals;
+    if (t) {
+      if (t.rsi14) known.add(Math.round(t.rsi14));
+      for (const s of t.supports ?? []) known.add(Math.round(s * 100) / 100);
+      for (const r of t.resistances ?? []) known.add(Math.round(r * 100) / 100);
+    }
+    // MultiTF
+    const m = a.snapshot.multiTF;
+    if (m) {
+      if (m.daily3y?.sma200) known.add(Math.round(m.daily3y.sma200));
+      if (m.daily1y?.high52w) known.add(Math.round(m.daily1y.high52w * 100) / 100);
+      if (m.daily1y?.low52w) known.add(Math.round(m.daily1y.low52w * 100) / 100);
+    }
+    // MarketMemory zones
+    try {
+      const mem = loadMemory(a.symbol);
+      if (mem) {
+        for (const z of mem.zones) known.add(Math.round(z.level * 100) / 100);
+        if (mem.indicators_daily) {
+          known.add(Math.round(mem.indicators_daily.rsi14));
+          known.add(Math.round(Math.abs(mem.indicators_daily.mm20_slope_deg)));
+        }
+      }
+    } catch {}
+  }
+  // Yields
+  if (flagged.yields) {
+    known.add(flagged.yields.us10y);
+    known.add(flagged.yields.us2y);
+    known.add(Math.round(flagged.yields.spread10y2y * 100)); // as bps
+    known.add(Math.round(Math.abs(flagged.yields.spread10y2y) * 100) / 100);
+  }
+  // Sentiment
+  if (flagged.sentiment?.cryptoFearGreed) {
+    known.add(flagged.sentiment.cryptoFearGreed.value);
+  }
+  // StockScreen top movers
+  for (const s of flagged.screenResults ?? []) {
+    if (s.changePct) {
+      known.add(Math.round(Math.abs(s.changePct) * 10) / 10);
+      known.add(Math.round(Math.abs(s.changePct) * 100) / 100);
+    }
+  }
+  return known;
+}
+
+/**
+ * Extract all "significant" numbers from text (> 10, likely price levels or indicators).
+ * Ignores percentages, durations, and small numbers.
+ */
+function extractSignificantNumbers(text: string): number[] {
+  const nums: number[] = [];
+  // Match numbers like 6744, 99.85, 4994, but skip percentages and small
+  const matches = text.matchAll(/(?<!\w)(\d[\d\s]*[\d,.]*\d)(?!\s*(?:pour cent|%|s\b|min\b|sec))/g);
+  for (const m of matches) {
+    const raw = m[1].replace(/[\s,]/g, '').replace(',', '.');
+    const n = parseFloat(raw);
+    if (!isNaN(n) && n > 10) nums.push(n);
+  }
+  return nums;
+}
+
 export function validateMechanical(
   draft: DraftScript,
   plan: EditorialPlan,
   budget: WordBudget,
+  flagged?: SnapshotFlagged,
 ): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
   const fullText = getAllNarration(draft);
@@ -146,6 +228,59 @@ export function validateMechanical(
         segmentId: seg.segmentId,
         description: `Narration vide ou trop courte dans ${seg.segmentId}`,
         severity: 'blocker',
+        source: 'code',
+      });
+    }
+  }
+
+  // 9. Hallucination check: numbers in narration vs known data sources
+  if (flagged) {
+    const known = buildKnownNumbers(flagged);
+    for (const seg of draft.segments) {
+      const nums = extractSignificantNumbers(seg.narration);
+      for (const n of nums) {
+        // Check if this number (or close approximation ±1%) exists in known data
+        const isKnown = [...known].some(k => Math.abs(k - n) / Math.max(k, 1) < 0.015);
+        if (!isKnown) {
+          issues.push({
+            type: 'compliance',
+            segmentId: seg.segmentId,
+            description: `Niveau ${n} non trouvé dans les données sources — potentielle hallucination`,
+            severity: 'warning',
+            suggestedFix: `Vérifier si ${n} provient des données. Si non, remplacer par un niveau réel ou supprimer.`,
+            source: 'code',
+          });
+        }
+      }
+    }
+  }
+
+  // 10. Temporal consistency: "cette semaine" on Monday = only today's events
+  if (flagged) {
+    const dayOfWeek = new Date(flagged.date + 'T12:00:00Z').getDay();
+    if (dayOfWeek === 1) { // Monday
+      const weekClaims = fullText.match(/cette semaine|cette sem\.|de la semaine/gi);
+      if (weekClaims && weekClaims.length > 0) {
+        issues.push({
+          type: 'compliance',
+          description: `"cette semaine" utilisé un lundi — impossible d'avoir des événements répétés "cette semaine" le premier jour`,
+          severity: 'warning',
+          suggestedFix: 'Remplacer par "aujourd\'hui" ou "en début de semaine" ou retirer la référence temporelle',
+          source: 'code',
+        });
+      }
+    }
+  }
+
+  // 11. "seul" comparative claims: check if truly unique
+  if (flagged) {
+    const seulMatches = fullText.matchAll(/seul[e]?\s+(indice|actif|devise|crypto|marché)\s+(?:en\s+)?(baisse|hausse)/gi);
+    for (const m of seulMatches) {
+      issues.push({
+        type: 'compliance',
+        description: `Claim "${m[0]}" — vérifier que c'est factuel sur TOUS les actifs du groupe`,
+        severity: 'warning',
+        suggestedFix: 'Si non vérifié, utiliser "parmi les rares" au lieu de "seul"',
         source: 'code',
       });
     }
@@ -303,12 +438,13 @@ export async function runValidation(
   plan: EditorialPlan,
   analysis: AnalysisBundle,
   budget: WordBudget,
+  flagged?: SnapshotFlagged,
 ): Promise<ValidationResult> {
   // Fix anglicisms first (always, no LLM needed)
   fixAnglicisms(draft);
 
-  // Step 1: Mechanical validation
-  const mechIssues = validateMechanical(draft, plan, budget);
+  // Step 1: Mechanical validation (with hallucination checks if flagged data available)
+  const mechIssues = validateMechanical(draft, plan, budget, flagged);
   const mechBlockers = mechIssues.filter(i => i.severity === 'blocker');
 
   if (mechBlockers.length > 0) {

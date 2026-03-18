@@ -56,7 +56,7 @@ export const PredictionsScene: React.FC<PredictionsSceneProps> = ({ section, lan
       <div
         style={{
           fontSize: layout.fontSize.sectionTitle,
-          color: BRAND.colors.predictions,
+          color: BRAND.colors.accentBlue,
           fontWeight: 700,
           opacity: fadeIn(frame, 0, 20),
           marginTop: layout.padding.top,

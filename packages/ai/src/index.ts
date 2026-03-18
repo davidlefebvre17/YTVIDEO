@@ -46,3 +46,27 @@ export type {
   StoredArticle,
   EconomicEvent,
 } from "./memory";
+
+// TTS Audio (P7)
+export {
+  generateSegmentAudio,
+  generateEpisodeAudio,
+  checkEdgeTTS,
+  VOICES,
+} from "./p7-audio";
+export type {
+  TTSSegment,
+  TTSResult,
+  AudioManifest,
+} from "./p7-audio";
+
+// Visual Storyboard (P7 C7)
+export {
+  runC7Storyboard,
+} from "./p7-visual";
+export type {
+  VisualStoryboard,
+  VisualSlot,
+  VisualSource,
+  VisualComponentType,
+} from "./p7-visual";

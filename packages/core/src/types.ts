@@ -43,6 +43,40 @@ export interface ScriptSection {
   assets?: string[];
 }
 
+export interface EpisodeDirection {
+  arc: Array<{
+    segmentId: string;
+    tensionLevel: number;
+    role: 'hook' | 'montee' | 'pic' | 'respiration' | 'rebond' | 'resolution' | 'closing';
+  }>;
+  transitions: Array<{
+    fromSegmentId: string;
+    toSegmentId: string;
+    type: 'cut' | 'fade' | 'wipe' | 'zoom_out' | 'slide';
+    durationMs: number;
+    soundEffect?: 'silence' | 'sting' | 'swoosh' | 'none';
+    vocalShift?: string;
+  }>;
+  chartTimings: Array<{
+    chartInstruction: {
+      type: string;
+      asset: string;
+      value?: number;
+      label?: string;
+      timeframe?: string;
+    };
+    showAtSec: number;
+    hideAtSec: number;
+  }>;
+  moodMusic: 'tension_geopolitique' | 'risk_off_calme' | 'bullish_momentum' | 'neutre_analytique' | 'incertitude';
+  thumbnailMoment: {
+    segmentId: string;
+    reason: string;
+    keyFigure?: string;
+    emotionalTone: string;
+  };
+}
+
 export interface EpisodeScript {
   episodeNumber: number;
   date: string;
@@ -55,6 +89,7 @@ export interface EpisodeScript {
   threadSummary: string;
   segmentCount: number;
   coverageTopics: string[];
+  direction?: EpisodeDirection;
 }
 
 export interface MultiTimeframeAnalysis {

@@ -30,7 +30,3 @@ export async function fetchEconomicCalendar(date?: string): Promise<{
     return { today: [], yesterday: [], upcoming: [] };
   }
 }
-
-export function getUpcomingEvents(date: string): EconomicEvent[] {
-  return [];
-}

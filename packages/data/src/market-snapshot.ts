@@ -111,9 +111,10 @@ export async function fetchMarketSnapshot(
       return true;
     });
 
-  // Phase 2 — per-asset enrichment (sequential to avoid rate-limit)
+  // Phase 2 — per-asset enrichment (sequential with throttle to avoid Yahoo rate-limit)
   console.log(`\nEnriching ${assets.length} assets (technicals + multi-TF)...`);
-  for (const asset of assets) {
+  for (let ai = 0; ai < assets.length; ai++) {
+    const asset = assets[ai];
     try {
       // Fetch all candle series in parallel for this asset
       const [dailyCandles, weeklyCandles, daily3yCandles] = await Promise.all([
@@ -156,6 +157,10 @@ export async function fetchMarketSnapshot(
       }
     } catch (err) {
       console.warn(`  Failed to enrich ${asset.name}: ${err}`);
+    }
+    // Throttle between assets (3 requests each) to avoid Yahoo rate-limit
+    if (ai < assets.length - 1) {
+      await new Promise((r) => setTimeout(r, 500));
     }
   }
 

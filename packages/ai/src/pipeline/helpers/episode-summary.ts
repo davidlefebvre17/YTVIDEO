@@ -30,18 +30,33 @@ function buildForwardLooking(snapshot: DailySnapshot | undefined): string[] {
 export function buildEpisodeSummaries(
   prevContext: PrevContext | undefined,
   count: number,
+  currentDate?: string,
 ): EpisodeSummary[] {
   if (!prevContext?.entries?.length) return [];
 
   const entries = prevContext.entries.slice(-count);
-  const total = entries.length;
 
-  return entries.map((entry, i) => {
+  // Use currentDate if provided, otherwise infer from latest entry + 1 day
+  const refDate = currentDate
+    ? new Date(currentDate + "T12:00:00Z")
+    : (() => {
+        const last = entries[entries.length - 1]?.snapshot?.date;
+        if (!last) return new Date();
+        const d = new Date(last + "T12:00:00Z");
+        d.setDate(d.getDate() + 1);
+        return d;
+      })();
+
+  return entries.map((entry) => {
     const script = entry.script;
-    const daysAgo = total - i;
+    const entryDate = entry.snapshot?.date;
+    // Compute real calendar day difference
+    const daysAgo = entryDate
+      ? Math.round((refDate.getTime() - new Date(entryDate + "T12:00:00Z").getTime()) / (24 * 60 * 60 * 1000))
+      : 0;
 
     return {
-      date: entry.snapshot?.date ?? `?`,
+      date: entryDate ?? `?`,
       label: `J-${daysAgo}`,
       segmentTopics: script?.sections
         ?.filter(s => s.type === 'segment')

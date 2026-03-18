@@ -178,6 +178,7 @@ function bootstrapMemory(
  */
 export function applyHaikuEnrichment(results: HaikuEnrichmentResult[]): void {
   for (const result of results) {
+    if (!result?.symbol) continue;
     const memory = loadMemory(result.symbol);
     if (!memory) continue;
 

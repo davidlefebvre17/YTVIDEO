@@ -84,8 +84,12 @@ function loadKnowledgeForC2(snapshot: DailySnapshot, selectedSymbols: string[]):
  */
 function formatAssetForC2(asset: FlaggedAsset, depth: 'DEEP' | 'FOCUS' | 'FLASH'): string {
   const fmt = (n: number) => n.toFixed(asset.price > 100 ? 2 : 4);
+  const hi = asset.snapshot.high24h;
+  const lo = asset.snapshot.low24h;
   let text = `### ${asset.name} (${asset.symbol}) — ${depth}\n`;
-  text += `Prix: ${fmt(asset.price)} | Var: ${asset.changePct >= 0 ? '+' : ''}${asset.changePct.toFixed(2)}%\n`;
+  text += `Prix (clôture): ${fmt(asset.price)} | Var: ${asset.changePct >= 0 ? '+' : ''}${asset.changePct.toFixed(2)}%`;
+  if (hi && lo) text += ` | Séance: low ${fmt(lo)} → high ${fmt(hi)}`;
+  text += '\n';
 
   if (depth === 'FLASH') return text + '\n';
 
@@ -101,7 +105,7 @@ function formatAssetForC2(asset: FlaggedAsset, depth: 'DEEP' | 'FOCUS' | 'FLASH'
   if (m) {
     text += `MultiTF: tendance séculaire=${m.weekly10y.trend} | moyen terme=${m.daily3y.trend}\n`;
     text += `  SMA200=${fmt(m.daily3y.sma200)} (${m.daily3y.aboveSma200 ? 'AU-DESSUS' : 'EN-DESSOUS'}) | ${m.daily3y.goldenCross ? 'GOLDEN' : 'DEATH'} CROSS\n`;
-    text += `  ATH: ${m.weekly10y.distanceFromATH.toFixed(1)}% | High52w: ${fmt(m.daily1y.high52w)} | Low52w: ${fmt(m.daily1y.low52w)}\n`;
+    text += `  ATH: ${m.weekly10y.distanceFromATH.toFixed(1)}% | High52w(calibration): ${fmt(m.daily1y.high52w)} | Low52w(calibration): ${fmt(m.daily1y.low52w)}\n`;
   }
 
   text += `Flags: ${asset.flags.join(', ') || 'none'}\n`;
@@ -158,6 +162,16 @@ RÔLE : Analyser en profondeur les assets sélectionnés. Produire des données 
 RÈGLES :
 - Pour chaque segment, produire EXACTEMENT les champs du schema SegmentAnalysis
 - Les chartInstructions sont SÉMANTIQUES : quoi afficher (type, asset, value, label), PAS quand (le timing vient en P6)
+- TYPES VISUELS DISPONIBLES pour chartInstructions:
+  • Overlays prix (single asset): price_line, support_line, resistance_line, trend_line, zone_highlight, annotation, gauge_rsi
+  • Multi-assets (mettre dans assets[]): chart_comparaison (J-1 vs J0), chart_split (2 assets simultanés), chart_correlation (overlay corrélation)
+  • Data: yield_curve (courbe taux), gauge_fear_greed, multi_badge (max 4 assets), heatmap_sectorielle, countdown_event
+  • Infographies: causal_chain (chaîne causale), scenario_fork (fork bull/bear), stat_callout (chiffre géant)
+- Pour les types multi-assets: remplir le champ "assets": ["sym1", "sym2"] en plus de "asset" (premier asset)
+- Utilise causal_chain quand le segment a une chaîne causale claire à montrer visuellement
+- Utilise scenario_fork pour les segments avec 2 scénarios chiffrés bullish/bearish
+- Utilise gauge_rsi quand le RSI est un élément clé (surachat/survente)
+- Utilise chart_comparaison pour les retournements marquants (J-1 vs J0)
 - Les scénarios DOIVENT être CHIFFRÉS avec niveaux précis
 - confidenceLevel reflète la qualité des données :
   • high : données techniques claires + catalyst identifié + pattern confirmé
@@ -171,6 +185,12 @@ RÈGLES :
   Types valides : snapshot_price, news_article, knowledge_base, market_memory, causal_brief, inference
 - Maximum 2 niveaux techniques clés par asset dans technicalReading — les plus pertinents pour la narration, pas tous les indicateurs disponibles
 - Les niveaux supplémentaires vont dans chartInstructions (affichage visuel, pas narration)
+- RIGUEUR FACTUELLE : High52w/Low52w sont des NIVEAUX DE RÉFÉRENCE pour calibrer les scénarios (résistance/support lointain), PAS des faits à narrer. Ne JAMAIS écrire "plus haut/bas de 52 semaines" dans narrativeHook ou keyFacts sauf si le prix actuel est à ±2% de ce niveau
+- DISTINCTION ACTIFS : ne jamais utiliser un terme générique ("le pétrole", "les cryptos", "les indices") quand un prix ou pourcentage est cité. Toujours nommer le contrat exact (WTI vs Brent, BTC vs ETH, S&P vs Nasdaq). Si un seuil est franchi par un seul des deux, nommer celui-ci.
+- TRAÇABILITÉ DES NIVEAUX : pour chaque niveau technique (support, résistance, SMA, pivot) cité dans technicalReading ou scenarios, indiquer la source entre crochets :
+  [MM] = MarketMemory zone, [SNAP] = prix/high/low du snapshot, [COT] = positionnement CFTC,
+  [YIELD] = taux obligataires, [SCREEN] = stockScreen mover, [KB] = knowledge base.
+  INTERDIT de citer un niveau sans tag source. Si aucune source ne fournit un niveau, NE PAS l'inventer.
 
 RÈGLES COT (positionnement CFTC — lag structurel de 9-11 jours) :
 Le COT reflète les positions AVANT le move du jour, jamais pendant. Trois règles absolues :
@@ -258,15 +278,19 @@ Retourne un JSON avec cette structure exacte :
       },
       "narrativeHook": "L'accroche suggérée pour le rédacteur",
       "chartInstructions": [
-        { "type": "support_line", "asset": "GC=F", "value": 2900, "label": "Support historique" }
+        { "type": "price_line", "asset": "{SYMBOL}", "value": "{SNAP_PRICE}", "label": "{NOM} spot" },
+        { "type": "resistance_line", "asset": "{SYMBOL}", "value": "{MM_LEVEL}", "label": "Résistance [MM]" },
+        { "type": "chart_comparaison", "asset": "{SYMBOL}", "assets": ["{SYMBOL}"], "label": "J-1 vs J0", "label2": "{CHANGE_J1}% vs {CHANGE_J0}%" },
+        { "type": "causal_chain", "asset": "{SYMBOL}", "detail": "{CAUSE} → {TRANSMISSION} → {EFFET}" },
+        { "type": "scenario_fork", "asset": "{SYMBOL}", "value": "{BULLISH_TARGET}", "value2": "{BEARISH_TARGET}", "label": "Haussier", "label2": "Baissier" }
       ],
       "visualSuggestions": ["idée visuel 1"],
       "risk": "Ce qui pourrait invalider l'analyse",
       "confidenceLevel": "high",
       "sourcesUsed": [
-        { "type": "snapshot_price", "detail": "WTI -11.9%, RSI=70" },
-        { "type": "news_article", "detail": "Trump declares end of Iran conflict" },
-        { "type": "inference", "detail": "Positions leveragées inférées du RSI surachat" }
+        { "type": "snapshot_price", "detail": "{SYMBOL} {CHANGE}%, RSI={RSI_VALUE}" },
+        { "type": "news_article", "detail": "{TITRE_ARTICLE_EXACT}" },
+        { "type": "market_memory", "detail": "zone {MM_LEVEL} [MM], daysOld={JOURS}" }
       ]
     }
   ],

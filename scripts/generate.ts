@@ -68,6 +68,7 @@ async function main() {
   const type = (opts.type as EpisodeType) || "daily_recap";
   const lang = (opts.lang as Language) || "fr";
   const skipTts = !!opts["skip-tts"];
+  const skipRender = !!opts["no-render"];
   // Default to yesterday — videos are morning recaps of the previous trading day
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
@@ -168,8 +169,10 @@ async function main() {
       try {
         const { system, user } = getMarketMemoryHaikuPrompt(memory, update.events);
         const result = await generateStructuredJSON<HaikuEnrichmentResult>(system, user, { role: "fast" });
+        // Ensure symbol is set (LLM sometimes omits it)
+        if (!result.symbol) result.symbol = update.symbol;
         enrichments.push(result);
-        console.log(`    ${update.symbol}: ${result.tactical_note}`);
+        console.log(`    ${update.symbol}: ${result.tactical_note ?? "(no note)"}`);
       } catch (err) {
         console.warn(`    ${update.symbol}: Haiku failed — ${(err as Error).message.slice(0, 60)}`);
       }
@@ -185,6 +188,7 @@ async function main() {
   console.log("\n--- Step 2: Generating script ---");
   const episodeNumber = getNextEpisodeNumber();
   const useLegacy = !!opts["legacy"];
+  const usePipeline = !useLegacy; // Pipeline is default unless --legacy is specified
 
   const prevContext = loadPrevContextFromEpisodes(date);
   console.log(`  PrevContext: ${prevContext.entries.length} épisodes précédents chargés`);
@@ -195,8 +199,8 @@ async function main() {
     console.log("  Mode: LEGACY (monolithe)");
     script = await generateScript(snapshot, { type, lang, episodeNumber, newsDb, prevContext });
   } else {
-    // New pipeline C1→C5
-    console.log("  Mode: PIPELINE C1→C5");
+    // New pipeline C1→C5 (default)
+    console.log("  Mode: PIPELINE C1→C5 (default)");
     const result = await runPipeline({
       snapshot,
       lang,
@@ -241,6 +245,13 @@ async function main() {
   console.log("Manifest updated");
 
   // 5. Render
+  if (skipRender) {
+    console.log("\n--- Step 5: Rendering SKIPPED (--no-render) ---");
+    try { newsDb.close(); } catch {}
+    console.log("\n=== Done! ===");
+    console.log(`Episode #${episodeNumber}: "${script.title}"`);
+    return;
+  }
   console.log("\n--- Step 5: Rendering video ---");
   const outDir = path.resolve(__dirname, "..", "out");
   if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });

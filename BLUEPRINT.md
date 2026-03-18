@@ -1,8 +1,10 @@
-# TradingRecap — Blueprint v2
+# TradingRecap — Blueprint v3
 
 > Ce document est un GUIDE VIVANT, pas une specification figee.
 > Chaque section doit etre questionnee au moment de l'implementation.
 > Avant de coder : "Est-ce que ca sert la qualite de la video finale ? Est-ce coherent avec ce qui existe ?"
+>
+> **Mis a jour : 2026-03-11** — Architecture pipeline multi-couches v3, MarketMemory, separation stricte des responsabilites LLM.
 
 ---
 
@@ -25,7 +27,7 @@
 | Resolution | 1920x1080 (16:9) |
 | FPS | 30 |
 | Codec | h264, CRF 18 |
-| Duree cible | 8-10 minutes (480-600s) |
+| Duree cible | 7-11 minutes (420-660s) |
 | Langue | FR prioritaire, EN pret a activer |
 | Pacing | ~150 mots / 60 secondes |
 
@@ -48,17 +50,17 @@ Debutants et intermediaires en trading/investissement, francophones. Le ton est 
 | Layout engine | `core/layout.ts` | Complet — responsive landscape/portrait |
 | Animations | `core/animations.ts` | Complet — fadeIn/Out, slide, spring, stagger |
 | Yahoo Finance | `data/yahoo.ts` | Phase 1 — 21 assets, candles 1h 2j + 1d 1mois. Phase 2 : 38 assets + multi-timeframe |
-| RSS News | `data/news.ts` | Phase 1 — 8 feeds, dedup, spread horaire, max 20. Phase 2 : ~30 feeds, sans limite |
+| RSS News | `data/news.ts` | Phase 2 — ~30 feeds, sans limite, filtering par asset |
 | FRED client | `data/fred.ts` | Complet — yields 10Y, 2Y, spread (graceful degradation) |
 | Finnhub client | `data/finnhub.ts` | Complet — earnings calendar (eco calendar = plan payant) |
-| FMP client | `data/fmp.ts` | Complet — top movers gainers/losers (plan payant requis) |
-| Sentiment client | `data/sentiment.ts` | Complet — Alternative.me F&G + CoinGecko BTC dom + trending |
+| Finnhub News | `data/finnhub.ts` | Complet — news, earnings calendar, sentiment |
+| COT positioning | `data/cot.ts` | Complet — CFTC COT data + positioning analyzer |
 | Snapshot orchestrateur | `data/market-snapshot.ts` | Complet — 7 fetchers paralleles, enriched snapshot |
 | LLM client | `ai/llm-client.ts` | Complet — OpenRouter, 4 modeles free, retry |
-| Script generator | `ai/script-generator.ts` | Complet — formatage snapshot + appel LLM |
-| Prompt daily recap | `ai/prompts/daily-recap.ts` | Complet — FR/EN, schema JSON |
+| Script generator | `ai/script-generator.ts` | Complet — thématique v3, mémoire contextuelle dégradée 15j |
+| Prompt daily recap | `ai/prompts/daily-recap.ts` | Complet — FR/EN, schema JSON, structure 6-10 sections (no previously_on) |
 | Episode history | `ai/episode-history.ts` | Complet — manifest R/W |
-| 7 scenes Remotion | `remotion-app/scenes/*` | Complet — Intro, MarketOverview, ChartDeepDive, News, Predictions, PreviouslyOn, Outro |
+| 6 scenes Remotion | `remotion-app/scenes/*` | Complet — Intro, MarketOverview, ChartDeepDive, News, Predictions, Outro |
 | 4 composants shared | `remotion-app/scenes/shared/*` | Complet — AssetCard, AnimatedText, Sparkline, TransitionWipe |
 | Pipeline full | `scripts/generate.ts` | Complet — fetch → script → render |
 | Prompt Studio UI | `scripts/prompt-studio.ts` | Complet — web UI port 3030 |
@@ -66,7 +68,16 @@ Debutants et intermediaires en trading/investissement, francophones. Le ton est 
 | Knowledge: analyse technique | `ai/knowledge/technical-analysis.md` | Complet — EMA, RSI, S/R, volume, ATH, combinaisons |
 | Knowledge: intermarche | `ai/knowledge/intermarket.md` | Complet — correlations, regimes, decorrelations |
 | Knowledge: macro | `ai/knowledge/macro-indicators.md` | Complet — VIX, yields, DXY, F&G, events eco |
-| Knowledge: narration | `ai/knowledge/narrative-patterns.md` | Complet — 5 patterns, structure, criteres qualite |
+| Knowledge: narration | `ai/knowledge/narrative-patterns.md` | Complet — 7 patterns (A-G), structure thématique v3, critères qualité |
+| Knowledge: geopolitics | `ai/knowledge/geopolitics.md` | Complet — géopolitique, sanctions, tensions |
+| Knowledge: central-banks | `ai/knowledge/central-banks.md` | Complet — banques centrales, politiques monétaires |
+| Knowledge: asset-profiles | `ai/knowledge/asset-profiles.md` | Complet — profils 763 sociétés, secteurs, caractéristiques |
+| Knowledge: COT patterns | `ai/knowledge/cot-positioning.md` | Complet — positionnement CFTC, contrarian signals |
+| Knowledge: tone-references | `ai/knowledge/tone-references.md` | Complet — registre de ton, transitions, expressivité |
+| Knowledge loader | `ai/knowledge-loader.ts` | Complet — 3-tier injection (always/conditional/filtered) |
+| Editorial score | `ai/editorial-score.ts` | Complet — drama score, impact score, 52-week contextual |
+| News selector | `ai/news-selector.ts` | Complet — sélection intelligente par relevance asset |
+| Company profiles | `data/company-profiles.ts` | Complet — profils 763 stocks FMP |
 
 ### Ce qui est STUBBE
 
@@ -74,118 +85,229 @@ Debutants et intermediaires en trading/investissement, francophones. Le ton est 
 |-----------|---------|------|
 | Calendrier economique | `data/calendar.ts` | Delegue a Finnhub — retourne [] si pas de cle ou plan free |
 | Prompt chart analysis | `ai/prompts/chart-analysis.ts` | Texte placeholder |
-| Prompt previously-on | `ai/prompts/previously-on.ts` | Texte placeholder |
 
 ### Ce qui N'EXISTE PAS encore (a construire)
 
 - ~~Enrichissement data (CoinGecko, FRED, Fear&Greed, Finnhub calendar, calculs techniques)~~ **FAIT**
-- Knowledge loader (`knowledge-loader.ts` — selectionne et injecte les fiches pertinentes)
-- Prompt Opus v2 (persona, compliance, structure narrative)
-- EpisodeMemory (continuite inter-episodes)
-- **News Memory** (`@yt-maker/memory` — tagging LLM, SQLite index, research brief agentic) — voir Bloc D2
-- Types enrichis (EnrichedSnapshot, EnrichedEpisodeScript)
+- ~~Knowledge loader (`knowledge-loader.ts` — selectionne et injecte les fiches pertinentes)~~ **FAIT**
+- ~~Fiches Knowledge: central-banks, asset-profiles~~ **FAIT**
+- **Pipeline multi-couches C1→C10** (refactoring majeur du script-generator.ts — voir Bloc C)
+  - C1 prompt editorial (Haiku) + `editorial_plan.json`
+  - C2 prompt analytique (Sonnet) + `analytical_brief.json`
+  - C3 prompt narratif (Opus) + `episode_draft.json`
+  - C4 validation (code + Haiku) avec boucle max 2 iterations
+  - C5 direction globale (Sonnet) + `episode_directed.json`
+  - C6→C10 prompts production (Haiku/Sonnet selon couche)
+- **MarketMemory** (`@yt-maker/ai/market-memory/`)
+  - JSONs par actif (`data/market-memory/{symbol}.json`)
+  - Détection événements zones (code pur) : TOUCH/REJET/CASSURE/PULLBACK_TENU/PULLBACK_RATE
+  - Calcul indicators_daily (pandas-ta) : bb_width_pct_rank, mm20_slope_deg, atr_ratio, volume_ratio_20d
+  - Enrichissement soir Haiku (conditionnel, ~4-8 actifs)
+  - Job hebdomadaire Sonnet (zones, impression, market_weekly_brief.json)
+- **EpisodeMemory** (continuite inter-episodes) — mémoire contextuelle dégradée 15j PARTIELLEMENT FAIT
+- **NewsMemory** (`@yt-maker/ai/memory/` — tagging rules-based, SQLite FTS5, research context) — voir Bloc D2
+- Types enrichis (EnrichedSnapshot, EnrichedEpisodeScript, editorial_plan, analytical_brief, episode_directed)
+- Fiches Knowledge manquantes (seasonal-patterns)
 - Scenes Remotion v2 (ColdOpen, Dashboard, Correlation, Macro, Zones, Recap)
 - Composants visuels (HeatmapGrid, Gauge, ChartOverlay, LevelAnnotation, etc.)
-- TTS (ElevenLabs)
-- SEO generator
+- TTS (ElevenLabs + C6 Haiku adaptation + Whisper sous-titres)
+- SEO generator (C10 Haiku)
 - Pipeline resilience (fallbacks, retry, notifications)
 - Automation (cron, upload YouTube)
 - Assets library (SVGs)
-- Thumbnail generator
-- Quality gate
+- Thumbnail generator (C9 Haiku + Flux A/B)
+- Quality gate (code + C4 Haiku)
 
 ### Bugs et dettes connues
 
-- `PredictionsScene.tsx` : labels de confiance hardcodes en francais ("HAUTE", "MOYENNE") — devrait utiliser `lang`
-- `PreviouslyOnScene.tsx` : titre hardcode "Precedemment..." — idem
 - `CLAUDE.md` : dit "Gemini 2.0 Flash" mais on utilise OpenRouter multi-modeles — a corriger
 - **BLOQUANT** : pas de validation du JSON retourne par le LLM — un JSON malformed crash le pipeline.
   Fix : ajouter validation zod/ajv + retry si malformed. Priorite 0 avant toute autre implementation.
+- **DETTE ARCHITECTURE** : `script-generator.ts` est un LLM monolithique (1 appel Opus).
+  A refactoriser en pipeline C1→C5 lors du Bloc C. Ne pas ajouter de features au monolithe en attendant.
 
 ---
 
 ## 3. Architecture cible
 
-### Pipeline complet (vision finale)
+### Pipeline complet — 10 couches, 9 phases (vision finale v3)
+
+> **Principe fondateur** : LLM uniquement là où le code est insuffisant.
+> Chaque couche a UNE responsabilité. Aucun LLM ne fait deux choses à la fois.
+> La séparation éditorial / analytique / narratif / validation est NON NÉGOCIABLE.
 
 ```
-FETCH (parallele)                    ENRICHMENT (local)              LLM CHAIN (sequentiel)
-┌─────────────────┐                 ┌──────────────────┐
-│ Yahoo (38 assets│──┐              │ Multi-timeframe  │
-│   multi-TF)     │  │              │   10y/3y/1y      │
-│ Yahoo batch     │──┤              │ Drama Score      │
-│   (763 actions) │  │              │ Support/Resist   │
-│ RSS (~30 feeds) │──┤              │ Correlations     │
-│ Finnhub news    │──┼─→ Snapshot ──┼─→ Volume anomaly ┼─→ Enriched
-│ Finnhub earnings│──┤              │ Trend direction  │  Snapshot
-│ FRED            │──┤              │ ATH/ATL detect   │     │
-│ CoinGecko       │──┤              │ Stock screening  │     │
-│ Alternative.me  │──┤              │ Mover flagging   │     │
-│ Supabase cal.   │──┘              └──────────────────┘     │
-                                                              │
-                  ┌───────────────────────────────────────────┤
-                  │                                           │
-                  ▼                                           ▼
-         ┌────────────────┐                          ┌────────────────────┐
-         │ NEWS MEMORY    │                          │ 1. Haiku: tag news │
-         │ (SQLite+FTS5)  │◄─── store tagged news ──│    (batch, ingest) │
-         │ articles_fts   │                          └────────────────────┘
-         │ article_assets │                                   │
-         │ article_themes │                                   ▼
-         └───────┬────────┘                          ┌────────────────────┐
-                 │                                   │ 2. Haiku: research │
-                 │  query by asset/theme/FTS         │    (build brief)   │
-                 └──────────────────────────────────→│                    │
-                                                     └─────────┬──────────┘
-                                                               │
-                                                        ResearchBrief
-                                                               │
-                                    ┌──────────────────┐       │
-                                    │ Knowledge Base   │───┐   │
-                                    │ + EpisodeMemory  │   │   │
-                                    └──────────────────┘   │   │
-                                                           ▼   ▼
-                                                     ┌────────────────────┐
-                                                     │ 3. Opus: script    │
-                                                     │    (enriched ctx)  │
-                                                     └─────────┬──────────┘
-                                                               │
-                                                     ┌────────────────────┐
-                                                     │ 4. Haiku: SEO      │
-                                                     └─────────┬──────────┘
-                                                               ▼
-                                                     EnrichedEpisodeScript
-                                                               │
-                                                               ▼
-                                                     ┌────────────────┐
-                                                     │ TTS ElevenLabs │
-                                                     └───────┬────────┘
-                                                             │
-                                                             ▼
-                                                     ┌────────────────┐
-                                                     │ Remotion Render │
-                                                     └───────┬────────┘
-                                                             │
-                                                             ▼
-                                                     ┌────────────────┐
-                                                     │ Quality Gate   │
-                                                     └───────┬────────┘
-                                                             │
-                                                             ▼
-                                                     ┌────────────────┐
-                                                     │ Upload YouTube │
-                                                     │ + SEO + Notif  │
-                                                     └────────────────┘
+P0 — INGESTION (5h45, code pur, parallèle)
+┌──────────────────────────────────────────────────────────────────┐
+│ Yahoo (38 assets multi-TF) │ RSS ~30 feeds │ Finnhub news/earnings│
+│ FRED yields │ CoinGecko │ Alternative.me F&G │ Supabase cal. eco  │
+│ MarketMemory JSONs par actif (zones S/R + last_events)           │
+│ EpisodeMemory J-1 à J-5                                          │
+└──────────────────────────────┬───────────────────────────────────┘
+                               │ snapshot.json
+                               ▼
+P1 — PRÉ-FILTRAGE MÉCANIQUE (code pur, ~5s)
+┌──────────────────────────────────────────────────────────────────┐
+│ Seuils déterministes — score numérique par actif                 │
+│ variation >2% │ volume >150% │ cassure EMA │ RSI <25/>75         │
+│ earnings beat/miss >10% │ F&G <10/>90 │ événement zone MM détecté│
+│ TOUS les actifs passent à P2 même score=0                        │
+│ (continuités narratives J-1 non détectables mécaniquement)       │
+└──────────────────────────────┬───────────────────────────────────┘
+                               │
+                               ▼
+P2 — SÉLECTION ÉDITORIALE (C1 — Haiku, ~25s)
+┌──────────────────────────────────────────────────────────────────┐
+│ RÔLE UNIQUE : décider ce que le code ne peut pas décider         │
+│ • News vraiment liée à un actif ? (pas juste co-occurrence)      │
+│ • Continuité narrative J-1 à exploiter ?                         │
+│ • Angle éditorial du jour ?                                       │
+│ Attribution : DEEP / FOCUS / FLASH / skip                        │
+│ Ordre narratif global                                            │
+│ Reçoit : market_weekly_brief.json (Bloc MarketMemory)            │
+│ RÈGLE : si actif classé DEEP → matière à chaîne causale garantie │
+│ Pas de boucle retour P3→P2                                       │
+└──────────────────────────────┬───────────────────────────────────┘
+                               │
+                               ▼
+P3 — ANALYSE ANALYTIQUE (C2 — Sonnet, ~60s)
+┌──────────────────────────────────────────────────────────────────┐
+│ RÔLE UNIQUE : produire la matière analytique complète            │
+│ • Chaîne causale complète par actif sélectionné                  │
+│ • Scénarios haussier/baissier CHIFFRÉS                           │
+│ • Risque d'invalidation explicite                                │
+│ • Continuité J-1 explicite (via EpisodeMemory + MarketMemory)    │
+│ • chart_instructions niveau SÉMANTIQUE                           │
+│   ("afficher support 8400", "marquer cassure EMA21")             │
+│   PAS de timing vidéo (décidé en P6)                             │
+│ Reçoit : Knowledge Base (intermarket, macro, AT, asset-profiles) │
+│ Reçoit : MarketMemory JSONs des actifs DEEP/FOCUS                │
+└──────────────────────────────┬───────────────────────────────────┘
+                               │
+                               ▼
+P4 — RÉDACTION NARRATIVE (C3 — Opus, ~90s)
+┌──────────────────────────────────────────────────────────────────┐
+│ RÔLE UNIQUE : écrire la narration                                │
+│ • Ne décide PAS quoi couvrir (C1 l'a fait)                       │
+│ • Ne décide PAS comment analyser (C2 l'a fait)                   │
+│ • Varie les formulations vs EpisodeMemory J-3                    │
+│ • Ton analytique strict, jamais générique                        │
+│ • Few-shot exemples Bondain/Zonebourse injectés (registre oral)  │
+│ Output → episode_draft.json                                      │
+└──────────────────────────────┬───────────────────────────────────┘
+                               │
+                               ▼
+P5 — VALIDATION (code + C4 — Haiku, ~20s) ← SEULE BOUCLE DU PIPELINE
+┌──────────────────────────────────────────────────────────────────┐
+│ CODE (mécanique) :                                               │
+│   • drama_score absent dans le script ?                          │
+│   • durées dans les specs (7-11 min total) ?                     │
+│   • disclaimer absent de la narration ?                          │
+│   • chiffres cohérents avec snapshot (±1%) ?                     │
+│   • répétitions de formulations vs J-3 ?                        │
+│ C4 HAIKU (sémantique) :                                          │
+│   • recommandation directe déguisée ?                            │
+│   • ton "retail" glissé dans la narration ?                      │
+│   • cohérence temporelle ambiguë ?                               │
+│ Max 2 itérations → sinon alerte Discord + review manuelle        │
+└──────────────────────────────┬───────────────────────────────────┘
+                               │ episode_draft validé
+                               ▼
+P6 — DIRECTION GLOBALE (C5 — Sonnet, ~35s) — POINT DE SYNCHRONISATION
+┌──────────────────────────────────────────────────────────────────┐
+│ RÔLE UNIQUE : seule couche qui voit l'épisode ENTIER             │
+│ • Arc de tension global (montée → pic → respiration → closing)   │
+│ • Transitions entre segments (type, durée ms, effet sonore)      │
+│   depuis liste Remotion disponible injectée dans le prompt       │
+│ • Mood musical (tag parmi liste prédéfinie)                      │
+│ • Timing des chart_instructions (horodatées par rapport à l'audio)│
+│ • Thumbnail moment (segment à CTR max)                           │
+│ Output → episode_directed.json (fichier maître Remotion)         │
+└──────────────────┬───────────────────────────────────────────────┘
+                   │ episode_directed.json
+                   ▼
+P7 — PRODUCTION PARALLÈLE (~4 min, 3 branches simultanées)
+┌─────────────────┬──────────────────┬──────────────────────────────┐
+│ BRANCHE AUDIO   │ BRANCHE VISUELLE │ BRANCHE THUMBNAIL + MUSIQUE  │
+│                 │                  │                              │
+│ C6 Haiku        │ Code : routage   │ C9 Haiku :                   │
+│ adaptation TTS  │ ticker financier │ 2 prompts Flux variants A/B  │
+│ (raccourcit     │ → Remotion       │ depuis thumbnail_moment (C5) │
+│ phrases,        │ conceptuel       │                              │
+│ supprime refs   │ → C7 Sonnet DA   │ Flux : génération            │
+│ visuelles,      │                  │ + overlay titre/chiffre      │
+│ SSML pauses)    │ C7 Sonnet DA :   │ en post-traitement code      │
+│                 │ direction artis- │                              │
+│ Config ElevenL. │ tique par segm.  │ Code : sélection musique     │
+│ statique par    │ dans charte fixe │ bibliothèque par mood tag     │
+│ type segment :  │ voit TOUS les    │ fade calculé depuis durée    │
+│ DEEP 0.75/0.92  │ segments en 1    │ WAV réelle                   │
+│ FLASH 0.65/1.02 │ appel           │                              │
+│                 │                  │ A/B test YouTube planifié    │
+│ ElevenLabs :    │ C8 Haiku :       │ J+2 auto (500 impressions)   │
+│ WAV horodatés   │ prompts Midj/    │                              │
+│ = timing maître │ Flux optimisés   │                              │
+│                 │ (switching para- │                              │
+│ Whisper :       │ métrable sans    │                              │
+│ SRT + ASS auto  │ toucher LLM)     │                              │
+│ dictionnaire    │                  │                              │
+│ custom tickers  │                  │                              │
+└─────────────────┴──────────────────┴──────────────────────────────┘
+                               │ WAV réels = timing maître
+                               ▼
+P8 — MONTAGE (Remotion + FFmpeg, ~2-3 min)
+┌──────────────────────────────────────────────────────────────────┐
+│ Remotion consomme episode_directed.json comme référence maître   │
+│ WAV réels = timing (ignore durées estimées de C3)                │
+│ Graphiques prix animés depuis chart_instructions (jamais IA gen.)│
+│ QC auto : durée 7-11 min, sync <50ms, -14 LUFS                   │
+│ Short auto : segment drama_score max + cold open, format 9:16    │
+└──────────────────────────────┬───────────────────────────────────┘
+                               │
+                               ▼
+P9 — SEO & DISTRIBUTION (C10 — Haiku + code, ~30s)
+┌──────────────────────────────────────────────────────────────────┐
+│ ⚠️ DÉPENDANCE CACHÉE : chapitres horodatés = durées WAV réelles  │
+│ P9 ne peut pas tourner COMPLÈTEMENT en parallèle de P8           │
+│ C10 peut commencer titre+tags+thread X pendant P8                │
+│ description+chapitres attendent fin render                       │
+│ Code : upload YouTube + Shorts                                   │
+│ EpisodeMemory sauvegardée AVANT upload                           │
+│ Notification Discord (succès/warning/erreur)                     │
+└──────────────────────────────────────────────────────────────────┘
 ```
 
-### Strategie LLM
+**Coût LLM total estimé : ~0.39$/épisode**
+| Couche | Modèle | Coût ~estimé |
+|--------|--------|-------------|
+| C1 Sélection éditoriale | Haiku | ~0.01$ |
+| C2 Analyse analytique | Sonnet | ~0.04$ |
+| C3 Rédaction narrative | Opus | ~0.15$ |
+| C4 Validation | Haiku | ~0.01$ |
+| C5 Direction globale | Sonnet | ~0.04$ |
+| C6 Adaptation TTS | Haiku | ~0.01$ |
+| C7 Direction artistique visuelle | Sonnet | ~0.04$ |
+| C8 Prompts image | Haiku | ~0.01$ |
+| C9 Prompts thumbnail | Haiku | ~0.01$ |
+| C10 SEO | Haiku | ~0.01$ |
+| **Total** | | **~0.33-0.45$/épisode** |
 
-| Tache | Production | Dev/Test | Raison |
-|-------|-----------|----------|--------|
-| Formatage data | Claude Haiku | OpenRouter free | Mecanique, pas de creativite |
-| Analyse + knowledge | Claude Sonnet | OpenRouter free | Raisonnement marche |
-| **Script narratif** | **Claude Opus** | OpenRouter free | Coeur du produit |
-| SEO / thumbnails | Claude Haiku | OpenRouter free | Mecanique |
+### Stratégie LLM — Principe de séparation stricte
+
+> **Règle absolue** : un LLM = une responsabilité. Ne jamais combiner "décider quoi couvrir" et "écrire la narration" dans le même appel.
+
+| Couche | Rôle | Modèle | Pourquoi ce modèle |
+|--------|------|--------|-------------------|
+| C1 | Sélection éditoriale | Haiku | Décision binaire rapide, pas de créativité |
+| C2 | Analyse technique + causale | Sonnet | Raisonnement structuré, chiffres |
+| C3 | Rédaction narrative | **Opus** | Cœur du produit — qualité narrative non négociable |
+| C4 | Validation sémantique | Haiku | Détection patterns, pas de créativité |
+| C5 | Direction globale | Sonnet | Vision d'ensemble + cohérence arc narratif |
+| C6 | Adaptation vocale TTS | Haiku | Transformation mécanique texte→audio |
+| C7 | Direction artistique | Sonnet | Cohérence visuelle multi-segments |
+| C8 | Prompts image | Haiku | Optimisation mécanique de prompts |
+| C9 | Prompts thumbnail | Haiku | Variants A/B mécaniques |
+| C10 | SEO | Haiku | Tâche mécanique, coût négligeable |
 
 ### LLM Routing — Architecture du client
 
@@ -205,9 +327,9 @@ Les deux APIs acceptent `system` + `messages`. Anthropic a un format legerement 
 
 | Role | Anthropic | OpenRouter (free) | Usage |
 |------|-----------|-------------------|-------|
-| `fast` | claude-haiku-4-5-20251001 | qwen/qwen3-4b:free | Formatage, SEO, taches mecaniques |
-| `balanced` | claude-sonnet-4-6 | qwen/qwen3-235b-a22b-thinking-2507 | Analyse, knowledge loading |
-| `quality` | claude-opus-4-6 | meta-llama/llama-3.3-70b-instruct:free | Script narratif (coeur produit) |
+| `fast` | claude-haiku-4-5-20251001 | qwen/qwen3-4b:free | C1, C4, C6, C8, C9, C10 |
+| `balanced` | claude-sonnet-4-6 | qwen/qwen3-235b-a22b-thinking-2507 | C2, C5, C7 |
+| `quality` | claude-opus-4-6 | meta-llama/llama-3.3-70b-instruct:free | C3 uniquement |
 
 Le role par defaut est `quality` (on veut le meilleur script possible).
 
@@ -223,11 +345,7 @@ generateStructuredJSON<T>(systemPrompt, userMessage, { role: "fast" })  → role
 
 Pas de SDK externe. Les deux providers sont appeles via `fetch()` natif. La seule difference est le format du body et les headers.
 
-> QUESTION : faut-il pouvoir forcer le provider par appel (ex: toujours OpenRouter pour le SEO meme en prod) ?
-> Recommandation : non en V1. Si le cout Haiku est negligeable (~0.01$/appel), autant rester coherent sur un seul provider en prod.
-
-**Cout production estime** : ~0.80-1.00 EUR/video (Haiku 2x + Sonnet 1x + Opus 1x).
-
+### Monorepo
 ### Monorepo
 
 ```
@@ -235,12 +353,14 @@ packages/
   core/       → Types, brand, layout, animations (dependance de tout)
   data/       → Fetch + enrichissement (Yahoo multi-TF, FRED, Finnhub, CoinGecko, sentiment, ~30 RSS,
                 stock screening, candle cache)
-  ai/         → LLM client, prompts, knowledge base, episode memory, SEO,
-                news memory (SQLite+FTS5, tagging rules, research context), causal analysis
+  ai/         → LLM client, prompts C1-C10, knowledge base, episode memory, SEO,
+                news memory (SQLite+FTS5, tagging rules, research context), causal analysis,
+                market-memory (JSONs par actif, enrichissement soir, job hebdo Sonnet)
   remotion-app/ → Scenes, composants, compositions
 scripts/      → CLI (generate, fetch, script, render, prompt-studio)
 knowledge/    → Fiches markdown d'analyse fondamentale
-data/         → Snapshots, scripts, episodes, news-memory.db, indices/*.json, candles/, logs (gitignore)
+data/         → Snapshots, scripts, episodes, news-memory.db, market-memory/*.json,
+                indices/*.json, candles/, logs (gitignore)
 assets/       → SVGs, backgrounds, icones
 ```
 
@@ -361,7 +481,7 @@ Les DECORRELATIONS sont plus interessantes que les correlations normales (or + d
 
 ### 5.4 Criteres de qualite du script
 
-**Bloquants** (fail = re-generation) : zero terme interdit AMF, disclaimer present, duree 480-600s, ratio mots correct, suivi J-1 present, cold open specifique, pas de liste dans le recit.
+**Bloquants** (fail = re-generation) : zero terme interdit AMF, disclaimer present, duree 390-520s, ratio mots correct, références au passé intégrées naturellement dans les segments (si mémoire contextuelle disponible), cold open specifique, pas de liste dans le recit.
 
 **Qualitatifs** (scoring) : connecteurs causaux ("parce que" pas "et"), specificite (chiffres precis), conditionnel, liens intermarche, engagement (questions, suspense), transitions fluides, variete de structure.
 
@@ -1167,110 +1287,169 @@ Fiches markdown ecrites + `loadKnowledge(snapshot: EnrichedSnapshot): string` qu
 
 ---
 
-### Bloc C — Prompt Engineering v2
+### Bloc C — Prompts multi-couches (C1 → C10)
 
-**Dependances** : Bloc A (EnrichedSnapshot) + Bloc B (knowledge base)
+**Dependances** : Bloc A (EnrichedSnapshot) + Bloc B (knowledge base) + Bloc D (EpisodeMemory) + Bloc MarketMemory
 **Impact** : c'est LE coeur du produit — la qualite du script fait ou defait la video
 
-#### C.1 Structure du system prompt
+> **DÉCISION FONDAMENTALE v3** : le Bloc C n'est plus UN prompt Opus monolithique.
+> C'est 5 prompts sequentiels avec responsabilites strictement separees (C1→C5),
+> plus 5 prompts production (C6→C10). Chaque couche recoit exactement ce dont elle a besoin.
 
-Le prompt est organise en blocs clairs, chacun avec un role precis :
+#### C.1 — C1 : Prompt sélection éditoriale (Haiku, ~25s)
 
-| Bloc | Role | Tokens ~estimes |
-|------|------|----------------|
-| Identite & persona | Definir le narrateur, son ton, ses expressions | 200 |
-| Compliance AMF | Regles de langage, vocabulaire autorise/interdit | 300 |
-| Structure narrative | Template de script, drama scores, budget temps | 400 |
-| Obligations par episode | Ce qui doit apparaitre (suiviJ1, surprise, CTA) | 200 |
-| Knowledge context | Injecte par le loader — varie chaque jour | 500-1500 |
-| Episode memory | Contexte des 5 derniers episodes | 300-800 |
-| Format de sortie | Schema JSON exact attendu | 500 |
+**Rôle unique** : décider ce que le code ne peut pas décider.
 
-**Total prompt** : ~2500-4000 tokens selon le jour.
+Input reçu :
+- Snapshot P1 annoté (scores numériques par actif)
+- market_weekly_brief.json (MarketMemory hebdomadaire)
+- EpisodeMemory J-1 à J-3 (résumé des angles couverts)
 
-> QUESTION : avec un prompt de 4000 tokens + un user message de ~2000 tokens (snapshot),
-> et une reponse de ~3000 tokens (script), on est a ~9000 tokens total.
-> Opus peut gerer ca facilement. Mais il faut surveiller le cout.
+Ce que C1 décide :
+- Cette news est-elle vraiment liée à cet actif ? (pas juste co-occurrence de mots)
+- Y a-t-il une continuité narrative depuis J-1 à exploiter ?
+- Quel angle éditorial aujourd'hui ? (rupture de tendance, confirmation, surprise)
+- Attribution de chaque actif : `DEEP` / `FOCUS` / `FLASH` / `skip`
+- Ordre narratif global (quel actif ouvre, lequel clôture)
 
-#### C.2 Persona narrateur
+**Règle critique** : si un actif est classé DEEP, cela garantit qu'il y a matière à chaîne causale. C1 ne classe pas DEEP un actif sans raison narrative solide.
 
-```
-Tu es [NOM], analyste de marche independant, 10 ans d'experience.
-Tu tutoies ton audience. Ton analyse est directe, jamais generique.
-Tu fais des liens entre les marches — tu ne fais JAMAIS de liste.
-Tu crees du suspense. Phrases courtes, rythmees. Maximum 15 mots en analyse technique.
-Tu vulgarises les termes techniques en UNE phrase naturelle.
-Tu as des expressions signatures : [a definir — contribue a l'identite de la chaine]
-```
+Output → `editorial_plan.json` : liste ordonnée avec type + raison éditoriale par actif.
 
-> QUESTION : quel nom pour le persona ? Ca contribue au branding.
-> Il faut un nom qui sonne analyste FR, memorable, coherent avec "TradingRecap".
+#### C.2 — C2 : Prompt analyse analytique (Sonnet, ~60s)
 
-#### C.3 Structure narrative dynamique
+**Rôle unique** : produire la matière analytique. Ne pas écrire le script.
 
-Le LLM recoit :
-- Les drama scores de chaque asset
-- Un budget temps total (480-600s)
-- Les themes du jour (risk-on/off, event macro, breakout, etc.)
+Input reçu :
+- editorial_plan.json (actifs DEEP/FOCUS/FLASH uniquement)
+- MarketMemory JSONs pour chaque actif sélectionné (zones, last_events, regime)
+- Knowledge Base sélectionnée (intermarket, AT, macro, asset-profiles pertinents)
+- EpisodeMemory (niveaux mentionnés J-1 à J-5)
+- CausalBrief (Bloc A2)
 
-Il decide :
-- Le nombre de deep dives (1-3) et leur duree
-- L'angle du "recit du jour" (pas une liste, une HISTOIRE)
-- L'ordre des segments (variable selon contexte)
+Ce que C2 produit pour chaque actif DEEP :
+- Chaîne causale complète ("or monte PARCE QUE DXY faiblit PARCE QUE...")
+- Scénario haussier chiffré avec niveau d'invalidation
+- Scénario baissier chiffré avec niveau d'invalidation
+- Continuité J-1 explicite ("niveau 8400 testé hier, maintenant cassé")
+- chart_instructions SÉMANTIQUES (pas de timing — décidé en C5) :
+  - "afficher support 8400 avec label 'support J-1'"
+  - "marquer la zone de cassure EMA21"
+  - "overlay volume avec barre rouge sur la bougie de rupture"
 
-Segments disponibles :
+Ce que C2 ne fait PAS : écrire la narration. Seulement la matière.
+
+Output → `analytical_brief.json`
+
+#### C.3 — C3 : Prompt rédaction narrative (Opus, ~90s)
+
+**Rôle unique** : écrire. Ne décide rien, n'analyse rien.
+
+Input reçu :
+- editorial_plan.json (structure + ordre)
+- analytical_brief.json (toute la matière analytique)
+- EpisodeMemory J-3 (formulations déjà utilisées à éviter)
+- Few-shot exemples Bondain/Zonebourse (3-4 extraits injectés pour registre oral naturel)
+- Compliance AMF (vocabulaire interdit/autorisé)
+
+Ce que C3 écrit :
+- Cold open (1 phrase choc, élément date-spécifique, jamais générique)
+- Narration de chaque segment dans l'ordre défini par C1
+- Variation de formulations vs J-3 (pas "on observe que" 3 fois de suite)
+- Ton oral naturel, tutoiement, phrases courtes
+- Respect strict du conditionnel AMF
+
+Ce que C3 ne décide PAS :
+- L'ordre des segments (C1)
+- Les chiffres (C2)
+- Les transitions (C5)
+- Les timings (C5)
+
+Output → `episode_draft.json`
+
+#### C.4 — C4 : Prompt validation (Haiku, ~20s) — SEULE BOUCLE
+
+**Rôle unique** : détecter les violations. Max 2 passes.
+
+Check CODE (avant C4, mécanique) :
+- Drama score absent dans sections qui devaient en avoir
+- Durées totales hors specs (7-11 min)
+- Disclaimer absent
+- Chiffres incohérents avec snapshot (±1%)
+- Répétitions de formulations vs J-3
+
+Check C4 HAIKU (sémantique) :
+- Recommandation directe déguisée ("ce niveau est une excellente entrée...")
+- Ton "retail" glissé ("cette opportunité ne se représente pas...")
+- Cohérence temporelle ambiguë (mélange ouverture EU / clôture US sans préciser)
+- Vocabulaire AMF interdit passé entre les mailles du code
+
+Si violations → retour à C3 avec liste précise des problèmes.
+Max 2 itérations → sinon alerte Discord + review manuelle.
+
+#### C.5 — C5 : Prompt direction globale (Sonnet, ~35s)
+
+**Rôle unique** : mettre en scène l'épisode entier. Seul LLM qui voit tout.
+
+Input reçu :
+- episode_draft.json validé (épisode complet)
+- Liste des transitions Remotion disponibles (injectée dans le prompt)
+- Liste des tags musicaux disponibles
+- Drama scores par segment
+
+Ce que C5 décide :
+- Arc de tension global : montée → pic → respiration → closing
+- Transitions entre chaque segment (type, durée ms, effet sonore) depuis la liste Remotion
+- Mood musical global → tag parmi liste prédéfinie → transmis à la branche musique
+- Timing des chart_instructions (horodatées par rapport à la durée audio estimée)
+- Thumbnail moment : quel segment a le plus fort potentiel CTR, quelle frame
+
+Output → `episode_directed.json` (fichier maître consommé par Remotion en P8)
+
+#### C.6 — C10 : Prompts production (voir Pipeline P7 et P9)
+
+Ces couches sont documentées dans les Blocs F et G.
+Résumé :
+- C6 (Haiku) : adaptation TTS (raccourcit phrases, SSML pauses, supprime refs visuelles)
+- C7 (Sonnet) : direction artistique visuelle (cohérence globale en 1 appel pour tous segments)
+- C8 (Haiku) : prompts Midjourney/Flux optimisés (switching paramétrable sans toucher LLM)
+- C9 (Haiku) : 2 prompts Flux variants A/B pour thumbnails depuis thumbnail_moment C5
+- C10 (Haiku) : SEOPackage complet (titre, description, chapitres, tags)
+
+#### C.7 Segments disponibles (inchangés, allocation décidée par C1/C5)
 
 | Segment | Duree | Obligatoire |
 |---------|-------|-------------|
-| Cold open | 5-8s | Oui — UNE phrase choc sur le top mover |
-| Titre anime | 3-5s | Oui |
-| Suivi J-1 | 20-40s | Oui (sauf episode 1) |
-| Recit du jour | 60-90s | Oui — l'HISTOIRE, pas une liste |
-| Dashboard flash | 30-45s | Oui — vue rapide de tous les assets |
-| Deep dive(s) | 60-150s chacun | 1 a 3 selon drama scores |
-| Correlation spotlight | 45-60s | Optionnel — quand correlation notable |
-| Macro & sentiment | 45-60s | Oui si event macro ou shift sentiment |
-| News impact | 30-45s | Oui si news significative |
-| Zones a surveiller | 45-60s | Oui — les 3 niveaux cles du jour |
-| Recap 3 points | 15-20s | Oui |
-| Outro + teaser | 10-15s | Oui — CTA + "demain on surveille..." |
+| Cold open (hook) | 5-10s | Oui — UNE phrase choc |
+| Titre anime (title_card) | 3-5s | Oui |
+| Fil conducteur (thread) | 15-25s | Oui — theme dominant + cascade |
+| Segments thematiques (segment x4-7) | 300-420s total | Oui — DEEP/FOCUS/FLASH |
+| Closing | 20-30s | Oui — retour fil rouge + CTA |
 
-#### C.3b Injection du stockScreen dans le prompt — probleme de densite
+**Note** : La section previously_on/suivi J-1 n'existe plus. Les references au passe s'integrent naturellement dans les segments concernes via la memoire contextuelle.
 
-**Probleme identifie (audit fev. 2026 — comparaison vs Bondin/ZoneBourse) :**
+#### C.8 Injection stockScreen dans le prompt C3 (problème densité — résolution)
 
-Le stockScreen detecte 77 movers par jour mais le prompt n'en injecte que 15 (`slice(0, 15)` dans `formatSnapshotForPrompt`). Meme avec ces 15, le LLM n'en utilise que 2-3 dans le script final. Resultat : une richesse d'information gachee.
+**Probleme identifie (audit fev. 2026)** : le stockScreen detecte 77 movers mais seuls 15 etaient injectes. Le LLM n'en utilisait que 2-3.
 
-Bondin en revanche cite 30+ societes en 9 minutes, dont beaucoup en flux rapide (5-10 secondes chacune). Son format "actu societes" correspond a ce qu'on appelle "dashboard flash" dans notre structure.
+**Solutions implementees dans C2 et C3** :
 
-**Pourquoi le LLM sous-utilise le stockScreen :**
+Solution 1 — C2 remonte les top 5 movers du stockScreen en tête de l'analytical_brief
+- Les top 5 par amplitude → "urgences du jour" avec chaîne causale si disponible
 
-1. Les 15 movers arrivent sous forme de liste a la fin du prompt — apres les 38 assets watchlist, le calendrier, les news. Le LLM a deja "decide" de sa structure narrative avant de les lire.
-2. Le format de chaque ligne est dense (`name (symbol, index): +X% | RSI=Y trend=Z | reason`) mais sans contexte explicite sur pourquoi cela compte editorialement.
-3. Le prompt n'assigne pas de "budget temps" pour le dashboard flash.
-
-**Solutions a implementer dans Bloc C :**
-
-Solution 1 — Remonter le stockScreen en tete du user message (avant la watchlist 38 assets) :
-- Les top 5 movers par amplitude → en evidence comme "urgences du jour"
-- Logique : si Cisco fait -12%, c'est plus important que la watchlist reguliere
-
-Solution 2 — Augmenter le slice de 15 a 30 movers injectes, mais groupes par indice :
+Solution 2 — Slice augmenté à 30 movers dans C2, groupés par indice :
 ```
 ## Top movers par indice (screening 763 actions)
 ### SP500 (top 8 movers)
 ### CAC40 (top 5 movers)
 ### DAX (top 3 movers)
-...
 ```
-Avec une instruction explicite : "Le dashboard flash DOIT mentionner au moins 8 de ces movers en narration rapide (5-8 secondes chacun, comme un flash info)."
 
-Solution 3 — Section "actu societes" separee dans le script (nouveau type de section) :
-Equivalent du bloc "actu societes" de Bondin : 60-90s de narration rapide, 8-12 societes, format "X fait +Y% apres ses resultats / parce que Z".
+Solution 3 — Section "actu societes" dans C3 :
+Segment dédié 60-90s, 8-12 sociétés, format flash info ("X fait +Y% parce que Z").
+Instruction explicite dans C3 : ce segment DOIT mentionner au moins 8 movers en narration rapide.
 
-**Decision : concevoir Solution 2 + Solution 3 lors du Bloc C. Ne pas implementer avant car ca change le format JSON de sortie (nouveau type de section).** En attendant, ajuster le slice de 15 → 25 dans `formatSnapshotForPrompt` comme fix rapide (5 minutes, zero risque).
-
-#### C.4 Type EnrichedEpisodeScript
+#### C.9 Type EnrichedEpisodeScript
 
 Nouveau type dans `core/types.ts` :
 
@@ -1318,12 +1497,11 @@ interface EnrichedEpisodeScript {
 }
 ```
 
-> QUESTION : le champ `variationStructure` de l'ancien blueprint est-il necessaire ?
-> Si le LLM decide deja l'ordre des segments et le nombre de deep dives, c'est redondant.
-> Recommandation : ne pas l'inclure. Laisser le LLM structurer librement dans les sections[].
-
 #### Livrable Bloc C
-Nouveau system prompt complet + type `EnrichedEpisodeScript` dans types.ts + tests via Prompt Studio.
+5 prompts séquentiels C1→C5 + 5 prompts production C6→C10.
+Type `EnrichedEpisodeScript` dans types.ts.
+Tests via Prompt Studio pour chaque couche indépendamment.
+`episode_directed.json` comme contrat d'interface entre C5 et Remotion.
 
 ---
 
@@ -1380,9 +1558,9 @@ interface EpisodeMemory {
 
 #### D.3 Regles
 
-- 5 episodes max en contexte (au-dela = tokens gaspilles pour peu de valeur)
+- 15 episodes max en contexte (degraded: J-1 to J-3 detailed, J-4 to J-7 summary, J-8 to J-15 thread only)
 - Niveaux cles expires apres 10 jours (sauf si retestes)
-- Le suivi J-1 est OBLIGATOIRE — mode degrade si indisponible ("donnees non disponibles")
+- Les references au passe s'integrent naturellement dans les segments (pas de section dediee)
 - Les predictions fausses sont aussi importantes que les correctes
 
 > QUESTION : faut-il un `EpisodeMemory` simplifie pour le Bloc C (prompt) ou est-ce qu'on peut
@@ -1761,6 +1939,153 @@ Integration dans le pipeline generate : fetch → tag & store (code) → researc
 
 ---
 
+### Bloc D3 — MarketMemory (zones techniques + événements prix)
+
+**Dependances** : Bloc A (candles + indicateurs), indépendant de D2
+**Impact** : transforme C2 d'un analyste sans mémoire en desk qui suit chaque actif au quotidien
+**Code** : dans `@yt-maker/ai/market-memory/`
+
+> **DÉCISION v3** : troisième type de mémoire distinct de EpisodeMemory (narrative) et NewsMemory (articles).
+> Un fichier JSON par actif, enrichi chaque soir. Donne à C2 le contexte technique pré-mâché.
+
+#### D3.1 Structure JSON par actif
+
+Fichier : `data/market-memory/{symbol}.json` — un par actif de la watchlist (38 + movers récurrents)
+
+```typescript
+interface AssetMarketMemory {
+  symbol: string
+  context: {
+    regime: "bull" | "bear" | "range"        // calculé code sur EMA + trend
+    regime_since: string                      // date ISO
+    impression: string                        // résumé hebdo Sonnet (job dominical)
+    impression_updated: string               // date dernière MAJ
+  }
+  zones: Array<{                             // 3-5 zones max par actif
+    level: number
+    type: "support" | "resistance" | "pivot"
+    created: string                          // date création
+    age_days: number                         // calculé à la lecture
+    touches: number                          // nb fois testé
+    last_touch: string
+    last_event_type: EventType | null
+    cassure_date: string | null
+    cassure_confirmed: boolean | null        // null = en attente, true/false = résolu
+    last_behavior: string                    // note libre Sonnet
+  }>
+  indicators_daily: {                        // calculés code pur (pandas-ta), zéro lag
+    bb_width_pct: number                     // largeur BB en % du prix
+    bb_width_pct_rank: number                // rang sur 90j (0-100)
+    mm20_slope_deg: number                   // inclinaison MM20 en degrés
+    atr14: number
+    atr90: number                            // ATR 90j pour normalisation
+    atr_ratio: number                        // atr14 / atr90
+    volume_ratio_20d: number                 // volume J / moyenne 20j
+    rsi14: number
+  }
+  last_events: Array<{                       // 5 max, FIFO
+    date: string
+    event_type: EventType
+    detail: string
+  }>
+}
+
+type EventType = "TOUCH" | "REJET" | "CASSURE" | "PULLBACK_TENU" | "PULLBACK_RATE"
+```
+
+#### D3.2 Les 5 types d'événements (détection code pur sur prix brut, zéro lag)
+
+| Événement | Définition code |
+|-----------|----------------|
+| `TOUCH` | prix ±0.3% du level |
+| `REJET` | TOUCH + clôture repart du côté d'origine |
+| `CASSURE` | clôture >1% au-delà du level sur volume_ratio >1.2 → cassure_confirmed = null |
+| `PULLBACK_TENU` | après CASSURE, retour sur level, clôture reste au-delà → confirmed = true |
+| `PULLBACK_RATE` | après CASSURE, retour sur level, clôture repasse → confirmed = false |
+
+> Pas de timeout post-cassure — le code guette indéfiniment, Haiku juge la signification.
+
+#### D3.3 Enrichissement quotidien — Flow soir (après P0)
+
+```
+1. Code : détecter événements sur les zones pour tous les actifs watchlist
+2. Code : calculer indicators_daily (pandas-ta sur candles J)
+3. Filtrage déclenchement Haiku (soir, ~4-8 actifs typiquement) :
+   Déclencheurs ZÉRO LAG (utilisés comme triggers) :
+     - événement détecté sur zone aujourd'hui (principal)
+     - OU variation >1.5×ATR14
+     - OU volume_ratio >1.5
+   Indicateurs BB/ATR/MM (CONTEXTE uniquement, jamais triggers — ils ont du lag)
+4. Haiku (1 appel multi-actifs) : pour chaque actif déclenché
+     - Mettre à jour last_behavior (note libre)
+     - Qualifier cassure_confirmed si applicable
+     - Formuler l'impression tactique
+5. Sauvegarder JSONs mis à jour
+```
+
+**⚠️ Règle critique sur les indicateurs** : bb_width_pct, atr_ratio, mm20_slope sont du CONTEXTE
+injecté dans le prompt Haiku pour qu'il comprenne l'état de l'actif. Ce ne sont JAMAIS des
+déclencheurs d'enrichissement — ils ont du lag (calculés sur candles passées). Seuls les
+événements sur zones et les mouvements prix bruts déclenchent.
+
+#### D3.4 Job hebdomadaire Sonnet (dimanche soir, pipeline séparé)
+
+Input : tous les JSONs watchlist + candles weekly 6 mois.
+
+Actions :
+- Identifier nouvelles zones (pivots weekly/daily significatifs)
+- Supprimer zones obsolètes (cassure confirmed > 3 semaines sans retour)
+- Mettre à jour `impression` et `regime` pour chaque actif
+- Générer `market_weekly_brief.json` (injecté dans C1 chaque matin)
+
+Output : JSONs MAJ + `data/market-memory/market_weekly_brief.json`
+
+#### D3.5 Intégration pipeline
+
+```
+P0 : détecte événements prix brut + calcule indicators_daily
+     → met à jour market-memory/*.json (code pur)
+P1 : score via variation jour + volume (pas indicators laggards)
+P2 (C1) : reçoit market_weekly_brief.json
+           règle anti-répétition via last_event_type
+           ("même event TOUCH sur ce level hier → pas DEEP aujourd'hui")
+P3 (C2) : reçoit JSON complet pour actifs DEEP/FOCUS
+           contexte pré-mâché → chaînes causales plus précises
+```
+
+#### D3.6 Grille d'interprétation indicateurs (dans system prompt Haiku)
+
+| Indicateur | Seuil | Interprétation |
+|------------|-------|----------------|
+| bb_width_pct_rank < 20 | Compression | Mouvement violent imminent (direction inconnue) |
+| mm20_slope_deg > 10° | Tendance forte | Momentum directionnel confirmé |
+| atr_ratio > 1.3 | Volatilité anormale | Journée hors-norme, prudence sur les niveaux |
+| volume_ratio > 1.5 | Participation institutionnelle | Signal significatif |
+| Prix hors BB + volume_ratio > 1.5 | Breakout potentiellement valide | Surveiller confirmation J+1 |
+
+#### D3.7 Scénarios narratifs couverts
+
+| Scénario | Situation | Action pipeline |
+|----------|-----------|-----------------|
+| S1 Rien | Aucun événement | Pas de mention zone dans la narration |
+| S2 Approche | Prix s'approche d'une zone | C1 classe FOCUS si contexte fort |
+| S3 Rejet | REJET détecté | "La résistance à X tient" |
+| S4 Cassure | CASSURE, confirmed=null | "Cassure en cours, confirmation attendue" |
+| S5 Pullback tenu | confirmed=true | "Cassure validée, le niveau devient support" |
+| S6 Pullback raté | confirmed=false | "Faux breakout — piège haussier" |
+| S7 Cassure sans pullback longue | confirmed=null depuis >3 semaines | Job hebdo Sonnet évalue |
+| S8 Stagnation zone | Asset stagne sur une zone | Haiku met à jour last_behavior chaque soir |
+
+#### Livrable Bloc D3
+- `data/market-memory/{symbol}.json` pour les 38 actifs watchlist (init manuel ou script bootstrap)
+- `detectZoneEvents(candles, zones)` : code pur, détection 5 types d'événements
+- `calculateDailyIndicators(candles)` : pandas-ta, zéro lag
+- `enrichMarketMemory(snapshot)` : flow soir (code + Haiku conditionnel)
+- `weeklyMarketMemoryJob()` : job Sonnet dominical
+- `loadMarketMemoryForAssets(symbols[])` : lecture rapide pour C2
+
+---
+
 ### Bloc E — Scenes Remotion v2
 
 **Dependances** : Bloc C (les types enrichis definissent ce que les scenes doivent afficher)
@@ -1775,7 +2100,7 @@ Integration dans le pipeline generate : fetch → tag & store (code) → researc
 | ChartDeepDiveScene | Ajouter niveaux S/R annotes, zones colorees, overlays |
 | NewsScene | Ajouter sentiment indicator par news |
 | PredictionsScene | Renommer "Zones a surveiller", conditionnel obligatoire |
-| PreviouslyOnScene | Devenir "Suivi J-1" avec resultats (check/cross) |
+| PreviouslyOnScene | SUPPRIME — les references au passe sont integrees dans les segments |
 | OutroScene | Ajouter teaser tomorrow, recap 3 points |
 
 #### E.2 Nouvelles scenes a creer
@@ -1792,6 +2117,10 @@ Integration dans le pipeline generate : fetch → tag & store (code) → researc
 | CalendarScene | Timeline events eco | V2 |
 
 #### E.3 Nouveaux composants shared
+
+> **Convention palette visuelle** : tous les composants réutilisables sont dans `packages/remotion-app/src/scenes/shared/`.
+> Le prompt C7 (direction artistique) doit scanner ce dossier pour connaître la palette disponible avant de générer ses instructions visuelles.
+> Le code EST la source de vérité — pas de catalogue séparé à maintenir.
 
 | Composant | Usage | Priorite |
 |-----------|-------|----------|
@@ -1842,21 +2171,58 @@ Scenes V1 fonctionnelles avec EnrichedEpisodeScript + DisclaimerBar + assets de 
 - Enregistrer 3-5 min de voix naturelle du createur
 - Upload sur ElevenLabs → voice clone API
 - Voix du createur = authenticite legale pour YouTube
-- Cout : ~22 EUR/mois (plan Creator)
+- Cout : selon plan (voir Section 9 Couts)
 
-#### F.2 Integration technique
+#### F.2 Architecture TTS — Couche C6 + config statique
 
-- Un appel TTS par section du script
-- Word-level timestamps → sous-titres animes dans Remotion
-- `AudioManifest` (type existant dans `core/types.ts`) contient les segments + timing
+> **DÉCISION v3** : le paramétrage ElevenLabs est une CONFIG STATIQUE par type de segment.
+> Pas de LLM pour décider stability/speed. C6 (Haiku) fait uniquement l'adaptation textuelle.
 
-#### F.2b Architecture narration / TTS — Decision critique (2026-02-19)
+**Étape 1 — C6 Haiku : adaptation vocale du texte**
 
-**Probleme** : le champ `narration` sert actuellement deux roles incompatibles :
-1. Texte affiche a l'ecran dans Remotion (AnimatedText en bas de scene)
-2. Texte envoye a ElevenLabs pour synthese vocale
+C6 reçoit episode_directed.json et transforme chaque section pour la voix :
+- Raccourcit les phrases > 20 mots
+- Supprime les références visuelles ("comme vous pouvez le voir sur le graphique")
+- Ajoute des balises SSML de pauses naturelles (`<break time="300ms"/>`)
+- Adapte le rythme selon le type de segment
 
-Ces deux usages ont des contraintes contradictoires :
+**Étape 2 — Config statique ElevenLabs par type**
+
+```typescript
+const ELEVENLABS_CONFIG: Record<SegmentType, ElevenLabsParams> = {
+  DEEP:    { stability: 0.75, similarity_boost: 0.85, speed: 0.92 },  // Posé, analytique
+  FOCUS:   { stability: 0.70, similarity_boost: 0.82, speed: 0.96 },
+  FLASH:   { stability: 0.65, similarity_boost: 0.78, speed: 1.02 },  // Dynamique, flash
+  COLD_OPEN: { stability: 0.60, similarity_boost: 0.80, speed: 1.00 }, // Impactant
+  RECAP:   { stability: 0.75, similarity_boost: 0.85, speed: 0.95 },
+  OUTRO:   { stability: 0.70, similarity_boost: 0.82, speed: 0.94 },
+}
+```
+
+Un appel TTS par section → WAV horodatés.
+
+**⚠️ Les durées WAV réelles = timing MAÎTRE de tout le pipeline.**
+- Remotion en P8 utilise les WAV réels, PAS les durées estimées par C3
+- P9 (chapitres horodatés) attend la fin de P8 pour les durées exactes
+
+**Étape 3 — Whisper : sous-titres automatiques**
+
+- SRT + ASS depuis les WAV
+- Dictionnaire custom pour les tickers (XAUUSD → "or", EURUSD → "euro dollar")
+- Word-level timestamps pour sous-titres synchronisés en V2
+
+#### F.3 Decision texte a l'ecran (V1 vs V2)
+
+**V1 (immediate)** : supprimer `AnimatedText` des scenes, remplacer par `DisclaimerBar` permanent en bas. La voix raconte, les visuels montrent.
+
+**V2** : sous-titres synchronises depuis word timestamps ElevenLabs → SRT → Remotion.
+
+**Non retenu** : `displayText` court par section — ajoute de la complexite LLM pour un resultat inferieur aux sous-titres auto.
+
+#### F.4 Sanitizer TTS (filet de securite)
+
+Le champ `narration` reste la source de verite unique (prose lisible par un humain).
+Un module `sanitizeForTTS(text, lang)` dans `packages/ai/src/tts-sanitizer.ts` transforme avant envoi.
 
 | Symbole dans `narration` | ElevenLabs lirait | Ce qu'on veut |
 |---|---|---|
@@ -1866,45 +2232,28 @@ Ces deux usages ont des contraintes contradictoires :
 | `+5,53%` | OK en FR | OK |
 | `$` | variable | "dollars" |
 
-**Solution retenue : un seul champ `narration` + sanitizer TTS**
+#### F.5 Anti-robot (imperfections volontaires)
 
-Le champ `narration` reste la source de verite unique (ecrit en prose lisible par un humain).
-Un module `sanitizeForTTS(text, lang)` dans `packages/ai/src/tts-sanitizer.ts` transforme le texte avant envoi a ElevenLabs. Le prompt impose deja la prose sans fleches ni symboles — le sanitizer est un filet de securite.
-
-**Probleme du texte a l'ecran — AnimatedText actuel**
-
-L'`AnimatedText` actuel affiche 200-300 mots en bas de l'ecran → illisible sur YouTube.
-Les vraies chaines finance n'affichent pas la narration complete en bas — elles utilisent soit des sous-titres synchronises, soit des visuels seuls.
-
-Options :
-- **V1 (immediat)** : supprimer `AnimatedText` des scenes, remplacer par `DisclaimerBar` permanent en bas. La voix raconte, les visuels montrent.
-- **V2** : sous-titres synchronises depuis les word timestamps ElevenLabs → SRT → Remotion. C'est ce que font les chaines pro.
-- **Non retenu** : `displayText` court par section — ajoute de la complexite LLM pour un resultat inferieur aux sous-titres auto.
-
-**Decision V1** : supprimer AnimatedText, DisclaimerBar permanent (voir Bloc E).
-**Decision V2** : sous-titres word-level depuis ElevenLabs timestamps (voir F.2 ci-dessus).
-
-#### F.3 Anti-robot (imperfections volontaires)
-
-Le prompt de narration doit inclure :
-- Pauses naturelles ("... enfin, plus precisement ...")
-- Variations de ton : energique sur les mouvements forts, pose sur le macro
-- Rythme variable : ralentir sur les niveaux cles, accelerer sur le contexte
-
-> QUESTION : ElevenLabs supporte-t-il les instructions de prosodie (pauses, emphase) ?
-> A tester. Si non, les "imperfections" devront etre dans le texte (ellipses, tirets).
+Via SSML dans C6 et config stability ElevenLabs :
+- Pauses naturelles sur les niveaux cles
+- Ton energique sur les mouvements forts (stability basse)
+- Rythme variable : ralentir sur le contexte macro (speed 0.92), accelerer sur le flash
 
 #### Livrable Bloc F
-`generateAudio(script): AudioManifest` + integration dans le pipeline render.
+`adaptForTTS(script)` (C6) + `generateAudio(adaptedScript)` (ElevenLabs + config statique) + `generateSubtitles(wav)` (Whisper) + `sanitizeForTTS(text)` + integration dans le pipeline render.
 
 ---
 
-### Bloc G — SEO & Upload
+### Bloc G — SEO & Upload (C10)
 
 **Dependances** : Bloc C (script), Bloc F (video renderee)
 **Impact** : decouvabilite sur YouTube — inutile de faire une bonne video si personne ne la voit
 
-#### G.1 SEOPackage
+> **⚠️ DÉPENDANCE CACHÉE** : les chapitres horodatés nécessitent les durées WAV réelles (P8).
+> C10 peut commencer titre + tags + thread X pendant P8.
+> La description complète avec chapitres attend la fin du render.
+
+#### G.1 SEOPackage (généré par C10 Haiku)
 
 ```typescript
 interface SEOPackage {
@@ -1912,35 +2261,40 @@ interface SEOPackage {
   titreAlternatif: string        // A/B test
   descriptionAbove: string       // 150 chars (visible avant "voir plus")
   descriptionFull: string        // 300-500 mots
-  chapters: Array<{ timecode: string; label: string }>
+  chapters: Array<{ timecode: string; label: string }>  // nécessite durées WAV réelles
   tags: string[]                 // 5-8
   hashtags: string[]             // 3-5
   pinnedComment: string
   nomFichier: string             // MP4 renomme
   playlistId: string
   categoryId: "27" | "25"        // Education=27, News=25
+  threadX: string                // Thread court pour partage Twitter/X
 }
 ```
 
-Genere par Haiku a partir du script. Cout negligeable.
-
 #### G.2 Coherence semantique
 
-Le mot-cle principal doit apparaitre dans : titre, description, tags, chapters, transcript (prononce par le narrateur), sous-titres, thumbnail, nom fichier. Le prompt Opus doit inclure l'instruction de prononcer le mot-cle dans les 30 premieres secondes.
+Le mot-cle principal doit apparaitre dans : titre, description, tags, chapters, transcript (prononce par le narrateur), sous-titres, thumbnail, nom fichier. C3 (Opus) doit inclure l'instruction de prononcer le mot-cle dans les 30 premieres secondes.
 
-#### G.3 Upload YouTube
+#### G.3 Upload YouTube + Shorts
 
 - YouTube Data API v3
 - Upload video + metadata + thumbnail
 - Post pinned comment automatique
 - Ajout a la bonne playlist
+- Short auto (segment drama_score max + cold open, 9:16) uploadé simultanément
 
 > QUESTION : OAuth 2.0 YouTube requiert une verification Google pour les apps "publiques".
 > Pour un usage personnel (sa propre chaine), un token OAuth "testing" suffit-il indefiniment ?
 > A verifier avant de coder — si limitation, envisager un upload semi-auto via CLI.
 
+#### G.4 EpisodeMemory — ordre de sauvegarde critique
+
+**EpisodeMemory est sauvegardée AVANT l'upload YouTube.**
+Raison : si l'upload échoue, la mémoire narrative est quand même préservée pour J+1.
+
 #### Livrable Bloc G
-`generateSEO(script): SEOPackage` + `uploadToYouTube(video, seo)`.
+`generateSEO(script, durationsFromWav): SEOPackage` (C10) + `uploadToYouTube(video, seo)` + `saveEpisodeMemory(script)` appelé avant upload.
 
 ---
 
@@ -2017,14 +2371,24 @@ Depuis juillet 2025, YouTube penalise le contenu "non authentique" (AI slop). L'
 
 ### Les 5 piliers anti-detection
 
-**1. Unicite narrative (dans le prompt Opus)**
+**1. Unicite narrative (dans le prompt C3 Opus)**
 - Hook contenant un element date-specifique (jamais generique)
 - Biais directionnel clair et assume — jamais "ca peut monter ou descendre"
 - Surprise du jour obligatoire (element inattendu)
 - Connecter l'actualite mondiale aux actifs (pas juste les chiffres)
 - Mood marche adapte le registre emotionnel
+- **Few-shot Bondain injectes** : 3-4 extraits de journalisme financier FR de qualite pour calibrer le registre oral naturel
 
-**2. Continuite et memoire (EpisodeMemory — Bloc D)**
+**1b. Leçons de l'audit comparatif (fev. 2026 — scripts vs Bondain/Zonebourse)**
+
+Cinq ameliorations concretes integrees dans le pipeline v3 :
+1. **Verification donnees** : snapshot.json = source unique, C2 contraint de citer uniquement les donnees presentes (elimine les niveaux inventés ou perimés)
+2. **Contexte YTD** : calcule en P0, injecte dans snapshot (ex: "Arcelor +45% YTD"), utilise par C2 quand l'actif est en vedette
+3. **Lecture business model** : Knowledge Base enrichie avec fiches sectorielles pour connexions type "Salesforce subit la disruption IA sur son CRM"
+4. **Discipline temporelle** : chaque donnee horodatee dans le JSON, C2 utilise les timestamps (elimine la confusion ouverture EU / cloture US)
+5. **Densite societes** : section "actu societes" dediee dans C3 (60-90s, 8-12 societes, format flash info)
+
+**2. Continuite et memoire (EpisodeMemory — Bloc D + MarketMemory — Bloc D3)**
 - Suivi J-1 obligatoire avec resultats honnetes
 - References a des episodes passes : "comme je le disais il y a 3 jours..."
 - Fil directeur hebdomadaire (les themes de la semaine)
@@ -2035,16 +2399,18 @@ Depuis juillet 2025, YouTube penalise le contenu "non authentique" (AI slop). L'
 - 1x/semaine : integrer un commentaire de viewer (reel ou simule au debut)
 - Expressions signatures recurrentes (contribuent a l'identite)
 
-**4. Imperfections volontaires (TTS — Bloc F)**
-- Pauses naturelles, hesitations legeres
-- Ton energique sur les mouvements forts, pose sur le contexte macro
-- Rythme variable (pas monotone)
-- References a l'observation : "ce matin en regardant les donnees..."
+**4. Imperfections volontaires (C6 + ElevenLabs config statique — Bloc F)**
+- Pauses naturelles via SSML dans C6
+- Config stability variable par type de segment (DEEP=0.75, FLASH=0.65)
+- Ton energique sur les mouvements forts (stability basse), pose sur le contexte macro (stability haute)
+- Rythme variable via speed parameter (FLASH=1.02, DEEP=0.92)
 
-**5. Variations visuelles (Remotion — Bloc E)**
-- Couleur dominante pilotee par le mood du jour
-- Ordre des segments variable selon drama scores
-- Nombre d'assets variable (2-3 deep dives)
+**5. Variations visuelles (C5 direction globale + Remotion — Bloc E)**
+- Couleur dominante pilotee par le mood du jour (decide par C5)
+- Arc de tension global decide par C5 (montee → pic → respiration → closing)
+- Transitions dynamiques depuis liste Remotion (decide par C5, pas hardcode)
+- Ordre des segments variable selon drama scores (decide par C1)
+- Nombre d'assets variable (2-3 deep dives selon editorial_plan.json)
 - 1x/semaine : element special (stat historique, citation, graphique inhabituel)
 
 ---
@@ -2071,7 +2437,7 @@ Depuis juillet 2025, YouTube penalise le contenu "non authentique" (AI slop). L'
 |---------|-----------|-------|
 | Data pipeline | 0 EUR | Yahoo, RSS, FRED, Finnhub, CoinGecko, Supabase — tout gratuit |
 | News Memory + Causal | 0 EUR | Tagging rules-based + SQL queries — tout en code |
-| Anthropic API (script) | ~25-40 EUR | 22 videos × Opus (~30K input tokens). Scenarios forward Haiku ~0.30$ |
+| Anthropic API (script) | ~8-12 EUR | 22 videos × 10 couches LLM (~0.39$/video) |
 | ElevenLabs | ~22-99 EUR | Creator (100min/mois) ou Scale (500min) si 22 videos × 10min depasse |
 | Flux AI (fal.ai) | ~3-5 EUR | Thumbnails (V2) |
 | Hosting | ~5-10 EUR | VPS ou Railway |
@@ -2082,7 +2448,7 @@ Depuis juillet 2025, YouTube penalise le contenu "non authentique" (AI slop). L'
 > ou reduire a 15 videos/mois, ou utiliser des voix non-clonees moins cheres.
 > A evaluer au moment du Bloc F.
 
-**Cout par video : ~2-3 EUR**
+**Cout par video : ~1.5-2.5 EUR** (LLM ~0.39$, ElevenLabs ~0.50-1.00€, infra ~0.20€)
 
 ### Revenus projetes (hypotheses conservatrices)
 
@@ -2121,34 +2487,37 @@ Point de rentabilite estime : **mois 7-8**.
 
 ### V1 — Premiere video publiable
 
-**Objectif** : une video complete (data enrichie + script Opus + scenes ameliorees + TTS) publiee sur YouTube.
+**Objectif** : une video complete (data enrichie + pipeline multi-couches C1→C10 + TTS) publiee sur YouTube.
 
 | Priorite | Bloc | Taches cles |
 |----------|------|-------------|
 | 1a | ~~A Phase 1~~ | ~~21 assets + 8 RSS + FRED + Finnhub + CoinGecko + Supabase~~ **FAIT** |
 | 1b | A Phase 2 | 38 assets multi-TF + ~30 RSS + Finnhub news + screening 763 actions + suppr FMP | **A FAIRE** |
 | 2 | B (knowledge) | Knowledge loader + fiches manquantes (central-banks, asset-profiles) |
-| 3 | D (memory) | Version simple : sauvegarde predictions + suivi J-1 |
-| 3.5 | D2 (news memory) | SQLite + tagging Haiku + research brief |
-| 4 | C (prompt) | Prompt Opus v2 avec compliance + persona + structure narrative |
+| 3 | D (EpisodeMemory) | Version simple : sauvegarde predictions + suivi J-1 |
+| 3.5 | D2 (NewsMemory) | SQLite + tagging rules + research context |
+| 3.6 | D3 (MarketMemory) | JSONs par actif + détection événements + enrichissement Haiku soir + job hebdo Sonnet |
+| 4 | C (prompts C1→C5) | **Refactoring majeur** — 5 prompts séquentiels avec responsabilités séparées |
 | 5 | A2 (market intel) | Market RAG (~763 actions), analyse causale, scenarios forward |
 | 6 | E (scenes) | 4-5 scenes essentielles + DisclaimerBar + quelques composants |
-| 7 | F (TTS) | ElevenLabs clone + integration audio |
-| 8 | G (SEO) | SEOPackage basique + upload semi-auto |
+| 7 | F (TTS) | C6 adaptation + ElevenLabs config statique par segment + Whisper sous-titres |
+| 8 | G (SEO) | C10 SEOPackage + upload semi-auto |
 
 ### V1.5 — Stabilisation
 
-- Knowledge base complete (toutes les fiches)
+- Knowledge base complete (toutes les fiches + asset-profiles + central-banks)
+- MarketMemory complète pour les 38 actifs watchlist (zones calibrées sur 6 mois)
 - EpisodeMemory complet avec fil directeur hebdomadaire
-- Quality gate automatique
+- Quality gate automatique (code + C4 Haiku)
 - Pipeline resilience basique (fallbacks, retry)
+- Thumbnail A/B test automatique J+2
 
 ### V2 — Qualite professionnelle
 
 - Toutes les scenes (12) + composants visuels avances
-- Drama Score calibre sur episodes reels
+- Drama Score calibre sur episodes reels (drama-weights.json editable)
 - Segments speciaux hebdomadaires
-- Thumbnail generator (Sharp.js)
+- Sous-titres word-level depuis ElevenLabs timestamps
 - Assets library SVGs complete
 
 ### V3 — Automation totale

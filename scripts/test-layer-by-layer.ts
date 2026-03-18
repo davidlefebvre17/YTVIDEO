@@ -342,6 +342,74 @@ async function main() {
     console.log(`\nSaved to data/pipeline/${date}/validated.json`);
   }
 
+  if (layer === "p6") {
+    const { runC5Direction } = await import("@yt-maker/ai");
+    const editorial = JSON.parse(readFileSync(join(process.cwd(), "data", "pipeline", date, "editorial.json"), "utf-8"));
+    const analysis = JSON.parse(readFileSync(join(process.cwd(), "data", "pipeline", date, "analysis.json"), "utf-8"));
+    const validated = JSON.parse(readFileSync(join(process.cwd(), "data", "pipeline", date, "validated.json"), "utf-8"));
+    const draft = validated.validatedScript ?? JSON.parse(readFileSync(join(process.cwd(), "data", "pipeline", date, "draft.json"), "utf-8"));
+
+    console.log(`--- P6 C5 SONNET (direction) ---`);
+    const directed = await runC5Direction({ draft, editorial, analysis, lang: "fr" });
+
+    console.log(`\nMood music: ${directed.moodMusic}`);
+    console.log(`\nArc (${directed.arc.length} beats):`);
+    for (const beat of directed.arc) {
+      console.log(`  ${beat.segmentId.padEnd(10)} tension=${beat.tensionLevel.toString().padStart(2)}  role=${beat.role}`);
+    }
+    console.log(`\nTransitions (${directed.transitions.length}):`);
+    for (const t of directed.transitions) {
+      console.log(`  ${t.fromSegmentId} → ${t.toSegmentId}  [${t.type}] ${t.durationMs}ms${t.soundEffect ? '  sfx:'+t.soundEffect : ''}${t.vocalShift ? '  vocal:'+t.vocalShift : ''}`);
+    }
+    console.log(`\nChart timings (${directed.chartTimings.length}):`);
+    for (const ct of directed.chartTimings) {
+      console.log(`  ${ct.chartInstruction.asset.padEnd(12)} ${ct.chartInstruction.label?.slice(0,40).padEnd(42)} show=${ct.showAtSec}s hide=${ct.hideAtSec}s`);
+    }
+    console.log(`\nThumbnail: segment=${directed.thumbnailMoment.segmentId}  figure=${directed.thumbnailMoment.keyFigure}  tone=${directed.thumbnailMoment.emotionalTone}`);
+    console.log(`  Reason: ${directed.thumbnailMoment.reason}`);
+
+    const outDir = join(process.cwd(), "data", "pipeline", date);
+    writeFileSync(join(outDir, "directed.json"), JSON.stringify(directed, null, 2));
+    console.log(`\nSaved to data/pipeline/${date}/directed.json`);
+  }
+
+  if (layer === "p7") {
+    const { runC7Storyboard } = await import("@yt-maker/ai");
+    const directed = JSON.parse(readFileSync(join(process.cwd(), "data", "pipeline", date, "directed.json"), "utf-8"));
+
+    console.log(`--- P7 C7 SONNET (direction artistique storyboard) ---`);
+    const storyboard = await runC7Storyboard(directed, "fr");
+
+    console.log(`\nTotal slots: ${storyboard.totalSlots} sur ${storyboard.totalDurationSec}s`);
+    console.log(`Densité: ${(storyboard.totalDurationSec / storyboard.totalSlots).toFixed(1)}s/slot en moyenne`);
+    console.log(`\nRépartition sources:`);
+    console.log(`  REMOTION CHART  : ${storyboard.summary.remotionChart}`);
+    console.log(`  REMOTION TEXT   : ${storyboard.summary.remotionText}`);
+    console.log(`  REMOTION DATA   : ${storyboard.summary.remotionData}`);
+    console.log(`  REMOTION LOWER  : ${storyboard.summary.remotionLower}`);
+    console.log(`  MIDJOURNEY      : ${storyboard.summary.midjourney}`);
+    console.log(`  STOCK           : ${storyboard.summary.stock}`);
+
+    console.log(`\nMidjourney prompts (${storyboard.midjourneyPrompts.length}):`);
+    for (const p of storyboard.midjourneyPrompts) {
+      console.log(`  [${p.segId}] ${p.prompt.slice(0, 100)}...`);
+    }
+
+    console.log(`\nStock photo needs (${storyboard.stockPhotoNeeds.length}):`);
+    for (const s of storyboard.stockPhotoNeeds) {
+      console.log(`  [${s.segId}] ${s.subject} — "${s.keywords}"`);
+    }
+
+    console.log(`\nPremiers slots:`);
+    storyboard.slots.slice(0, 12).forEach(s => {
+      console.log(`  #${String(s.slot).padStart(2)} t=${s.tStart}-${s.tEnd}s [${s.source.replace('REMOTION_','')}] ${s.type.padEnd(22)} ${s.desc.slice(0, 60)}`);
+    });
+
+    const outDir = join(process.cwd(), "data", "pipeline", date);
+    writeFileSync(join(outDir, "storyboard.json"), JSON.stringify(storyboard, null, 2));
+    console.log(`\nSaved to data/pipeline/${date}/storyboard.json`);
+  }
+
   // p5b: force C4 Haiku semantic validation even if mechanical blockers exist
   if (layer === "p5b") {
     const { generateStructuredJSON } = await import("@yt-maker/ai");

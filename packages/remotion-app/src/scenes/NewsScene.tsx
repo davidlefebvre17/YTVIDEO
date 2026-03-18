@@ -32,7 +32,7 @@ export const NewsScene: React.FC<NewsSceneProps> = ({ section, news }) => {
       <div
         style={{
           fontSize: layout.fontSize.sectionTitle,
-          color: BRAND.colors.news,
+          color: BRAND.colors.accentWarning,
           fontWeight: 700,
           opacity: fadeIn(frame, 0, 20),
           marginTop: layout.padding.top,
@@ -64,7 +64,7 @@ export const NewsScene: React.FC<NewsSceneProps> = ({ section, news }) => {
                 backgroundColor: BRAND.colors.surface,
                 borderRadius: BRAND.borderRadius.md,
                 padding: 20,
-                borderLeft: `4px solid ${BRAND.colors.news}`,
+                borderLeft: `4px solid ${BRAND.colors.accentWarning}`,
                 opacity: cardOpacity,
                 transform: `translateX(${interpolate(slideX, [0, 1], [60, 0])}px)`,
               }}

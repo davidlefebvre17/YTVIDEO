@@ -1,0 +1,302 @@
+{
+  "episodeNumber": 2,
+  "date": "2026-03-10",
+  "type": "daily_recap",
+  "lang": "fr",
+  "title": "Le pétrole s'effondre de 12% — et tout bascule",
+  "description": "Trump évoque la fin de la guerre en Iran, le pétrole chute de près de 12%, l'or et l'argent explosent, le KOSPI bondit de 5%. Un épisode dominé par la géopolitique et ses conséquences en cascade sur tous les marchés.",
+  "coldOpen": "Moins douze pour cent. Le pétrole vient de vivre sa pire séance depuis le Covid.",
+  "dominantTheme": "geopolitique-iran-petrole",
+  "threadSummary": "Trump évoque la fin de la guerre en Iran et déclenche un effondrement du pétrole de 12%, provoquant une cascade sur les métaux précieux, les indices et le secteur énergétique.",
+  "moodMarche": "rotation",
+  "sections": [
+    {
+      "id": "hook",
+      "type": "hook",
+      "title": "Cold Open",
+      "narration": "Moins douze pour cent. Le pétrole vient de vivre sa pire séance depuis le Covid.",
+      "durationSec": 7,
+      "visualCues": [],
+      "data": {}
+    },
+    {
+      "id": "title_card",
+      "type": "title_card",
+      "title": "Générique",
+      "narration": "",
+      "durationSec": 4,
+      "visualCues": [],
+      "data": {}
+    },
+    {
+      "id": "thread",
+      "type": "thread",
+      "title": "Un mot de Trump, et tout bascule",
+      "narration": "Aujourd'hui, un seul homme a dicté la direction de tous les marchés. Trump a évoqué la fin imminente du conflit en Iran — et ça a déclenché une cascade. Le pétrole s'effondre, les métaux précieux explosent, les indices européens rebondissent, et les raffineurs américains se retrouvent dans une position paradoxale. On va remonter toute la chaîne, maillon par maillon.",
+      "durationSec": 22,
+      "visualCues": [],
+      "data": {}
+    },
+    {
+      "id": "seg_1",
+      "type": "segment",
+      "depth": "deep",
+      "topic": "petrole-effondrement-iran",
+      "assets": [
+        "CL=F",
+        "BZ=F"
+      ],
+      "title": "Le pétrole perd 12% en une séance",
+      "narration": "Vendredi, je surveillais le brut qui venait de bondir à un plus haut de sept mois avec les tensions au Moyen-Orient. Et c'est exactement l'inverse qui s'est produit aujourd'hui. Le WTI dégringole de presque 12% à 83.45 dollars, le Brent lâche 11.3% à 87.80 dollars. Le range intraday est monstrueux — le WTI a oscillé entre 76.73 et 91.48 dollars. Pourquoi un tel effondrement ? Trump a déclaré lundi soir que la guerre en Iran serait terminée très bientôt. Dans la foulée, le G7 et l'Agence Internationale de l'Énergie se sont dits prêts à libérer des réserves stratégiques si nécessaire. Résultat : la prime de risque géopolitique qui s'était accumulée ces dernières semaines s'évapore d'un coup. Techniquement, le WTI reste au-dessus de ses EMA 9 et 21, respectivement à 81.89 et 74.68 dollars. Le RSI est à 70 — en zone de surachat malgré la chute, ce qui montre à quel point le mouvement haussier précédent avait été violent. Le support immédiat se situe à 83 dollars. Si le prix venait à casser ce niveau, le prochain palier serait beaucoup plus bas, vers les 62 dollars — la zone de support moyen terme. À l'inverse, si la désescalade se confirme mais reste partielle, un rebond vers les 88-90 dollars reste envisageable. Le risque d'invalidation du scénario baissier serait une escalade surprise — un incident dans le détroit d'Ormuz, par exemple, renverrait le brut au-dessus des 90 dollars en quelques heures.",
+      "durationSec": 85,
+      "visualCues": [
+        {
+          "type": "show_chart",
+          "asset": "CL=F"
+        },
+        {
+          "type": "show_level",
+          "asset": "CL=F",
+          "value": 83,
+          "label": "Support immédiat"
+        },
+        {
+          "type": "show_level",
+          "asset": "CL=F",
+          "value": 61.87,
+          "label": "Support moyen terme"
+        }
+      ],
+      "data": {
+        "predictions": [
+          {
+            "asset": "CL=F",
+            "direction": "bearish",
+            "confidence": "medium",
+            "reasoning": "Désescalade géopolitique + libération potentielle de réserves stratégiques pèsent sur la prime de risque. Mais le positionnement COT reste long (P80) et un retournement géopolitique invaliderait le scénario."
+          },
+          {
+            "asset": "BZ=F",
+            "direction": "bearish",
+            "confidence": "medium",
+            "reasoning": "Suit le WTI à la baisse, spread Brent-WTI reste élevé à ~4.35$ signalant encore des tensions logistiques résiduelles."
+          }
+        ]
+      }
+    },
+    {
+      "id": "seg_2",
+      "type": "segment",
+      "depth": "deep",
+      "topic": "or-argent-refuges",
+      "assets": [
+        "GC=F",
+        "SI=F"
+      ],
+      "title": "Or et argent explosent à la hausse malgré la désescalade",
+      "narration": "Et c'est là que ça devient contre-intuitif. Si les tensions géopolitiques s'apaisent, l'or et l'argent devraient baisser — c'est la logique flight to safety classique. Sauf qu'aujourd'hui, l'or bondit de 2.7% à 5230 dollars l'once et l'argent explose de 6% à 89 dollars. L'or au-dessus de 5000 dollars, c'est un territoire qu'on explore à peine depuis quelques semaines — des niveaux historiques. Alors pourquoi les métaux montent alors que le risque géopolitique baisse ? Parce que le marché regarde autre chose. Le dollar recule de 0.35%, les taux réels stagnent, et surtout l'effondrement du pétrole relance les espoirs de baisse de taux de la Fed — parce que moins de pétrole cher, c'est potentiellement moins d'inflation. Et quand le marché anticipe des taux plus bas, l'or en profite mécaniquement. L'argent surperforme parce que sa double nature joue à plein — valeur refuge ET métal industriel, porté par la demande chinoise en panneaux solaires. Techniquement, l'or évolue au-dessus de ses EMA 9 à 5151 et EMA 21 à 5093. RSI à 56 — de la marge avant le surachat. La résistance se situe à 5300 dollars, puis le plus haut récent à 5405. En dessous, le support des 5200 est le premier niveau à surveiller. Si le scénario de baisse de taux se renforce avec le CPI américain qui arrive, l'or pourrait tenter d'aller chercher ses records. En revanche, un CPI supérieur aux attentes — signal que l'inflation résiste — invaliderait ce scénario et ramènerait potentiellement l'or vers les 5000-5050 dollars.",
+      "durationSec": 85,
+      "visualCues": [
+        {
+          "type": "show_chart",
+          "asset": "GC=F"
+        },
+        {
+          "type": "show_level",
+          "asset": "GC=F",
+          "value": 5300,
+          "label": "Résistance"
+        },
+        {
+          "type": "show_level",
+          "asset": "GC=F",
+          "value": 5200,
+          "label": "Support"
+        },
+        {
+          "type": "show_chart",
+          "asset": "SI=F"
+        }
+      ],
+      "data": {
+        "predictions": [
+          {
+            "asset": "GC=F",
+            "direction": "bullish",
+            "confidence": "medium",
+            "reasoning": "Dollar en repli, anticipations de baisse de taux relancées par la chute du pétrole. Positionnement COT sur l'or au P13 — loin de la complaisance, ce qui laisse de la marge haussière."
+          },
+          {
+            "asset": "SI=F",
+            "direction": "bullish",
+            "confidence": "medium",
+            "reasoning": "Double moteur refuge + industriel. Ratio or/argent en compression, demande chinoise structurelle. RSI à 50 — aucun excès technique."
+          }
+        ]
+      }
+    },
+    {
+      "id": "seg_3",
+      "type": "segment",
+      "depth": "focus",
+      "topic": "europe-rebond-petrole",
+      "assets": [
+        "^FCHI",
+        "^GDAXI",
+        "^STOXX"
+      ],
+      "title": "L'Europe respire grâce au pétrole",
+      "narration": "La chute du pétrole, c'est une bénédiction pour l'Europe. Le CAC 40 rebondit de 1.8% à 8057 points, le DAX reprend 2.4% à 23969, le STOXX 600 gagne 1.9%. En parallèle, Lagarde a confirmé que la BCE fera tout pour maintenir l'inflation sous contrôle — ce qui rassure les investisseurs sur la trajectoire monétaire européenne. Un pétrole moins cher, c'est moins d'inflation importée, c'est plus de marge de manœuvre pour la BCE. Mais attention — les données industrielles allemandes racontent une autre histoire. Les commandes d'usines ont plongé de 11.1% le mois dernier, contre une baisse attendue de 4.2%. La production industrielle recule de 0.5% alors que le marché attendait une hausse de 1%. Techniquement, le CAC reste sous ses EMA — l'EMA 9 à 8122 fait office de résistance immédiate. Tant que l'indice ne repasse pas au-dessus de ce niveau avec conviction, ce rebond pourrait n'être qu'un soulagement temporaire dans une tendance qui reste fragile.",
+      "durationSec": 55,
+      "visualCues": [
+        {
+          "type": "show_chart",
+          "asset": "^FCHI"
+        },
+        {
+          "type": "show_level",
+          "asset": "^FCHI",
+          "value": 8122,
+          "label": "EMA 9 — résistance"
+        }
+      ],
+      "data": {
+        "predictions": [
+          {
+            "asset": "^FCHI",
+            "direction": "neutral",
+            "confidence": "medium",
+            "reasoning": "Rebond de soulagement sur la chute du pétrole et les propos de Lagarde, mais les données industrielles allemandes pèsent et le CAC reste sous ses moyennes mobiles. Tendance de fond encore fragile."
+          }
+        ]
+      }
+    },
+    {
+      "id": "seg_4",
+      "type": "segment",
+      "depth": "focus",
+      "topic": "wall-street-divergence",
+      "assets": [
+        "^GSPC",
+        "^DJI",
+        "ORCL",
+        "XLE",
+        "XLF"
+      ],
+      "title": "Wall Street diverge — le S&P hésite, Oracle brille",
+      "narration": "Côté américain, le contraste est frappant. L'Europe bondit, mais Wall Street n'arrive pas à suivre. Le S&P 500 lâche 0.2% à 6781, le Dow cède 0.07%, et le volume est anémique — 80% en dessous de la moyenne sur 20 jours. Ce qui explique cette divergence ? Les financières continuent de souffrir — le XLF perd 0.5% avec un RSI à 31, en zone de survente. Le secteur énergie via le XLE recule de 1.3%, ce qui semble logique quand le pétrole perd 12%. Mais dans ce brouillard, il y a Oracle. Le géant du cloud publie des résultats après la clôture et bondit de 10.25%. Un EPS à 1.79 dollar contre 1.74 attendu, et surtout des perspectives sur l'IA jusqu'en 2027 qui enthousiasment le marché. C'est le genre de résultat qui peut donner le ton au secteur tech dans les prochains jours. La zone des 6700 sur le S&P 500 fait office de support — un enfoncement ouvrirait la voie vers les 6636, le plus bas récent.",
+      "durationSec": 55,
+      "visualCues": [
+        {
+          "type": "show_chart",
+          "asset": "^GSPC"
+        },
+        {
+          "type": "show_level",
+          "asset": "^GSPC",
+          "value": 6700,
+          "label": "Support"
+        },
+        {
+          "type": "show_chart",
+          "asset": "ORCL"
+        }
+      ],
+      "data": {
+        "predictions": [
+          {
+            "asset": "^GSPC",
+            "direction": "neutral",
+            "confidence": "low",
+            "reasoning": "Volume très faible, divergence Europe/US, financières en difficulté. Résultats d'Oracle pourraient soutenir le Nasdaq mais le S&P manque de conviction directionnelle."
+          }
+        ]
+      }
+    },
+    {
+      "id": "seg_5",
+      "type": "segment",
+      "depth": "focus",
+      "topic": "kospi-asie-rebond",
+      "assets": [
+        "^KS11",
+        "^N225",
+        "^HSI"
+      ],
+      "title": "Le KOSPI bondit de 5% — l'Asie mène le rebond mondial",
+      "narration": "Le mouvement le plus spectaculaire du jour ne vient pas de New York ni de Paris. C'est en Corée du Sud que ça s'est passé. Le KOSPI explose de 5.35% à 5533 points. Le Nikkei reprend 2.9%, le Hang Seng 2.2%, Shanghai progresse modestement de 0.65%. Pourquoi la Corée en tête ? Parce que le KOSPI avait été l'un des indices les plus violemment pénalisés par la montée des tensions au Moyen-Orient ces dernières semaines — sa volatilité annualisée est de 72.6%, c'est un marché à effet de levier sur le sentiment mondial. Quand la peur recule, le rebond est proportionnel à la chute. Techniquement, le KOSPI revient sur son EMA 21 à 5532 — exactement le niveau du jour. C'est une zone de décision. Si l'indice confirme au-dessus dans les prochaines séances, la résistance des 5600 serait le prochain objectif. Mais les 4899, point bas récent, restent le garde-fou en cas de rechute géopolitique.",
+      "durationSec": 55,
+      "visualCues": [
+        {
+          "type": "show_chart",
+          "asset": "^KS11"
+        },
+        {
+          "type": "show_level",
+          "asset": "^KS11",
+          "value": 5532,
+          "label": "EMA 21 — zone de décision"
+        }
+      ],
+      "data": {
+        "predictions": [
+          {
+            "asset": "^KS11",
+            "direction": "bullish",
+            "confidence": "low",
+            "reasoning": "Rebond violent typique d'un marché survendu. Le KOSPI revient pile sur son EMA 21, zone technique clé. La direction dépend entièrement de la confirmation de la désescalade Iran."
+          }
+        ]
+      }
+    },
+    {
+      "id": "seg_6",
+      "type": "segment",
+      "depth": "flash",
+      "topic": "crypto-rebond-timide",
+      "assets": [
+        "BTC-USD",
+        "ETH-USD"
+      ],
+      "title": "Crypto : rebond discret malgré la peur extrême",
+      "narration": "Bitcoin reprend 2.2% à 69927 dollars, Ethereum aussi à 2037 dollars. Ça semble positif, sauf que le Fear and Greed crypto reste à 15 sur 100 — peur extrême. Et le BTC évolue toujours sous sa SMA 200 en death cross. Le rebond suit le mouvement global de désescalade, mais la structure de fond reste baissière tant que le Bitcoin ne repasse pas au-dessus des 72800 dollars.",
+      "durationSec": 25,
+      "visualCues": [],
+      "data": {}
+    },
+    {
+      "id": "seg_7",
+      "type": "segment",
+      "depth": "flash",
+      "topic": "rheinmetall-defense",
+      "assets": [
+        "RHM.DE"
+      ],
+      "title": "Rheinmetall chute de 7% — le revers de la paix",
+      "narration": "Quand la guerre recule, le secteur défense trinque. Rheinmetall, le champion de la défense européenne, lâche 7.4% avec un volume en forte hausse. C'est la logique inversée — tout ce qui avait profité des tensions géopolitiques rend ses gains. Un rappel que la géopolitique fonctionne dans les deux sens.",
+      "durationSec": 22,
+      "visualCues": [],
+      "data": {}
+    },
+    {
+      "id": "closing",
+      "type": "closing",
+      "title": "Closing",
+      "narration": "Un seul signal politique a fait chuter le pétrole de 12%, exploser l'or, rebondir l'Europe et l'Asie — et couler la défense. C'est la preuve que la géopolitique reste le maître du jeu en ce moment. Demain, tous les yeux seront sur le CPI américain — parce que c'est lui qui dira si la chute du pétrole suffit à rouvrir la porte à une baisse de taux de la Fed. La paix au Moyen-Orient d'ici la fin du mois — réaliste ou vœu pieux ? Dis-moi en commentaire.",
+      "durationSec": 28,
+      "visualCues": [],
+      "data": {}
+    }
+  ],
+  "totalDurationSec": 443,
+  "segmentCount": 7,
+  "coverageTopics": [
+    "petrole-effondrement-iran",
+    "or-argent-refuges",
+    "europe-rebond-petrole",
+    "wall-street-divergence",
+    "kospi-asie-rebond",
+    "crypto-rebond-timide",
+    "rheinmetall-defense"
+  ]
+}

@@ -288,21 +288,71 @@ export function buildSnapshotFromCandles(
   // Asian markets (UTC+8/+9) have candle timestamps at local midnight, which falls
   // on the previous UTC day (e.g. Shanghai Feb 17 = UTC Feb 16 16:00).
   // So we also try targetDate - 1 day as a fallback.
+  // Forex (24/5) candles may skip weekends entirely — try next day too.
   const prevDay = (() => {
     const d = new Date(targetDate + "T12:00:00Z");
     d.setDate(d.getDate() - 1);
     return d.toISOString().split("T")[0];
   })();
+  const nextDay = (() => {
+    const d = new Date(targetDate + "T12:00:00Z");
+    d.setDate(d.getDate() + 1);
+    return d.toISOString().split("T")[0];
+  })();
 
-  let targetIdx = dailyCandles.findIndex((c) => c.date.startsWith(targetDate));
+  // Helper: find a candle for a given date prefix, preferring valid close
+  function findCandle(datePrefix: string): number {
+    // Prefer the LAST candle with this date that has a valid close
+    for (let i = dailyCandles.length - 1; i >= 0; i--) {
+      if (dailyCandles[i].date.startsWith(datePrefix) && dailyCandles[i].c !== null) return i;
+    }
+    // Fall back to any candle with this date (even null close)
+    return dailyCandles.findIndex((c) => c.date.startsWith(datePrefix));
+  }
+
+  let targetIdx = findCandle(targetDate);
+
+  // Yahoo quirk: for the latest trading day, the "official" candle has close=null,
+  // and the real close is in the NEXT entry (regularMarketTime), often the next UTC day
+  // for non-US assets (Asian indices, forex, DXY).
+  if (targetIdx >= 0 && dailyCandles[targetIdx].c === null) {
+    // Check the next candle — it's the regularMarketTime entry with the real close
+    const nextIdx = targetIdx + 1;
+    if (nextIdx < dailyCandles.length && dailyCandles[nextIdx].c !== null) {
+      // Merge: keep H/L from the session candle, close from the next entry
+      const session = dailyCandles[targetIdx];
+      const real = dailyCandles[nextIdx];
+      const merged: Candle = {
+        ...session,
+        c: real.c,
+        h: Math.max(session.h ?? 0, real.h ?? 0),
+        l: Math.min(session.l ?? Infinity, real.l ?? Infinity),
+      };
+      dailyCandles[targetIdx] = merged;
+    } else {
+      // No real close available — skip
+      targetIdx = -1;
+    }
+  }
+
   if (targetIdx < 0) {
-    // Timezone fallback for Asian markets
-    targetIdx = dailyCandles.findIndex((c) => c.date.startsWith(prevDay));
+    // Timezone fallback: Asian markets
+    targetIdx = findCandle(prevDay);
+    if (targetIdx >= 0 && dailyCandles[targetIdx].c === null) targetIdx = -1;
+  }
+  if (targetIdx < 0) {
+    // Forex fallback: candles may land on next UTC day
+    targetIdx = findCandle(nextDay);
+    if (targetIdx >= 0 && dailyCandles[targetIdx].c === null) targetIdx = -1;
   }
   if (targetIdx < 0) return null;
 
   const candle = dailyCandles[targetIdx];
-  const prevCandle = targetIdx > 0 ? dailyCandles[targetIdx - 1] : null;
+  // For prevCandle, skip any null-close entries
+  let prevCandle: Candle | null = null;
+  for (let i = targetIdx - 1; i >= 0; i--) {
+    if (dailyCandles[i].c !== null) { prevCandle = dailyCandles[i]; break; }
+  }
 
   const price = candle.c;
   const prevClose = prevCandle ? prevCandle.c : candle.o;
@@ -329,7 +379,8 @@ export async function fetchAllAssets(
   console.log(`Fetching ${assets.length} assets${isHistorical ? ` (historical: ${targetDate})` : ""}...`);
   const results: AssetSnapshot[] = [];
 
-  for (const asset of assets) {
+  for (let i = 0; i < assets.length; i++) {
+    const asset = assets[i];
     try {
       if (isHistorical) {
         // Historical mode: use daily candles to reconstruct the snapshot
@@ -347,6 +398,10 @@ export async function fetchAllAssets(
       }
     } catch (err) {
       console.warn(`  Failed to fetch ${asset.name}: ${err}`);
+    }
+    // Throttle Yahoo requests to avoid rate-limiting (300ms between each)
+    if (i < assets.length - 1) {
+      await new Promise((r) => setTimeout(r, 300));
     }
   }
 

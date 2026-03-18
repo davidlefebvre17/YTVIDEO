@@ -10,6 +10,7 @@ export type {
   VisualCue,
   ScriptSection,
   EpisodeScript,
+  EpisodeDirection,
   AssetSnapshot,
   TechnicalIndicators,
   MultiTimeframeAnalysis,

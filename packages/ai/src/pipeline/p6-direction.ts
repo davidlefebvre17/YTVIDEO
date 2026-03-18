@@ -1,7 +1,7 @@
 import { generateStructuredJSON } from "../llm-client";
 import type {
   DraftScript, EditorialPlan, AnalysisBundle, DirectedEpisode,
-  ArcBeat, Transition, ChartTiming, ThumbnailMoment, MoodTag,
+  ArcBeat, Transition, ChartTiming, ThumbnailMoment, MoodTag, AudioBreakpoint,
 } from "./types";
 import type { Language } from "@yt-maker/core";
 
@@ -36,6 +36,21 @@ RÈGLES :
 4. Un seul tag mood pour l'épisode entier
 5. Chart timings : showAtSec = 2 secondes AVANT la mention dans la narration, hideAtSec = fin du point technique
 6. Tu ne MODIFIES JAMAIS la narration — elle est figée depuis C3/C4
+7. AUDIO BREAKPOINTS : Pour chaque segment, découper la narration en sous-segments selon le pacing naturel.
+   - Identifie les ruptures de rythme dans la narration (fait dense → explication → montée → respiration)
+   - Chaque sous-segment = pacingTag + wordIndex de début/fin + paramètres ElevenLabs estimés
+   - Maximum 3 sous-segments par DEEP, 2 par FOCUS, 1 par FLASH
+   - Les segments cold_open et thread sont des sous-segments uniques
+   PACING TAGS et paramètres ElevenLabs typiques :
+   • lent_martelé : speed=0.82, stability=0.85, style=0.6 (cold open dramatique)
+   • pose_fluide : speed=0.93, stability=0.72, style=0.3 (thread, fluide)
+   • rapide : speed=1.08-1.10, stability=0.62-0.65, style=0.6-0.7 (info dense)
+   • posé : speed=0.88-0.93, stability=0.75-0.80, style=0.2-0.3 (analyse)
+   • tension : speed=0.87-0.88, stability=0.78-0.82, style=0.45-0.55 (build-up)
+   • analytique : speed=0.95, stability=0.75, style=0.2 (données)
+   • synthèse : speed=0.92, stability=0.78, style=0.2 (closing recap)
+   • engagement : speed=0.97, stability=0.70, style=0.45 (CTA)
+   • teaser : speed=1.04, stability=0.68, style=0.5 (teaser demain)
 
 SORTIE : JSON strict.`;
 }
@@ -99,17 +114,46 @@ function buildC5UserPrompt(
     }
   ],
   "thumbnailMoment": {
-    "segmentId": "seg_2",
-    "reason": "Chiffre exceptionnel sur l'or",
-    "keyFigure": "2950$",
-    "emotionalTone": "choc"
+    "segmentId": "{SEG_ID_PLUS_FORT_CTR}",
+    "reason": "Pourquoi ce segment accroche le plus",
+    "keyFigure": "{CHIFFRE_CLE_DU_SEGMENT}",
+    "emotionalTone": "choc | surprise | tension | espoir"
   },
   "moodMusic": "tension_geopolitique",
   "chartTimings": [
     {
-      "chartInstruction": { "type": "support_line", "asset": "GC=F", "value": 2900, "label": "Support" },
+      "chartInstruction": { "type": "{TYPE_FROM_C2}", "asset": "{SYMBOL}", "value": "{LEVEL_FROM_C2}", "label": "{LABEL}" },
       "showAtSec": 45,
       "hideAtSec": 80
+    }
+  ],
+  "audioBreakpoints": [
+    {
+      "segmentId": "cold_open",
+      "subIndex": 0,
+      "startWordIndex": 0,
+      "endWordIndex": 999,
+      "pacingTag": "lent_martelé",
+      "durationSec": 7,
+      "elevenLabsParams": { "speed": 0.82, "stability": 0.85, "style": 0.6 }
+    },
+    {
+      "segmentId": "seg_1",
+      "subIndex": 0,
+      "startWordIndex": 0,
+      "endWordIndex": 80,
+      "pacingTag": "rapide",
+      "durationSec": 33,
+      "elevenLabsParams": { "speed": 1.08, "stability": 0.65, "style": 0.7 }
+    },
+    {
+      "segmentId": "seg_1",
+      "subIndex": 1,
+      "startWordIndex": 80,
+      "endWordIndex": 220,
+      "pacingTag": "tension",
+      "durationSec": 50,
+      "elevenLabsParams": { "speed": 0.88, "stability": 0.80, "style": 0.55 }
     }
   ]
 }`;
@@ -138,6 +182,7 @@ export async function runC5Direction(input: {
     thumbnailMoment: ThumbnailMoment;
     moodMusic: MoodTag;
     chartTimings: ChartTiming[];
+    audioBreakpoints: AudioBreakpoint[];
   }>(
     systemPrompt,
     userPrompt,
@@ -186,6 +231,11 @@ export async function runC5Direction(input: {
         ct.hideAtSec = (ct as any).hide ?? (ct as any).endSec ?? ct.showAtSec + 15;
       }
     }
+  }
+
+  // AudioBreakpoints: ensure array exists
+  if (!Array.isArray(c5Output.audioBreakpoints)) {
+    c5Output.audioBreakpoints = [];
   }
 
   // ── Ensure arc has all segments (including blocks) ──
@@ -239,6 +289,7 @@ export async function runC5Direction(input: {
     },
     moodMusic: c5Output.moodMusic ?? 'neutre_analytique',
     chartTimings: c5Output.chartTimings ?? [],
+    audioBreakpoints: c5Output.audioBreakpoints ?? [],
     totalEstimatedDuration: input.draft.metadata?.totalDurationSec ?? 420,
   };
 }
