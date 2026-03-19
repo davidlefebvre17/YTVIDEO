@@ -7,9 +7,10 @@
     "build": "npx remotion render src/index.ts DailyRecap out/episode.mp4 --codec=h264 --crf=18"
   },
   "dependencies": {
-    "@yt-maker/core": "*",
     "@remotion/cli": "^4.0.421",
     "@remotion/player": "^4.0.421",
+    "@remotion/transitions": "^4.0.436",
+    "@yt-maker/core": "*",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "remotion": "^4.0.421"

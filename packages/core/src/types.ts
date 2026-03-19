@@ -370,3 +370,97 @@ export interface AudioManifest {
   segments: AudioSegment[];
   totalDurationSec: number;
 }
+
+// ── Beat Pipeline Types (Bloc E v2) ─────────────────────
+
+export type ImageEffect =
+  | 'ken_burns_in'
+  | 'ken_burns_out'
+  | 'slow_pan_left'
+  | 'slow_pan_right'
+  | 'static';
+
+export type BeatTransition =
+  | 'cut'
+  | 'fade'
+  | 'slide_left'
+  | 'slide_up'
+  | 'wipe'
+  | 'cross_dissolve';
+
+export type BeatEmotion =
+  | 'tension'
+  | 'analyse'
+  | 'revelation'
+  | 'contexte'
+  | 'impact'
+  | 'respiration'
+  | 'conclusion';
+
+export type OverlayType =
+  | 'stat'
+  | 'chart'
+  | 'chart_zone'
+  | 'causal_chain'
+  | 'comparison'
+  | 'headline'
+  | 'text_card'
+  | 'heatmap'
+  | 'scenario_fork'
+  | 'gauge'
+  | 'ticker_strip';
+
+export interface BeatOverlay {
+  type: OverlayType;
+  data: Record<string, unknown>;
+  position: 'center' | 'bottom_third' | 'lower_third' | 'top_right' | 'full';
+  enterAnimation: 'pop' | 'slide_up' | 'fade' | 'count_up';
+  enterDelayMs: number;
+  triggerWord?: string;
+}
+
+export interface BeatTiming {
+  estimatedDurationSec: number;
+  audioDurationSec?: number;
+  wordTimestamps?: Array<{
+    word: string;
+    startMs: number;
+    endMs: number;
+  }>;
+}
+
+export interface Beat {
+  id: string;
+  segmentId: string;
+  startSec: number;
+  durationSec: number;
+  narrationChunk: string;
+  timing: BeatTiming;
+  imagePrompt: string;
+  imagePath?: string;
+  imageReuse?: string;
+  imageEffect: ImageEffect;
+  overlay?: BeatOverlay;
+  transitionOut: BeatTransition;
+  emotion: BeatEmotion;
+  audioPath?: string;
+}
+
+export interface EpisodeVisualIdentity {
+  colorTemperature: 'warm' | 'cool' | 'neutral';
+  lightingRegister: 'soft_natural' | 'golden_hour' | 'overcast' | 'studio_warm';
+  photographicStyle: string;
+  forbiddenElements: string[];
+}
+
+export interface BeatEpisodeData {
+  beats: Beat[];
+  visualIdentity: EpisodeVisualIdentity;
+  totalBeats: number;
+  uniqueImages: number;
+  stats: {
+    overlayCount: number;
+    imageOnlyCount: number;
+    avgBeatDurationSec: number;
+  };
+}

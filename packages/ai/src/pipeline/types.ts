@@ -1,7 +1,7 @@
 import type {
   AssetSnapshot, DailySnapshot, EpisodeScript, ScriptSection, VisualCue, Prediction,
   ThemesDuJour, BondYields, MarketSentiment, EconomicEvent, StockScreenResult, NewsItem,
-  Language,
+  Language, OverlayType, ImageEffect, BeatTransition, BeatEmotion, EpisodeVisualIdentity,
 } from "@yt-maker/core";
 import type { NewsMemoryDB } from "../memory";
 
@@ -420,4 +420,43 @@ export interface PrevEntry {
 
 export interface PrevContext {
   entries: PrevEntry[];
+}
+
+// ── P7 Visual Pipeline Types ────────────────────────────
+
+export interface RawBeat {
+  id: string;
+  segmentId: string;
+  startSec: number;
+  durationSec: number;
+  narrationChunk: string;
+  overlayHint: OverlayType | 'none';
+  overlayData?: Record<string, unknown>;
+  segmentDepth: 'flash' | 'focus' | 'deep';
+  segmentTopic?: string;
+  assets: string[];
+  isSegmentStart: boolean;
+  isSegmentEnd: boolean;
+}
+
+export interface BeatDirection {
+  beatId: string;
+  imageDirection: string;
+  imageReuse?: string;
+  overlay: OverlayType | 'none';
+  overlayNotes?: string;
+  imageEffect: ImageEffect;
+  transitionOut: BeatTransition;
+  emotion: BeatEmotion;
+}
+
+export interface C7DirectionResult {
+  visualIdentity: EpisodeVisualIdentity;
+  directions: BeatDirection[];
+}
+
+export interface ImagePromptResult {
+  beatId: string;
+  imagePrompt: string;
+  skip: boolean;
 }

@@ -13,7 +13,9 @@ import { SegmentScene, type VisualSlot } from "./scenes/SegmentScene";
 import { NewspaperEpisode } from "./compositions/NewspaperEpisode";
 import { NewspaperCanvas } from "./scenes/newspaper/NewspaperCanvas";
 import { SAMPLE_SCRIPT, SAMPLE_ASSETS, SAMPLE_NEWS, SAMPLE_STORYBOARD } from "./fixtures/sample-data";
-import type { EpisodeScript, ScriptSection, AssetSnapshot } from "@yt-maker/core";
+import { SAMPLE_BEATS } from "./fixtures/sample-beats";
+import { BeatEpisode, getEffectiveDuration, getTransitionDurationFrames } from "./compositions/BeatEpisode";
+import type { EpisodeScript, ScriptSection, AssetSnapshot, Beat } from "@yt-maker/core";
 import { BRAND } from "@yt-maker/core";
 
 // Scene wrapper components for Remotion Compositions
@@ -276,6 +278,37 @@ export const RemotionRoot: React.FC = () => {
             />
           );
         })()}
+      </Folder>
+
+      <Folder name="BeatEpisodes">
+        <Composition
+          id="BeatDaily"
+          component={BeatEpisode}
+          durationInFrames={300}
+          fps={30}
+          width={1920}
+          height={1080}
+          defaultProps={{
+            script: SAMPLE_SCRIPT,
+            beats: SAMPLE_BEATS,
+            assets: SAMPLE_ASSETS,
+            news: SAMPLE_NEWS,
+          }}
+          calculateMetadata={({ props }: { props: Record<string, unknown> }) => {
+            const beats = (props.beats ?? []) as Beat[];
+            const fps = 30;
+            const totalBeatFrames = beats.reduce(
+              (sum, b) => sum + Math.max(15, Math.round(getEffectiveDuration(b) * fps)), 0
+            );
+            const transitionOverlap = beats.slice(0, -1).reduce((sum, b) => {
+              return sum + getTransitionDurationFrames(b.transitionOut);
+            }, 0);
+            return {
+              durationInFrames: Math.max(30, totalBeatFrames - transitionOverlap),
+              fps, width: 1920, height: 1080,
+            };
+          }}
+        />
       </Folder>
 
       <Folder name="Newspaper">

@@ -36,6 +36,15 @@ export type {
   EpisodeManifestEntry,
   AudioSegment,
   AudioManifest,
+  ImageEffect,
+  BeatTransition,
+  BeatEmotion,
+  OverlayType,
+  BeatOverlay,
+  BeatTiming,
+  Beat,
+  EpisodeVisualIdentity,
+  BeatEpisodeData,
 } from "./types";
 
 export { computeLayout } from "./layout";
