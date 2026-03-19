@@ -55,6 +55,8 @@ export interface SnapshotFlagged {
   date: string;
   assets: FlaggedAsset[];
   events: EconomicEvent[];
+  yesterdayEvents?: EconomicEvent[];
+  upcomingEvents?: EconomicEvent[];
   yields?: BondYields;
   sentiment?: MarketSentiment;
   earnings: StockScreenResult[];

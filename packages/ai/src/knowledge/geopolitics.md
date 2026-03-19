@@ -77,6 +77,49 @@ Tensions Moyen-Orient → Risque approvisionnement pétrole
 - Les stocks stratégiques US (SPR) : "Les États-Unis pourraient puiser dans les réserves stratégiques — ça calme temporairement les prix."
 - Houthis et mer Rouge : pétroliers détournés par l'Afrique du Sud → coûts de transport en hausse → inflation logistique
 
+## Asymétries régionales face aux chocs énergétiques
+
+Un même choc pétrolier n'a PAS le même impact selon la région. Le narrateur doit toujours distinguer QUI souffre et QUI en profite.
+
+### États-Unis — net exporteur, autonome
+- Premier producteur mondial de pétrole (>12 Mb/j) et de gaz naturel
+- Net exporteur d'énergie depuis 2019 — un choc pétrolier mondial AUGMENTE les revenus des producteurs US
+- La Maison Blanche peut agir sur les prix domestiques (SPR, permis de forage, waivers)
+- Le S&P 500 contient les majors pétrolières (XOM, CVX) → un indice US peut monter malgré un choc pétrolier
+- Conséquence narrative : "Les US sont les moins vulnérables à un choc Moyen-Orient — c'est l'Europe et l'Asie qui paient les pots cassés"
+
+### Europe — dépendante, exposée
+- Importe ~90% de son pétrole et ~80% de son gaz (post-Russie, redirigé vers GNL US/Qatar/Norvège)
+- Un pétrole à 100$+ = inflation importée directe → coûts industriels (chimie, transport, sidérurgie)
+- Le DAX souffre plus que le S&P dans un choc énergie (industrie lourde exportatrice)
+- Le CAC résiste mieux (TotalEnergies compense, luxe moins exposé)
+- La BCE est plus contrainte que la Fed : ne peut pas couper les taux si l'inflation énergie persiste
+- Conséquence narrative : "L'Europe subit le choc sans pouvoir y répondre — ni par la production, ni par les taux"
+
+### Japon — importateur total, sensible au yen
+- Importe ~95% de son énergie (pétrole, GNL)
+- Un yen faible AMPLIFIE le coût d'importation (double peine : prix + devises)
+- Les sogo shosha (Mitsui, Mitsubishi, Sumitomo) sont des BÉNÉFICIAIRES : ce sont des traders de commodities
+- Le Nikkei peut monter sur un choc pétrolier grâce aux sogo shosha, même si l'économie japonaise souffre
+- La BOJ est contrainte : monter les taux pour défendre le yen → casse la croissance, ne pas monter → inflation importée
+- Conséquence narrative : "Le Japon est dans le même piège que l'Europe, avec une nuance : ses conglomérats de négoce profitent du chaos"
+
+### Chine — importateur stratégique, levier diplomatique
+- Deuxième importateur mondial de pétrole, premier importateur de GNL
+- Peut acheter du pétrole russe/iranien à prix réduit (contournement de sanctions)
+- Les marchés chinois réagissent moins aux chocs Moyen-Orient (diversification des sources)
+- Levier diplomatique : la Chine peut peser sur les négociations (acheteur crucial pour l'Iran)
+- CNOOC (0883.HK) et PetroChina bénéficient d'un pétrole élevé
+
+### Grille de lecture rapide pour le narrateur
+
+| Choc | US (^GSPC) | Europe (^GDAXI) | Japon (^N225) | Chine (^HSI) |
+|------|-----------|-----------------|---------------|--------------|
+| Pétrole +10% | Mixte (XOM↑, airlines↓) | Négatif (coûts) | Mixte (sogo shosha↑, économie↓) | Faible impact |
+| Pétrole -10% | Mixte (XOM↓, consommation↑) | Positif (coûts↓) | Positif (imports↓) | Neutre |
+| Gaz +20% | Neutre (exportateur net) | Très négatif | Négatif | Négatif |
+| Sanctions Iran | Haussier pétrole (offre↓) | Négatif (supply chain) | Négatif (import) | Positif (discount russe/iranien) |
+
 ## Grille 2 : Russie-Ukraine
 
 ### Chaîne causale principale

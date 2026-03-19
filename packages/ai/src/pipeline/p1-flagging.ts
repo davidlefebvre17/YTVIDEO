@@ -574,6 +574,8 @@ export function flagAssets(snapshot: DailySnapshot): SnapshotFlagged {
     date: snapshot.date ?? new Date().toISOString().slice(0, 10),
     assets: flagged,
     events: snapshot.events ?? [],
+    yesterdayEvents: snapshot.yesterdayEvents,
+    upcomingEvents: snapshot.upcomingEvents,
     yields: snapshot.yields,
     sentiment: snapshot.sentiment,
     earnings: snapshot.stockScreen ?? [],

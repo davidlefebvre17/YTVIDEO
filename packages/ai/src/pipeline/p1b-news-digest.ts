@@ -30,6 +30,7 @@ CATÉGORIES :
 - corporate : M&A, earnings surprise, faillite, IPO, changement de CEO, contrat majeur, guidance révisée
 - market_structure : approbation/rejet d'ETF, rebalancing d'indice, circuit breaker, changement de marge, short squeeze
 - institutional : adoption/rejet par grande institution (banque, fonds souverain, assureur), allocation stratégique, deal infra >$500M
+- political_context : motivation politique derrière une décision (pourquoi un gouverneur reste/part, pression présidentielle, enquête judiciaire, visite diplomatique tendue). Ce n'est pas l'événement lui-même mais le CONTEXTE qui change son interprétation.
 - other : autre événement structurel ne rentrant dans aucune catégorie
 
 NIVEAUX D'IMPORTANCE :
@@ -59,11 +60,12 @@ significant — Catalyseur DIRECT d'un mouvement de marché observable ou attend
 notable — Contexte utile pour comprendre le jour, pas de catalyseur immédiat.
   TEST : le spectateur a-t-il besoin de cette info pour comprendre le contexte ?
   Exemples génériques :
-  • Visite diplomatique, nomination politique
+  • Visite diplomatique, nomination politique, contexte humain d'une décision
   • Partenariat stratégique ou deal < $500M
   • Donnée éco conforme au consensus (confirme la trajectoire)
   • Rapport d'analyste ou étude sectorielle sans impact prix
   • Événement à venir (earnings la semaine prochaine, sommet annoncé)
+  • Motivation politique derrière une décision économique (enquête judiciaire, pression présidentielle)
 
 CE QUI N'EST PAS UN ÉVÉNEMENT (IGNORER) :
 - Articles d'opinion : "Why I wouldn't...", "Is X a buy?", "Best stocks to..."
@@ -95,7 +97,7 @@ function buildUserPrompt(news: NewsItem[], calendarHighlights: string[]): string
     }
   }
 
-  prompt += `\nExtrais les 5 à 10 événements structurels les plus importants. JSON strict.`;
+  prompt += `\nExtrais les 8 à 15 événements structurels les plus importants. Inclus le CONTEXTE POLITIQUE derrière les décisions (pas juste la décision). JSON strict.`;
   return prompt;
 }
 

@@ -7,6 +7,7 @@ import type { BriefingPack } from "./helpers/briefing-pack";
 import { formatBriefingPack } from "./helpers/briefing-pack";
 import type { NewsDigest } from "./p1b-news-digest";
 import { formatNewsDigest } from "./p1b-news-digest";
+import { detectCalendarPatterns, formatCalendarPatterns } from "./helpers/calendar-patterns";
 import { buildTemporalAnchors } from "./helpers/temporal-anchors";
 
 /**
@@ -118,6 +119,16 @@ function buildC1UserPrompt(
   // News digest FIRST — structural events before raw data
   if (newsDigest?.events.length) {
     prompt += formatNewsDigest(newsDigest);
+  }
+
+  // Calendar patterns (CB clusters, macro clusters)
+  const calendarPatterns = detectCalendarPatterns(
+    flagged.events ?? [],
+    flagged.upcomingEvents ?? [],
+    flagged.yesterdayEvents ?? [],
+  );
+  if (calendarPatterns.length) {
+    prompt += formatCalendarPatterns(calendarPatterns);
   }
 
   prompt += `## THÈMES DU JOUR\n${formatThemesCompact(flagged)}\n\n`;
