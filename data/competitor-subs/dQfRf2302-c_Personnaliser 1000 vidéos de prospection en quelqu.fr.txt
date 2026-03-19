@@ -1,0 +1,592 @@
+Salut tout le monde, c'est Tier Col B et
+bienvenue sur ma chaîne YouTube. Dans
+cette vidéo, je vais vous montrer
+comment utiliser antigravity pour
+réaliser des vidéos. OK ? Et le point
+ici, c'est très intéressant parce que ça
+va nous permettre de pouvoir réaliser
+des vidéos personnalisées pour les
+entreprises dans plusieurs cas de
+figure, notamment celui-ci. Je vais vous
+montrer une démonstration
+de ce qu'on va faire dans dans la vidéo.
+Bonjour Sophie, je vous appelle car je
+suis actuellement sur le site internet
+de Textart. J'ai repéré rapidement deux
+ou trois points d'amélioration qui
+pourraient aider à augmenter les
+demandes de contact. Je ne veux rien
+vous vendre maintenant, juste vous
+proposer un échange de 15 minutes pour
+vous les partager. Est-ce que ça
+pourrait vous intéresser cette semaine ?
+OK. Ou encore un autre exemple.
+avec cette vidéo.
+Bonjour Alice, je vous appelle car je
+de Flurco. J'ai repéré rapidement deux
+pourrai t'aider à augmenter les demandes
+de contact. Je ne veux rien vous vendre
+maintenant, juste vous proposer un
+échange de 15 minutes pour vous les
+partager. Est-ce que ça pourrait vous
+intéresser cette semaine ?
+OK. Donc en fait l'idée euh c'est de
+réaliser des vidéos personnalisées pour
+les entreprises, pour les prospects. On
+va utiliser Eleven Labs et on va rédiger
+un script qui va euh proposer un appel
+de vente, un appel de découverte au
+clients de manière personnalisée sur son
+site internet et avec les informations
+complémentaires qu'on pourra lui
+trouver.
+Ça marche super fort lorsque vous faites
+de la prospection notamment en code
+emailing et ou voir même lorsque vous
+prospectez des personnes sur LinkedIn.
+C'est des solutions que moi je développe
+pour au sein de Autonomeet pour mon
+agence I et que je propose également aux
+entreprises et que je vends aux
+entreprises. Ça marche très très bien,
+c'est très sophistiqué et dans cette
+vidéo, on va voir on va voir comment
+réaliser ça. Ça sera un prototype. Euh
+il va falloir l'améliorer naturellement.
+Il va falloir apporter des
+modifications. Ici, c'est vraiment de
+vous montrer euh les grandes lignes. Si
+vous ne me connaissez pas, je m'appelle
+Tierno Kyakbali. J'ai monté une agence
+IA qui s'appelle Autonome HNET et
+également j'ai monté un incubateur pour
+les HPE, les haut potentiels
+entrepreneurs euh dans laquelle on parle
+vraiment business et IA et on on monte
+on fait du business ensemble, on monte
+une agence IA et puis je leur montre
+exactement euh comment mettre en place
+des processés pour pouvoir euh générer
+de l'activité rentable avec
+l'intelligence artificielle au bout de
+90 jours. Si vous êtes intéressé, tout
+est dans la description et également si
+vous êtes une entreprise et que vous
+êtes intéressé par les solutions que je
+propose sur YouTube, n'hésitez pas à
+prendre rendez-vous dans mon cal dans
+mon call, comme ça on pourra voir
+comment est-ce qu'on pourrait apporter
+ces solutions dans votre boîte. OK ?
+Donc pour commencer, remotion, qu'est-ce
+que c'est ? En fait, remotion, c'est une
+app qui a été lancée récemment et l'idée
+en fait, c'est de pouvoir
+automatiser, créer des vidéos ou des
+motion graphiques. En fait, on peut
+faire beaucoup de choses. Je vais vous
+montrer en détail avec cette
+application. C'est gratuit, vous avez un
+usage gratuit ici avec une limite avec
+limite d'usage illimité. Et ensuite
+après si vous voulez travailler en
+équipe, scaler, là c'est à partir de 75
+dollars par mois. Donc c'est largement
+rentable. Ça évite d'utiliser des des IA
+tels que euh B Human ou encore Opus
+Vidéo et cetera pour faire des montages
+de vidéos. Donc là avec cette solution,
+vous allez pouvoir faire des montages
+vidéos avec Lia, vraiment avec votre
+voix ou en lui écrivant. OK ? Pour
+commencer, on va copier ce lien. Vous
+vous allez sur remotion.
+Vous copiez ce lien et on va ouvrir
+comme d'habitude antiravity
+notre magnifique application de Google.
+Dessus on va créer un nouveau dossier.
+Donc moi, j'ai déjà créé un nouveau
+dossier auparavant que j'ai appelé
+remotion, il me semble. Donc je vais
+cliquer sur open folder, donc ouvrir un
+dossier et je vais choisir
+remotion.
+Donc ici pareil, on est en fait dans un
+dans on crée notre environnement de
+travail. Et pour cela, on va donc
+premièrement installer ce qu'on appelle
+les dépendances. Les dépendances en
+fait, ce sont euh des euh des
+fonctionnalités que l'ordinateur va
+aller récupérer dans les bibliothèques
+virtuel de certaines applications pour
+nous les installer directement sur notre
+bureau de travail. OK ? Donc en gros,
+c'est comme si euh vous devez
+réaliser un chantier. OK ? pour les
+professionnels. Les professionnels
+doivent réaliser un chantier. Donc pour
+cela, euh ils vont aller euh chez le roi
+Merlin récupérer euh du bois. Ils vont
+aller récupérer euh euh une trançonneuse
+chez euh chez euh dans une là où on loue
+des des outils et cetera et cetera. OK.
+Pour réaliser sa sa maison. Donc en
+fait, il va louer des des du matos pour
+réaliser son chantier. Et là, c'est
+pareil. Nous ce qu'on veut c'est de
+créer une vidéo et au lieu de tout
+télécharger, de télécharger euh euh
+Adobier et cetera et cetera, on va
+récupérer uniquement les
+fonctionnalités, donc les outils
+nécessaires pour réaliser notre vidéo et
+c'est tout. OK ? Ça nous évite d'avoir
+une surcharge de logiciel sur notre
+bureau. Et pour cela, donc on va copier
+et coller ce link dans le dossier
+remotion et dedans en fait voilà, là il
+nous propose plusieurs euh templates de
+création. Donc on peut créer un template
+playground Hello World. Euh on peut
+travailler avec Next GS. Ça c'est plus
+pour les développeurs euh UI un peu plus
+poussé mais c'est pas c'est pas ce qui
+nous intéresse pour le moment. Euh on
+peut faire des enregistrements, on peut
+traduire un prompt en motion graphic. OK
+pour réaliser euh des motion graphiques
+pour les SAS notamment. Euh les SAS,
+elles ont besoin de réaliser des vidéos
+de présentation de leurs produits. Donc
+on peut le réaliser avec euh le motion.
+Euh donc on va pouvoir combiner dans
+Grunder, combiner et et traduire les et
+euh créer les vidéos. Euh travailler
+avec React. Il y a énormément d'options.
+On peut faire traduire de l'audio au
+texte visuel. Donc en fait, par exemple,
+on va parler et ensuite après ça va
+s'afficher euh un peu comme sur ce qu'on
+voit sur euh TikTok et tout ça les et et
+tout et tous les et tout ça. Pareil,
+prompt vidéo, ce qu'il y a overlay, euh
+on peut même euh mettre en place des
+sous-titres automatisés euh sur nos
+vidéos. Donc par exemple euh les
+entreprises aimeraient bien ajouter des
+sous-titres sur leurs vidéos euh de
+production ou encore des youtubeurs ou
+quoi que ce soit. Donc du coup, ils sont
+obligés de passer par des applications
+pour sous-titrer. Donc là avec c avec
+cette application, on va pouvoir
+simplement importer la vidéo et utiliser
+cette fonctionnalité pour traduire grâce
+à l'intelligence artificielle les
+sous-titres de la vidéo. OK ? Donc et
+c'est très économe parce que ça nous
+invite de prendre des abonnements auprès
+des des applications et de devoir les
+faire actuellement là. Donc là, on peut
+travailler directement sur notre bureau
+grâce à antiravity.
+OK.
+Donc nous ce qui nous intéresse, on va
+partir d'une feuille blanche. Donc on va
+prendre la première option blanque from
+scratch. OK. Nothing expect and unty
+canvas. OK. Ensuite, il nous demande
+d'utiliser l'outil ti cs. On va prendre
+oui. Est-ce qu' on doit on veut ajouter
+les agents skills ? Oui.
+Et donc là, il est en train de
+configurer notre configuration, notre
+settings.
+OK. Donc là sur notre bureau, il a
+détecté trois agents. H alors il nous
+demande est-ce que il doit installer
+tous les agents euh actuellement ou
+est-ce que ça sera uniquement l'agent
+sélectionné ? En l'occurrence, nous on a
+Gemini, Cloud et GPTOS. Donc ici on va
+prendre principalement Gemini. Donc pas
+besoin d'installer tous les tous les
+agents parce que Gemenna il est très
+très bon en tout ce qui est euh
+graphique.
+Euh le scope d'installation, est-ce
+qu'on veut installer Remotion de manière
+globale donc sur tout notre PC ou
+uniquement dans le projet dans lequel on
+est en train de travailler ?
+C'est-à-dire dans le dossier remotion.
+On va choisir project. On veut pas on n
+pas besoin de installer surtout notre
+PC. Et dans inst dans la méthode
+installation, on va choisir SIM link.
+procéder à l'installation. Yes,
+nickel. Donc là, il vient euh là, ce
+qu'il fait en fait, c'est d'aller
+récupérer grâce au protocole HTTP les
+informations essentielles sur les liens,
+les sites internet et les importer sur
+notre bureau dans notre espace de
+travail. Donc là, ça a été copié. Pour
+commencer, on doit faire NP I.
+On va lancer la commande donc NPI.
+Et donc là, il est en train de mettre en
+place tout le settings, le la
+configuration. OK. Donc là, on voit bien
+qu'on a bien les dossiers, on a bien les
+agents, Gemini,
+public, source et toutes les dépendances
+nécessaires. Ensuite, pour vous montrer,
+on va faire NP run dev.
+Et là, ce qu'il va faire en fait, il va
+ouvrir euh un lien, il va nous donner un
+lien en local. Donc comme sur N8N,
+lorsque vous voyez local host 58 78, je
+crois, et ben c'est les sont les ports
+d'ouverture où la data va transiter. Et
+ben là, c'est pareil, il va ouvrir le
+port 3000 de notre PC pour euh faire
+notre projet. Donc là, on est en full
+local. OK. Et là en fait tout ce qu'on
+voit ici là genre fichier, view, tools,
+package et cetera et cetera, c'est grâce
+aux euh importation qu'on a fait en
+lançant la commande. Et là c'est tout ça
+en fait, c'est tout ce qu'on a ici là.
+OK ? C'est ce qu'on a ici visuellement.
+OK ? Donc en fait c'est ça quand vous en
+fait quand vous téléchargez des
+applications web, vous téléchargez des
+fichiers sur votre ordinateur et ça se
+traduit graphiquement sur votre en
+visuel comme ça. OK ? Et c'est pour ça
+que c'est comme ça qu'on peut modifier
+parfois euh des applications et les
+adapter. Donc voilà. Euh nous donc là
+c'est from scratch. Nous c'est là c'est
+c'est je voulais juste vous montrer à
+peu près comment ça fonctionne. Là vous
+avez vous pouvez le faire soit
+manuellement ou soit avec un agent. Et
+c'est ce que je vais vous montrer. Euh
+donc ici vous avez ça se présente un peu
+comme
+euh euh Adobe premier ou toute
+application de montage. OK. C'est c'est
+ils prennent les les basiques pour
+pouvoir travailler. OK.
+OK. Donc là, on va faire contrôle C pour
+quitter. OK. Quit. Et là, on va voir.
+Hop, ça s'est arrêté parce qu'on a
+quitté.
+Voilà, ça marche plus parce qu'on a fait
+contrôle C pour quitter.
+Voilà. Donc maintenant, on a importé nos
+euh fonctionnalités, nos applications
+nécessaires. On a créé notre
+environnement de travail pour euh pour
+travailler, pour commencer à à monter
+nos vidéos. Et donc du coup, plutôt que
+de le faire à la main, ce qui peut
+prendre beaucoup de temps, on va
+utiliser notre agent manager. L'agent
+manager va travailler pour nous. Il va
+réaliser ce qu'on veut faire pour nous.
+Et pour cela, donc j'ai créé j'ai j'ai
+monté un j'ai écrit un un prompt, c'est
+celui-ci, système prompt interactive
+vidéo automation engineer.
+Vous allez retrouver toutes les
+ressources dans la dans mon lien dans le
+la description et on va faire copier
+ici là.
+Donc là en fait en gros, le prompt il
+dit quoi ? le prompt, il va le
+configurer comme étant un software
+engineer, donc un ingénieur en en
+développement de de logiciel et il va
+notamment dans la programmation de
+vidéos de la génération de vidéos et
+ensuite on lui donne tous les
+compétences nécessaires. Et donc du coup
+le fait qu'on ait copié de ce print, on
+va le coller ici et on va choisir donc
+méthode planning.
+Attendez, je vais passer en je vais
+passer en mode voilà comme ça vous allez
+voir ce que je fais. Donc là on va on va
+donc là on va commencer on va travailler
+dans l'espace remotion. OK start
+conversation in remotion. Comme ça il a
+en référence les fichiers qu'on a qu'on
+a qu'on a construit
+qu'on a importé. Et là on va coller le
+prom. OK. H et donc le plus le promte
+est détaillé, plus ça il pourra réaliser
+la tâche qu'on lui demande précisément.
+OK ? Et c'est ça qui change de N8N de
+tous les autres applications. C'est
+parce que les applications, elles sont
+rigides, fermées, cloisonnées et sur
+NFN, les agents sont probabilistes. Là,
+on lui donne exactement la méthode, le
+cheminement de de vidéo qu'on veut
+produire pour qu'il réalise la vidéo. Et
+donc, on va lui envoyer ça.
+Et là, il va rentrer. Si vous avez vu ma
+vidéo sur le print Engineering, euh vous
+allez, je vous recommande d'aller la
+voir. Vous allez bien comprendre ce qu'
+impr pourquoi est-ce qu'il y a des
+étoiles, pourquoi est-ce qu'il y a des
+hashtags, pourquoi est-ce que en en la
+forme, le fond et cetera ? OK, c'est
+très important. La vidéo, elle date d'il
+y a 1 an. Aujourd'hui, le prendre c'est
+devenu un peu plus euh un peu plus
+sophistiqué, facile à produire.
+Néanmoins, les principes premiers
+restent la même. Il faut respecter les
+principes premiers pour pouvoir obtenir
+un un rendu de qualité. OK ? Mais je
+vous encourage à aller la voir. Pas
+besoin d'acheter des formations bidon
+sur l'IA ou des des des coachings ou des
+trucs comme ça. Franchement, vous allez
+perdre votre argent. Vous vous allez sur
+ma chaîne YouTube, vous regardez touses
+les vidéos techniques sur Lia et vous
+allez avoir un niveau euh plus élevé que
+que la que pas mal de personnes. Après,
+si vous êtes intéressé par le côté
+business, par le côté gestion de d'une
+agence, par le côté comment monétiser
+ses compétences en là effectivement je
+vous recommande de rejoindre notre
+incubateur Vecteur Dynamic, le lien dans
+la description. OK, donc là il est en
+train de initialiser le pr
+et donc du coup euh de de se comporter
+comme tel. Là maintenant, il nous
+demande trois éléments pour pouvoir
+avancer. La langue utilisée, euh le lien
+du site du client, le nom du client et
+la le type de voix. OK ? Donc on va dire
+one
+français
+de on va prendre le lien on va prendre
+par exemple hop on va prendre le lien de
+vecteur dynamix virgule 3 le nom du
+client tierno
+et 4
+le script à pitié donc le script on va
+demander à GPT de nous rédiger un script
+Euh est-ce que tu peux me rédiger un
+script de prospection euh rapide ? Il
+doit durer à peu près 15 à 20 secondes
+de pour présenter un peu en fait c'est
+une personne qui va être sur le site
+internet du client et il va lui dire
+qu'il a détecté des opportunités pour
+améliorer son site internet et que s'il
+est intéressé et ben il peut est-ce
+qu'il a du temps dans la semaine pour
+pour un col. OK, faut que ça soit
+vraiment rapide, succin et que ça dure
+entre 15 et 20 secondes.
+Voilà. Hop, en lui parlant sur le
+prompt.
+Je vous recommande vraiment de
+télécharger des outils de travail
+rapide. Là, le prom, j'ai pas besoin de
+le de le de l'écrire. Euh, j'ai
+téléchargé euh Glido qui est en fait une
+application pour pouvoir transcrire
+oralement ou textuellement comme ça si
+vous gagnez du temps. OK, on est on doit
+on doit être dans une obit dans une euh
+objectif d'efficience.
+Euh donc voilà, il nous a donné deux
+options de texte. On va
+les coller ici.
+Voilà.
+et on va l'envoyer à notre agent. Alors,
+dans mon promte, j'ai oublié de lui
+donner de lui dire de me de m'ajouter
+des variables euh notamment pour le nom,
+le prénom et et le et le nom du
+de l'entreprise. Mais je pense qu'il va
+Lia va le retrouver dans toutes les
+informations que je lui ai donné. Et
+donc voilà, hop, je lui donne tout.
+Voilà. Et là dans en Jason, il va
+récupérer les informations nécessaires,
+non ? Euh l'URL, le message et euh et la
+langue, donc FR. Et ensuite après, il va
+lui-même commencer à monter la vidéo, il
+va commencer à produire la vidéo grâce à
+la technologie qu'on a téléchargé. OK ?
+Et ce qui a bien, ce qui est bien, c'est
+que ils ont également euh mis en place
+ce qu'on appelle les skills. Maintenant,
+vous devriez être familier avec les les
+skills, agent skills. Donc en fait,
+c'est pareil, c'est euh c'est euh c'est
+comme cloud code skills, sauf que là,
+c'est pour remotion. Donc, en fait, vous
+les importe, on les importe et puis on
+les on les met dans notre dossier et
+comme ça, on peut travailler avec. Et
+automatiquement, en fait, bah grâce au
+prank que je lui ai donné, il va
+directement euh utiliser les skills
+qu'on a importé, pas besoin de les
+mentionner. OK ? Au grâce à à l'agent à
+au prompt que je lui ai donné, celui-là.
+OK ?
+Donc la production peut prendre quelques
+temps.
+Il suffit simplement de patienter.
+Dans votre cas, alors moi j'ai ajouté
+j'ai déjà ajouté la clé à payer pour
+Eleven Labs. Dans votre cas, il se
+pourrait que l'agent vous demande votre
+clé à payer. Donc ce qu'il va falloir
+faire, c'est simplement de vous rendre
+sur Eleven Labs.
+Et ensuite euh alors ça dépendra, vous
+avez 10 cas de crédit octroyé. Ensuite,
+si vous voulez utiliser votre propre
+voix, il va falloir donc prendre
+l'abonnement, il va falloir passer en en
+upgrade. Donc prendre, je vous
+recommande starter, c'est largement
+suffisant mais euh c'est ça dépendra de
+votre capacité, ça dépendra de votre
+demande. Donc plus vous avez des
+demandes, plus il va falloir produire.
+Donc du coup euh et également plus vous
+avez des prospects, plus il va falloir
+générer des vidéos personnalisées. Donc
+en fonction de vos capacit de votre
+capacité financière, vous pouvez
+commencer par starter et ensuite après
+passer créateor et ensuite après si il y
+a du retour sur investissement là vous
+scalez en prenant pro. OK ? Mais ne
+commencez pas directement à prendre
+l'option annuelle et et pro ou un truc.
+C'est c'est c'est stupide. OK ?
+pour récupérer votre clé à payer.
+On va aller donc ici dans settings, il
+me non, on va aller dans développer.
+Développer ici, on va apprate
+key mais là vous allez euh
+pas mettre de restriction, pas mettre de
+limite mensuel et vous allez mettre
+access. OK ? Vous allez lui donner full
+access à votre espace relevance à votre
+espace Eleven Labs pour qu'il puisse
+avoir pleine autonomie. Après, ça dépend
+euh de la complexité de votre agence
+parce que si vous travaillez pour un
+client, il va pas falloir donner totale
+autonomie, il va falloir vraiment
+sélectionner uniquement les éléments
+importants pour éviter que on puisse
+avoir accès grâce aux API. Si jamais le
+client, il se fait son sac API, et ben
+on peut faire n'importe quoi avec. Donc
+euh donc ça ça dépendra. Mais là dans le
+ce cas d'usage, moi j'ai mis full access
+que c'est c'est une un usage personnel
+et euh et voilà. Donc OK.
+Hello conversation. OK. Donc là
+maintenant il nous demande d'insérer
+notre clé API. Pour insérer votre clé
+API, vous allez dans le fichier dot pour
+environnement. Et ici on va coller la
+clé API.
+OK. Voilà. et on va fermer pour
+sauvegarder. Save. OK.
+Et là,
+voilà. Donc voilà, là on a copié notre
+clé API
+dans euh le fichier et c'est ça qui va
+lui permettre de pouvoir euh
+commencer le script. Donc voilà, vous
+voyez, c'est là qu' va pouvoir traduire,
+comment c'est la la le
+script personnalisé pour les vidéos.
+Voilà. Donc là, il a terminé la vidéo.
+OK, il a terminé le montage avec toutes
+les informations. OK. Tien bali vidéo.
+On va lui demander de nous ouvrir le
+dossier pourir pour lire la vidéo.
+Ok.
+On va voir le rendu.
+Bonjour, je me permets de vous contacter
+car en visitant votre site, j'ai
+identifié quelques opportunités simples
+pour améliorer sa performance et sa
+visibilité.
+Si ça vous intéresse, est-ce que vous
+auriez 15 minutes cette semaine pour
+qu'on en parle rapidement par téléphone
+?
+OK, c'est plutôt pas mal. Ça nécessite
+encore de l'amélioration. Euh après,
+vous pouvez le personnaliser euh en
+fonction de vos besoins. OK, le
+framework là, il a pris format un peu
+téléphone. Donc après, c'est à vous de
+l'ajuster en fonctionnant de vos besoins
+et de détailler quel type de format vous
+souhaitez, quel type de ajouter des des
+motion graphiques, ajouter de la musique
+et cetera. OK. Mais franchement, ça ça
+m'a pris moins euh de temps, moins de
+pour réaliser une vidéo comme ça,
+j'aurais pris facilement plus de 30
+minutes par par le lit. là euh en
+mettant en place un processus de
+production automatisé, ça vous pouvez le
+vendre facilement aux entreprises, très
+très cher. Euh moi c'est c'est ce que
+j'enseigne au sein de Vecteur Dynamics.
+Euh et la méthode, elle est beaucoup
+plus poussée, c'est vraiment de euh je
+je montre comment utiliser des dossiers
+euh Excel pour pouvoir vraiment
+processer la lecture des informations et
+ensuite produire ce le contenu. OK, donc
+voilà, c'était une petite démo pour vous
+montrer encore les prouess de
+Antigravity.
+N'hésitez pas à vous abonner à ma chaîne
+YouTube si ce n'est pas déjà fait. Je
+vais produire pas mal de contenu sur
+Antigravity. Et si vous êtes intéressé
+par le côté business de Lia, on n'est
+pas un un un club de formation lambda où
+on va vous apprendre à utiliser nos
+chaînes air table ou un truc comme ça.
+C'est pas ça. OK ? On va vous apprendre
+à faire du business avec Li donc si vous
+n'êtes pas intéressé par le business, ne
+rejoignez pas Vectur Dynamic. OK ? C'est
+fait pour les entrepreneurs, les HPE.
+Donc voilà, on vous accompagne vraiment
+à trouver vos clients, à vous à à monter
+votre boîte progressivement pour que
+vous puissiez atteindre une forme de
+d'autonomie, de liberté
+euh de travail et financière en même
+temps et afin que vous puissiez aimer ce
+que vous faites. OK ?
+Anyway, donc voilà, c'est tout.

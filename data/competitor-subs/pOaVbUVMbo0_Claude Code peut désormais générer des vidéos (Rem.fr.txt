@@ -1,0 +1,254 @@
+Il existe un framework avec lequel vous
+pouvez créer des vidéos en programmant
+avec React. Alors ça c'est pas nouveau.
+Ce qui est nouveau par contre c'est
+qu'on peut désormais l'utiliser de
+manière optimale avec euh Cloud Code et
+grâce notamment au skills.
+Alors euh donc cette outil s'appelle
+Remotion. Comme vous pouvez le voir, il
+est sur GitHub. Il a plus de 30k stars.
+Donc c'est pas c'est pas n'importe quel
+projet.
+Il existe depuis déjà un bon nombre
+d'années
+et ils ont ajouté récemment la
+possibilité de d'utiliser un LLM, donc
+notamment cloud pour créer les vidéos de
+manière hyper hyper optimisée en
+utilisant les skills comme je viens de
+le dire grâce à Versel qui ont sorti le
+site skills.shsh.
+Euh donc ils veulent apporter le fait de
+pouvoir partager les skills très
+facilement aux autres développeurs, aux
+autres équipes. Et donc vous avez la
+possibilité de rechercher ici des skills
+euh avec les les mots clés que vous
+souhaitez. Donc par exemple, on peut pas
+marquer PHP, on peut marquer React, on
+peut marquer design et on va avoir en
+fait des compétences qu'on va pouvoir
+donner à nos à nos ZIA, à nos LLM
+donc comme Cloud Code, Codex ou autres
+euh pour pouvoir les aider à utiliser
+certaines technologies. Et comme vous
+pouvez le voir, la troisème
+le trème skill le plus téléchargé, c'est
+Remotion Best Practices. Donc les les
+meilleures pratiques pour utiliser
+Remotion. Et on peut voir en fait que ce
+skill ce n'est rien d'autre que
+une dizaine de fichiers point MD, donc
+des des règles comment utiliser tel ou
+tel composant de cette librairie
+remotion. par exemple ici, comment bien
+gérer la 3D, comment gérer les polices
+de caractère, comment gérer les
+paramètres et cetera et cetera. Et donc
+pour utiliser ce skill, c'est pas
+compliqué. Il suffit de copier cette
+ligne, de la coller dans votre terminal.
+Donc moi je l'ai déjà fait. Et après, je
+peux aller vérifier directement si
+j'exécute Cloud.
+Je peux lui faire lui faire la
+commande/skills.
+Et on voit qu'ici j'ai le skill remotion
+B practices. Donc moi qui est installé
+en global, c'est-à-dire dans le dossier
+pointcloud/skills.
+Et si on ne veut pas l'installer en
+global, on peut aussi l'installer en en
+suivant le tuto de de création de projet
+avec Cloud Code. On va sur la page
+d'accueil, on a use with cloud code et
+on va voir qu'on peut créer un nouveau
+projet. Euh sélectionner un template et
+sélectionner oui à installer les skills.
+On va faire ça tout de suite pour la
+démo et ensuite on va voir en preview
+quelle vidéo on va générer euh pour pour
+l'exemple. Alors, je vais aller dans le
+dossier YouTube,
+je vais retirer ça et je vais lancer la
+commande NPX create vidéo@litust.
+Et donc on choisit blanque comme il nous
+disait. On va appeler ça my vidéo. Oui.
+Euh mince, j'ai oublié de retourner en
+arrière.
+Et cette fois-ci je relance.
+Je choisis un un template vide. Euh
+YouTube vidéo. On ajoute ta tilewind.
+Donc c'est recommandé d'utiliser
+Tailwind comme ils nous le disent juste
+ici. De toute façon euh on dit oui à
+Tail Wind et ensuite on dit oui pour
+ajouter les skills.
+En fait ça va nous créer un dossier
+pointcloud dans le projet à moins que ça
+l'installe. Ouais ça l'installe en fait
+directement au sein de Non, ça
+l'installe directement au sein du
+projet. Ouais. Donc je vais lancer
+pareil oui l'ouverture dans PS code. Là
+vous voyez on a le dossier pointcloud et
+ça va bien installer en fait tous les
+skills directement ici. Voilà. Là c'est
+si vous n'avez pas list les skills
+d'installer au global euh sur votre PC,
+vous pouvez l'installer uniquement pour
+le dans ce projet.
+Là c'est installé pour absolument tous
+les
+les providers.
+OK. Qui on été qui ont été détectés il
+me semble sur sur le sur le PC en
+question.
+Et moi je vais vous montrer quelle
+quelle vidéo on va générer. Alors ça va
+ressembler à ça du coup.
+Voilà, donc c'est 30 secondes de vidéo
+qui permettent d'afficher, comme vous
+voyez, comment faire une vidéo virale,
+l'anatomie d'une vidéo virale.
+Comment j'ai fait ça ? Donc déjà, j'ai
+utilisé les skills, mais d'abord j'ai
+fait ça en deux étapes. J'ai généré avec
+Cloud toujours en fait une page HTML. On
+va pas refaire cette génération. En
+gros, j'ai eu l'idée euh je lui demandé
+de créer bah en fait oui un un site
+statique là. Si je vais en live euh
+générer ça. Donc en gros, un site
+statique sur l'anatomie d'une vidéo
+YouTube virale. J'ai demandé à Claude et
+à Gémini me semble pour avoir un design
+à peu près très joli
+euh d'une avec une timeline. Du coup,
+comment comment ça se ça une vidéo
+virale est-elle réalisée ? Et donc j'ai
+juste ça en fait ce fichier là du coup
+le fichier website.html
+on va le prendre et le c dans mon
+projet. dans mon projet de de création
+de vidéo remotion.
+Donc ça vous pouvez partir de n'importe
+quel fichier HTML. Alors c'est une
+manière de faire. Je pense que ce n'est
+pas l'unique manière. Vous pouvez très
+bien juste prompter Cloud pour créer une
+vidéo euh ou bien partir d'un site comme
+moi d'une d'une page statique pour
+arriver à à création d'une vidéo.
+Moi je vais venir dans Cloud. Alors
+déjà, je vais lancer le serveur.
+Donc je vais dans YouTube vidéo, je vais
+aller sur VS Code pour lancer
+le serveur local.
+Et en fait, remotion, je vais lancer
+l'installation des packages. Remotion,
+ça vous ouvre un petit site web dans
+lequel vous pouvez venir visualiser les
+vidéos créées.
+Par exemple, ici dans route, on a on a
+une composition qui s'appelle MyCOM et
+vous verrez qu'elle est qu'elle est donc
+disponible sur la page d'accueil. Je
+vais lancer run.
+Hop, voilà, ça m'ouvre directement le
+site. Et là, vous voyez, on a My Comp,
+c'est un starter, un template blanc.
+Donc il y a absolument rien. Euh mais
+voilà comment ça se présente. C'est des
+composants React. Donc moi j'ai mon site
+website.hthtml.
+Maintenant je vais pouvoir ouvrir cloud.
+Oui, j'autorise. Si. OK. Et ce qu'on va
+faire euh donc c'est dire déjà vérifier
+les skills qui sont bien installés. Euh
+c'est tout bon.
+BL PES.
+Et maintenant, je vais lui dire euh donc
+je vais lui pointer mon site euh le
+fichier website pardon. HTML.
+J'ai dit en te basant
+euh sur
+le fichier HTML qui représente
+alors qui représente le
+une timeline,
+une vidéo YouTube virale
+génère une vidéo qui montre
+euh qui qui montre le parcours pour de
+cette timeline
+étape par étape. Bon, c'est pas le
+meilleur prompt du monde bien sûr, mais
+là c'est juste pour voir avec un un
+prompt même s'il est bancal, on va
+arriver à un résultat assez intéressant.
+Pourquoi ? Euh parce que on a on a les
+skills qui du coup nous donnent à cloud
+absolument les meilleures pratiques
+possibles pour pour y arriver.
+Donc là, il va d'abord examiner le
+projet. Bon, il y a pas grand chose à
+examiner, donc ça devrait aller assez
+vite. Pour ça, j'utilise aussi important
+le modèle Opus qui est le plus
+performant, par contre, le plus oné
+aussi. Euh donc ça peut aller très très
+vite avec avec le pricing.
+Donc là, il est en train de bosser. Je
+peux faire contre O pour voir exactement
+ce qu'il fait.
+Voilà, il est en train de de se rendre
+compte qu'il va falloir faire ça en
+cette étape. Il a lu le fichier HTML.
+Hop.
+Et bon voilà, donc là ça peut prendre ça
+peut prendre de de de 2 à 5 voire 10
+minutes pour pour bosser cette vidéo. On
+va voir au fur et à mesure que qu'il
+travaille.
+OK, donc là elle me demandé de lancer le
+studio mais c'est déjà fait.
+On va voir ce qu'il m'a proposé. Alors,
+j'appuie rentrer.
+OK. Alors,
+l'idée
+le script. OK, c'est très très propre.
+Donc, c'est encore plus beau que ce que
+j'ai ce que j'ai fait à la base. J'ai
+pas le même prompt. Là, j'ai été j'ai
+inventé un nouveau prompt
+mais c'est sympa. Alors, les animations
+sont assez longues mais mais c'est
+pareil, on arrive quand même sur un
+résultat vraiment propre.
+Alors juste pour cette génération, il
+m'a tout fait dans un seul fichier alors
+que pour l'autre que j'ai fait avant de
+réaliser cette vidéo, il a vraiment fait
+proprement par avec des composants.
+C'était plus propre au niveau de la
+génération du code.
+Mais mais sinon, le résultat est
+beaucoup plus beau sur cette version. Je
+trouve c'est vraiment sympa. Donc le
+prompting aussi très important. Euh bah
+si vous voulez euh vous amuser à tester
+ça, n'hésitez pas.
+Moi, en passant par la création d'un
+site web HTML simple puis en faisant
+lire par Lia, ça ça marche assez bien
+mais juste en prometant. Du coup, bah il
+y a il y a énormément de choses à faire
+avec l'arrivée de ces skills. C'est
+c'est vraiment ouf. Merci d'avoir suivi
+la vidéo jusqu'au bout. N'hésitez pas à
+vous abonner si ce n'est pas déjà fait,
+likez la vidéo si elle vous a plu et je
+vous retrouve très bientôt pour de
+nouveaux tutos sur sur Lia et toutes les
+les nouveautés qui arrivent à une
+vitesse une vitesse folle. M.

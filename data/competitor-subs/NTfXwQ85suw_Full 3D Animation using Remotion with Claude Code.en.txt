@@ -1,0 +1,258 @@
+Hello. Hello guys. Welcome to today's
+video. My name is Lucas. Now, I recently
+saw this video on X. Some guy basically
+created this 3D animation based on real
+data and real images all using AI. So,
+big big shout out to Dylam Sanaya. I'm
+going to link his post down in the
+description below for you guys to check
+out. And he basically talks about the
+entire process of how to get this
+started. He even used the Sketch Fab
+model that you can see over here. We're
+also going to try to do the same thing
+today. So yeah, today we're going to try
+to do a very similar type of animation
+all using Remotion inside of Cloud Code.
+So without further ado, let's go ahead
+and dive into it. But guys, before we
+start with today's video, I'd love to
+invite you guys to my Discord server
+where a bunch of different startup
+founders, designers, developers from all
+around the world, and we get together
+every single weekday to talk about
+different tools, different topics,
+different challenges. So if you guys are
+interested in joining, link is down in
+the description below. So the first
+thing that I want to do here is create a
+new folder in my Finder. We're going to
+call it like 3D remotion animation. And
+then let's open up cursor and let's open
+that project. So we're going to open
+that folder, that empty folder. And
+we're going to open the sidebar and the
+little terminal uh area down here. And
+in the sidebar, I'm going to look for
+cloud code. Going to open that up. And
+well, the first thing that we want to do
+is install Remotion. So actually
+Remotion has a very very great
+documentation guide. I made a quick
+little tutorial on how to get started
+with Remotion and how to like how to do
+some simple types of animations that you
+see over here in another video. I'll
+link that also down below. But if you
+plan on prompting videos with cloud
+code, see prompting videos with cloud
+code guide. So let's open this up. And
+all we have to do is select or copy this
+little command down here. And we can go
+to our terminal over here. Paste that in
+here. And we're going to choose a blank
+project. Let's say yes to Tailwind CSS
+and yes to agent skills. And let's go
+ahead and click yes to this as well. And
+install in our project. Just click on
+yes. Prep proceed. Yes. Perfect. Open
+and cursor. Yes. And then all you have
+to do is paste this to your terminal.
+Click on enter. And then paste this and
+click on enter. And then you're going to
+get your blank little remotion uh canvas
+over here. And now Remotion has this
+page. It's basically called prompts. You
+can search for remotion.dev/prompts
+and you get all of these different
+prompts that people are using. you have
+some really cool examples like with
+interactive maps like this. But in this
+case, we want his project dillum. So,
+we're going to use this prompt and we're
+going to copy this and then paste this
+into cloud code. And it says that here
+that here is an empty reotion project
+because we already set up the reotion
+project. And it says I want to create a
+3D video to visualize the top 20 video
+games by copies of all time. Let's
+change this up a little bit. So, I'm
+going to say visualize the top 20 top
+earning soccer players of all time. So,
+it's a little bit different. And then
+we're going to say create a reotion
+video that visualizes the top visualizes
+the top 20 bestselling. Let's not do
+this. Let's again use our our new one.
+And let's change a few things. So
+instead of using boxes, we can use like
+soccer balls as towers with height
+representing the amount of of money
+earned. And then it says remove the
+default example from this project and
+create a remotion plus react 3 fiber
+example to do this visualization. And I
+actually saw in his tweet like someone
+said you you know you actually built a
+3D system yourself as well. Remotion
+doesn't come with that and there's no
+camera so you can also you also made
+that and he said that react 3 fiber
+provides a camera and 3D scene setup. So
+when you use react 3 fiber inside a
+motion project you already have a full
+3D system to work with. So it says
+animate the camera from the bottom of
+the last rank of the top of the of the
+first rank. stop the camera on the top
+of each rank for a few milliseconds. And
+then it says here is the ranking data
+that you need. So I've already asked
+Claude to help me visualize this in a
+kind of 2D way. But what I'm going to do
+is I'm going to kind of uh explain my
+situation that I want to create an
+animation for this and I need a data set
+for this. If we go back over here, it
+says data as a JSON string. So it would
+be nice to have a JSON string of this
+data. So I just give it the prompt and I
+say that I need a JSON string data of
+the top earning footballers net worth
+because it gave me like two different
+types of brackets. I want the net worth
+one and we're going to click on submit
+and we get our JSON string. So let's go
+ahead and copy this and let's paste this
+over here and let's click on edit
+automatically and let's go ahead and
+submit this. So as you can see these are
+the different to-dos. Install the
+reotion and react 3 fiber. It's going to
+create the player data file and ranking
+info. It's going to create that soccer
+ball 3D component, then the tower, and
+then it's going to start creating the
+different towers and the scenes, and
+then we can test it out. All right, look
+at this. So, we get Kaka, we get
+Franchesco, Totti, Sio, Manet, Venios,
+Zinedine, Zidan, Tiari. So, first thing
+that I notice obviously very, very
+simple in terms of the graphics, right?
+We have that blue backdrop, the green
+grass, which is cool because it it
+represents, you know, the sport, but
+also the balls seem pretty simple, very
+low poly, and they don't really look
+like soccer balls. And it's just two. It
+looks like if Kaka, number 10, and and
+Venius Jr. number what, seven or or six,
+have the same amount, right? So, we want
+that to be maybe we want the balls to be
+a little bit smaller. That might be like
+an option. But as you can see, like the
+initial, you can really see how how that
+looks like David Beckham and then Messi
+and Cristiano are like way on the top.
+So I want to try to get this stadium. So
+we have this Oh, over here we have this
+stadium 3D assets from from SketchFab.
+And what I'm going to do is I'm going to
+download the 3D model. And I don't
+really know what which one to use. I'm
+probably going to use this one. And then
+we download it's it's almost a gigabyte.
+It's pretty big. And while this
+downloads, I'm going to start preparing
+the next prompt to give to Cloud Code to
+kind of, you know, improve our our our
+entire composition. All right. So, we
+downloaded that. We're going to add it
+to our folder. And we're going to
+mention it over here as well. So, we
+just have to look for something called
+Dragon Stadium. There we go. So, let's
+reduce the ball size by much more so
+they look like a pile of small soccer
+balls rather than a tower. And also for
+the background, I want to use a 3D model
+of the stadium. I gave it the link in
+Sketchvab, but I also said you can also
+find it here. So, I basically, you know,
+as you saw, added that that file to the
+folder. And let's go ahead and click on
+submit. All right, let's see. All right,
+so we get we still get our green little
+pitch. We get the piles of balls, which
+looks pretty good, but the pile should
+kind of stack and they shouldn't stay on
+the floor. And it sees it shows that
+Ronaldo and Messi are kind of outside
+the stadium, which isn't good, but it's
+a good good progress, right? And I'm
+going to look for a soccer ball in
+SketchFab. I don't know since it's World
+Cup season. Let's go ahead and use this
+one. So again, I'm just going to
+download download it. I'm going to use
+this again because it worked pretty
+well. And again, just add that to your
+folder. So the small ball should stack
+on top of each other. And the design of
+the ball should look like this. So I'm
+going to do forward slashment mention
+file from this project. And let's look
+for the ball. So we can also type it. So
+FIFA tri and I'm also going to see that
+to make sure that all the graphics
+except for the stadium are reduced in
+size by half so that the graphics don't
+actually leave the stadium and the base
+of the balls and graphics should should
+match the the the base of the stadium.
+So let's go ahead and send that. All
+right. So now the balls seem to be in
+the center like or sorry they they seem
+to be stacked which is good. So you can
+kind of tell the difference a little bit
+more. But as you can see, our animation
+is kind of kind of going off the screen
+off. It's actually a little bit worse. I
+think now the the stadium got smaller or
+something. So we need to ask, you know,
+the AI to make the stadium a little bit
+larger. So just only make the stadium
+size like 3x larger. All right. So it's
+getting somewhere, but it's still still
+needs some some touch. Okay. Now we're
+almost there, but the balls are still
+kind of uh, you know, going out of the
+stadium. I don't want that. And nice, we
+get our animation. It's looking much
+better. Still needs a little bit of
+touch, you know, touches here and there
+in terms of design. Maybe the the fonts
+don't look so good, but we get our stack
+of World Cup soccer balls, which looks
+nice. But yeah guys, after a few
+touches, you know, we I think wrote like
+a couple of messages, maybe six to eight
+messages to cloud code, we get a really
+cool design. And by the way, someone
+also commented on this original tweet,
+like this kind of visualization could
+also be used to create size comparison
+videos of ancient creatures or
+dinosaurs. So yeah, guys, if you're
+testing this out, please feel free to do
+something like this. Feel free to reach
+out to me and share with me what you
+did. But yeah, this is basically it.
+Hope you enjoyed today's video. If you
+have any questions or comments, let me
+know down in the comments below. And
+like always, thank you all so much for
+watching.

@@ -1,0 +1,563 @@
+This is breaking the internet right now
+and it's genuinely one of the most wild
+use cases I've seen from AI. People are
+generating entire videos with
+voiceovers, motion graphics and product
+demos all from a single text prompt
+inside of Claude. No editor and no
+coding, just by typing what you want and
+you get an output in under a few
+minutes. So in this episode I bring on
+my friend Salman to show us exactly how
+he is doing this to create some insane
+videos. So without further ado, let's
+jump into this video. All right, so
+let's hop right in real quick. I want to
+show you guys these Twitter posts
+because this is absolutely trending
+right now on Twitter if you guys haven't
+been living under a rock. Remotion now
+apparently lets you build and edit
+videos inside of Claude Code. And here
+are just some of the examples that
+people have been posting. So like this
+right here, Salman, if I'm correct, is
+like literally generated all inside of
+Cloud Code. Nobody is like it doesn't an
+editor is not editing this video. This
+is literally all cloud code generating
+the graphics and whatnot. So, what we're
+going to be doing in this video is we're
+going to be showing stuff that Salman
+has built because he's been using this
+the last couple of days to build some
+pretty cool things. And then he's going
+to actually show us how we could start
+doing this right now even if we have no
+coding or technical capabilities. So,
+Salman, let's let's dive into this, man.
+&gt;&gt; For sure. For sure.
+&gt;&gt; This is going to be fun. So, something I
+wanted to show is like just with like
+one or two prompts, I had another video.
+It just I can make now videos where it
+takes components from my UI and it can
+literally build have voiceovers and
+generate like full-on product demos.
+&gt;&gt; Uh I don't want to show you the whole
+thing but like for example here it takes
+literally the components from my
+software and then generates a voice over
+uses Nano Banana to make an entire
+video. Right? This is pretty fun to make
+because now what I can do is if I can
+just have Claude thinking of other use
+cases on other marketing videos, I can
+have an automated pipeline where it's
+just like a marketing team on autopilot.
+Right?
+&gt;&gt; The reason we can make these kind of
+remotion videos with Claude is because
+Claude can use this thing which is
+skills. And at a high level, you can
+think of skills like this. So imagine
+this is Claude. This is um a little
+diagram of Thanos from the Avengers. I
+don't know if you've seen like he does
+that snap to wipe everyone out. But you
+know, Thanos himself is is cool. He's
+kind of weak, but he's not super strong.
+But Thanos with the Infinity Gauntlet,
+he gets so many things he can do like
+manipulate time, all that. So, think of
+giving Claude skills in the same way.
+So, and the elements like the ability to
+code, use Remotion to create videos,
+using nano banana to kind of make more
+images, using 11 Labs to generate a
+voiceover. That is all different types
+of skills we can give to Claude so it
+can make really really good videos. All
+right. So, it's just kind of super
+giving Claude superpowers to make them
+make it way more powerful. Claude, you
+can put in a lot of empty skills and
+making sure that at the end after we
+equip Claude with all these skills, it
+can do crazy things and that's why
+everyone's been really loving Claude.
+Not to mention, it's also a really
+powerful model. So, it's kind of like
+just this where Claude will now have
+access to Remotion and it can also
+create images with Nanobanana Pro and 11
+Labs. All right. So, one thing I want to
+mention before we move on and show how
+people could actually begin doing this
+as well as some of the use cases you've
+built. I want to quickly mention that
+like this Remotion skill is one of the
+first ones that's kind of like breaking
+the internet cuz people are like, "Wow,
+okay, we are giving Claude this skill to
+go and generate videos." But what I'm
+excited for is when more and more of
+these apps and tools that we use on a
+daily basis begin implementing these
+skills into Claude because it's
+genuinely going to become insane. And
+this is when we're going to give Thanos
+like these superpowers cuz right now we
+might have like a couple like one or two
+infinity stones. But like what happens
+when the majority of these platforms now
+begin having these skills that make our
+agentic workflows just like super
+productive and are able to do some
+pretty cool things instead of just like
+these kind of basic coding tasks.
+&gt;&gt; Yeah, exactly. So it's like taking it to
+a next level where now Claude not only
+can just code which is cool you can only
+write so much code but then it can
+leverage other services people who spent
+thousands of hours building their
+products kind of like I'll show you hey
+Jen very recently introduced their plot
+skill where now you can essentially
+create your own avatar. You can use
+Remotion to create a video and then have
+your avatar there speaking as if you are
+the content creator making it. And that
+just opens up a whole new world of
+possibilities, especially for content
+creation where, you know, as this tech
+just gets better and better, everything
+might change as we know it.
+&gt;&gt; Yeah, man. That's crazy. You and I,
+Salman, as YouTubers, like I'm more of a
+YouTuber. You you're you're also a
+business owner, but I like kind of
+identify as like an AI YouTuber. My job
+might be gone here soon. So, it's really
+interesting to see. And and honestly,
+like genuinely, I think this is like the
+biggest opportunity to begin learning
+how to use something like claw code and
+and anti-gravity because it's really
+only going to just like supercharge
+people that understand how to use these
+technologies.
+&gt;&gt; Yeah, abs. Absolutely. This is like kind
+of I feel like there's such a big
+arbitrage opportunity that we can take
+advantage of because this is still only
+like a handful of people can do this at
+this moment. So if you really learn this
+technology and actually even even just
+know about it, the possibilities you can
+think of and unlock and take advantage
+before everyone else is actually insane.
+&gt;&gt; Yeah, it's endless. All right, so
+Salmon, we kind of understand skills now
+and why they're important and why
+they're going to be important in the
+future. But how could and somebody in my
+audience right now that has no idea how
+to code, doesn't use cursor, doesn't use
+anti-gravity, how could they begin
+building out these videos with this
+Claude skill? Let's could you walk me
+through that part?
+&gt;&gt; Yeah, for sure. So I'm going to keep
+this super simple. All we need to build
+these kind of videos is just a cloud
+subscription and that's it. So after you
+have the cloud subscription, you see
+this is just a quick little picture I
+have. This is all we're going to be
+interacting with. All right. So if I
+open up my claude app first, what you
+want to do, it's really easy. You want
+to open up a new folder. So for example,
+I'm going to make a new folder inside my
+documents. Let's say Remotion Brock. All
+right. So all we did right now is just
+go into our cloud app. I hit this code
+button and I selected a folder. That's
+it. There's nothing fancy I'm doing
+right now. So now what we want to do is
+we want to give this folder in our
+folder. We should tell Claude, hey,
+right here we're going to be building
+videos. So you need this reotion skill,
+right? And to do that, what we're going
+to do is we're going to take this file
+right here, which is from the creator of
+Claude Code, and we're going to take
+this. I'm just all I'm doing is just
+copying the URL. I'm pasting it here,
+and I'm being like, "Hey, can you
+install this Claude skill for me? We're
+going to be building Remotion videos
+here and then can you please build a
+video for me?
+&gt;&gt; Yeah. Wow, that is easy. And then guys,
+if you want to access this, there's
+going to be a link in the description
+just to be able to click on this and you
+know, so you could copy that URL just
+like Solomon did right there.
+&gt;&gt; Yeah. So, normally what you would have
+to do is make a file, you'd have to make
+the put the file inside all the stuff.
+But right now, because Cloud Code is
+become so smart, I don't even have to
+like read or know what's going on. I can
+just give it a link and I'm like, "Hey,
+go figure this stuff out. I just want it
+done." Yeah. And the funny part is I
+think people on the background on the
+back end I mean people from the outside
+looking in don't even know what it's
+doing on the back end and that's super
+complex stuff but like I don't know how
+to code. I'm non-technical. I don't
+care. It's it's just doing it for me.
+That's like the the power of it and the
+best part.
+&gt;&gt; Yeah. It's just like pretty much just
+make me a video. That that's all we
+&gt;&gt; um we're just pointing it at like like
+imagine if you're a chef you can use
+tons of different things, right? To
+let's say make a video. You can use like
+let's say we're making a meal. We can we
+can make something like a chicken dish.
+We can make a beef dish. So now this is
+kind of like an ingredient. We're saying
+it, hey, use these utensils. Use these
+ingredients to make me this kind of
+meal,
+&gt;&gt; right? And if you don't know how to do
+it, then go and figure out how to do it.
+And it'll go ahead and figure out how to
+put the ingredients together. Like it's
+crazy.
+&gt;&gt; Here it just got all the claw skills and
+it just asking me for permission and
+it's like, hey, can I put this in a
+file?
+&gt;&gt; So it's literally downloading all those
+skills that were inside of that GitHub
+thing. And so now your claude has access
+to being able to go off and do multiple
+different things, right? Without us even
+having to give it that skill.
+&gt;&gt; Yeah. So right now, now it says the
+reotion skill is installed. The project
+directory is empty. So I need to set up
+a new motion project. Before I do that,
+what kind of video would you like me to
+build? So it's asking for all these
+things. Uh Brock, do you have a website?
+&gt;&gt; I don't have a website, actually.
+&gt;&gt; Okay. So because what I could do is I
+could be like, "Hey, go to this website.
+Go grab these assets and then build a
+video for that."
+&gt;&gt; Right. Well, let's go to your website
+and let's see what yours looks like cuz
+I'm I believe you did something similar
+for your video, right?
+&gt;&gt; Yes. So, here. So, for example, this is
+my website.ai. I have a color scheme and
+all this stuff. I have some, you know,
+pictures, etc. So, what I could be like
+is I can copy this. I can go back and be
+like, for this website, can you go fetch
+the assets, use the same colors, like
+the white, black text, blue accents,
+stuff like that, and then build a video
+for a product demo for this exact SAS or
+tool. And I'm intentionally just being
+like incredibly vague about what I'm
+saying because I want to show that you
+know as long as you're just like talking
+to this thing that that's about it.
+That's all you need to do.
+&gt;&gt; Right.
+&gt;&gt; And now you see now it's saying, "Hey,
+can you allow me to go fetch this
+stuff?" And I'm like, "Yeah, go for it.
+Do your thing."
+&gt;&gt; Yeah.
+&gt;&gt; I think the barrier of entry for doing
+anything honestly has drastically
+getting lower and lower and lower. It's
+just like, you know, you have to kind of
+get through that initial hurdle. There's
+always going to be some uh weird
+vocabulary people are using because as
+um technical people, people use a lot of
+jargon. But honestly, it's you have to
+just ignore what people are saying. And
+if you're ever in doubt, just go to
+Claude and be past it and be like, "Hey,
+figure this out for me. This is what I
+want. What do I do next?"
+&gt;&gt; Yeah. And I think me since I've been
+using Claude Code the last two weeks
+religiously for the first time ever cuz
+I thought it was going to be too
+difficult. I've noticed that like I'm
+like it's much easier than it seems.
+Like I I do agree with the technical
+jargon thing because it does kind of
+intimidate so many people for making
+that first step. Whereas if you don't
+worry about the technical jargon and you
+just ask Claude to do something and if
+you don't know how to do it, have it
+explain it to you like you're in fifth
+grade. It is so good at just like
+simplifying it and making it easy. And a
+lot of the times you don't even need to
+know what it's doing on the back end
+because it's able to go off and do it
+itself and work through and make
+iterations and figure out how to do it.
+Yeah, it's it's pretty insane like how
+uh the trajectory of everything's going
+because like now I don't know there's
+been this concept I don't know if you've
+seen like of Ralph
+&gt;&gt; Wiggum
+&gt;&gt; and the reason that kind of concept was
+born is because Ralph Wigum as a
+character in the Simpsons is is
+portrayed to be like a stupid character
+right but what it does it has unlimited
+tenacity and it just goes and you know
+tries to tackle problems
+&gt;&gt; super persistent right
+&gt;&gt; exactly yeah
+&gt;&gt; so it's kind of like a fun analogy but
+like we all just need to be Ralph Wigum.
+We just need to keep asking Cloud, "Hey,
+what do I do? Hey, what did you do this
+for me and at the end we're just gonna
+get our outcome."
+&gt;&gt; All right. So, this thing just got done.
+So, it just says, "Open up this thing on
+your browser." Let's open it up. Uh,
+okay. So, let's hit play. And you see it
+has literally took my headline. It took
+all the copy from um our website. It
+Yeah, that's actually really insane.
+It's doing all these motion graphics. It
+even built up these little phone. That's
+kind of cool.
+&gt;&gt; Jeez, dude.
+&gt;&gt; Yeah. And of course, you know, you can
+edit uh a bunch of stuff really easily
+by just asking it to. And let's say, for
+example, now you like this video or you
+approve it. You want to make sure it's
+automatically sent to my boss so they
+can like approve it or disapprove it,
+right? What I could do right now is let
+me show you this graphic that might make
+it easier. So, right now, let's say our
+clot code agent. This one says
+anti-gravity agent because next week
+we're going to actually be showing you
+how to do this stuff with anti-gravity
+as well. Stay tuned for that. Um, but we
+just generated that video and then what
+we can do now is we can use something
+like Zapier to send us a Slack message
+and the video automatically after it's
+done. And if we say a go ahead, it's
+automatically going to get published to
+all our social medias. The way we do
+that is by using Zapier and we go right
+here. So we go to zapier.com/mcp.
+We go start building and then this is
+already an MCP server but you can make a
+new MCP server. You can select cloud or
+cloud code whichever one you want right
+so oh there's even co-work now actually
+that's kind of cool so let's say you
+create that and then after you have that
+you add whatever app you need so for
+example we can add something like slack
+and here we can ask for like approvals
+from our team or managers etc. So you
+can like add these things. You can
+select all of them and you can hit
+connect. And then after you have your
+Slack connected then you can do
+something like metricool. Yeah. Then you
+can use something like metricool to
+essentially you know add your post or
+schedule your posts automatically. And
+by doing that so let's say you have both
+of these done. You just hit connect and
+then you copy this command give it to
+claude and you can be like hey go ask my
+manager if I can if this is approved to
+publish. And if he says yes, you can
+just be like, "Okay, now publish this
+with metricool." And then it'll get this
+all done for you. So with all this, you
+can see you can have an automated flow
+where you can make a video, you can
+generate it, and then you can make your
+edits easily just by prompting Claude
+being like, "Hey, change the motion of
+this here and there, and then you
+connect it to Zapier, and you can just
+post and do all your work from one place
+with just Claude Desktop." I guess
+that's just like one very simple example
+of what we could use the Zap year MCP
+for because it literally connects to
+8,000 plus different applications. I
+think there's over 30,000 plus actions
+it could perform across those apps. So
+if you use a specific thing like you
+could send a Gmail message to your team,
+you could add that video link to Google
+Sheets or update your notion page, all
+that stuff just by kind of like giving
+it those hands for it to go off and run
+and you know utilize different apps that
+you use. So it's a way to kind of bridge
+that bridge that gap like you said.
+&gt;&gt; Exactly. Yeah. It's honestly the world's
+your oyster. It's like whenever you're
+trying to do something like just think
+of what you do dayto-day like all the
+little steps, you can just have those
+all connected and think of this like
+giving Zapier think of Zapier like
+giving Claude a different skill like
+that Thanos gauntlet. This is just
+another skill where you can be like,
+"Hey, Claude, go do this stuff for me."
+It has access.
+&gt;&gt; Yeah. No, it's crazy. All right, Simmon.
+So, we have this video now that's
+generated with Remotion, but how can we
+now add another skill and utilize
+another tool such as 11 Labs to actually
+go ahead and generate a voice over for
+the video? So, not only do we have a
+video now, we have an entire video with
+a voice over on it. Yeah. So, it's
+actually really simple. So, in the same
+way, what we're going to do is we're
+going to give it a new skill. And the
+way we give things new skills is, so for
+example, for 11 Labs, what I like using
+is this thing called wave speed. And
+with waves, what I can do is right here.
+You see there's a lot of 11 labs models,
+right? And what I can do is I can
+generate these voiceovers with claude
+and wave. So the way you do that is you
+just go to API keys, you copy this
+thing, and then you come here, you paste
+your key in, and then be like, hey, can
+you create a voiceover script for me
+using Wavespeed 11 Labs V3? And then
+attach it to this video. And right now
+I'm just going to paste my wave speed
+API key, but I'm going to hide it so you
+guys don't see. But [laughter]
+um all right. So uh I just opened up the
+local host and then I downloaded this
+video and you can see right now I just
+want to make sure you guys can hear it
+and it will have a voice over. So for
+example, I'm just going to go to the
+middle
+&gt;&gt; funnel grow as AI agents work around the
+clock. Next up the agent builder. Create
+AI sales agents in minutes. Choose a
+voice. configure channels like voice SM.
+&gt;&gt; So now it can speak. There's like
+literally a text speech going on. You
+can also be like, you know, give it sub
+subtitles. You can say stuff like cut
+this out. If you don't like the voice or
+even if you recorded your own voice, you
+could just be like, here's the
+recording, go attach this to the
+Remotion project, and you'll be good to
+go there as well.
+&gt;&gt; Yeah. So you're saying you could
+literally clone your own voice and then
+add your own voice over to this.
+Literally all AI generated just by a
+couple of simple prompts in cloud.
+That's crazy.
+&gt;&gt; Yeah. I mean, like the barrier to entry
+to all this stuff is getting so low just
+because all you need to do is just go to
+this text box and type in what you want.
+&gt;&gt; Yeah. Crazy, man. I I don't know what
+else to say other than that. All right,
+guys. That's crazy. Solomon, I'm stoked
+that you showed us how to use this. I'm
+actually going to go and begin building
+videos after this video and probably
+nerd out with it for the next couple of
+hours. So, first of all, where could
+they find you? And then B, I want to ask
+you about anti-gravity and what your
+thoughts are on that.
+&gt;&gt; Oh, so uh if you want you can find me on
+my YouTube channel. I should be collabed
+with the link. Uh but it's just Salman
+Yasar, that's my name. But the
+anti-gravity part that's really
+interesting because everything we just
+did with claude code right now we can
+also do with anti-gravity. The thing is
+we should be learning both because this
+AI race is kind of crazy this week or
+this month. Let's say clot code is
+ahead, but you don't know what OpenAI or
+Gemini is going to release randomly.
+That's just going to skyrocket. So,
+anti-gravity kind of lets us use a bunch
+of different models. Right now, the only
+problem is rate limits, but it is free.
+So, if you just want to get started with
+all of this for free rather than me
+paying 200 bucks a month for cloud code,
+I suggest use anti-gravity to get
+started and then you can do the same
+thing with skills there.
+&gt;&gt; Yeah, perfect. And if you guys are
+interested, subscribe. We're going to be
+talking about that next week on our next
+podcast. But Salmon, thanks man. These
+podcasts have been fun. And I think my
+audience is getting a lot of value. It's
+fun talking to somebody who has a coding
+background, but is able to explain it in
+a super simple way to somebody like
+myself. And then I get to ask the
+questions that maybe my audience has. So
+if you guys are enjoying this format,
+let me know in the comments below. I
+really appreciate hearing your feedback.
+Salmon, they could go ahead follow you.
+In the description, there's going to be
+a link and yeah, thanks for coming on,
+man.
+&gt;&gt; Awesome. Thanks for having me, bro.
+Super fun. Dev course.

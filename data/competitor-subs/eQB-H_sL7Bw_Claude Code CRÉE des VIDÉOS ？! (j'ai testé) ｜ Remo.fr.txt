@@ -1,0 +1,386 @@
+J'ai vu passer un truc complètement
+dingue sur Twitter. Apparemment, Code
+Code peut maintenant créer des vidéos
+genre des vraies animations
+professionnelles juste en tapant du
+texte. J'ai vu des exemples et
+honnêtement, j'y crois pas trop. Ça a
+l'air trop beau pour un vrai. Du coup,
+on va tester ensemble. J'ai jamais
+utilisé ce truc. Donc, on va tester
+ensemble et le découvrir tout au long de
+cette vidéo. Comme ça, je pourrais te
+donner mon propre avis. Alors, d'où ça
+vient ce délire ? En gros, il y a un
+framework qui s'appelle remotion. Ça
+permet de créer des vidéos avec du code
+React et récemment, ils ont sorti des
+agent skill. C'est des instructions pour
+que les agents de type cloud code
+puissent comprendre et utiliser l'outil
+de la meilleure des manières. Et là, des
+gens postent des trucs de fou. Des
+animation style motion design, des pubs
+produits, des explications visuelles.
+Tout ça fait avec l'autre code. Bon, on
+va pas se mentir, sur les réseaux tout
+paraît toujours incroyable. Mais la
+vraie question, est-ce que moi qui n'ai
+jamais touché à Rotion, je peux obtenir
+les mêmes résultats ? C'est ce qu'on va
+découvrir dans cette vidéo. Allez, c'est
+parti. Donc du coup, on va se rendre sur
+le site de remotion. Donc c'est sur
+remotion.dev. On va copier la commande
+NPX create vidéo@l test. Donc là, on va
+se mettre ici, on va faire entrer et
+vas-y, on va tester le truc de base. On
+va dire que on est sur Blank directory
+to create your project.
+Ouais, my vidéo, c'est bien. Hop, on va
+lui dire add wind, vas-y. Et addent
+skill, bah forcément parce queon va
+utiliser clut code pour le faire. Donc
+c'est mieux d'avoir un agent skill. OK,
+donc là on va attendre. OK, donc il est
+en train d'installer directement le
+skill. Donc là, tu vois, il détecte
+trois agents. All detective agent.
+Vas-y, on va le mettre sur tous. On va
+le mettre de manière globale. Comme ça
+au moins, bah si je veux l'utiliser pour
+le reste de la vidéo, on aura accès. Et
+on va faire l'installation recommandée.
+Allez, proc to install. Installe de find
+skill it page on discover skill. OK. Et
+donc là, normalement, on est bon. Euh,
+vas-y, on va l'ouvrir dans cursor. On va
+voir ce que ça donne. Donc là, pour
+l'instant, on a ça. Et du coup, on va
+essayer de regarder. On va faire ls.
+Normalement, devrait avoir un truc qui
+s'appelle my vidéo. Ouais. Nickel. Donc
+on va faire un CD my V et vas-y, on va
+lancer et on va lancer notre premier
+prompt. Donc là, je vais juste vérifier
+dans slash skill qui nous a bien
+installé le skill en question. Donc là,
+tu vois, on a bien remotion best
+practice qui est juste ici. Donc ça veut
+dire que normalement, on devrait avoir
+accès à remotion pour générer des
+vidéos. Donc pour commencer, on va faire
+un truc assez classique, hein. On va pas
+trop le pousser, mais on va juste
+découvrir et on augmentera la complexité
+du prompt au fur et à mesure de notre
+test. Donc là pour le test de base, on
+va lui dire de créer une animation assez
+simple. J'avais déjà préparé un prompt
+que je te mets juste en dessous. Donc
+là, hop, on va le mettre ici. Tac. Et on
+va lui dire utilise le skill de remotion
+pour faire la vidéo. Tac. Donc on va
+voir ce que ça donne. Là, il est en
+train de thinking. Donc là, tu vois, il
+utilise le skill, il le met avec le
+point vert skill remotion best practice.
+Donc je vais d'abord lire les règles
+pertinentes pour les animations et le
+timing puis explorer la structure du
+projet existant. Donc là, tu vois, il
+veut reader files. Donc on va lui on va
+lui autoriser ça. Donc là, il nous dit
+bah je vais créer l'animation. Là, il
+doit changer du coup la duration in
+frame. Donc on voit qu'il passe de 60 à
+150. Donc on va lui dire bah oui, vas-y,
+hésite pas, fais ta modification. Donc
+l'animation est créée. Je vais vérifier
+que tout fonctionne en lançant la
+preview. Vas-y. Hop, aucun problème. On
+fait yes. Et on va voir du coup notre
+rendu final qui doit être un fond noir
+avec le texte Hello Word en blanc
+centré. Et ensuite le texte apparaît en
+fade in dou pendant 1 seconde, reste
+visible pendant 3 secondes, disparaît en
+fade out une police moderne sans sérif.
+Donc là, l'animation remotion est prête.
+Voici ce que j'ai créé. Donc là, tu
+vois, il explique qu'il a créé un
+fichier de composition avec le fond
+noir, le textello world, la police
+moderne, l'animation d'opacité et la
+durée ajustée à 150 frames à 5 secondes
+à 30 fps. Donc là, tu vois le timing de
+l'animation. Fad in progressif, texte
+visible, fade out progressif. Le serveur
+de preview est lancé. Tu peux voir la
+vidéo à l'adresse suivante. Donc vas-y,
+on va aller se rendre là-dessus.
+Normalement, on devrait avoir accès. OK,
+ça fonctionne pas. Donc là, lance le
+serveur en background car on a pas la
+preview de lancer.
+Donc là, il va lancer le NPM start. Donc
+là, tu vois, il a une erreur de missing
+script. Donc on va faire un yes. Et donc
+là, normalement, il devrait trouver
+exactement ce qu'il faut lancer. Donc
+là, un NPM run pour lancer en
+background. Est-ce que ça va fonctionner
+cette fois-ci ? Il a pas l'air de
+vouloir fonctionner non plus, mais c'est
+pas grave. Tu vois, on teste le produit
+et on voit en fonction ce dont il y a
+besoin. Donc là, tu vois, c'est normal,
+les dépendances étaient pas installées.
+Logique. On va attendre qu'il finisse
+d'installer les dépendances et on se
+retrouve juste après. Donc voilà, il a
+fini d'installer les dépendances, il
+nous demande de lancer le serveur. On va
+faire yes. Et donc là, normalement, on
+devrait avoir accès à notre montage.
+Donc là, vas-y, on va lancer, on va
+faire un play pour voir. OK, pas mal.
+Et donc du coup, on a bien le fade et
+donc du coup, tu peux voir, c'est un
+genre de caput mais version web et on a
+notre animation qui se fait directement
+au-dessus. OK, donc pour ça c'est pas
+mal mais on aimerait faire un peu ce
+qu'on a vu sur Twitter, c'est-à-dire je
+sais pas des des vidéos pour des pubs,
+des vidéos de démonstration et cetera.
+Et donc du coup, j'ai préparé un autre
+prompt. Donc là, ce qu'on va faire,
+c'est qu'on va passer à une deuxième
+step. On va lui donner un prompt un peu
+plus compliqué. Donc je te cople le
+prompt directement ici. D'ailleurs,
+hésite pas. Normalement, toutes les
+ressources seront directement sur le
+school. Je te mets les promptes, toutes
+les commandes que j'ai utilisé dans la
+vidéo. Hésite pas à nous rejoindre, on
+est plus de 300 et honnêtement, tu peux
+poser tes questions. Tu peux aussi
+rejoindre le Discord via cc-france.org.
+Et si tu as besoin, que tu veux
+confirmer ton workflow ou tu as besoin
+de moi pour mettre en place ça dans ton
+entreprise, hésite pas. Tu as le lien
+calend directement en description.
+Allez, on repasse à la suite et je te
+montre à quoi ressemble notre prompte.
+Donc là, on va lui dire "OK, pas mal,
+mais maintenant j'aimerais qu'on pousse
+plus loin et qu'on le en fasse un autre
+avec le prompt suivant. Au niveau du
+prompt, c'est créer une animation
+remotion de 15 secondes qui explique le
+fonctionnement d'une API reste." On va
+le tester là-dessus tout simplement
+parce que j'en ai pas vu beaucoup des
+schémas et cetera et donc ça pourrait
+être pas mal si dans les prochaines
+vidéos, bah je peux t'expliquer comment
+est-ce que ça fonctionne tel ou tel
+process et que je puisse te le
+visualiser et te faire une genre de mini
+vidéo qui sera faite du coup par
+Remotion. Donc l'objectif c'est d'avoir
+un layout avec un fond dégradé sombre, à
+gauche une icône de navigateur avec un
+laptop. Au centre une icône de serveur
+et à droite une icône de base de données
+pour vraiment simuler le process de je
+me connecte avec un PC sur un browser,
+le browser et le site web communiquent
+directement avec la PI et la PI
+communique avec la base de données. OK,
+donc là au niveau de l'animation, les
+éléments apparaissent avec un effet
+Springb aussi. une flèche de navigateur
+qui va vers serveur avec get/pay user,
+le serveur pulse glow, une flèche
+serveur vers la database, la database
+pulse avec une flèche retour et la
+flèche verte retour avec 200 OK bah pour
+valider entre guillemets que tu as
+récupéré la data comme c'est comme ça
+que fonctionne une API restant. Donc là
+on va le valider, on va voir ce qui va
+nous produire et on se retrouve juste
+après. Donc là tu vois, il nous dit je
+vais créer une nouvelle composition pour
+cette animation, c'est un projet plus
+complexe, je vais créer le fichier
+principal. Donc je pense qu'il va nous
+créer à peu près la même chose que tout
+à l'heure mais directement pour mettre
+en place le nouveau prompt. OK, donc là
+l'animation est prête, le serveur a
+recompellé automatiquement. Nouvelle
+composition créée, le API rest explainer
+et on peut la voir directement sur le
+Localos 3000. Donc là, normalement, ça
+suit bien ce qu'on a fait tout à l'heure
+et on va voir ce que ça donne. Donc là,
+on retourne ici, on fait ça juste ici.
+Et là, normalement, Oh là là là là,
+c'est incroyable.
+C'est incroyable franchement. Le
+résultat est fou, quoi. Et donc là,
+ouais, tu fais un genre de select.
+D'accord. Et donc derrière ça, on voit
+la data et OK, ça nous fait 1 200. C'est
+fou, c'est fou. Bon, à part le truc un
+peu bizarre à la fin, mais bon, je pense
+que c'est normal, il doit y avoir la
+transparence d'activer mais franchement
+pas mal du tout. Ah oui, OK, il y a même
+la petite description en dessous. OK,
+franchement, c'est pas mal du tout.
+C'est pas mal du tout. OK, donc là, on
+va mettre ça en pause derrière. On va
+essayer peut-être de lui faire des
+ajustements. Je sais pas si si on peut
+gérer ça. Imaginons, on dirait
+j'aimerais changer la couleur de fond
+pour qu'il mit un dégradé au aux
+couleurs de cloud code par exemple. On
+va voir si justement les ajustements
+fonctionnent de manière à ce que tu
+puisses générer ta vidéo et s'il y a
+certains morceaux qui conviennent pas,
+bah de les ajuster au fur et à mesure.
+Donc on va voir, on va faire un petit
+changement et on va voir ce que ça
+donne. On va aller peut-être directement
+dessus pour voir si on a un résultat
+instant. J'attends qu'il termine et je
+te et je te dis ça. Bah attends, j'ai
+l'impression qu'il a terminé. Voilà. Bah
+nickel. C'est incroyable. Genre je suis
+vraiment assez bluffé du résultat. Je
+pensais pas que c'était aussi simple de
+générer des schémas ou des explications
+directement en vidéo comme ça.
+Franchement, je t'avoue, je suis assez
+sur le cul. OK, donc là maintenant, il
+faudrait trouver une idée pour voir pour
+pouvoir le pousser encore plus loin. Je
+sais pas par exemple aller trouver aller
+trouver des assetts genre je sais pas.
+Imaginons, on prend le logo logo de
+Claude en PNG, on va dire. Euh tac.
+Ouais. Voilà, parfait. Tac, on va save
+l'image. Tac, on va mettre Cloud logo.
+Tac. et et on va lui faire un genre de
+prompt où on est censé animer ça. On va
+voir ce que ça donne. Donc là, on lui a
+référé l'image une et on va lui dire
+basé sur le logo de load Redige un
+prompt pour faire une animation qui
+transforme le logo en terminal avec une
+interface l'autre code au final dont je
+vais te donner une image et on va lui
+mettre que c'est la rêve 2. Tac. Donc on
+va recevoir un nouveau terminal. On va
+lancer. On va prendre un screen. Tac. On
+est ici. Hop, on va se mettre ça là. Et
+vas-y, on va mettre ça comme ça. On va
+faire un command. Et comme ça, au moins,
+ça nous permet de voir si en lui mettant
+très peu de détails, ça nous donne aussi
+un bon résultat. On va lui donner ça. On
+va faire entrer. Et logiquement, il
+devrait créer une nouvelle frame avec
+une nouvelle animation et nous donner le
+résultat attendu. Donc, je vais le
+laisser travailler. Je te mets en
+timeelapse et on se retrouve juste après
+quand il a généré le résultat. Allez, à
+toute.
+OK, donc là, il nous a déterminé un
+genre de plan. Donc prompe animation
+logo cloud into cloud terminal durée 8 à
+10 secondes. Donc là tu vois le logo de
+cloud état initial. Ensuite ça passe le
+terminal cloud en état initial. Donc
+qu'est-ce qu' me dit ? Le logo cloud
+apparaît au centre avec un effet sprint.
+Léger rotation ok ça nous convient. Les
+12 branches commencent à pulser briller
+doucement. Les branches se rétractent
+vers le centre. Le logo se contracte et
+forment un point lumineux. Le point
+lumineux s tire horizontalement pour
+former la bordure supérieure du
+terminal. OK pas mal. La bordure se
+déploie. Ligne verticale descend.
+bordure inférieure se forme et fait
+drawing. L'intérieur du terminal se
+remplit, fond sombre apparaît,
+séparateur vertical se dessine, le
+contenu apparaît en typewriter, titre,
+texte, mascotte, pixel art, fade et le
+prom clignot, curseur apparaît,
+animation complète. OK, bah ça me paraît
+pas mal. Ça me paraît pas mal. Vas-y.
+Donc, on va lui dire de la créer. Euh,
+on va attendre du coup qu'elle se
+finisse. Moi, je te mets en timeelapse.
+Au moins ça ira beaucoup plus vite. Et
+on se retrouve après pour le résultat
+final.
+OK, donc là, il a terminé. Il est en
+train juste d'ajouter notre animation et
+notre composition directement sur
+l'interface web et on va voir le
+résultat. Donc là, ça a l'air d'être
+prêt. L'animation cloud code terminal
+est prête. Et ben vas-y, on va checker
+ça direct. OK, donc on retourne ici.
+Clogo terminal. Allez, tu es prêt pour
+le résultat ? C'est parti.
+OK, pas mal. Tac. On retourne au milieu.
+Pas mal.
+OK. Bon, c'est pas incroyable mais en
+vrai, ça fait le taf. Je pense que tu
+vois, il fallait être un peu plus précis
+sur le prompt. Mais franchement, avec
+deux screens, on a réussi à faire une
+animation que j'aurais jamais pu faire
+moi. Franchement, je suis je suis assez
+bluffé. Ça c'est assez prometteur et
+honnêtement, je pense l'utiliser pour
+les prochaines vidéos pour essayer de
+vous matérialiser un peu mieux ce qui se
+passe dedans. Je suis je suis je suis je
+suis vraiment sur le cul. C'est c'est
+vraiment pas mal du tout. Donc voilà, on
+a testé le produit. Honnêtement, bah ça
+respecte ce qu'on a vu sur Twitter. Je
+vais essayer de m'améliorer un petit peu
+plus. Peut-être que je te referai une
+vidéo où je te ferai peut-être un format
+short sur le produit quand j'aurai testé
+un peu plus. Hésite pas à me dire en
+commentaire ce que toi tu en penses,
+comment est-ce que tu l'utilise et
+hésite pas à nous faire aussi bah des
+partages directement sur le Discord qui
+est accessible via cc-france.org. Lors
+de l'inscription, tu as un onboarding et
+tu peux rejoindre directement le
+Discord. Sur ce, c'est la fin de cette
+vidéo. Je t'invite à liker, à partager
+un maximum et surtout à t'abonner pour
+pas louper les prochaines vidéos. à la
+semaine prochaine pour faire un jeu web
+avec l'autre code. Sur ce, c'était para
+ciao !

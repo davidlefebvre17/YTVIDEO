@@ -1,0 +1,2032 @@
+WEBVTT
+Kind: captions
+Language: fr
+
+00:00:00.160 --> 00:00:01.949 align:start position:0%
+ 
+Il<00:00:00.359><c> existe</c><00:00:00.719><c> un</c><00:00:00.880><c> framework</c><00:00:01.360><c> avec</c><00:00:01.560><c> lequel</c><00:00:01.800><c> vous</c>
+
+00:00:01.949 --> 00:00:01.959 align:start position:0%
+Il existe un framework avec lequel vous
+ 
+
+00:00:01.959 --> 00:00:03.510 align:start position:0%
+Il existe un framework avec lequel vous
+pouvez<00:00:02.240><c> créer</c><00:00:02.520><c> des</c><00:00:02.679><c> vidéos</c><00:00:02.919><c> en</c><00:00:03.120><c> programmant</c>
+
+00:00:03.510 --> 00:00:03.520 align:start position:0%
+pouvez créer des vidéos en programmant
+ 
+
+00:00:03.520 --> 00:00:05.670 align:start position:0%
+pouvez créer des vidéos en programmant
+avec<00:00:03.800><c> React.</c><00:00:04.560><c> Alors</c><00:00:04.680><c> ça</c><00:00:04.839><c> c'est</c><00:00:05.000><c> pas</c><00:00:05.160><c> nouveau.</c>
+
+00:00:05.670 --> 00:00:05.680 align:start position:0%
+avec React. Alors ça c'est pas nouveau.
+ 
+
+00:00:05.680 --> 00:00:06.710 align:start position:0%
+avec React. Alors ça c'est pas nouveau.
+Ce<00:00:05.759><c> qui</c><00:00:05.879><c> est</c><00:00:05.960><c> nouveau</c><00:00:06.240><c> par</c><00:00:06.359><c> contre</c><00:00:06.600><c> c'est</c>
+
+00:00:06.710 --> 00:00:06.720 align:start position:0%
+Ce qui est nouveau par contre c'est
+ 
+
+00:00:06.720 --> 00:00:08.750 align:start position:0%
+Ce qui est nouveau par contre c'est
+qu'on<00:00:06.879><c> peut</c><00:00:07.040><c> désormais</c><00:00:08.000><c> l'utiliser</c><00:00:08.599><c> de</c>
+
+00:00:08.750 --> 00:00:08.760 align:start position:0%
+qu'on peut désormais l'utiliser de
+ 
+
+00:00:08.760 --> 00:00:11.509 align:start position:0%
+qu'on peut désormais l'utiliser de
+manière<00:00:09.080><c> optimale</c><00:00:09.679><c> avec</c><00:00:10.120><c> euh</c><00:00:10.320><c> Cloud</c><00:00:10.639><c> Code</c><00:00:11.320><c> et</c>
+
+00:00:11.509 --> 00:00:11.519 align:start position:0%
+manière optimale avec euh Cloud Code et
+ 
+
+00:00:11.519 --> 00:00:13.950 align:start position:0%
+manière optimale avec euh Cloud Code et
+grâce<00:00:11.799><c> notamment</c><00:00:12.280><c> au</c><00:00:12.400><c> skills.</c>
+
+00:00:13.950 --> 00:00:13.960 align:start position:0%
+grâce notamment au skills.
+ 
+
+00:00:13.960 --> 00:00:16.109 align:start position:0%
+grâce notamment au skills.
+Alors<00:00:14.240><c> euh</c><00:00:14.599><c> donc</c><00:00:15.120><c> cette</c><00:00:15.559><c> outil</c><00:00:15.799><c> s'appelle</c>
+
+00:00:16.109 --> 00:00:16.119 align:start position:0%
+Alors euh donc cette outil s'appelle
+ 
+
+00:00:16.119 --> 00:00:17.670 align:start position:0%
+Alors euh donc cette outil s'appelle
+Remotion.<00:00:17.039><c> Comme</c><00:00:17.119><c> vous</c><00:00:17.199><c> pouvez</c><00:00:17.359><c> le</c><00:00:17.439><c> voir,</c><00:00:17.560><c> il</c>
+
+00:00:17.670 --> 00:00:17.680 align:start position:0%
+Remotion. Comme vous pouvez le voir, il
+ 
+
+00:00:17.680 --> 00:00:20.990 align:start position:0%
+Remotion. Comme vous pouvez le voir, il
+est<00:00:17.760><c> sur</c><00:00:17.960><c> GitHub.</c><00:00:18.400><c> Il</c><00:00:18.480><c> a</c><00:00:18.600><c> plus</c><00:00:18.760><c> de</c><00:00:19.000><c> 30k</c><00:00:19.960><c> stars.</c>
+
+00:00:20.990 --> 00:00:21.000 align:start position:0%
+est sur GitHub. Il a plus de 30k stars.
+ 
+
+00:00:21.000 --> 00:00:23.150 align:start position:0%
+est sur GitHub. Il a plus de 30k stars.
+Donc<00:00:21.160><c> c'est</c><00:00:21.359><c> pas</c><00:00:22.039><c> c'est</c><00:00:22.199><c> pas</c><00:00:22.359><c> n'importe</c><00:00:22.720><c> quel</c>
+
+00:00:23.150 --> 00:00:23.160 align:start position:0%
+Donc c'est pas c'est pas n'importe quel
+ 
+
+00:00:23.160 --> 00:00:24.550 align:start position:0%
+Donc c'est pas c'est pas n'importe quel
+projet.
+
+00:00:24.550 --> 00:00:24.560 align:start position:0%
+projet.
+ 
+
+00:00:24.560 --> 00:00:26.550 align:start position:0%
+projet.
+Il<00:00:24.720><c> existe</c><00:00:25.000><c> depuis</c><00:00:25.720><c> déjà</c><00:00:26.080><c> un</c><00:00:26.240><c> bon</c><00:00:26.359><c> nombre</c>
+
+00:00:26.550 --> 00:00:26.560 align:start position:0%
+Il existe depuis déjà un bon nombre
+ 
+
+00:00:26.560 --> 00:00:28.070 align:start position:0%
+Il existe depuis déjà un bon nombre
+d'années
+
+00:00:28.070 --> 00:00:28.080 align:start position:0%
+d'années
+ 
+
+00:00:28.080 --> 00:00:30.390 align:start position:0%
+d'années
+et<00:00:28.240><c> ils</c><00:00:28.400><c> ont</c><00:00:28.480><c> ajouté</c><00:00:29.480><c> récemment</c><00:00:30.199><c> la</c>
+
+00:00:30.390 --> 00:00:30.400 align:start position:0%
+et ils ont ajouté récemment la
+ 
+
+00:00:30.400 --> 00:00:33.350 align:start position:0%
+et ils ont ajouté récemment la
+possibilité<00:00:30.960><c> de</c><00:00:31.920><c> d'utiliser</c><00:00:32.719><c> un</c><00:00:32.840><c> LLM,</c><00:00:33.200><c> donc</c>
+
+00:00:33.350 --> 00:00:33.360 align:start position:0%
+possibilité de d'utiliser un LLM, donc
+ 
+
+00:00:33.360 --> 00:00:37.790 align:start position:0%
+possibilité de d'utiliser un LLM, donc
+notamment<00:00:34.800><c> cloud</c><00:00:36.079><c> pour</c><00:00:36.520><c> créer</c><00:00:37.000><c> les</c><00:00:37.239><c> vidéos</c><00:00:37.600><c> de</c>
+
+00:00:37.790 --> 00:00:37.800 align:start position:0%
+notamment cloud pour créer les vidéos de
+ 
+
+00:00:37.800 --> 00:00:39.510 align:start position:0%
+notamment cloud pour créer les vidéos de
+manière<00:00:38.200><c> hyper</c><00:00:38.680><c> hyper</c><00:00:39.000><c> optimisée</c><00:00:39.399><c> en</c>
+
+00:00:39.510 --> 00:00:39.520 align:start position:0%
+manière hyper hyper optimisée en
+ 
+
+00:00:39.520 --> 00:00:41.229 align:start position:0%
+manière hyper hyper optimisée en
+utilisant<00:00:39.840><c> les</c><00:00:40.000><c> skills</c><00:00:40.719><c> comme</c><00:00:40.920><c> je</c><00:00:41.039><c> viens</c><00:00:41.160><c> de</c>
+
+00:00:41.229 --> 00:00:41.239 align:start position:0%
+utilisant les skills comme je viens de
+ 
+
+00:00:41.239 --> 00:00:44.190 align:start position:0%
+utilisant les skills comme je viens de
+le<00:00:41.360><c> dire</c><00:00:42.000><c> grâce</c><00:00:42.440><c> à</c><00:00:43.079><c> Versel</c><00:00:43.480><c> qui</c><00:00:43.640><c> ont</c><00:00:43.760><c> sorti</c><00:00:44.039><c> le</c>
+
+00:00:44.190 --> 00:00:44.200 align:start position:0%
+le dire grâce à Versel qui ont sorti le
+ 
+
+00:00:44.200 --> 00:00:46.389 align:start position:0%
+le dire grâce à Versel qui ont sorti le
+site<00:00:44.520><c> skills.shsh.</c>
+
+00:00:46.389 --> 00:00:46.399 align:start position:0%
+site skills.shsh.
+ 
+
+00:00:46.399 --> 00:00:48.069 align:start position:0%
+site skills.shsh.
+Euh<00:00:46.559><c> donc</c><00:00:46.719><c> ils</c><00:00:46.879><c> veulent</c><00:00:47.120><c> apporter</c><00:00:47.600><c> le</c><00:00:47.800><c> fait</c><00:00:47.960><c> de</c>
+
+00:00:48.069 --> 00:00:48.079 align:start position:0%
+Euh donc ils veulent apporter le fait de
+ 
+
+00:00:48.079 --> 00:00:49.990 align:start position:0%
+Euh donc ils veulent apporter le fait de
+pouvoir<00:00:48.399><c> partager</c><00:00:48.879><c> les</c><00:00:49.039><c> skills</c><00:00:49.760><c> très</c>
+
+00:00:49.990 --> 00:00:50.000 align:start position:0%
+pouvoir partager les skills très
+ 
+
+00:00:50.000 --> 00:00:51.549 align:start position:0%
+pouvoir partager les skills très
+facilement<00:00:50.600><c> aux</c><00:00:50.800><c> autres</c><00:00:50.960><c> développeurs,</c><00:00:51.440><c> aux</c>
+
+00:00:51.549 --> 00:00:51.559 align:start position:0%
+facilement aux autres développeurs, aux
+ 
+
+00:00:51.559 --> 00:00:53.750 align:start position:0%
+facilement aux autres développeurs, aux
+autres<00:00:51.719><c> équipes.</c><00:00:52.719><c> Et</c><00:00:52.879><c> donc</c><00:00:53.239><c> vous</c><00:00:53.559><c> avez</c><00:00:53.680><c> la</c>
+
+00:00:53.750 --> 00:00:53.760 align:start position:0%
+autres équipes. Et donc vous avez la
+ 
+
+00:00:53.760 --> 00:00:56.470 align:start position:0%
+autres équipes. Et donc vous avez la
+possibilité<00:00:54.440><c> de</c><00:00:54.680><c> rechercher</c><00:00:55.239><c> ici</c><00:00:55.359><c> des</c><00:00:55.520><c> skills</c>
+
+00:00:56.470 --> 00:00:56.480 align:start position:0%
+possibilité de rechercher ici des skills
+ 
+
+00:00:56.480 --> 00:00:58.470 align:start position:0%
+possibilité de rechercher ici des skills
+euh<00:00:56.719><c> avec</c><00:00:57.480><c> les</c><00:00:57.760><c> les</c><00:00:57.920><c> mots</c><00:00:58.079><c> clés</c><00:00:58.239><c> que</c><00:00:58.359><c> vous</c>
+
+00:00:58.470 --> 00:00:58.480 align:start position:0%
+euh avec les les mots clés que vous
+ 
+
+00:00:58.480 --> 00:00:59.470 align:start position:0%
+euh avec les les mots clés que vous
+souhaitez.<00:00:58.840><c> Donc</c><00:00:58.960><c> par</c><00:00:59.120><c> exemple,</c><00:00:59.239><c> on</c><00:00:59.320><c> peut</c><00:00:59.399><c> pas</c>
+
+00:00:59.470 --> 00:00:59.480 align:start position:0%
+souhaitez. Donc par exemple, on peut pas
+ 
+
+00:00:59.480 --> 00:01:02.110 align:start position:0%
+souhaitez. Donc par exemple, on peut pas
+marquer<00:00:59.760><c> PHP,</c><00:01:00.239><c> on</c><00:01:00.359><c> peut</c><00:01:00.480><c> marquer</c><00:01:01.600><c> React,</c><00:01:02.039><c> on</c>
+
+00:01:02.110 --> 00:01:02.120 align:start position:0%
+marquer PHP, on peut marquer React, on
+ 
+
+00:01:02.120 --> 00:01:04.990 align:start position:0%
+marquer PHP, on peut marquer React, on
+peut<00:01:02.239><c> marquer</c><00:01:02.840><c> design</c><00:01:04.119><c> et</c><00:01:04.320><c> on</c><00:01:04.439><c> va</c><00:01:04.559><c> avoir</c><00:01:04.839><c> en</c>
+
+00:01:04.990 --> 00:01:05.000 align:start position:0%
+peut marquer design et on va avoir en
+ 
+
+00:01:05.000 --> 00:01:07.469 align:start position:0%
+peut marquer design et on va avoir en
+fait<00:01:05.199><c> des</c><00:01:06.000><c> compétences</c><00:01:06.960><c> qu'on</c><00:01:07.119><c> va</c><00:01:07.240><c> pouvoir</c>
+
+00:01:07.469 --> 00:01:07.479 align:start position:0%
+fait des compétences qu'on va pouvoir
+ 
+
+00:01:07.479 --> 00:01:11.469 align:start position:0%
+fait des compétences qu'on va pouvoir
+donner<00:01:07.880><c> à</c><00:01:08.080><c> nos</c><00:01:08.479><c> à</c><00:01:08.640><c> nos</c><00:01:08.840><c> ZIA,</c><00:01:09.640><c> à</c><00:01:09.759><c> nos</c><00:01:09.920><c> LLM</c>
+
+00:01:11.469 --> 00:01:11.479 align:start position:0%
+donner à nos à nos ZIA, à nos LLM
+ 
+
+00:01:11.479 --> 00:01:14.469 align:start position:0%
+donner à nos à nos ZIA, à nos LLM
+donc<00:01:11.640><c> comme</c><00:01:11.840><c> Cloud</c><00:01:12.119><c> Code,</c><00:01:12.720><c> Codex</c><00:01:13.360><c> ou</c><00:01:13.560><c> autres</c>
+
+00:01:14.469 --> 00:01:14.479 align:start position:0%
+donc comme Cloud Code, Codex ou autres
+ 
+
+00:01:14.479 --> 00:01:17.670 align:start position:0%
+donc comme Cloud Code, Codex ou autres
+euh<00:01:15.040><c> pour</c><00:01:15.400><c> pouvoir</c><00:01:16.159><c> les</c><00:01:16.360><c> aider</c><00:01:17.040><c> à</c><00:01:17.240><c> utiliser</c>
+
+00:01:17.670 --> 00:01:17.680 align:start position:0%
+euh pour pouvoir les aider à utiliser
+ 
+
+00:01:17.680 --> 00:01:19.630 align:start position:0%
+euh pour pouvoir les aider à utiliser
+certaines<00:01:18.000><c> technologies.</c><00:01:19.320><c> Et</c><00:01:19.439><c> comme</c><00:01:19.560><c> vous</c>
+
+00:01:19.630 --> 00:01:19.640 align:start position:0%
+certaines technologies. Et comme vous
+ 
+
+00:01:19.640 --> 00:01:22.429 align:start position:0%
+certaines technologies. Et comme vous
+pouvez<00:01:19.799><c> le</c><00:01:19.880><c> voir,</c><00:01:20.200><c> la</c><00:01:20.479><c> troisème</c>
+
+00:01:22.429 --> 00:01:22.439 align:start position:0%
+pouvez le voir, la troisème
+ 
+
+00:01:22.439 --> 00:01:24.789 align:start position:0%
+pouvez le voir, la troisème
+le<00:01:22.560><c> trème</c><00:01:22.920><c> skill</c><00:01:23.360><c> le</c><00:01:23.520><c> plus</c><00:01:23.680><c> téléchargé,</c><00:01:24.400><c> c'est</c>
+
+00:01:24.789 --> 00:01:24.799 align:start position:0%
+le trème skill le plus téléchargé, c'est
+ 
+
+00:01:24.799 --> 00:01:27.910 align:start position:0%
+le trème skill le plus téléchargé, c'est
+Remotion<00:01:25.320><c> Best</c><00:01:25.560><c> Practices.</c><00:01:26.960><c> Donc</c><00:01:27.400><c> les</c><00:01:27.840><c> les</c>
+
+00:01:27.910 --> 00:01:27.920 align:start position:0%
+Remotion Best Practices. Donc les les
+ 
+
+00:01:27.920 --> 00:01:29.749 align:start position:0%
+Remotion Best Practices. Donc les les
+meilleures<00:01:28.159><c> pratiques</c><00:01:28.840><c> pour</c><00:01:29.119><c> utiliser</c>
+
+00:01:29.749 --> 00:01:29.759 align:start position:0%
+meilleures pratiques pour utiliser
+ 
+
+00:01:29.759 --> 00:01:32.510 align:start position:0%
+meilleures pratiques pour utiliser
+Remotion.<00:01:31.159><c> Et</c><00:01:31.240><c> on</c><00:01:31.360><c> peut</c><00:01:31.439><c> voir</c><00:01:31.600><c> en</c><00:01:31.759><c> fait</c><00:01:32.000><c> que</c><00:01:32.320><c> ce</c>
+
+00:01:32.510 --> 00:01:32.520 align:start position:0%
+Remotion. Et on peut voir en fait que ce
+ 
+
+00:01:32.520 --> 00:01:35.789 align:start position:0%
+Remotion. Et on peut voir en fait que ce
+skill<00:01:33.560><c> ce</c><00:01:33.680><c> n'est</c><00:01:33.799><c> rien</c><00:01:33.960><c> d'autre</c><00:01:34.200><c> que</c>
+
+00:01:35.789 --> 00:01:35.799 align:start position:0%
+skill ce n'est rien d'autre que
+ 
+
+00:01:35.799 --> 00:01:37.550 align:start position:0%
+skill ce n'est rien d'autre que
+une<00:01:35.920><c> dizaine</c><00:01:36.280><c> de</c><00:01:36.439><c> fichiers</c><00:01:36.840><c> point</c><00:01:37.040><c> MD,</c><00:01:37.280><c> donc</c>
+
+00:01:37.550 --> 00:01:37.560 align:start position:0%
+une dizaine de fichiers point MD, donc
+ 
+
+00:01:37.560 --> 00:01:40.590 align:start position:0%
+une dizaine de fichiers point MD, donc
+des<00:01:38.040><c> des</c><00:01:38.240><c> règles</c><00:01:39.560><c> comment</c><00:01:39.840><c> utiliser</c><00:01:40.280><c> tel</c><00:01:40.479><c> ou</c>
+
+00:01:40.590 --> 00:01:40.600 align:start position:0%
+des des règles comment utiliser tel ou
+ 
+
+00:01:40.600 --> 00:01:43.109 align:start position:0%
+des des règles comment utiliser tel ou
+tel<00:01:40.840><c> composant</c><00:01:41.560><c> de</c><00:01:41.799><c> cette</c><00:01:42.000><c> librairie</c>
+
+00:01:43.109 --> 00:01:43.119 align:start position:0%
+tel composant de cette librairie
+ 
+
+00:01:43.119 --> 00:01:45.709 align:start position:0%
+tel composant de cette librairie
+remotion.<00:01:44.159><c> par</c><00:01:44.360><c> exemple</c><00:01:44.719><c> ici,</c><00:01:44.880><c> comment</c><00:01:45.560><c> bien</c>
+
+00:01:45.709 --> 00:01:45.719 align:start position:0%
+remotion. par exemple ici, comment bien
+ 
+
+00:01:45.719 --> 00:01:48.510 align:start position:0%
+remotion. par exemple ici, comment bien
+gérer<00:01:45.960><c> la</c><00:01:46.119><c> 3D,</c><00:01:47.159><c> comment</c><00:01:47.399><c> gérer</c><00:01:48.079><c> les</c><00:01:48.280><c> polices</c>
+
+00:01:48.510 --> 00:01:48.520 align:start position:0%
+gérer la 3D, comment gérer les polices
+ 
+
+00:01:48.520 --> 00:01:50.670 align:start position:0%
+gérer la 3D, comment gérer les polices
+de<00:01:48.680><c> caractère,</c><00:01:49.960><c> comment</c><00:01:50.200><c> gérer</c><00:01:50.520><c> les</c>
+
+00:01:50.670 --> 00:01:50.680 align:start position:0%
+de caractère, comment gérer les
+ 
+
+00:01:50.680 --> 00:01:53.830 align:start position:0%
+de caractère, comment gérer les
+paramètres<00:01:51.680><c> et</c><00:01:51.880><c> cetera</c><00:01:52.320><c> et</c><00:01:52.520><c> cetera.</c><00:01:53.479><c> Et</c><00:01:53.600><c> donc</c>
+
+00:01:53.830 --> 00:01:53.840 align:start position:0%
+paramètres et cetera et cetera. Et donc
+ 
+
+00:01:53.840 --> 00:01:55.469 align:start position:0%
+paramètres et cetera et cetera. Et donc
+pour<00:01:54.360><c> utiliser</c><00:01:54.759><c> ce</c><00:01:54.920><c> skill,</c><00:01:55.240><c> c'est</c><00:01:55.360><c> pas</c>
+
+00:01:55.469 --> 00:01:55.479 align:start position:0%
+pour utiliser ce skill, c'est pas
+ 
+
+00:01:55.479 --> 00:01:57.789 align:start position:0%
+pour utiliser ce skill, c'est pas
+compliqué.<00:01:55.840><c> Il</c><00:01:55.960><c> suffit</c><00:01:56.200><c> de</c><00:01:56.399><c> copier</c><00:01:57.560><c> cette</c>
+
+00:01:57.789 --> 00:01:57.799 align:start position:0%
+compliqué. Il suffit de copier cette
+ 
+
+00:01:57.799 --> 00:02:00.630 align:start position:0%
+compliqué. Il suffit de copier cette
+ligne,<00:01:58.479><c> de</c><00:01:58.560><c> la</c><00:01:58.640><c> coller</c><00:01:58.880><c> dans</c><00:01:59.000><c> votre</c><00:01:59.159><c> terminal.</c>
+
+00:02:00.630 --> 00:02:00.640 align:start position:0%
+ligne, de la coller dans votre terminal.
+ 
+
+00:02:00.640 --> 00:02:02.670 align:start position:0%
+ligne, de la coller dans votre terminal.
+Donc<00:02:00.759><c> moi</c><00:02:01.000><c> je</c><00:02:01.119><c> l'ai</c><00:02:01.280><c> déjà</c><00:02:01.479><c> fait.</c><00:02:02.320><c> Et</c><00:02:02.399><c> après,</c><00:02:02.600><c> je</c>
+
+00:02:02.670 --> 00:02:02.680 align:start position:0%
+Donc moi je l'ai déjà fait. Et après, je
+ 
+
+00:02:02.680 --> 00:02:04.709 align:start position:0%
+Donc moi je l'ai déjà fait. Et après, je
+peux<00:02:02.799><c> aller</c><00:02:02.960><c> vérifier</c><00:02:04.039><c> directement</c><00:02:04.560><c> si</c>
+
+00:02:04.709 --> 00:02:04.719 align:start position:0%
+peux aller vérifier directement si
+ 
+
+00:02:04.719 --> 00:02:06.389 align:start position:0%
+peux aller vérifier directement si
+j'exécute<00:02:05.200><c> Cloud.</c>
+
+00:02:06.389 --> 00:02:06.399 align:start position:0%
+j'exécute Cloud.
+ 
+
+00:02:06.399 --> 00:02:08.070 align:start position:0%
+j'exécute Cloud.
+Je<00:02:06.479><c> peux</c><00:02:06.680><c> lui</c><00:02:06.880><c> faire</c><00:02:07.360><c> lui</c><00:02:07.560><c> faire</c><00:02:07.920><c> la</c>
+
+00:02:08.070 --> 00:02:08.080 align:start position:0%
+Je peux lui faire lui faire la
+ 
+
+00:02:08.080 --> 00:02:09.869 align:start position:0%
+Je peux lui faire lui faire la
+commande/skills.
+
+00:02:09.869 --> 00:02:09.879 align:start position:0%
+commande/skills.
+ 
+
+00:02:09.879 --> 00:02:12.790 align:start position:0%
+commande/skills.
+Et<00:02:10.000><c> on</c><00:02:10.160><c> voit</c><00:02:10.319><c> qu'ici</c><00:02:10.679><c> j'ai</c><00:02:11.640><c> le</c><00:02:11.800><c> skill</c><00:02:12.319><c> remotion</c>
+
+00:02:12.790 --> 00:02:12.800 align:start position:0%
+Et on voit qu'ici j'ai le skill remotion
+ 
+
+00:02:12.800 --> 00:02:15.190 align:start position:0%
+Et on voit qu'ici j'ai le skill remotion
+B<00:02:13.000><c> practices.</c><00:02:13.520><c> Donc</c><00:02:13.599><c> moi</c><00:02:13.720><c> qui</c><00:02:13.879><c> est</c><00:02:13.959><c> installé</c>
+
+00:02:15.190 --> 00:02:15.200 align:start position:0%
+B practices. Donc moi qui est installé
+ 
+
+00:02:15.200 --> 00:02:16.550 align:start position:0%
+B practices. Donc moi qui est installé
+en<00:02:15.360><c> global,</c><00:02:15.680><c> c'est-à-dire</c><00:02:16.000><c> dans</c><00:02:16.120><c> le</c><00:02:16.200><c> dossier</c>
+
+00:02:16.550 --> 00:02:16.560 align:start position:0%
+en global, c'est-à-dire dans le dossier
+ 
+
+00:02:16.560 --> 00:02:20.110 align:start position:0%
+en global, c'est-à-dire dans le dossier
+pointcloud/skills.
+
+00:02:20.110 --> 00:02:20.120 align:start position:0%
+ 
+ 
+
+00:02:20.120 --> 00:02:21.350 align:start position:0%
+ 
+Et<00:02:20.280><c> si</c><00:02:20.440><c> on</c><00:02:20.519><c> ne</c><00:02:20.640><c> veut</c><00:02:20.720><c> pas</c><00:02:20.800><c> l'installer</c><00:02:21.200><c> en</c>
+
+00:02:21.350 --> 00:02:21.360 align:start position:0%
+Et si on ne veut pas l'installer en
+ 
+
+00:02:21.360 --> 00:02:24.030 align:start position:0%
+Et si on ne veut pas l'installer en
+global,<00:02:21.720><c> on</c><00:02:21.840><c> peut</c><00:02:21.959><c> aussi</c><00:02:22.160><c> l'installer</c><00:02:23.560><c> en</c><00:02:23.879><c> en</c>
+
+00:02:24.030 --> 00:02:24.040 align:start position:0%
+global, on peut aussi l'installer en en
+ 
+
+00:02:24.040 --> 00:02:26.670 align:start position:0%
+global, on peut aussi l'installer en en
+suivant<00:02:24.360><c> le</c><00:02:24.480><c> tuto</c><00:02:25.440><c> de</c><00:02:25.920><c> de</c><00:02:26.000><c> création</c><00:02:26.319><c> de</c><00:02:26.440><c> projet</c>
+
+00:02:26.670 --> 00:02:26.680 align:start position:0%
+suivant le tuto de de création de projet
+ 
+
+00:02:26.680 --> 00:02:28.309 align:start position:0%
+suivant le tuto de de création de projet
+avec<00:02:26.840><c> Cloud</c><00:02:27.040><c> Code.</c><00:02:27.640><c> On</c><00:02:27.760><c> va</c><00:02:27.879><c> sur</c><00:02:28.040><c> la</c><00:02:28.160><c> page</c>
+
+00:02:28.309 --> 00:02:28.319 align:start position:0%
+avec Cloud Code. On va sur la page
+ 
+
+00:02:28.319 --> 00:02:31.309 align:start position:0%
+avec Cloud Code. On va sur la page
+d'accueil,<00:02:28.800><c> on</c><00:02:28.920><c> a</c><00:02:29.200><c> use</c><00:02:29.480><c> with</c><00:02:29.640><c> cloud</c><00:02:29.920><c> code</c><00:02:31.120><c> et</c>
+
+00:02:31.309 --> 00:02:31.319 align:start position:0%
+d'accueil, on a use with cloud code et
+ 
+
+00:02:31.319 --> 00:02:32.790 align:start position:0%
+d'accueil, on a use with cloud code et
+on<00:02:31.440><c> va</c><00:02:31.519><c> voir</c><00:02:31.680><c> qu'on</c><00:02:31.879><c> peut</c><00:02:32.000><c> créer</c><00:02:32.319><c> un</c><00:02:32.519><c> nouveau</c>
+
+00:02:32.790 --> 00:02:32.800 align:start position:0%
+on va voir qu'on peut créer un nouveau
+ 
+
+00:02:32.800 --> 00:02:35.430 align:start position:0%
+on va voir qu'on peut créer un nouveau
+projet.<00:02:34.120><c> Euh</c><00:02:34.360><c> sélectionner</c><00:02:34.800><c> un</c><00:02:34.920><c> template</c><00:02:35.280><c> et</c>
+
+00:02:35.430 --> 00:02:35.440 align:start position:0%
+projet. Euh sélectionner un template et
+ 
+
+00:02:35.440 --> 00:02:37.670 align:start position:0%
+projet. Euh sélectionner un template et
+sélectionner<00:02:35.959><c> oui</c><00:02:36.200><c> à</c><00:02:36.319><c> installer</c><00:02:36.640><c> les</c><00:02:36.760><c> skills.</c>
+
+00:02:37.670 --> 00:02:37.680 align:start position:0%
+sélectionner oui à installer les skills.
+ 
+
+00:02:37.680 --> 00:02:38.869 align:start position:0%
+sélectionner oui à installer les skills.
+On<00:02:37.800><c> va</c><00:02:37.879><c> faire</c><00:02:38.000><c> ça</c><00:02:38.160><c> tout</c><00:02:38.319><c> de</c><00:02:38.400><c> suite</c><00:02:38.599><c> pour</c><00:02:38.760><c> la</c>
+
+00:02:38.869 --> 00:02:38.879 align:start position:0%
+On va faire ça tout de suite pour la
+ 
+
+00:02:38.879 --> 00:02:41.229 align:start position:0%
+On va faire ça tout de suite pour la
+démo<00:02:39.120><c> et</c><00:02:39.200><c> ensuite</c><00:02:39.480><c> on</c><00:02:39.599><c> va</c><00:02:39.720><c> voir</c><00:02:40.599><c> en</c><00:02:40.800><c> preview</c>
+
+00:02:41.229 --> 00:02:41.239 align:start position:0%
+démo et ensuite on va voir en preview
+ 
+
+00:02:41.239 --> 00:02:44.070 align:start position:0%
+démo et ensuite on va voir en preview
+quelle<00:02:41.519><c> vidéo</c><00:02:41.840><c> on</c><00:02:42.000><c> va</c><00:02:42.120><c> générer</c><00:02:43.000><c> euh</c><00:02:43.239><c> pour</c><00:02:43.680><c> pour</c>
+
+00:02:44.070 --> 00:02:44.080 align:start position:0%
+quelle vidéo on va générer euh pour pour
+ 
+
+00:02:44.080 --> 00:02:46.190 align:start position:0%
+quelle vidéo on va générer euh pour pour
+l'exemple.<00:02:45.319><c> Alors,</c><00:02:45.480><c> je</c><00:02:45.560><c> vais</c><00:02:45.640><c> aller</c><00:02:45.800><c> dans</c><00:02:46.040><c> le</c>
+
+00:02:46.190 --> 00:02:46.200 align:start position:0%
+l'exemple. Alors, je vais aller dans le
+ 
+
+00:02:46.200 --> 00:02:48.430 align:start position:0%
+l'exemple. Alors, je vais aller dans le
+dossier<00:02:46.680><c> YouTube,</c>
+
+00:02:48.430 --> 00:02:48.440 align:start position:0%
+dossier YouTube,
+ 
+
+00:02:48.440 --> 00:02:50.910 align:start position:0%
+dossier YouTube,
+je<00:02:48.599><c> vais</c><00:02:48.760><c> retirer</c><00:02:49.200><c> ça</c><00:02:50.120><c> et</c><00:02:50.280><c> je</c><00:02:50.400><c> vais</c><00:02:50.480><c> lancer</c><00:02:50.760><c> la</c>
+
+00:02:50.910 --> 00:02:50.920 align:start position:0%
+je vais retirer ça et je vais lancer la
+ 
+
+00:02:50.920 --> 00:02:55.229 align:start position:0%
+je vais retirer ça et je vais lancer la
+commande<00:02:51.280><c> NPX</c><00:02:51.800><c> create</c><00:02:52.319><c> vidéo@litust.</c>
+
+00:02:55.229 --> 00:02:55.239 align:start position:0%
+commande NPX create vidéo@litust.
+ 
+
+00:02:55.239 --> 00:02:57.550 align:start position:0%
+commande NPX create vidéo@litust.
+Et<00:02:55.360><c> donc</c><00:02:56.159><c> on</c><00:02:56.319><c> choisit</c><00:02:56.800><c> blanque</c><00:02:57.159><c> comme</c><00:02:57.319><c> il</c><00:02:57.400><c> nous</c>
+
+00:02:57.550 --> 00:02:57.560 align:start position:0%
+Et donc on choisit blanque comme il nous
+ 
+
+00:02:57.560 --> 00:03:01.869 align:start position:0%
+Et donc on choisit blanque comme il nous
+disait.<00:02:58.480><c> On</c><00:02:58.599><c> va</c><00:02:58.680><c> appeler</c><00:02:58.920><c> ça</c><00:02:59.200><c> my</c><00:02:59.440><c> vidéo.</c><00:02:59.800><c> Oui.</c>
+
+00:03:01.869 --> 00:03:01.879 align:start position:0%
+disait. On va appeler ça my vidéo. Oui.
+ 
+
+00:03:01.879 --> 00:03:04.789 align:start position:0%
+disait. On va appeler ça my vidéo. Oui.
+Euh<00:03:02.200><c> mince,</c><00:03:03.680><c> j'ai</c><00:03:03.879><c> oublié</c><00:03:04.080><c> de</c><00:03:04.200><c> retourner</c><00:03:04.599><c> en</c>
+
+00:03:04.789 --> 00:03:04.799 align:start position:0%
+Euh mince, j'ai oublié de retourner en
+ 
+
+00:03:04.799 --> 00:03:06.910 align:start position:0%
+Euh mince, j'ai oublié de retourner en
+arrière.
+
+00:03:06.910 --> 00:03:06.920 align:start position:0%
+arrière.
+ 
+
+00:03:06.920 --> 00:03:10.229 align:start position:0%
+arrière.
+Et<00:03:07.040><c> cette</c><00:03:07.239><c> fois-ci</c><00:03:07.599><c> je</c><00:03:07.760><c> relance.</c>
+
+00:03:10.229 --> 00:03:10.239 align:start position:0%
+Et cette fois-ci je relance.
+ 
+
+00:03:10.239 --> 00:03:14.470 align:start position:0%
+Et cette fois-ci je relance.
+Je<00:03:10.400><c> choisis</c><00:03:10.760><c> un</c><00:03:11.319><c> un</c><00:03:11.480><c> template</c><00:03:11.920><c> vide.</c><00:03:13.000><c> Euh</c>
+
+00:03:14.470 --> 00:03:14.480 align:start position:0%
+Je choisis un un template vide. Euh
+ 
+
+00:03:14.480 --> 00:03:17.910 align:start position:0%
+Je choisis un un template vide. Euh
+YouTube<00:03:15.680><c> vidéo.</c><00:03:17.040><c> On</c><00:03:17.200><c> ajoute</c><00:03:17.480><c> ta</c><00:03:17.519><c> tilewind.</c>
+
+00:03:17.910 --> 00:03:17.920 align:start position:0%
+YouTube vidéo. On ajoute ta tilewind.
+ 
+
+00:03:17.920 --> 00:03:18.949 align:start position:0%
+YouTube vidéo. On ajoute ta tilewind.
+Donc<00:03:18.040><c> c'est</c><00:03:18.159><c> recommandé</c><00:03:18.560><c> d'utiliser</c>
+
+00:03:18.949 --> 00:03:18.959 align:start position:0%
+Donc c'est recommandé d'utiliser
+ 
+
+00:03:18.959 --> 00:03:20.710 align:start position:0%
+Donc c'est recommandé d'utiliser
+Tailwind<00:03:19.519><c> comme</c><00:03:19.680><c> ils</c><00:03:19.799><c> nous</c><00:03:19.920><c> le</c><00:03:20.000><c> disent</c><00:03:20.360><c> juste</c>
+
+00:03:20.710 --> 00:03:20.720 align:start position:0%
+Tailwind comme ils nous le disent juste
+ 
+
+00:03:20.720 --> 00:03:23.070 align:start position:0%
+Tailwind comme ils nous le disent juste
+ici.<00:03:20.879><c> De</c><00:03:21.040><c> toute</c><00:03:21.200><c> façon</c><00:03:22.200><c> euh</c><00:03:22.480><c> on</c><00:03:22.720><c> dit</c><00:03:22.840><c> oui</c><00:03:23.000><c> à</c>
+
+00:03:23.070 --> 00:03:23.080 align:start position:0%
+ici. De toute façon euh on dit oui à
+ 
+
+00:03:23.080 --> 00:03:24.710 align:start position:0%
+ici. De toute façon euh on dit oui à
+Tail<00:03:23.280><c> Wind</c><00:03:23.599><c> et</c><00:03:23.760><c> ensuite</c><00:03:24.040><c> on</c><00:03:24.239><c> dit</c><00:03:24.360><c> oui</c><00:03:24.560><c> pour</c>
+
+00:03:24.710 --> 00:03:24.720 align:start position:0%
+Tail Wind et ensuite on dit oui pour
+ 
+
+00:03:24.720 --> 00:03:26.990 align:start position:0%
+Tail Wind et ensuite on dit oui pour
+ajouter<00:03:25.040><c> les</c><00:03:25.159><c> skills.</c>
+
+00:03:26.990 --> 00:03:27.000 align:start position:0%
+ajouter les skills.
+ 
+
+00:03:27.000 --> 00:03:28.670 align:start position:0%
+ajouter les skills.
+En<00:03:27.080><c> fait</c><00:03:27.239><c> ça</c><00:03:27.360><c> va</c><00:03:27.440><c> nous</c><00:03:27.599><c> créer</c><00:03:28.159><c> un</c><00:03:28.360><c> dossier</c>
+
+00:03:28.670 --> 00:03:28.680 align:start position:0%
+En fait ça va nous créer un dossier
+ 
+
+00:03:28.680 --> 00:03:31.509 align:start position:0%
+En fait ça va nous créer un dossier
+pointcloud<00:03:29.400><c> dans</c><00:03:30.080><c> le</c><00:03:30.280><c> projet</c><00:03:30.920><c> à</c><00:03:31.120><c> moins</c><00:03:31.280><c> que</c><00:03:31.360><c> ça</c>
+
+00:03:31.509 --> 00:03:31.519 align:start position:0%
+pointcloud dans le projet à moins que ça
+ 
+
+00:03:31.519 --> 00:03:34.030 align:start position:0%
+pointcloud dans le projet à moins que ça
+l'installe.<00:03:32.519><c> Ouais</c><00:03:32.640><c> ça</c><00:03:32.760><c> l'installe</c><00:03:33.080><c> en</c><00:03:33.200><c> fait</c>
+
+00:03:34.030 --> 00:03:34.040 align:start position:0%
+l'installe. Ouais ça l'installe en fait
+ 
+
+00:03:34.040 --> 00:03:37.270 align:start position:0%
+l'installe. Ouais ça l'installe en fait
+directement<00:03:35.439><c> au</c><00:03:35.680><c> sein</c><00:03:36.480><c> de</c><00:03:37.080><c> Non,</c><00:03:37.200><c> ça</c>
+
+00:03:37.270 --> 00:03:37.280 align:start position:0%
+directement au sein de Non, ça
+ 
+
+00:03:37.280 --> 00:03:38.229 align:start position:0%
+directement au sein de Non, ça
+l'installe<00:03:37.560><c> directement</c><00:03:37.879><c> au</c><00:03:38.000><c> sein</c><00:03:38.120><c> du</c>
+
+00:03:38.229 --> 00:03:38.239 align:start position:0%
+l'installe directement au sein du
+ 
+
+00:03:38.239 --> 00:03:39.190 align:start position:0%
+l'installe directement au sein du
+projet.<00:03:38.519><c> Ouais.</c><00:03:38.720><c> Donc</c><00:03:38.799><c> je</c><00:03:38.879><c> vais</c><00:03:38.920><c> lancer</c>
+
+00:03:39.190 --> 00:03:39.200 align:start position:0%
+projet. Ouais. Donc je vais lancer
+ 
+
+00:03:39.200 --> 00:03:42.070 align:start position:0%
+projet. Ouais. Donc je vais lancer
+pareil<00:03:39.760><c> oui</c><00:03:39.920><c> l'ouverture</c><00:03:40.319><c> dans</c><00:03:40.480><c> PS</c><00:03:40.720><c> code.</c><00:03:41.920><c> Là</c>
+
+00:03:42.070 --> 00:03:42.080 align:start position:0%
+pareil oui l'ouverture dans PS code. Là
+ 
+
+00:03:42.080 --> 00:03:44.149 align:start position:0%
+pareil oui l'ouverture dans PS code. Là
+vous<00:03:42.159><c> voyez</c><00:03:42.599><c> on</c><00:03:42.720><c> a</c><00:03:42.799><c> le</c><00:03:42.920><c> dossier</c><00:03:43.239><c> pointcloud</c><00:03:44.000><c> et</c>
+
+00:03:44.149 --> 00:03:44.159 align:start position:0%
+vous voyez on a le dossier pointcloud et
+ 
+
+00:03:44.159 --> 00:03:45.270 align:start position:0%
+vous voyez on a le dossier pointcloud et
+ça<00:03:44.319><c> va</c><00:03:44.360><c> bien</c><00:03:44.519><c> installer</c><00:03:44.799><c> en</c><00:03:44.920><c> fait</c><00:03:45.040><c> tous</c><00:03:45.159><c> les</c>
+
+00:03:45.270 --> 00:03:45.280 align:start position:0%
+ça va bien installer en fait tous les
+ 
+
+00:03:45.280 --> 00:03:48.429 align:start position:0%
+ça va bien installer en fait tous les
+skills<00:03:45.760><c> directement</c><00:03:46.400><c> ici.</c><00:03:47.400><c> Voilà.</c><00:03:48.040><c> Là</c><00:03:48.200><c> c'est</c>
+
+00:03:48.429 --> 00:03:48.439 align:start position:0%
+skills directement ici. Voilà. Là c'est
+ 
+
+00:03:48.439 --> 00:03:50.149 align:start position:0%
+skills directement ici. Voilà. Là c'est
+si<00:03:48.599><c> vous</c><00:03:48.680><c> n'avez</c><00:03:48.920><c> pas</c><00:03:49.000><c> list</c><00:03:49.480><c> les</c><00:03:49.680><c> skills</c>
+
+00:03:50.149 --> 00:03:50.159 align:start position:0%
+si vous n'avez pas list les skills
+ 
+
+00:03:50.159 --> 00:03:53.390 align:start position:0%
+si vous n'avez pas list les skills
+d'installer<00:03:50.879><c> au</c><00:03:51.000><c> global</c><00:03:52.079><c> euh</c><00:03:52.439><c> sur</c><00:03:52.640><c> votre</c><00:03:52.920><c> PC,</c>
+
+00:03:53.390 --> 00:03:53.400 align:start position:0%
+d'installer au global euh sur votre PC,
+ 
+
+00:03:53.400 --> 00:03:54.750 align:start position:0%
+d'installer au global euh sur votre PC,
+vous<00:03:53.560><c> pouvez</c><00:03:53.680><c> l'installer</c><00:03:54.079><c> uniquement</c><00:03:54.560><c> pour</c>
+
+00:03:54.750 --> 00:03:54.760 align:start position:0%
+vous pouvez l'installer uniquement pour
+ 
+
+00:03:54.760 --> 00:03:57.069 align:start position:0%
+vous pouvez l'installer uniquement pour
+le<00:03:55.200><c> dans</c><00:03:55.360><c> ce</c><00:03:55.480><c> projet.</c>
+
+00:03:57.069 --> 00:03:57.079 align:start position:0%
+le dans ce projet.
+ 
+
+00:03:57.079 --> 00:03:58.949 align:start position:0%
+le dans ce projet.
+Là<00:03:57.599><c> c'est</c><00:03:57.799><c> installé</c><00:03:58.079><c> pour</c><00:03:58.239><c> absolument</c><00:03:58.760><c> tous</c>
+
+00:03:58.949 --> 00:03:58.959 align:start position:0%
+Là c'est installé pour absolument tous
+ 
+
+00:03:58.959 --> 00:04:00.910 align:start position:0%
+Là c'est installé pour absolument tous
+les
+
+00:04:00.910 --> 00:04:00.920 align:start position:0%
+les
+ 
+
+00:04:00.920 --> 00:04:02.710 align:start position:0%
+les
+les<00:04:01.000><c> providers.</c>
+
+00:04:02.710 --> 00:04:02.720 align:start position:0%
+les providers.
+ 
+
+00:04:02.720 --> 00:04:05.390 align:start position:0%
+les providers.
+OK.<00:04:03.680><c> Qui</c><00:04:04.120><c> on</c><00:04:04.239><c> été</c><00:04:04.400><c> qui</c><00:04:04.480><c> ont</c><00:04:04.599><c> été</c><00:04:04.799><c> détectés</c><00:04:05.319><c> il</c>
+
+00:04:05.390 --> 00:04:05.400 align:start position:0%
+OK. Qui on été qui ont été détectés il
+ 
+
+00:04:05.400 --> 00:04:07.190 align:start position:0%
+OK. Qui on été qui ont été détectés il
+me<00:04:05.519><c> semble</c><00:04:05.760><c> sur</c><00:04:06.040><c> sur</c><00:04:06.239><c> le</c><00:04:06.560><c> sur</c><00:04:06.680><c> le</c><00:04:06.799><c> PC</c><00:04:07.040><c> en</c>
+
+00:04:07.190 --> 00:04:07.200 align:start position:0%
+me semble sur sur le sur le PC en
+ 
+
+00:04:07.200 --> 00:04:08.509 align:start position:0%
+me semble sur sur le sur le PC en
+question.
+
+00:04:08.509 --> 00:04:08.519 align:start position:0%
+question.
+ 
+
+00:04:08.519 --> 00:04:10.429 align:start position:0%
+question.
+Et<00:04:08.640><c> moi</c><00:04:08.760><c> je</c><00:04:08.840><c> vais</c><00:04:08.920><c> vous</c><00:04:09.040><c> montrer</c><00:04:09.840><c> quelle</c>
+
+00:04:10.429 --> 00:04:10.439 align:start position:0%
+Et moi je vais vous montrer quelle
+ 
+
+00:04:10.439 --> 00:04:13.789 align:start position:0%
+Et moi je vais vous montrer quelle
+quelle<00:04:10.720><c> vidéo</c><00:04:11.079><c> on</c><00:04:11.239><c> va</c><00:04:11.400><c> générer.</c><00:04:12.400><c> Alors</c><00:04:13.480><c> ça</c><00:04:13.680><c> va</c>
+
+00:04:13.789 --> 00:04:13.799 align:start position:0%
+quelle vidéo on va générer. Alors ça va
+ 
+
+00:04:13.799 --> 00:04:40.150 align:start position:0%
+quelle vidéo on va générer. Alors ça va
+ressembler<00:04:14.239><c> à</c><00:04:14.439><c> ça</c><00:04:14.560><c> du</c><00:04:14.720><c> coup.</c>
+
+00:04:40.150 --> 00:04:40.160 align:start position:0%
+ 
+ 
+
+00:04:40.160 --> 00:04:42.749 align:start position:0%
+ 
+Voilà,<00:04:40.919><c> donc</c><00:04:41.039><c> c'est</c><00:04:41.199><c> 30</c><00:04:41.400><c> secondes</c><00:04:41.680><c> de</c><00:04:41.840><c> vidéo</c>
+
+00:04:42.749 --> 00:04:42.759 align:start position:0%
+Voilà, donc c'est 30 secondes de vidéo
+ 
+
+00:04:42.759 --> 00:04:44.230 align:start position:0%
+Voilà, donc c'est 30 secondes de vidéo
+qui<00:04:43.000><c> permettent</c><00:04:43.360><c> d'afficher,</c><00:04:44.039><c> comme</c><00:04:44.160><c> vous</c>
+
+00:04:44.230 --> 00:04:44.240 align:start position:0%
+qui permettent d'afficher, comme vous
+ 
+
+00:04:44.240 --> 00:04:46.990 align:start position:0%
+qui permettent d'afficher, comme vous
+voyez,<00:04:45.120><c> comment</c><00:04:45.520><c> faire</c><00:04:45.759><c> une</c><00:04:45.960><c> vidéo</c><00:04:46.479><c> virale,</c>
+
+00:04:46.990 --> 00:04:47.000 align:start position:0%
+voyez, comment faire une vidéo virale,
+ 
+
+00:04:47.000 --> 00:04:49.430 align:start position:0%
+voyez, comment faire une vidéo virale,
+l'anatomie<00:04:47.479><c> d'une</c><00:04:47.680><c> vidéo</c><00:04:47.880><c> virale.</c>
+
+00:04:49.430 --> 00:04:49.440 align:start position:0%
+l'anatomie d'une vidéo virale.
+ 
+
+00:04:49.440 --> 00:04:51.310 align:start position:0%
+l'anatomie d'une vidéo virale.
+Comment<00:04:49.680><c> j'ai</c><00:04:49.840><c> fait</c><00:04:50.000><c> ça</c><00:04:50.120><c> ?</c><00:04:50.880><c> Donc</c><00:04:51.000><c> déjà,</c><00:04:51.199><c> j'ai</c>
+
+00:04:51.310 --> 00:04:51.320 align:start position:0%
+Comment j'ai fait ça ? Donc déjà, j'ai
+ 
+
+00:04:51.320 --> 00:04:53.590 align:start position:0%
+Comment j'ai fait ça ? Donc déjà, j'ai
+utilisé<00:04:51.720><c> les</c><00:04:51.919><c> skills,</c><00:04:53.000><c> mais</c><00:04:53.160><c> d'abord</c><00:04:53.479><c> j'ai</c>
+
+00:04:53.590 --> 00:04:53.600 align:start position:0%
+utilisé les skills, mais d'abord j'ai
+ 
+
+00:04:53.600 --> 00:04:56.390 align:start position:0%
+utilisé les skills, mais d'abord j'ai
+fait<00:04:53.720><c> ça</c><00:04:53.800><c> en</c><00:04:53.880><c> deux</c><00:04:54.039><c> étapes.</c><00:04:54.840><c> J'ai</c><00:04:55.199><c> généré</c><00:04:56.120><c> avec</c>
+
+00:04:56.390 --> 00:04:56.400 align:start position:0%
+fait ça en deux étapes. J'ai généré avec
+ 
+
+00:04:56.400 --> 00:04:59.270 align:start position:0%
+fait ça en deux étapes. J'ai généré avec
+Cloud<00:04:56.720><c> toujours</c><00:04:57.560><c> en</c><00:04:57.600><c> fait</c><00:04:57.800><c> une</c><00:04:57.960><c> page</c><00:04:58.199><c> HTML.</c><00:04:59.199><c> On</c>
+
+00:04:59.270 --> 00:04:59.280 align:start position:0%
+Cloud toujours en fait une page HTML. On
+ 
+
+00:04:59.280 --> 00:05:00.790 align:start position:0%
+Cloud toujours en fait une page HTML. On
+va<00:04:59.400><c> pas</c><00:04:59.600><c> refaire</c><00:04:59.880><c> cette</c><00:05:00.120><c> génération.</c><00:05:00.720><c> En</c>
+
+00:05:00.790 --> 00:05:00.800 align:start position:0%
+va pas refaire cette génération. En
+ 
+
+00:05:00.800 --> 00:05:03.390 align:start position:0%
+va pas refaire cette génération. En
+gros,<00:05:01.000><c> j'ai</c><00:05:01.160><c> eu</c><00:05:01.280><c> l'idée</c><00:05:02.639><c> euh</c><00:05:02.880><c> je</c><00:05:03.000><c> lui</c><00:05:03.160><c> demandé</c>
+
+00:05:03.390 --> 00:05:03.400 align:start position:0%
+gros, j'ai eu l'idée euh je lui demandé
+ 
+
+00:05:03.400 --> 00:05:05.469 align:start position:0%
+gros, j'ai eu l'idée euh je lui demandé
+de<00:05:03.560><c> créer</c><00:05:03.880><c> bah</c><00:05:04.000><c> en</c><00:05:04.080><c> fait</c><00:05:04.199><c> oui</c><00:05:04.560><c> un</c><00:05:05.000><c> un</c><00:05:05.160><c> site</c>
+
+00:05:05.469 --> 00:05:05.479 align:start position:0%
+de créer bah en fait oui un un site
+ 
+
+00:05:05.479 --> 00:05:08.629 align:start position:0%
+de créer bah en fait oui un un site
+statique<00:05:06.280><c> là.</c><00:05:06.479><c> Si</c><00:05:06.560><c> je</c><00:05:06.639><c> vais</c><00:05:06.759><c> en</c><00:05:06.919><c> live</c><00:05:08.120><c> euh</c>
+
+00:05:08.629 --> 00:05:08.639 align:start position:0%
+statique là. Si je vais en live euh
+ 
+
+00:05:08.639 --> 00:05:09.950 align:start position:0%
+statique là. Si je vais en live euh
+générer<00:05:08.960><c> ça.</c><00:05:09.199><c> Donc</c><00:05:09.280><c> en</c><00:05:09.360><c> gros,</c><00:05:09.680><c> un</c><00:05:09.800><c> site</c>
+
+00:05:09.950 --> 00:05:09.960 align:start position:0%
+générer ça. Donc en gros, un site
+ 
+
+00:05:09.960 --> 00:05:11.350 align:start position:0%
+générer ça. Donc en gros, un site
+statique<00:05:10.280><c> sur</c><00:05:10.400><c> l'anatomie</c><00:05:10.880><c> d'une</c><00:05:11.080><c> vidéo</c>
+
+00:05:11.350 --> 00:05:11.360 align:start position:0%
+statique sur l'anatomie d'une vidéo
+ 
+
+00:05:11.360 --> 00:05:13.189 align:start position:0%
+statique sur l'anatomie d'une vidéo
+YouTube<00:05:11.600><c> virale.</c><00:05:12.240><c> J'ai</c><00:05:12.360><c> demandé</c><00:05:12.639><c> à</c><00:05:12.720><c> Claude</c><00:05:13.120><c> et</c>
+
+00:05:13.189 --> 00:05:13.199 align:start position:0%
+YouTube virale. J'ai demandé à Claude et
+ 
+
+00:05:13.199 --> 00:05:14.629 align:start position:0%
+YouTube virale. J'ai demandé à Claude et
+à<00:05:13.280><c> Gémini</c><00:05:13.680><c> me</c><00:05:13.759><c> semble</c><00:05:13.919><c> pour</c><00:05:14.039><c> avoir</c><00:05:14.199><c> un</c><00:05:14.360><c> design</c>
+
+00:05:14.629 --> 00:05:14.639 align:start position:0%
+à Gémini me semble pour avoir un design
+ 
+
+00:05:14.639 --> 00:05:17.350 align:start position:0%
+à Gémini me semble pour avoir un design
+à<00:05:14.720><c> peu</c><00:05:14.800><c> près</c><00:05:15.520><c> très</c><00:05:15.600><c> joli</c>
+
+00:05:17.350 --> 00:05:17.360 align:start position:0%
+à peu près très joli
+ 
+
+00:05:17.360 --> 00:05:20.070 align:start position:0%
+à peu près très joli
+euh<00:05:17.759><c> d'une</c><00:05:18.000><c> avec</c><00:05:18.160><c> une</c><00:05:18.280><c> timeline.</c><00:05:19.600><c> Du</c><00:05:19.680><c> coup,</c>
+
+00:05:20.070 --> 00:05:20.080 align:start position:0%
+euh d'une avec une timeline. Du coup,
+ 
+
+00:05:20.080 --> 00:05:23.230 align:start position:0%
+euh d'une avec une timeline. Du coup,
+comment<00:05:20.639><c> comment</c><00:05:20.919><c> ça</c><00:05:21.240><c> se</c><00:05:21.919><c> ça</c><00:05:22.840><c> une</c><00:05:23.000><c> vidéo</c>
+
+00:05:23.230 --> 00:05:23.240 align:start position:0%
+comment comment ça se ça une vidéo
+ 
+
+00:05:23.240 --> 00:05:26.150 align:start position:0%
+comment comment ça se ça une vidéo
+virale<00:05:23.840><c> est-elle</c><00:05:24.400><c> réalisée</c><00:05:24.880><c> ?</c><00:05:25.560><c> Et</c><00:05:25.680><c> donc</c><00:05:25.960><c> j'ai</c>
+
+00:05:26.150 --> 00:05:26.160 align:start position:0%
+virale est-elle réalisée ? Et donc j'ai
+ 
+
+00:05:26.160 --> 00:05:30.070 align:start position:0%
+virale est-elle réalisée ? Et donc j'ai
+juste<00:05:26.440><c> ça</c><00:05:27.440><c> en</c><00:05:27.600><c> fait</c><00:05:28.360><c> ce</c><00:05:28.520><c> fichier</c><00:05:28.840><c> là</c><00:05:29.080><c> du</c><00:05:29.240><c> coup</c>
+
+00:05:30.070 --> 00:05:30.080 align:start position:0%
+juste ça en fait ce fichier là du coup
+ 
+
+00:05:30.080 --> 00:05:32.070 align:start position:0%
+juste ça en fait ce fichier là du coup
+le<00:05:30.240><c> fichier</c><00:05:30.560><c> website.html</c>
+
+00:05:32.070 --> 00:05:32.080 align:start position:0%
+le fichier website.html
+ 
+
+00:05:32.080 --> 00:05:35.590 align:start position:0%
+le fichier website.html
+on<00:05:32.160><c> va</c><00:05:32.440><c> le</c><00:05:32.560><c> prendre</c><00:05:34.039><c> et</c><00:05:34.240><c> le</c><00:05:34.400><c> c</c><00:05:35.240><c> dans</c><00:05:35.400><c> mon</c>
+
+00:05:35.590 --> 00:05:35.600 align:start position:0%
+on va le prendre et le c dans mon
+ 
+
+00:05:35.600 --> 00:05:37.710 align:start position:0%
+on va le prendre et le c dans mon
+projet.<00:05:36.319><c> dans</c><00:05:36.440><c> mon</c><00:05:36.600><c> projet</c><00:05:36.960><c> de</c><00:05:37.240><c> de</c><00:05:37.440><c> création</c>
+
+00:05:37.710 --> 00:05:37.720 align:start position:0%
+projet. dans mon projet de de création
+ 
+
+00:05:37.720 --> 00:05:39.830 align:start position:0%
+projet. dans mon projet de de création
+de<00:05:37.840><c> vidéo</c><00:05:38.120><c> remotion.</c>
+
+00:05:39.830 --> 00:05:39.840 align:start position:0%
+de vidéo remotion.
+ 
+
+00:05:39.840 --> 00:05:41.029 align:start position:0%
+de vidéo remotion.
+Donc<00:05:39.960><c> ça</c><00:05:40.080><c> vous</c><00:05:40.199><c> pouvez</c><00:05:40.360><c> partir</c><00:05:40.639><c> de</c><00:05:40.759><c> n'importe</c>
+
+00:05:41.029 --> 00:05:41.039 align:start position:0%
+Donc ça vous pouvez partir de n'importe
+ 
+
+00:05:41.039 --> 00:05:42.189 align:start position:0%
+Donc ça vous pouvez partir de n'importe
+quel<00:05:41.120><c> fichier</c><00:05:41.319><c> HTML.</c><00:05:41.759><c> Alors</c><00:05:41.880><c> c'est</c><00:05:42.000><c> une</c>
+
+00:05:42.189 --> 00:05:42.199 align:start position:0%
+quel fichier HTML. Alors c'est une
+ 
+
+00:05:42.199 --> 00:05:43.629 align:start position:0%
+quel fichier HTML. Alors c'est une
+manière<00:05:42.440><c> de</c><00:05:42.560><c> faire.</c><00:05:43.039><c> Je</c><00:05:43.080><c> pense</c><00:05:43.240><c> que</c><00:05:43.360><c> ce</c><00:05:43.479><c> n'est</c>
+
+00:05:43.629 --> 00:05:43.639 align:start position:0%
+manière de faire. Je pense que ce n'est
+ 
+
+00:05:43.639 --> 00:05:45.749 align:start position:0%
+manière de faire. Je pense que ce n'est
+pas<00:05:44.120><c> l'unique</c><00:05:44.520><c> manière.</c><00:05:45.319><c> Vous</c><00:05:45.400><c> pouvez</c><00:05:45.560><c> très</c>
+
+00:05:45.749 --> 00:05:45.759 align:start position:0%
+pas l'unique manière. Vous pouvez très
+ 
+
+00:05:45.759 --> 00:05:48.150 align:start position:0%
+pas l'unique manière. Vous pouvez très
+bien<00:05:45.919><c> juste</c><00:05:46.160><c> prompter</c><00:05:46.960><c> Cloud</c><00:05:47.639><c> pour</c><00:05:47.800><c> créer</c><00:05:48.039><c> une</c>
+
+00:05:48.150 --> 00:05:48.160 align:start position:0%
+bien juste prompter Cloud pour créer une
+ 
+
+00:05:48.160 --> 00:05:52.270 align:start position:0%
+bien juste prompter Cloud pour créer une
+vidéo<00:05:49.600><c> euh</c><00:05:49.800><c> ou</c><00:05:50.039><c> bien</c><00:05:50.240><c> partir</c><00:05:50.560><c> d'un</c><00:05:51.120><c> site</c><00:05:52.039><c> comme</c>
+
+00:05:52.270 --> 00:05:52.280 align:start position:0%
+vidéo euh ou bien partir d'un site comme
+ 
+
+00:05:52.280 --> 00:05:55.430 align:start position:0%
+vidéo euh ou bien partir d'un site comme
+moi<00:05:52.440><c> d'une</c><00:05:52.840><c> d'une</c><00:05:53.000><c> page</c><00:05:53.280><c> statique</c><00:05:54.479><c> pour</c>
+
+00:05:55.430 --> 00:05:55.440 align:start position:0%
+moi d'une d'une page statique pour
+ 
+
+00:05:55.440 --> 00:05:58.749 align:start position:0%
+moi d'une d'une page statique pour
+arriver<00:05:55.840><c> à</c><00:05:56.160><c> à</c><00:05:56.319><c> création</c><00:05:56.639><c> d'une</c><00:05:56.880><c> vidéo.</c>
+
+00:05:58.749 --> 00:05:58.759 align:start position:0%
+arriver à à création d'une vidéo.
+ 
+
+00:05:58.759 --> 00:06:01.189 align:start position:0%
+arriver à à création d'une vidéo.
+Moi<00:05:58.880><c> je</c><00:05:58.960><c> vais</c><00:05:59.080><c> venir</c><00:05:59.960><c> dans</c><00:06:00.160><c> Cloud.</c><00:06:01.039><c> Alors</c>
+
+00:06:01.189 --> 00:06:01.199 align:start position:0%
+Moi je vais venir dans Cloud. Alors
+ 
+
+00:06:01.199 --> 00:06:04.430 align:start position:0%
+Moi je vais venir dans Cloud. Alors
+déjà,<00:06:01.400><c> je</c><00:06:01.520><c> vais</c><00:06:01.600><c> lancer</c><00:06:02.039><c> le</c><00:06:02.280><c> serveur.</c>
+
+00:06:04.430 --> 00:06:04.440 align:start position:0%
+déjà, je vais lancer le serveur.
+ 
+
+00:06:04.440 --> 00:06:06.510 align:start position:0%
+déjà, je vais lancer le serveur.
+Donc<00:06:04.520><c> je</c><00:06:04.600><c> vais</c><00:06:04.680><c> dans</c><00:06:04.919><c> YouTube</c><00:06:05.199><c> vidéo,</c><00:06:06.280><c> je</c><00:06:06.440><c> vais</c>
+
+00:06:06.510 --> 00:06:06.520 align:start position:0%
+Donc je vais dans YouTube vidéo, je vais
+ 
+
+00:06:06.520 --> 00:06:09.430 align:start position:0%
+Donc je vais dans YouTube vidéo, je vais
+aller<00:06:06.680><c> sur</c><00:06:06.840><c> VS</c><00:06:07.160><c> Code</c><00:06:07.360><c> pour</c><00:06:07.520><c> lancer</c>
+
+00:06:09.430 --> 00:06:09.440 align:start position:0%
+aller sur VS Code pour lancer
+ 
+
+00:06:09.440 --> 00:06:12.230 align:start position:0%
+aller sur VS Code pour lancer
+le<00:06:09.639><c> serveur</c><00:06:09.960><c> local.</c>
+
+00:06:12.230 --> 00:06:12.240 align:start position:0%
+le serveur local.
+ 
+
+00:06:12.240 --> 00:06:14.710 align:start position:0%
+le serveur local.
+Et<00:06:12.319><c> en</c><00:06:12.440><c> fait,</c><00:06:12.639><c> remotion,</c><00:06:13.880><c> je</c><00:06:13.960><c> vais</c><00:06:14.039><c> lancer</c>
+
+00:06:14.710 --> 00:06:14.720 align:start position:0%
+Et en fait, remotion, je vais lancer
+ 
+
+00:06:14.720 --> 00:06:16.710 align:start position:0%
+Et en fait, remotion, je vais lancer
+l'installation<00:06:15.240><c> des</c><00:06:15.400><c> packages.</c><00:06:16.280><c> Remotion,</c>
+
+00:06:16.710 --> 00:06:16.720 align:start position:0%
+l'installation des packages. Remotion,
+ 
+
+00:06:16.720 --> 00:06:19.309 align:start position:0%
+l'installation des packages. Remotion,
+ça<00:06:16.880><c> vous</c><00:06:17.039><c> ouvre</c><00:06:17.919><c> un</c><00:06:18.160><c> petit</c><00:06:18.360><c> site</c><00:06:18.560><c> web</c><00:06:19.120><c> dans</c>
+
+00:06:19.309 --> 00:06:19.319 align:start position:0%
+ça vous ouvre un petit site web dans
+ 
+
+00:06:19.319 --> 00:06:21.189 align:start position:0%
+ça vous ouvre un petit site web dans
+lequel<00:06:19.639><c> vous</c><00:06:19.759><c> pouvez</c><00:06:19.960><c> venir</c><00:06:20.560><c> visualiser</c><00:06:21.039><c> les</c>
+
+00:06:21.189 --> 00:06:21.199 align:start position:0%
+lequel vous pouvez venir visualiser les
+ 
+
+00:06:21.199 --> 00:06:23.469 align:start position:0%
+lequel vous pouvez venir visualiser les
+vidéos<00:06:21.479><c> créées.</c>
+
+00:06:23.469 --> 00:06:23.479 align:start position:0%
+vidéos créées.
+ 
+
+00:06:23.479 --> 00:06:25.629 align:start position:0%
+vidéos créées.
+Par<00:06:23.680><c> exemple,</c><00:06:24.120><c> ici</c><00:06:24.280><c> dans</c><00:06:24.400><c> route,</c><00:06:25.199><c> on</c><00:06:25.319><c> a</c><00:06:25.440><c> on</c><00:06:25.560><c> a</c>
+
+00:06:25.629 --> 00:06:25.639 align:start position:0%
+Par exemple, ici dans route, on a on a
+ 
+
+00:06:25.639 --> 00:06:27.350 align:start position:0%
+Par exemple, ici dans route, on a on a
+une<00:06:25.759><c> composition</c><00:06:26.120><c> qui</c><00:06:26.199><c> s'appelle</c><00:06:26.479><c> MyCOM</c><00:06:27.160><c> et</c>
+
+00:06:27.350 --> 00:06:27.360 align:start position:0%
+une composition qui s'appelle MyCOM et
+ 
+
+00:06:27.360 --> 00:06:28.830 align:start position:0%
+une composition qui s'appelle MyCOM et
+vous<00:06:27.479><c> verrez</c><00:06:27.720><c> qu'elle</c><00:06:27.919><c> est</c><00:06:28.319><c> qu'elle</c><00:06:28.520><c> est</c><00:06:28.639><c> donc</c>
+
+00:06:28.830 --> 00:06:28.840 align:start position:0%
+vous verrez qu'elle est qu'elle est donc
+ 
+
+00:06:28.840 --> 00:06:31.350 align:start position:0%
+vous verrez qu'elle est qu'elle est donc
+disponible<00:06:29.960><c> sur</c><00:06:30.199><c> la</c><00:06:30.360><c> page</c><00:06:30.520><c> d'accueil.</c><00:06:31.280><c> Je</c>
+
+00:06:31.350 --> 00:06:31.360 align:start position:0%
+disponible sur la page d'accueil. Je
+ 
+
+00:06:31.360 --> 00:06:34.029 align:start position:0%
+disponible sur la page d'accueil. Je
+vais<00:06:31.479><c> lancer</c><00:06:32.000><c> run.</c>
+
+00:06:34.029 --> 00:06:34.039 align:start position:0%
+vais lancer run.
+ 
+
+00:06:34.039 --> 00:06:35.589 align:start position:0%
+vais lancer run.
+Hop,<00:06:34.440><c> voilà,</c><00:06:34.639><c> ça</c><00:06:34.800><c> m'ouvre</c><00:06:35.120><c> directement</c><00:06:35.520><c> le</c>
+
+00:06:35.589 --> 00:06:35.599 align:start position:0%
+Hop, voilà, ça m'ouvre directement le
+ 
+
+00:06:35.599 --> 00:06:38.150 align:start position:0%
+Hop, voilà, ça m'ouvre directement le
+site.<00:06:35.919><c> Et</c><00:06:36.039><c> là,</c><00:06:36.120><c> vous</c><00:06:36.199><c> voyez,</c><00:06:36.400><c> on</c><00:06:36.479><c> a</c><00:06:36.560><c> My</c><00:06:36.800><c> Comp,</c>
+
+00:06:38.150 --> 00:06:38.160 align:start position:0%
+site. Et là, vous voyez, on a My Comp,
+ 
+
+00:06:38.160 --> 00:06:40.790 align:start position:0%
+site. Et là, vous voyez, on a My Comp,
+c'est<00:06:38.319><c> un</c><00:06:38.720><c> starter,</c><00:06:39.560><c> un</c><00:06:39.720><c> template</c><00:06:40.360><c> blanc.</c>
+
+00:06:40.790 --> 00:06:40.800 align:start position:0%
+c'est un starter, un template blanc.
+ 
+
+00:06:40.800 --> 00:06:44.150 align:start position:0%
+c'est un starter, un template blanc.
+Donc<00:06:40.919><c> il</c><00:06:40.960><c> y</c><00:06:41.000><c> a</c><00:06:41.120><c> absolument</c><00:06:41.520><c> rien.</c><00:06:42.960><c> Euh</c><00:06:43.720><c> mais</c>
+
+00:06:44.150 --> 00:06:44.160 align:start position:0%
+Donc il y a absolument rien. Euh mais
+ 
+
+00:06:44.160 --> 00:06:45.309 align:start position:0%
+Donc il y a absolument rien. Euh mais
+voilà<00:06:44.520><c> comment</c><00:06:44.680><c> ça</c><00:06:44.800><c> se</c><00:06:44.880><c> présente.</c><00:06:45.160><c> C'est</c><00:06:45.199><c> des</c>
+
+00:06:45.309 --> 00:06:45.319 align:start position:0%
+voilà comment ça se présente. C'est des
+ 
+
+00:06:45.319 --> 00:06:47.710 align:start position:0%
+voilà comment ça se présente. C'est des
+composants<00:06:45.639><c> React.</c><00:06:46.639><c> Donc</c><00:06:46.720><c> moi</c><00:06:46.880><c> j'ai</c><00:06:47.039><c> mon</c><00:06:47.280><c> site</c>
+
+00:06:47.710 --> 00:06:47.720 align:start position:0%
+composants React. Donc moi j'ai mon site
+ 
+
+00:06:47.720 --> 00:06:50.469 align:start position:0%
+composants React. Donc moi j'ai mon site
+website.hthtml.
+
+00:06:50.469 --> 00:06:50.479 align:start position:0%
+website.hthtml.
+ 
+
+00:06:50.479 --> 00:06:54.029 align:start position:0%
+website.hthtml.
+Maintenant<00:06:50.800><c> je</c><00:06:50.880><c> vais</c><00:06:50.960><c> pouvoir</c><00:06:51.840><c> ouvrir</c><00:06:52.240><c> cloud.</c>
+
+00:06:54.029 --> 00:06:54.039 align:start position:0%
+Maintenant je vais pouvoir ouvrir cloud.
+ 
+
+00:06:54.039 --> 00:06:57.710 align:start position:0%
+Maintenant je vais pouvoir ouvrir cloud.
+Oui,<00:06:54.240><c> j'autorise.</c><00:06:55.360><c> Si.</c><00:06:55.919><c> OK.</c><00:06:57.240><c> Et</c><00:06:57.360><c> ce</c><00:06:57.440><c> qu'on</c><00:06:57.599><c> va</c>
+
+00:06:57.710 --> 00:06:57.720 align:start position:0%
+Oui, j'autorise. Si. OK. Et ce qu'on va
+ 
+
+00:06:57.720 --> 00:07:00.350 align:start position:0%
+Oui, j'autorise. Si. OK. Et ce qu'on va
+faire<00:06:58.280><c> euh</c><00:06:58.960><c> donc</c><00:06:59.199><c> c'est</c><00:06:59.400><c> dire</c><00:06:59.599><c> déjà</c><00:06:59.919><c> vérifier</c>
+
+00:07:00.350 --> 00:07:00.360 align:start position:0%
+faire euh donc c'est dire déjà vérifier
+ 
+
+00:07:00.360 --> 00:07:03.029 align:start position:0%
+faire euh donc c'est dire déjà vérifier
+les<00:07:00.479><c> skills</c><00:07:00.960><c> qui</c><00:07:01.120><c> sont</c><00:07:01.240><c> bien</c><00:07:01.479><c> installés.</c><00:07:02.879><c> Euh</c>
+
+00:07:03.029 --> 00:07:03.039 align:start position:0%
+les skills qui sont bien installés. Euh
+ 
+
+00:07:03.039 --> 00:07:04.230 align:start position:0%
+les skills qui sont bien installés. Euh
+c'est<00:07:03.199><c> tout</c><00:07:03.360><c> bon.</c>
+
+00:07:04.230 --> 00:07:04.240 align:start position:0%
+c'est tout bon.
+ 
+
+00:07:04.240 --> 00:07:06.869 align:start position:0%
+c'est tout bon.
+BL<00:07:04.440><c> PES.</c>
+
+00:07:06.869 --> 00:07:06.879 align:start position:0%
+BL PES.
+ 
+
+00:07:06.879 --> 00:07:08.869 align:start position:0%
+BL PES.
+Et<00:07:07.039><c> maintenant,</c><00:07:07.280><c> je</c><00:07:07.360><c> vais</c><00:07:07.440><c> lui</c><00:07:07.599><c> dire</c><00:07:07.960><c> euh</c><00:07:08.360><c> donc</c>
+
+00:07:08.869 --> 00:07:08.879 align:start position:0%
+Et maintenant, je vais lui dire euh donc
+ 
+
+00:07:08.879 --> 00:07:11.749 align:start position:0%
+Et maintenant, je vais lui dire euh donc
+je<00:07:09.039><c> vais</c><00:07:09.160><c> lui</c><00:07:09.280><c> pointer</c><00:07:10.039><c> mon</c><00:07:10.680><c> site</c><00:07:11.120><c> euh</c><00:07:11.639><c> le</c>
+
+00:07:11.749 --> 00:07:11.759 align:start position:0%
+je vais lui pointer mon site euh le
+ 
+
+00:07:11.759 --> 00:07:15.430 align:start position:0%
+je vais lui pointer mon site euh le
+fichier<00:07:12.160><c> website</c><00:07:13.080><c> pardon.</c><00:07:13.919><c> HTML.</c>
+
+00:07:15.430 --> 00:07:15.440 align:start position:0%
+fichier website pardon. HTML.
+ 
+
+00:07:15.440 --> 00:07:18.430 align:start position:0%
+fichier website pardon. HTML.
+J'ai<00:07:15.599><c> dit</c><00:07:15.840><c> en</c><00:07:16.000><c> te</c><00:07:16.160><c> basant</c>
+
+00:07:18.430 --> 00:07:18.440 align:start position:0%
+J'ai dit en te basant
+ 
+
+00:07:18.440 --> 00:07:20.909 align:start position:0%
+J'ai dit en te basant
+euh<00:07:18.720><c> sur</c>
+
+00:07:20.909 --> 00:07:20.919 align:start position:0%
+euh sur
+ 
+
+00:07:20.919 --> 00:07:25.510 align:start position:0%
+euh sur
+le<00:07:21.120><c> fichier</c><00:07:21.919><c> HTML</c><00:07:22.599><c> qui</c><00:07:22.879><c> représente</c>
+
+00:07:25.510 --> 00:07:25.520 align:start position:0%
+le fichier HTML qui représente
+ 
+
+00:07:25.520 --> 00:07:29.309 align:start position:0%
+le fichier HTML qui représente
+alors<00:07:25.759><c> qui</c><00:07:26.000><c> représente</c><00:07:26.720><c> le</c>
+
+00:07:29.309 --> 00:07:29.319 align:start position:0%
+alors qui représente le
+ 
+
+00:07:29.319 --> 00:07:32.350 align:start position:0%
+alors qui représente le
+une<00:07:29.800><c> timeline,</c>
+
+00:07:32.350 --> 00:07:32.360 align:start position:0%
+une timeline,
+ 
+
+00:07:32.360 --> 00:07:37.749 align:start position:0%
+une timeline,
+une<00:07:32.560><c> vidéo</c><00:07:33.000><c> YouTube</c><00:07:33.960><c> virale</c>
+
+00:07:37.749 --> 00:07:37.759 align:start position:0%
+ 
+ 
+
+00:07:37.759 --> 00:07:42.070 align:start position:0%
+ 
+génère<00:07:38.560><c> une</c><00:07:38.840><c> vidéo</c><00:07:39.919><c> qui</c><00:07:40.400><c> montre</c>
+
+00:07:42.070 --> 00:07:42.080 align:start position:0%
+génère une vidéo qui montre
+ 
+
+00:07:42.080 --> 00:07:44.909 align:start position:0%
+génère une vidéo qui montre
+euh<00:07:42.440><c> qui</c><00:07:42.639><c> qui</c><00:07:42.879><c> montre</c><00:07:43.160><c> le</c><00:07:43.360><c> parcours</c><00:07:43.840><c> pour</c><00:07:44.639><c> de</c>
+
+00:07:44.909 --> 00:07:44.919 align:start position:0%
+euh qui qui montre le parcours pour de
+ 
+
+00:07:44.919 --> 00:07:48.869 align:start position:0%
+euh qui qui montre le parcours pour de
+cette<00:07:46.199><c> timeline</c>
+
+00:07:48.869 --> 00:07:48.879 align:start position:0%
+cette timeline
+ 
+
+00:07:48.879 --> 00:07:50.629 align:start position:0%
+cette timeline
+étape<00:07:49.199><c> par</c><00:07:49.400><c> étape.</c><00:07:50.039><c> Bon,</c><00:07:50.280><c> c'est</c><00:07:50.440><c> pas</c><00:07:50.520><c> le</c>
+
+00:07:50.629 --> 00:07:50.639 align:start position:0%
+étape par étape. Bon, c'est pas le
+ 
+
+00:07:50.639 --> 00:07:52.869 align:start position:0%
+étape par étape. Bon, c'est pas le
+meilleur<00:07:50.919><c> prompt</c><00:07:51.599><c> du</c><00:07:51.759><c> monde</c><00:07:51.960><c> bien</c><00:07:52.120><c> sûr,</c><00:07:52.759><c> mais</c>
+
+00:07:52.869 --> 00:07:52.879 align:start position:0%
+meilleur prompt du monde bien sûr, mais
+ 
+
+00:07:52.879 --> 00:07:55.510 align:start position:0%
+meilleur prompt du monde bien sûr, mais
+là<00:07:53.039><c> c'est</c><00:07:53.199><c> juste</c><00:07:53.400><c> pour</c><00:07:54.199><c> voir</c><00:07:54.919><c> avec</c><00:07:55.159><c> un</c><00:07:55.360><c> un</c>
+
+00:07:55.510 --> 00:07:55.520 align:start position:0%
+là c'est juste pour voir avec un un
+ 
+
+00:07:55.520 --> 00:07:57.270 align:start position:0%
+là c'est juste pour voir avec un un
+prompt<00:07:55.840><c> même</c><00:07:56.000><c> s'il</c><00:07:56.199><c> est</c><00:07:56.280><c> bancal,</c><00:07:57.080><c> on</c><00:07:57.199><c> va</c>
+
+00:07:57.270 --> 00:07:57.280 align:start position:0%
+prompt même s'il est bancal, on va
+ 
+
+00:07:57.280 --> 00:07:59.270 align:start position:0%
+prompt même s'il est bancal, on va
+arriver<00:07:57.479><c> à</c><00:07:57.560><c> un</c><00:07:57.639><c> résultat</c><00:07:57.960><c> assez</c><00:07:58.240><c> intéressant.</c>
+
+00:07:59.270 --> 00:07:59.280 align:start position:0%
+arriver à un résultat assez intéressant.
+ 
+
+00:07:59.280 --> 00:08:02.909 align:start position:0%
+arriver à un résultat assez intéressant.
+Pourquoi<00:07:59.599><c> ?</c><00:08:00.919><c> Euh</c><00:08:01.400><c> parce</c><00:08:01.639><c> que</c><00:08:01.840><c> on</c><00:08:02.039><c> a</c><00:08:02.520><c> on</c><00:08:02.680><c> a</c><00:08:02.759><c> les</c>
+
+00:08:02.909 --> 00:08:02.919 align:start position:0%
+Pourquoi ? Euh parce que on a on a les
+ 
+
+00:08:02.919 --> 00:08:06.589 align:start position:0%
+Pourquoi ? Euh parce que on a on a les
+skills<00:08:03.440><c> qui</c><00:08:03.720><c> du</c><00:08:03.879><c> coup</c><00:08:04.080><c> nous</c><00:08:05.080><c> donnent</c><00:08:05.440><c> à</c><00:08:05.639><c> cloud</c>
+
+00:08:06.589 --> 00:08:06.599 align:start position:0%
+skills qui du coup nous donnent à cloud
+ 
+
+00:08:06.599 --> 00:08:08.350 align:start position:0%
+skills qui du coup nous donnent à cloud
+absolument<00:08:06.960><c> les</c><00:08:07.199><c> meilleures</c><00:08:07.520><c> pratiques</c>
+
+00:08:08.350 --> 00:08:08.360 align:start position:0%
+absolument les meilleures pratiques
+ 
+
+00:08:08.360 --> 00:08:11.990 align:start position:0%
+absolument les meilleures pratiques
+possibles<00:08:09.560><c> pour</c><00:08:09.879><c> pour</c><00:08:10.080><c> y</c><00:08:10.199><c> arriver.</c>
+
+00:08:11.990 --> 00:08:12.000 align:start position:0%
+possibles pour pour y arriver.
+ 
+
+00:08:12.000 --> 00:08:13.309 align:start position:0%
+possibles pour pour y arriver.
+Donc<00:08:12.159><c> là,</c><00:08:12.280><c> il</c><00:08:12.360><c> va</c><00:08:12.440><c> d'abord</c><00:08:12.680><c> examiner</c><00:08:13.120><c> le</c>
+
+00:08:13.309 --> 00:08:13.319 align:start position:0%
+Donc là, il va d'abord examiner le
+ 
+
+00:08:13.319 --> 00:08:14.390 align:start position:0%
+Donc là, il va d'abord examiner le
+projet.<00:08:13.680><c> Bon,</c><00:08:13.800><c> il</c><00:08:13.840><c> y</c><00:08:13.879><c> a</c><00:08:13.919><c> pas</c><00:08:14.039><c> grand</c><00:08:14.159><c> chose</c><00:08:14.280><c> à</c>
+
+00:08:14.390 --> 00:08:14.400 align:start position:0%
+projet. Bon, il y a pas grand chose à
+ 
+
+00:08:14.400 --> 00:08:15.790 align:start position:0%
+projet. Bon, il y a pas grand chose à
+examiner,<00:08:14.680><c> donc</c><00:08:14.800><c> ça</c><00:08:14.879><c> devrait</c><00:08:15.120><c> aller</c><00:08:15.520><c> assez</c>
+
+00:08:15.790 --> 00:08:15.800 align:start position:0%
+examiner, donc ça devrait aller assez
+ 
+
+00:08:15.800 --> 00:08:19.670 align:start position:0%
+examiner, donc ça devrait aller assez
+vite.<00:08:16.960><c> Pour</c><00:08:17.159><c> ça,</c><00:08:17.319><c> j'utilise</c><00:08:18.039><c> aussi</c><00:08:19.360><c> important</c>
+
+00:08:19.670 --> 00:08:19.680 align:start position:0%
+vite. Pour ça, j'utilise aussi important
+ 
+
+00:08:19.680 --> 00:08:21.830 align:start position:0%
+vite. Pour ça, j'utilise aussi important
+le<00:08:19.800><c> modèle</c><00:08:20.120><c> Opus</c><00:08:21.000><c> qui</c><00:08:21.199><c> est</c><00:08:21.479><c> le</c><00:08:21.639><c> plus</c>
+
+00:08:21.830 --> 00:08:21.840 align:start position:0%
+le modèle Opus qui est le plus
+ 
+
+00:08:21.840 --> 00:08:23.950 align:start position:0%
+le modèle Opus qui est le plus
+performant,<00:08:22.800><c> par</c><00:08:22.960><c> contre,</c><00:08:23.240><c> le</c><00:08:23.400><c> plus</c><00:08:23.599><c> oné</c>
+
+00:08:23.950 --> 00:08:23.960 align:start position:0%
+performant, par contre, le plus oné
+ 
+
+00:08:23.960 --> 00:08:25.749 align:start position:0%
+performant, par contre, le plus oné
+aussi.<00:08:24.840><c> Euh</c><00:08:24.919><c> donc</c><00:08:25.080><c> ça</c><00:08:25.199><c> peut</c><00:08:25.319><c> aller</c><00:08:25.440><c> très</c><00:08:25.560><c> très</c>
+
+00:08:25.749 --> 00:08:25.759 align:start position:0%
+aussi. Euh donc ça peut aller très très
+ 
+
+00:08:25.759 --> 00:08:28.830 align:start position:0%
+aussi. Euh donc ça peut aller très très
+vite<00:08:25.960><c> avec</c><00:08:26.599><c> avec</c><00:08:26.879><c> le</c><00:08:27.000><c> pricing.</c>
+
+00:08:28.830 --> 00:08:28.840 align:start position:0%
+vite avec avec le pricing.
+ 
+
+00:08:28.840 --> 00:08:29.909 align:start position:0%
+vite avec avec le pricing.
+Donc<00:08:28.919><c> là,</c><00:08:29.080><c> il</c><00:08:29.159><c> est</c><00:08:29.240><c> en</c><00:08:29.319><c> train</c><00:08:29.440><c> de</c><00:08:29.520><c> bosser.</c><00:08:29.840><c> Je</c>
+
+00:08:29.909 --> 00:08:29.919 align:start position:0%
+Donc là, il est en train de bosser. Je
+ 
+
+00:08:29.919 --> 00:08:31.230 align:start position:0%
+Donc là, il est en train de bosser. Je
+peux<00:08:30.000><c> faire</c><00:08:30.159><c> contre</c><00:08:30.440><c> O</c><00:08:30.599><c> pour</c><00:08:30.720><c> voir</c><00:08:30.879><c> exactement</c>
+
+00:08:31.230 --> 00:08:31.240 align:start position:0%
+peux faire contre O pour voir exactement
+ 
+
+00:08:31.240 --> 00:08:33.949 align:start position:0%
+peux faire contre O pour voir exactement
+ce<00:08:31.360><c> qu'il</c><00:08:31.520><c> fait.</c>
+
+00:08:33.949 --> 00:08:33.959 align:start position:0%
+ce qu'il fait.
+ 
+
+00:08:33.959 --> 00:08:35.190 align:start position:0%
+ce qu'il fait.
+Voilà,<00:08:34.159><c> il</c><00:08:34.279><c> est</c><00:08:34.360><c> en</c><00:08:34.440><c> train</c><00:08:34.560><c> de</c><00:08:34.800><c> de</c><00:08:34.959><c> se</c><00:08:35.080><c> rendre</c>
+
+00:08:35.190 --> 00:08:35.200 align:start position:0%
+Voilà, il est en train de de se rendre
+ 
+
+00:08:35.200 --> 00:08:36.190 align:start position:0%
+Voilà, il est en train de de se rendre
+compte<00:08:35.360><c> qu'il</c><00:08:35.479><c> va</c><00:08:35.560><c> falloir</c><00:08:35.800><c> faire</c><00:08:35.919><c> ça</c><00:08:36.039><c> en</c>
+
+00:08:36.190 --> 00:08:36.200 align:start position:0%
+compte qu'il va falloir faire ça en
+ 
+
+00:08:36.200 --> 00:08:39.709 align:start position:0%
+compte qu'il va falloir faire ça en
+cette<00:08:36.320><c> étape.</c><00:08:37.279><c> Il</c><00:08:37.399><c> a</c><00:08:37.479><c> lu</c><00:08:37.599><c> le</c><00:08:37.719><c> fichier</c><00:08:37.919><c> HTML.</c>
+
+00:08:39.709 --> 00:08:39.719 align:start position:0%
+cette étape. Il a lu le fichier HTML.
+ 
+
+00:08:39.719 --> 00:08:40.870 align:start position:0%
+cette étape. Il a lu le fichier HTML.
+Hop.
+
+00:08:40.870 --> 00:08:40.880 align:start position:0%
+Hop.
+ 
+
+00:08:40.880 --> 00:08:42.190 align:start position:0%
+Hop.
+Et<00:08:41.000><c> bon</c><00:08:41.120><c> voilà,</c><00:08:41.320><c> donc</c><00:08:41.399><c> là</c><00:08:41.519><c> ça</c><00:08:41.640><c> peut</c><00:08:41.760><c> prendre</c><00:08:42.039><c> ça</c>
+
+00:08:42.190 --> 00:08:42.200 align:start position:0%
+Et bon voilà, donc là ça peut prendre ça
+ 
+
+00:08:42.200 --> 00:08:44.870 align:start position:0%
+Et bon voilà, donc là ça peut prendre ça
+peut<00:08:42.320><c> prendre</c><00:08:42.800><c> de</c><00:08:42.800><c> de</c><00:08:43.000><c> de</c><00:08:43.560><c> 2</c><00:08:43.719><c> à</c><00:08:43.959><c> 5</c><00:08:44.480><c> voire</c><00:08:44.680><c> 10</c>
+
+00:08:44.870 --> 00:08:44.880 align:start position:0%
+peut prendre de de de 2 à 5 voire 10
+ 
+
+00:08:44.880 --> 00:08:46.990 align:start position:0%
+peut prendre de de de 2 à 5 voire 10
+minutes<00:08:45.160><c> pour</c><00:08:45.920><c> pour</c><00:08:46.160><c> bosser</c><00:08:46.440><c> cette</c><00:08:46.600><c> vidéo.</c><00:08:46.880><c> On</c>
+
+00:08:46.990 --> 00:08:47.000 align:start position:0%
+minutes pour pour bosser cette vidéo. On
+ 
+
+00:08:47.000 --> 00:08:49.910 align:start position:0%
+minutes pour pour bosser cette vidéo. On
+va<00:08:47.120><c> voir</c><00:08:47.360><c> au</c><00:08:47.560><c> fur</c><00:08:47.720><c> et</c><00:08:47.720><c> à</c><00:08:47.880><c> mesure</c><00:08:49.240><c> que</c><00:08:49.680><c> qu'il</c>
+
+00:08:49.910 --> 00:08:49.920 align:start position:0%
+va voir au fur et à mesure que qu'il
+ 
+
+00:08:49.920 --> 00:09:27.430 align:start position:0%
+va voir au fur et à mesure que qu'il
+travaille.
+
+00:09:27.430 --> 00:09:27.440 align:start position:0%
+ 
+ 
+
+00:09:27.440 --> 00:09:28.829 align:start position:0%
+ 
+OK,<00:09:27.680><c> donc</c><00:09:27.800><c> là</c><00:09:27.880><c> elle</c><00:09:27.920><c> me</c><00:09:28.040><c> demandé</c><00:09:28.240><c> de</c><00:09:28.360><c> lancer</c><00:09:28.680><c> le</c>
+
+00:09:28.829 --> 00:09:28.839 align:start position:0%
+OK, donc là elle me demandé de lancer le
+ 
+
+00:09:28.839 --> 00:09:30.509 align:start position:0%
+OK, donc là elle me demandé de lancer le
+studio<00:09:29.120><c> mais</c><00:09:29.240><c> c'est</c><00:09:29.399><c> déjà</c><00:09:29.640><c> fait.</c>
+
+00:09:30.509 --> 00:09:30.519 align:start position:0%
+studio mais c'est déjà fait.
+ 
+
+00:09:30.519 --> 00:09:32.870 align:start position:0%
+studio mais c'est déjà fait.
+On<00:09:30.680><c> va</c><00:09:30.800><c> voir</c><00:09:31.480><c> ce</c><00:09:31.640><c> qu'il</c><00:09:31.760><c> m'a</c><00:09:31.959><c> proposé.</c><00:09:32.760><c> Alors,</c>
+
+00:09:32.870 --> 00:09:32.880 align:start position:0%
+On va voir ce qu'il m'a proposé. Alors,
+ 
+
+00:09:32.880 --> 00:09:36.190 align:start position:0%
+On va voir ce qu'il m'a proposé. Alors,
+j'appuie<00:09:33.200><c> rentrer.</c>
+
+00:09:36.190 --> 00:09:36.200 align:start position:0%
+j'appuie rentrer.
+ 
+
+00:09:36.200 --> 00:09:38.790 align:start position:0%
+j'appuie rentrer.
+OK.<00:09:37.279><c> Alors,</c>
+
+00:09:38.790 --> 00:09:38.800 align:start position:0%
+OK. Alors,
+ 
+
+00:09:38.800 --> 00:09:40.870 align:start position:0%
+OK. Alors,
+l'idée
+
+00:09:40.870 --> 00:09:40.880 align:start position:0%
+l'idée
+ 
+
+00:09:40.880 --> 00:09:44.990 align:start position:0%
+l'idée
+le<00:09:41.040><c> script.</c><00:09:41.399><c> OK,</c><00:09:41.640><c> c'est</c><00:09:41.800><c> très</c><00:09:41.839><c> très</c><00:09:42.160><c> propre.</c>
+
+00:09:44.990 --> 00:09:45.000 align:start position:0%
+le script. OK, c'est très très propre.
+ 
+
+00:09:45.000 --> 00:09:46.110 align:start position:0%
+le script. OK, c'est très très propre.
+Donc,<00:09:45.079><c> c'est</c><00:09:45.200><c> encore</c><00:09:45.399><c> plus</c><00:09:45.600><c> beau</c><00:09:45.760><c> que</c><00:09:45.920><c> ce</c><00:09:46.040><c> que</c>
+
+00:09:46.110 --> 00:09:46.120 align:start position:0%
+Donc, c'est encore plus beau que ce que
+ 
+
+00:09:46.120 --> 00:09:48.430 align:start position:0%
+Donc, c'est encore plus beau que ce que
+j'ai<00:09:46.480><c> ce</c><00:09:46.600><c> que</c><00:09:46.680><c> j'ai</c><00:09:46.800><c> fait</c><00:09:46.959><c> à</c><00:09:47.079><c> la</c><00:09:47.200><c> base.</c><00:09:48.320><c> J'ai</c>
+
+00:09:48.430 --> 00:09:48.440 align:start position:0%
+j'ai ce que j'ai fait à la base. J'ai
+ 
+
+00:09:48.440 --> 00:09:51.110 align:start position:0%
+j'ai ce que j'ai fait à la base. J'ai
+pas<00:09:48.680><c> le</c><00:09:48.760><c> même</c><00:09:48.920><c> prompt.</c><00:09:49.160><c> Là,</c><00:09:49.320><c> j'ai</c><00:09:49.440><c> été</c><00:09:50.920><c> j'ai</c>
+
+00:09:51.110 --> 00:09:51.120 align:start position:0%
+pas le même prompt. Là, j'ai été j'ai
+ 
+
+00:09:51.120 --> 00:09:53.269 align:start position:0%
+pas le même prompt. Là, j'ai été j'ai
+inventé<00:09:51.320><c> un</c><00:09:51.399><c> nouveau</c><00:09:51.600><c> prompt</c>
+
+00:09:53.269 --> 00:09:53.279 align:start position:0%
+inventé un nouveau prompt
+ 
+
+00:09:53.279 --> 00:09:54.670 align:start position:0%
+inventé un nouveau prompt
+mais<00:09:53.480><c> c'est</c><00:09:53.600><c> sympa.</c><00:09:53.920><c> Alors,</c><00:09:54.079><c> les</c><00:09:54.320><c> animations</c>
+
+00:09:54.670 --> 00:09:54.680 align:start position:0%
+mais c'est sympa. Alors, les animations
+ 
+
+00:09:54.680 --> 00:09:57.350 align:start position:0%
+mais c'est sympa. Alors, les animations
+sont<00:09:54.839><c> assez</c><00:09:55.360><c> longues</c><00:09:56.680><c> mais</c><00:09:57.079><c> mais</c><00:09:57.240><c> c'est</c>
+
+00:09:57.350 --> 00:09:57.360 align:start position:0%
+sont assez longues mais mais c'est
+ 
+
+00:09:57.360 --> 00:09:58.230 align:start position:0%
+sont assez longues mais mais c'est
+pareil,<00:09:57.600><c> on</c><00:09:57.680><c> arrive</c><00:09:57.920><c> quand</c><00:09:57.959><c> même</c><00:09:58.040><c> sur</c><00:09:58.160><c> un</c>
+
+00:09:58.230 --> 00:09:58.240 align:start position:0%
+pareil, on arrive quand même sur un
+ 
+
+00:09:58.240 --> 00:10:00.550 align:start position:0%
+pareil, on arrive quand même sur un
+résultat<00:09:58.800><c> vraiment</c><00:09:59.120><c> propre.</c>
+
+00:10:00.550 --> 00:10:00.560 align:start position:0%
+résultat vraiment propre.
+ 
+
+00:10:00.560 --> 00:10:02.990 align:start position:0%
+résultat vraiment propre.
+Alors<00:10:00.720><c> juste</c><00:10:01.160><c> pour</c><00:10:01.800><c> cette</c><00:10:02.040><c> génération,</c><00:10:02.839><c> il</c>
+
+00:10:02.990 --> 00:10:03.000 align:start position:0%
+Alors juste pour cette génération, il
+ 
+
+00:10:03.000 --> 00:10:04.190 align:start position:0%
+Alors juste pour cette génération, il
+m'a<00:10:03.160><c> tout</c><00:10:03.279><c> fait</c><00:10:03.399><c> dans</c><00:10:03.519><c> un</c><00:10:03.600><c> seul</c><00:10:03.720><c> fichier</c><00:10:04.000><c> alors</c>
+
+00:10:04.190 --> 00:10:04.200 align:start position:0%
+m'a tout fait dans un seul fichier alors
+ 
+
+00:10:04.200 --> 00:10:07.030 align:start position:0%
+m'a tout fait dans un seul fichier alors
+que<00:10:04.360><c> pour</c><00:10:05.760><c> l'autre</c><00:10:06.240><c> que</c><00:10:06.399><c> j'ai</c><00:10:06.519><c> fait</c><00:10:06.680><c> avant</c><00:10:06.880><c> de</c>
+
+00:10:07.030 --> 00:10:07.040 align:start position:0%
+que pour l'autre que j'ai fait avant de
+ 
+
+00:10:07.040 --> 00:10:08.870 align:start position:0%
+que pour l'autre que j'ai fait avant de
+réaliser<00:10:07.320><c> cette</c><00:10:07.480><c> vidéo,</c><00:10:08.240><c> il</c><00:10:08.399><c> a</c><00:10:08.519><c> vraiment</c><00:10:08.720><c> fait</c>
+
+00:10:08.870 --> 00:10:08.880 align:start position:0%
+réaliser cette vidéo, il a vraiment fait
+ 
+
+00:10:08.880 --> 00:10:11.190 align:start position:0%
+réaliser cette vidéo, il a vraiment fait
+proprement<00:10:09.279><c> par</c><00:10:09.560><c> avec</c><00:10:09.760><c> des</c><00:10:09.920><c> composants.</c>
+
+00:10:11.190 --> 00:10:11.200 align:start position:0%
+proprement par avec des composants.
+ 
+
+00:10:11.200 --> 00:10:12.310 align:start position:0%
+proprement par avec des composants.
+C'était<00:10:11.440><c> plus</c><00:10:11.600><c> propre</c><00:10:11.920><c> au</c><00:10:12.079><c> niveau</c><00:10:12.200><c> de</c><00:10:12.240><c> la</c>
+
+00:10:12.310 --> 00:10:12.320 align:start position:0%
+C'était plus propre au niveau de la
+ 
+
+00:10:12.320 --> 00:10:14.790 align:start position:0%
+C'était plus propre au niveau de la
+génération<00:10:12.720><c> du</c><00:10:12.880><c> code.</c>
+
+00:10:14.790 --> 00:10:14.800 align:start position:0%
+génération du code.
+ 
+
+00:10:14.800 --> 00:10:15.990 align:start position:0%
+génération du code.
+Mais<00:10:15.000><c> mais</c><00:10:15.200><c> sinon,</c><00:10:15.399><c> le</c><00:10:15.519><c> résultat</c><00:10:15.839><c> est</c>
+
+00:10:15.990 --> 00:10:16.000 align:start position:0%
+Mais mais sinon, le résultat est
+ 
+
+00:10:16.000 --> 00:10:17.630 align:start position:0%
+Mais mais sinon, le résultat est
+beaucoup<00:10:16.200><c> plus</c><00:10:16.360><c> beau</c><00:10:16.880><c> sur</c><00:10:17.079><c> cette</c><00:10:17.279><c> version.</c><00:10:17.600><c> Je</c>
+
+00:10:17.630 --> 00:10:17.640 align:start position:0%
+beaucoup plus beau sur cette version. Je
+ 
+
+00:10:17.640 --> 00:10:20.790 align:start position:0%
+beaucoup plus beau sur cette version. Je
+trouve<00:10:18.640><c> c'est</c><00:10:18.760><c> vraiment</c><00:10:19.000><c> sympa.</c><00:10:20.440><c> Donc</c><00:10:20.640><c> le</c>
+
+00:10:20.790 --> 00:10:20.800 align:start position:0%
+trouve c'est vraiment sympa. Donc le
+ 
+
+00:10:20.800 --> 00:10:23.110 align:start position:0%
+trouve c'est vraiment sympa. Donc le
+prompting<00:10:21.240><c> aussi</c><00:10:21.440><c> très</c><00:10:21.680><c> important.</c><00:10:22.800><c> Euh</c><00:10:22.959><c> bah</c>
+
+00:10:23.110 --> 00:10:23.120 align:start position:0%
+prompting aussi très important. Euh bah
+ 
+
+00:10:23.120 --> 00:10:24.990 align:start position:0%
+prompting aussi très important. Euh bah
+si<00:10:23.279><c> vous</c><00:10:23.399><c> voulez</c><00:10:23.720><c> euh</c><00:10:24.000><c> vous</c><00:10:24.240><c> amuser</c><00:10:24.560><c> à</c><00:10:24.720><c> tester</c>
+
+00:10:24.990 --> 00:10:25.000 align:start position:0%
+si vous voulez euh vous amuser à tester
+ 
+
+00:10:25.000 --> 00:10:26.710 align:start position:0%
+si vous voulez euh vous amuser à tester
+ça,<00:10:25.200><c> n'hésitez</c><00:10:25.519><c> pas.</c>
+
+00:10:26.710 --> 00:10:26.720 align:start position:0%
+ça, n'hésitez pas.
+ 
+
+00:10:26.720 --> 00:10:28.030 align:start position:0%
+ça, n'hésitez pas.
+Moi,<00:10:26.959><c> en</c><00:10:27.120><c> passant</c><00:10:27.360><c> par</c><00:10:27.480><c> la</c><00:10:27.600><c> création</c><00:10:27.839><c> d'un</c>
+
+00:10:28.030 --> 00:10:28.040 align:start position:0%
+Moi, en passant par la création d'un
+ 
+
+00:10:28.040 --> 00:10:31.470 align:start position:0%
+Moi, en passant par la création d'un
+site<00:10:28.480><c> web</c><00:10:28.720><c> HTML</c><00:10:30.160><c> simple</c><00:10:30.920><c> puis</c><00:10:31.120><c> en</c><00:10:31.279><c> faisant</c>
+
+00:10:31.470 --> 00:10:31.480 align:start position:0%
+site web HTML simple puis en faisant
+ 
+
+00:10:31.480 --> 00:10:34.310 align:start position:0%
+site web HTML simple puis en faisant
+lire<00:10:31.640><c> par</c><00:10:31.800><c> Lia,</c><00:10:32.120><c> ça</c><00:10:32.320><c> ça</c><00:10:32.519><c> marche</c><00:10:32.720><c> assez</c><00:10:32.959><c> bien</c>
+
+00:10:34.310 --> 00:10:34.320 align:start position:0%
+lire par Lia, ça ça marche assez bien
+ 
+
+00:10:34.320 --> 00:10:35.509 align:start position:0%
+lire par Lia, ça ça marche assez bien
+mais<00:10:34.480><c> juste</c><00:10:34.640><c> en</c><00:10:34.760><c> prometant.</c><00:10:35.160><c> Du</c><00:10:35.240><c> coup,</c><00:10:35.360><c> bah</c><00:10:35.480><c> il</c>
+
+00:10:35.509 --> 00:10:35.519 align:start position:0%
+mais juste en prometant. Du coup, bah il
+ 
+
+00:10:35.519 --> 00:10:36.629 align:start position:0%
+mais juste en prometant. Du coup, bah il
+y<00:10:35.560><c> a</c><00:10:35.680><c> il</c><00:10:35.720><c> y</c><00:10:35.760><c> a</c><00:10:35.880><c> énormément</c><00:10:36.120><c> de</c><00:10:36.200><c> choses</c><00:10:36.360><c> à</c><00:10:36.440><c> faire</c>
+
+00:10:36.629 --> 00:10:36.639 align:start position:0%
+y a il y a énormément de choses à faire
+ 
+
+00:10:36.639 --> 00:10:38.750 align:start position:0%
+y a il y a énormément de choses à faire
+avec<00:10:37.720><c> l'arrivée</c><00:10:38.079><c> de</c><00:10:38.120><c> ces</c><00:10:38.240><c> skills.</c><00:10:38.680><c> C'est</c>
+
+00:10:38.750 --> 00:10:38.760 align:start position:0%
+avec l'arrivée de ces skills. C'est
+ 
+
+00:10:38.760 --> 00:10:40.750 align:start position:0%
+avec l'arrivée de ces skills. C'est
+c'est<00:10:39.000><c> vraiment</c><00:10:39.200><c> ouf.</c><00:10:40.079><c> Merci</c><00:10:40.320><c> d'avoir</c><00:10:40.560><c> suivi</c>
+
+00:10:40.750 --> 00:10:40.760 align:start position:0%
+c'est vraiment ouf. Merci d'avoir suivi
+ 
+
+00:10:40.760 --> 00:10:42.389 align:start position:0%
+c'est vraiment ouf. Merci d'avoir suivi
+la<00:10:40.920><c> vidéo</c><00:10:41.120><c> jusqu'au</c><00:10:41.480><c> bout.</c><00:10:41.880><c> N'hésitez</c><00:10:42.279><c> pas</c><00:10:42.360><c> à</c>
+
+00:10:42.389 --> 00:10:42.399 align:start position:0%
+la vidéo jusqu'au bout. N'hésitez pas à
+ 
+
+00:10:42.399 --> 00:10:44.069 align:start position:0%
+la vidéo jusqu'au bout. N'hésitez pas à
+vous<00:10:42.560><c> abonner</c><00:10:42.800><c> si</c><00:10:42.920><c> ce</c><00:10:43.000><c> n'est</c><00:10:43.160><c> pas</c><00:10:43.480><c> déjà</c><00:10:43.760><c> fait,</c>
+
+00:10:44.069 --> 00:10:44.079 align:start position:0%
+vous abonner si ce n'est pas déjà fait,
+ 
+
+00:10:44.079 --> 00:10:45.910 align:start position:0%
+vous abonner si ce n'est pas déjà fait,
+likez<00:10:44.279><c> la</c><00:10:44.440><c> vidéo</c><00:10:44.600><c> si</c><00:10:44.720><c> elle</c><00:10:44.839><c> vous</c><00:10:44.959><c> a</c><00:10:45.079><c> plu</c><00:10:45.639><c> et</c><00:10:45.839><c> je</c>
+
+00:10:45.910 --> 00:10:45.920 align:start position:0%
+likez la vidéo si elle vous a plu et je
+ 
+
+00:10:45.920 --> 00:10:47.590 align:start position:0%
+likez la vidéo si elle vous a plu et je
+vous<00:10:46.040><c> retrouve</c><00:10:46.360><c> très</c><00:10:46.560><c> bientôt</c><00:10:47.079><c> pour</c><00:10:47.440><c> de</c>
+
+00:10:47.590 --> 00:10:47.600 align:start position:0%
+vous retrouve très bientôt pour de
+ 
+
+00:10:47.600 --> 00:10:50.230 align:start position:0%
+vous retrouve très bientôt pour de
+nouveaux<00:10:47.800><c> tutos</c><00:10:48.160><c> sur</c><00:10:48.200><c> sur</c><00:10:48.800><c> Lia</c><00:10:49.120><c> et</c><00:10:49.320><c> toutes</c><00:10:49.519><c> les</c>
+
+00:10:50.230 --> 00:10:50.240 align:start position:0%
+nouveaux tutos sur sur Lia et toutes les
+ 
+
+00:10:50.240 --> 00:10:51.389 align:start position:0%
+nouveaux tutos sur sur Lia et toutes les
+les<00:10:50.320><c> nouveautés</c><00:10:50.720><c> qui</c><00:10:50.880><c> arrivent</c><00:10:51.120><c> à</c><00:10:51.279><c> une</c>
+
+00:10:51.389 --> 00:10:51.399 align:start position:0%
+les nouveautés qui arrivent à une
+ 
+
+00:10:51.399 --> 00:10:55.680 align:start position:0%
+les nouveautés qui arrivent à une
+vitesse<00:10:52.040><c> une</c><00:10:52.120><c> vitesse</c><00:10:52.399><c> folle.</c><00:10:53.480><c> M.</c>
+

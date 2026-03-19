@@ -2086,78 +2086,55 @@ P3 (C2) : reçoit JSON complet pour actifs DEEP/FOCUS
 
 ---
 
-### Bloc E — Scenes Remotion v2
+### Bloc E v2 — Visual Pipeline : Beat-based + ComfyUI Image Generation
 
-**Dependances** : Bloc C (les types enrichis definissent ce que les scenes doivent afficher)
-**Impact** : le "look" de la video — ce que le viewer voit
+> **CHANGEMENT MAJEUR (2026-03-19)** : l'ancien Bloc E (scenes statiques par section) est remplace
+> par un systeme beat-based avec images generees par IA. Spec complete : **`E2-VISUAL-PIPELINE-SPEC.md`**
 
-#### E.1 Scenes existantes a faire evoluer
+**Dependances** : Bloc C (script avec narration), P6 direction (mood, arc de tension)
+**Impact** : le "look" de la video — ce que le viewer voit. Changement fondamental d'approche.
 
-| Scene actuelle | Evolution necessaire |
-|----------------|---------------------|
-| IntroScene | Ajouter cold open (phrase choc geante) avant le titre |
-| MarketOverviewScene | Transformer en dashboard heatmap (pas juste des cards) |
-| ChartDeepDiveScene | Ajouter niveaux S/R annotes, zones colorees, overlays |
-| NewsScene | Ajouter sentiment indicator par news |
-| PredictionsScene | Renommer "Zones a surveiller", conditionnel obligatoire |
-| PreviouslyOnScene | SUPPRIME — les references au passe sont integrees dans les segments |
-| OutroScene | Ajouter teaser tomorrow, recap 3 points |
+#### Principe
 
-#### E.2 Nouvelles scenes a creer
+- Chaque episode = ~80-120 **beats visuels** de 5-8s chacun
+- Chaque beat = **image generee par ComfyUI (Flux 2 Dev)** + overlay data anime optionnel (chart, stat, causal)
+- Transitions dynamiques entre beats (fade, cut, slide, wipe) via `@remotion/transitions`
+- Ken Burns (zoom/pan lent) sur chaque image pour donner du mouvement
+- Les composants data existants (InkChart, CausalChain, AnimatedStat, etc.) sont reutilises comme overlays
 
-| Scene | Role | Priorite |
-|-------|------|----------|
-| ColdOpenScene | Chiffre geant anime + phrase choc | V1 |
-| DashboardScene | Grille heatmap de tous les assets | V1 |
-| DisclaimerBar | Bandeau permanent en bas | V1 (compliance) |
-| RecapScene | 3 bullet points animes | V1 |
-| CorrelationScene | 2 courbes overlay + coefficient | V1.5 |
-| MacroScene | Gauges (VIX, F&G) + yield curve | V1.5 |
-| ZonesScene | Chart avec zones colorees S/R | V2 |
-| CalendarScene | Timeline events eco | V2 |
-
-#### E.3 Nouveaux composants shared
-
-> **Convention palette visuelle** : tous les composants réutilisables sont dans `packages/remotion-app/src/scenes/shared/`.
-> Le prompt C7 (direction artistique) doit scanner ce dossier pour connaître la palette disponible avant de générer ses instructions visuelles.
-> Le code EST la source de vérité — pas de catalogue séparé à maintenir.
-
-| Composant | Usage | Priorite |
-|-----------|-------|----------|
-| HeatmapGrid | Dashboard — couleur par % change | V1 |
-| DisclaimerBar | Bandeau permanent | V1 |
-| LowerThird | Bandeau nom asset pendant analyse | V1 |
-| GaugeAnimated | Fear & Greed, VIX | V1.5 |
-| ChartOverlay | 2 courbes superposees | V1.5 |
-| LevelAnnotation | Lignes S/R sur les charts | V1.5 |
-| SectorBars | Barres perf sectorielle | V2 |
-| TickerTape | Bandeau defilant | V2 |
-
-> QUESTION : faut-il reconstruire les scenes de zero ou faire evoluer les existantes ?
-> Recommandation : evoluer les existantes pour V1 (IntroScene → ajouter cold open), creer les nouvelles en parallele.
-> Attention a ne pas tout faire d'un coup — 3-4 scenes V1 suffisent pour la premiere video.
-
-#### E.4 Assets library
+#### Pipeline visuel (P7a→P7c)
 
 ```
-assets/
-  crypto/     → btc.svg, eth.svg, sol.svg
-  forex/      → drapeaux (flag-icons npm), paires
-  indices/    → sp500.svg, nasdaq.svg
-  commodities/→ gold.svg, oil.svg
-  macro/      → fed.svg, bce.svg
-  mood/       → bull.svg, bear.svg, neutral.svg
-  ui/         → arrows.svg, badges.svg, frames.svg
+EpisodeScript → P7a Beat Generator (code+Haiku) → Beat[]
+             → P7b Image Prompts (Haiku) → Beat[] avec prompts
+             → P7c ComfyUI Cloud (Flux 2 Dev) → ~100 images 1920x1080
+             → P8 Remotion (BeatEpisode + TransitionSeries) → MP4
 ```
 
-`ASSET_MAP[symbol]` dans `asset-library.ts` pour que Remotion resolve les icones automatiquement.
+#### Stack image
 
-> QUESTION : SVGs customs ou utiliser une lib d'icones existante (lucide-react, simple-icons) ?
-> Recommandation V1 : simple-icons pour les logos connus + lucide-react pour les icones UI.
-> SVGs customs uniquement pour les elements de branding uniques.
+| Element | Choix |
+|---------|-------|
+| Provider | **Comfy Cloud** (cloud.comfy.org) — RTX 6000 Pro, 96Go VRAM |
+| Modele | **Flux 2 Dev** (pre-installe, langage naturel, pas de negative prompts) |
+| Workflow | txt2img simple : Checkpoint → CLIP → KSampler (25 steps, euler, cfg 3.5) → VAE → Save |
+| Resolution | 1344x768 natif (ratio ~16:9), scale par Remotion a 1920x1080 |
+| Cout | ~0.50-0.80$/episode (~100 images × ~5s GPU chacune) |
+| Plan | Standard 20$/mois (~30+ episodes couverts) |
+| Env var | `COMFYUI_API_URL`, `COMFYUI_API_KEY` |
 
-#### Livrable Bloc E
-Scenes V1 fonctionnelles avec EnrichedEpisodeScript + DisclaimerBar + assets de base.
+#### Compositions Remotion
+
+| Composition | Usage | Statut |
+|-------------|-------|--------|
+| `BeatEpisode` | **Defaut** — beat-based + images generees | A CONSTRUIRE |
+| `DailyRecapEpisode` | Legacy — scenes par section (flag `--legacy-render`) | EXISTANT |
+| `NewspaperEpisode` | Alternatif — canvas journal + camera | EXISTANT |
+
+#### Livrable Bloc E v2
+`p7a-beat-generator.ts` + `p7b-image-prompts.ts` + `p7c-image-generation.ts` + `comfyui-client.ts` + `BeatEpisode.tsx` + `BeatSequence.tsx` + `BackgroundImage.tsx` + `DataOverlay.tsx`.
+
+> Detail complet dans `E2-VISUAL-PIPELINE-SPEC.md`.
 
 ---
 
@@ -2439,6 +2416,7 @@ Cinq ameliorations concretes integrees dans le pipeline v3 :
 | News Memory + Causal | 0 EUR | Tagging rules-based + SQL queries — tout en code |
 | Anthropic API (script) | ~8-12 EUR | 22 videos × 10 couches LLM (~0.39$/video) |
 | ElevenLabs | ~22-99 EUR | Creator (100min/mois) ou Scale (500min) si 22 videos × 10min depasse |
+| Comfy Cloud (images) | ~15-20 EUR | ~100 images/episode × 22 episodes (Flux 2 Dev, plan Standard 20$/mois) |
 | Flux AI (fal.ai) | ~3-5 EUR | Thumbnails (V2) |
 | Hosting | ~5-10 EUR | VPS ou Railway |
 | **Total** | **~55-154 EUR/mois** | Fourchette large selon plan ElevenLabs |
@@ -2448,7 +2426,7 @@ Cinq ameliorations concretes integrees dans le pipeline v3 :
 > ou reduire a 15 videos/mois, ou utiliser des voix non-clonees moins cheres.
 > A evaluer au moment du Bloc F.
 
-**Cout par video : ~1.5-2.5 EUR** (LLM ~0.39$, ElevenLabs ~0.50-1.00€, infra ~0.20€)
+**Cout par video : ~2.0-3.5 EUR** (LLM ~0.39$, images ComfyUI ~0.60$, ElevenLabs ~0.50-1.00€, infra ~0.20€)
 
 ### Revenus projetes (hypotheses conservatrices)
 
@@ -2499,7 +2477,7 @@ Point de rentabilite estime : **mois 7-8**.
 | 3.6 | D3 (MarketMemory) | JSONs par actif + détection événements + enrichissement Haiku soir + job hebdo Sonnet |
 | 4 | C (prompts C1→C5) | **Refactoring majeur** — 5 prompts séquentiels avec responsabilités séparées |
 | 5 | A2 (market intel) | Market RAG (~763 actions), analyse causale, scenarios forward |
-| 6 | E (scenes) | 4-5 scenes essentielles + DisclaimerBar + quelques composants |
+| 6 | E v2 (visuel) | Beat generator + ComfyUI client + BeatEpisode Remotion (voir `E2-VISUAL-PIPELINE-SPEC.md`) |
 | 7 | F (TTS) | C6 adaptation + ElevenLabs config statique par segment + Whisper sous-titres |
 | 8 | G (SEO) | C10 SEOPackage + upload semi-auto |
 

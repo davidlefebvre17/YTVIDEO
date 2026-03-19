@@ -1,0 +1,395 @@
+Every video you're seeing right now was
+made simply by prompting Claude. So
+Claude actually just got a new skill
+called Remotion. And people are using it
+to create product demos, motion
+graphics, YouTube videos, even full-on
+presentations just by typing what they
+want. And to prove this actually works,
+I'm going to be using it to edit the
+entire video you're going to be watching
+right now. Normally I hand this off to
+my editor, but today I'm just going to
+be prompting the whole video. So, if
+this video looks slightly different,
+that's why you're watching the proof.
+And in this video, I'm going to be
+breaking down how you can get started in
+three levels. So, first, we're going to
+get set up. So, that means we're going
+to install what we need. We're going to
+connect the skills. Then, we're going to
+be making your first videos. This is all
+from scratch with your own footage and
+adding some more graphics. Then, we'll
+be diving deeper by adding voiceovers,
+generated visuals, and turning anything
+you want into a video. Even if you have
+zero technical background, you'll be
+able to do this because all we're going
+to be doing is simply speaking to
+Claude. Let's get into it. Okay, so
+before we set anything up, I need to
+explain to you how Claude actually uses
+skills because this is really the key to
+how everything works. So, think of
+Claude like a chef, a really talented
+chef who can follow any recipes, knows
+which ingredients go together, and all
+the fancy techniques. But the thing is,
+if you put that chef in an empty
+kitchen, they can't cook anything. So to
+make videos, we need to give Claude the
+Remotion skill. We're saying, "Here's
+everything you need, and you're going to
+use this to make me videos." And without
+that skill, Claude can describe a video.
+But with the skill, Claude can actually
+make these come to life. All right. So
+to get started, what you need is Claude
+Desktop. So all I'm doing is just
+googling Claude Desktop, going right
+here, and then what you want to do is
+just download either the Mac or the
+Windows version.
+Okay, great. So, just open up Cloud. I
+reinstalled it. And you see right here,
+there's chat, co-work, and code. Uh,
+you're probably going to be greeted at
+chat and you hit the co-work. And that's
+the easiest way to get started. All
+right. Okay. Now that we have Claude
+installed, what we need to do is give it
+the ability to create videos. And the
+way we do that is by giving it a skill.
+So, let me show you how to do that. So,
+I'm going to go back to my browser and
+in the link in the description below, I
+have the link to this community where
+you'll see inside this classroom in
+YouTube video resources in the bottom, I
+actually made a guide for you guys to
+follow. But all you have to do is like
+take this thing npx skills add reotion
+dev skills, right? This is kind of like
+a cheat code you're giving Claude where
+it's going to be downloading all those
+skills and it's going to be able to
+create videos for you. All right. So,
+right here, I'm just going to copy paste
+that and be like, "Hey, can you set this
+up for me?" And one more thing I want to
+show you is right here inside work in a
+folder. I'm going to choose a different
+folder because I want all my videos to
+be self-contained somewhere, right?
+So, let me put this somewhere like here.
+Let's make a new folder. Let's call it
+um videos or let's call it remotion
+videos. Okay, cool. Cool. So, I'm a
+little organized now. I opened that.
+Now, it has there. Now, let's hit let's
+go. Cool. And I'm going to wait for it
+to work.
+So, it just got done installing the
+skill. Now, we should be good to go to
+create videos. And it was as simple as
+that. All right. Now, let's create a
+video. So, for this example, I just open
+up my website, booktend.ai. And what I
+want is, let's say, a really simple
+product demo. So, I'm going to enter
+this and I'm going to be like, "Hey,
+with Remotion, can you create a product
+demo with the copy on the website? I
+want you to use the same colors." So,
+white background, black text, uh, blue
+accent colors, use the pictures from
+inside Booked.ai, and create me a motion
+graphic product demo that I can see.
+All right, cool. Now I did that. I'm
+going to hit enter and I'm going to
+wait.
+Okay, that's kind of cool. So, you see
+because I told it to go grab my assets
+from the website, what it just asked me
+to do is it asked me for permission to
+use my browser. Then cloud co-work
+literally is going to the website. It's
+scraping whatever it needs to and using
+that to create the video. All right, so
+it's saying it got done, but just from
+my experience, I know there is some
+problem here that we probably need to
+troubleshoot. And you can actually see
+it says it for us. The Remotion Studio
+server is running. However, I'm running
+a a sandboxed VM. I won't be able to do
+this stuff for you. Okay, what that
+means pretty much is that, hey, Cloud
+Co-work is not as good, so move over.
+Um, so what I'm going to do for you
+right now, as you can see, is I'm going
+to just hit code because right now it
+just made me like a little slideshow,
+which I don't want. I want a video. So,
+what I'm going to go back to is I'm
+going to go to code and then I'm going
+to select the same folder that we were
+working on.
+And this is cloud code. So, this is like
+the final evolution. And I suggest just
+use this if you if you have access to
+it. And I'm going to say uh plan ask and
+then just go starts immediately. Okay.
+In the Remotion video, I wanted you to
+build me the video, Remotion video for
+Bookedin.
+Can you make that product demo for me?
+Spin up the server and show it to me.
+Give me the link.
+Okay, so it just asking for some
+permissions and let's see what it does.
+Okay, great. So, this one seemed to have
+worked. Now, if I said your reotion
+server is running, if I click this,
+let's open the link. Oh, nice. Okay, let
+me play this.
+Awesome.
+Okay, so I can see it got the copy from
+my website. There's some good motions.
+And this is just off me simply
+prompting. I'm just trying to keep this
+easy. All right. So now I want to make
+sure you guys know how to do this. So
+let's say you can see it's not using the
+correct logo, right? And I wanted to use
+my own logo. So little edits like that.
+Maybe you want this like in a different
+position, etc. Anything you'd want, you
+can edit it by essentially just talking
+to Cloud Code right here. So, what I'm
+going to do is I'm going to insert my uh
+logo. All right. So, I'm going to look
+for my logo. So, here it's booked.png.
+I'm going to drag it over here and be
+like, "Hey, can you make sure it's using
+this asset?" Save it to the folder and
+make sure whenever a logo is used, this
+specific asset is being used.
+And I'm going say, "Trust this
+workspace." And I'm going to let it go
+ahead. Okay, great. So, it just got
+done. So, let me go click it and check
+it out. It's saying click this thing,
+open link. Okay, cool. So, you see it
+has my logo. It's doing all this
+motions. Now, let's say I do like this.
+What I could do is I can hit this render
+button and I can hit render video and
+it's going to start giving me the
+outputed video if I like it. Right? But
+it's as simple. You can start editing
+your logos, adding your own components,
+etc. Okay, so this is just the most
+tiptop level of how you can make these
+videos. Now, let's dive in and let me
+show you how to make this way more
+useful.
+All right, so we just learned how to
+make basic videos. Now, let's go a
+little bit deeper and get into level
+two. And level two is about skill
+stacking. What that means is now with
+level two, the idea is we should
+maintain consistent styling across every
+video we can make. Maybe we'll also use
+defined assets. So maybe you have all
+your pictures, videos, all these stuff
+in one centralized location. So the AI
+can go fetch it from there and always
+use those to create the videos. And then
+with level two with skill stacking, we
+can also do things like add sound to
+these videos, add voiceovers, all the
+stuff. So naturally, that begs the
+question, how do you do that? So right
+now, what we did is we gave Claude
+access to Remotion to create those
+simple videos.
+But what we're going to do now is we're
+also going to be giving it skills of
+letting it use stuff like Nano Banana
+Pro, 11 Labs, and Remotion, and then use
+the powers of all of them together to
+create much better videos that can do
+voice that can generate images and
+create really, really nice branded
+videos. So, let me show you an example
+that I had and I was just playing with.
+So, here I'll play this video. Meet
+Bookedin, your complete AI powered sales
+engagement platform. Let's take a quick
+tour of what makes Booked so powerful.
+First, your real-time dashboard. See
+every metric that matters at a glance.
+Okay, so you don't need to see the whole
+thing, but what I wanted to show you is
+that one, this has a voice over with 11
+Labs, but two, this is really cool that
+it maintains my style and also because
+it has access to my codebase for book
+10, it literally takes those components
+and then creates these Remotion videos
+with my component so everything stays
+consistent. So that's really cool and
+it's really easy to do. So let me show
+you how to do that. Okay. So, how we're
+going to train Claude and make it
+remember the many skills we're going to
+give it is through this thing called the
+claude.m MD or agent.m MD. All right?
+And all an agent.m MD is is imagine it's
+like a notebook. So, let's say you teach
+the AI to do something. We're just going
+to be like, "Hey, write it down in your
+notes and next time I ask you to do the
+same thing, go look in that book and do
+the same thing." Okay? So, that's about
+it. and let me show you how to set that
+up. All right, so I'm back to Claude and
+all I'm going to do is be like, "Hey,
+can you create a claude MD file for
+yourself?" And here we want to store the
+instructions of if I ask you to create a
+video, you're going to use Remotion. And
+when I'm going to be giving you access
+to new skills or new things to use,
+you're going to be using the new
+services. So right now, I just want you
+to make a cloud. MD so I can look at it.
+This is going to be the set of
+instructions that we're going to be
+appending and making better over time. I
+want you to if you learn something new
+that we use and I keep asking for it to
+update this document and always look
+into it when we're when I ask you to do
+something.
+And that's about it. And I'm
+intentionally keeping it kind of easy to
+do and just speaking to it like kind of
+a person because I feel like anyone can
+pick it up in that way. Even if you make
+mistakes, you can just ask the cloud to
+do something and it gets it done. So for
+example uh right now here I'm going to
+pull up my uh folder that we worked on
+before. Remember it was reotion videos.
+And you see there's a claw empty file
+now. So if I open it up, it's just a
+document. That's about it. It's just a
+notebook that Claude is saving and stuff
+to do. Okay, cool. Now, what I want to
+do is make sure Claude has access to use
+other skills, right, and other
+abilities. So, the way I'm going to be
+giving it access to use Nano Banana Pro
+and 11 Labs is through this service
+called Wavespeed. So, let me go to
+Wavespeed. So, I just pulled up
+Wavespeed. I'm going to sign in really
+quickly. And what I want you to do is,
+you know, just hit this thing called get
+API key and then copy this and then
+paste it in cloud. So I'm going to just
+skip through this part so I don't expose
+my API key. But what I want you to do is
+this. Hey, here is the wave speed API
+key. I want you to make the skill out of
+this. So and put it in cloud.MD MD that
+whenever I ask you to create a voice
+over, I want you to use 11 Labs V3 model
+because I think that works the best in
+terms of generating voiceovers. And then
+if I want you to generate pictures, I
+want you to use Nano Banana Pro. Use
+Wave Speed. Here's my API key.
+So you do this,
+you enter your API key and then you hit
+enter
+and then you wait. All right. So, now
+that's done, what I'm going to do is,
+hey, with the booked 10 video we just
+made, can you add a voice over with 11
+Labs from the wave speed API I just gave
+you.
+All right, so it got done. Let's open it
+up and check it out. Open link. Uh, let
+me hit play.
+&gt;&gt; Powered scheduling made simple.
+Tired of scheduling chaos? Endless back
+and forth.
+&gt;&gt; Okay, so uh we get the gist now. We have
+generated a video and added a voice over
+to it. That's crazy, right? Okay, so
+this was level two in terms of stacking
+skills on how you can add more graphics,
+more pictures, and you know, it's just
+about you being creative and asking for
+what you want. Now, let me show you
+level three. Okay, awesome. Now, we
+learned how to stack skills on Claude
+and actually make videos more
+interactive with voiceovers, pictures,
+all that stuff, right?
+Cool. Now, for level three, and this is
+how I'm actually creating the video
+you're watching right now, is by
+chaining videos. So, at a high level,
+what I did was essentially I made a
+bunch of different videos for my intro.
+So, if you rewatch my intro, you'll see
+there'll be a bunch of different videos.
+So, what happens is I made a script and
+I told Claude, "Hey, make individual
+videos for each section." So you see how
+I have a bunch of different videos like
+for example this is the WhatsApp one
+this is the skill explainer
+all these right so what I did
+was for chaining these videos this was
+the process number one if you want to
+make long YouTube videos with this you
+want to have let's say an outline or a
+script then you feed that into cloud and
+you're like hey for each of these
+sections make a new video. And if you
+like each one, then you put in your
+entire recording. So I put in my
+recording and I said, "Make a new video
+with myself in the bottom and all those
+videos chained together." Okay? And
+that's about it. So what it does,
+Claude, it becomes the orchestrator. It
+stitches the intro, the outro, the
+middle, all these stuff. it stitches it
+together and then creates this behemoth
+of a final video that you're seeing
+right now. So that is ultimately how you
+do it and it's as simple as going to the
+finder. So for example, since we were
+working with this Remotions video folder
+is the same thing as me. If I finish
+recording this video, I drop it in here
+and I'm like, "Hey, stitch the videos
+together." And Claude just takes care of
+the rest. So, this is just one small
+portion of how this will be done. But if
+you want to learn how to actually take
+this to the next level and have this be
+working autonomously, watch this video
+right here where you can use those
+skills to make these videos be generated
+on autopilot and actually do all your
+marketing if you

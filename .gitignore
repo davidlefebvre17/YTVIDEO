@@ -19,3 +19,15 @@ episodes/
 *.log
 tsconfig.tsbuildinfo
 references/
+
+# Binaries & generated artifacts
+*.exe
+*.pdf
+*.png
+data/news-memory.db-shm
+data/news-memory.db-wal
+data/market-memory/
+data/pipeline/
+data/sp500-chart.html
+c7-storyboard-view-*.html
+p7-production-parallele-*.html

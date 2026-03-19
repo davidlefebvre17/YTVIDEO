@@ -1,0 +1,238 @@
+Hey, the videos you see on the screen
+were generated with cloud code using the
+remote skill. And I'm aware that this
+skill has been around for a while now.
+But I'm also noticing that the most
+majority of people are using it in a way
+that is inefficient, which costs them
+time and also prevents them from getting
+the outcome that they desire. And so in
+this video, I want to share with you a
+workflow that's going to help you
+overcome that inefficiency. And so if
+that sounds good, let's dive right in.
+Before we begin to understand the
+effectiveness of the workflow I'm about
+to share better, we are going to borrow
+a concept from the AI video generation
+space. Now, if you have any experience
+generating videos, you probably already
+know the methods in which we can
+generate videos with, right? For
+instance, you can generate a video from
+text or directly from image. And if you
+have any experience in generating
+videos, you know that it is far better
+to use image to video because you have
+much more control over how your videos
+look and your videos are only going to
+be as good as the image you provide to
+it. Right? In the case where you
+generate videos from text, first of all,
+gives you much less control and the
+reiteration process is going to take
+much longer and also cost you more
+money. And when I say that people are
+using remotion in a way that is
+inefficient, I mean that they're
+basically doing the remotion equivalent
+of generating videos from text. And the
+workflow I'm going to share with you is
+basically generating videos from images.
+And that is what we are going to be
+looking at today. The way it works is
+usually people straight away go to cloud
+code, tell it to generate the animation
+that they want to see, right? But in
+today's video, I'm going to share with
+you how you can basically pass cloud
+code and image that it can then derive
+the animation from. And it's very
+simple. The way I'm going to demonstrate
+this is by animating this diagram here
+that shows the popularity of cloud code
+across time. And so what I'm going to do
+first is I'm just going to take a
+screenshot of this page. All right? Like
+this.
+And then instead of directly going to
+claude code, what we're going to first
+do is we're going to head to uh cloud
+desktop app and then pass it the
+screenshot. And as I said, we're going
+to first be generating an image. And the
+image equivalent in remotion is
+basically a still HTML. So I'm going to
+say something like please
+beautiful. I'm going to say beautiful
+because I'm not a design person. I'll
+just tell it uh what I want it to look
+like and I'll just leave it up to cloud
+to basically design it for me. Right?
+Please reconstruct this diagram of the
+popularity of cloud code in a way that
+is beautiful in HTML and I'm going to
+click on enter. So what's going to
+happen now is Claude is going to start
+generating the HTML reconstruction of
+the diagram that we gave it. Let's just
+wait and see what it ends up with. Okay,
+so this is the HTML that it generated
+for us. And you can see that it is
+definitely beautiful, but there is a
+mistake. I can already spot at a glance.
+You can see that it has two dots instead
+of one. So, I'm going to tell it to
+actually fix that. Could you please
+remove the duplicate circle that is
+overing? Wait,
+duplicate circle
+hovering at 98.
+Okay, so it actually misunderstood what
+I told it. Instead of removing the one
+that is peing at 98, it removed the one
+at the edge. So, I'm going to say you
+removed
+the wrong circle.
+Please
+add the one you remove and remove the
+one you kept.
+This should hopefully make the changes
+we wanted to. All right, let's see if it
+was able to actually do that. And you
+can see that yes, it was able to do
+exactly what we told it to. And in this
+case, you can already see that just from
+telling it to generate a still HTML
+alone, we had to reiterate over it
+twice. And that was for this very simple
+change. So the only thing we'll have to
+do now is basically just go over to CL
+the HTML code that it generated. And
+next, go to cloud code and tell it to
+generate the animation the way we want
+it to. All right. So now I'm in my code
+editor. And I'm going to treat this by
+assuming that you don't already have
+Remotion set up so that you can follow
+along and set it up with me if you
+haven't already. And for those of you
+who don't already have Cloud Code set up
+on their machine, you can go and check
+this video I just made recently where I
+show you how to do just that. But now
+let's continue with the video. So
+currently I don't even have a folder
+created. And we will need to create one.
+And for that I'm going to click on open
+folder.
+And then I'm going to say new here and
+then name it remotion.
+Go into this folder and then click on
+select folder so that we can open our
+code editor within that folder. And to
+show to demonstrate how simple it is
+nowadays to do anything, I'm going to
+show you how I'm able to start from
+scratch and with a single prompt have
+everything I need in place and ready to
+go. So what I'm going to do is I'm going
+to take this cloud code window
+if I can like that. Okay. And I'm going
+to tell it
+let me first put it in bypass
+permissions. Hi, could you please
+uh clone the clone the remote repository
+and also install
+the remote skills along with it and then
+provide me with the exact command that I
+have to run in the terminal to open it.
+Okay. And I just click on enter and
+wait. So in just 2 minutes it was able
+to do exactly what I told it to. And you
+can see it says the remote hello world
+template has been cloned and
+dependencies installed. The remote skill
+is also loaded. To open remotion studio
+run this command in your terminal. Like
+at this point there is no scarcity of
+knowledge and how how to do things. It's
+basically just being able to imagine
+stuff right and I just wanted to show
+you guys demonstrate how simple it is
+now for you to do technical things. You
+don't have to be a technical person. But
+yeah, I'm uh digressing here. I'm just
+instead going to go to my terminal,
+create one, and then go here and type
+exactly the command that it gave us.
+Okay.
+All right. So, the command didn't work
+here. And I actually know how to fix
+this, but I'm going to put myself in the
+shoes of those of you who don't know
+what to do here and uh try to act from
+your perspective. So instead of this,
+what I'm going to say is I just ran
+this. I ran this command in my VS code
+terminal and got this error. Okay, I'm
+saying VS Code terminal because I'm
+inside my my uh code editor which is VS
+Code. Okay, so you're using PowerShell
+which doesn't support NN run the two
+commands separately. So instead this
+time we're going to click on cd. this
+this will navigate us to this particular
+directory and then we are going to run
+npm start. This time we have we got
+another error and what I'm going to do
+is I'm just going to share with it the
+exact error that we got here and I'm
+guessing that it has to be npm run start
+instead of npm start. Oh, it's npm
+rundev. Okay, makes sense. And this time
+running this command should hopefully
+fix our problem. And once we have this,
+it means we have remote set up. And you
+can see that it automatically opened a
+browser at this particular port. And the
+next thing we're going to do is we're
+just going to go ahead and copy the HTML
+we already created here. Create an and
+then and then create a new cloud code
+instance. And before I paste the HTML,
+I'm going to say could you please
+and then I'm just going to paste in the
+HTML. And then now we should hopefully
+get an animation ready in just a few
+minutes. All right. So it is saying that
+it is done generating the animation.
+Let's take a look at how it turned out.
+All right. So I'm actually very happy
+with the way this turned out. And when
+you compare it with the HTML that we
+gave it, you can see that it is actually
+very accurate because it already had the
+exact raw material that it needed to
+derive this entire animation from. And
+this is a very good example of the
+control we have over animations that we
+can generate with cloud code using the
+remotion skill by using this workflow
+where we provide it with a still HTML
+that it can start from. And again as I
+also mentioned earlier we can take this
+a step further by providing it a first
+still HTML frame and an end still HTML
+frame. In this case, however, we just
+used a reference HTML still and it still
+worked great. But yeah, that's about it
+with the video. I hope you enjoyed it
+and more importantly found it helpful. I
+also want to let you know that I have a
+school community where I teach you how
+to become a top 1% AI user. So, if you
+are interested in AI, definitely check
+it out. I hope to see you in. But with
+that said, I'll see you in the next
+video. Have a great day.

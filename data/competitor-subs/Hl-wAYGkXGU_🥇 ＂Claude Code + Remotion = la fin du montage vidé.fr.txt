@@ -1,0 +1,281 @@
+Je suis choqué les gars, je suis choqué.
+C'est pas possible ça.
+C'est insane. What's up les boy ?
+L'outil que vous venez de voir là et ben
+c'est un outil que je viens de
+découvrir. C'est une vraie dinguerie les
+gars. Du coup si vous voulez savoir de
+quoi est-ce que ça retourne restez
+jusqu'à la fin de la vidéo et je vous
+présenterai exactement comment ça
+fonctionne. On va le découvrir ensemble.
+On va aller sur Google. C'est un petit
+peu de recherche. Vous allez voir
+comment je suis pr découvrir nouveaux
+outils car c'est ma passion. Je suis un
+fan de tech. Du coup là, on va essayer
+d'aller dessus redion
+rotion rotion rotion. Est-ce que j'ai
+bien écrit rotion ? Aï. OK, c'est
+remotion. D'accord. Du coup, on va
+essayer de découvrir voir comme
+qu'est-ce que ça fait exactement. Créer
+des vidéos par programmation. créer des
+vidéos véritables MP4 en React. Ah bon ?
+Euh
+paramétrer le contenu, effectuer le
+rendu côté serveur développer
+des applications. Du coup pour
+installer, qu'est-ce qu'il fait quoi ?
+Composer du code, modifier dynamiquement
+euh rendu évolutif. Ah ouais, pas mal
+hein. Bon bon bon. Quelutation.
+OK, on va essayer de le télécharger tout
+simplement. D'ailleurs pour ça, je vais
+commencer par CL code et on va aller
+voir sur la doc OK OK pour l'installer
+npm créate là test vidéo machin truc ce
+que je vais faire je vais propier tout
+simplement la doc et venir sur clut
+code. Kosovoski CC. OK, tu peux
+m'installer Rotion et je vais balancer
+le lien et bam. Du coup, on laisse à
+Claude Code Cloud Code.
+OK, je vais d'abord récupérer la
+documentation nan nanana plugin pas un
+truc. Ben, on va le laisser installer
+tout simplement. Et avant ça, on va
+essayer on va aussi essayer d'aller
+chercher les skills pour nous. Donc
+skills
+du coup on va taper motion
+c'est quoi ça ? Comment ça il a pas de
+skills ? Motion best practice. OK.
+Ouais ouais ouais. Là il y a plus de 100
+130 d'install. Et ben, on va utiliser
+celui-ci. OK OK OK.
+Le rules animation. OK. On va lui
+laisser Claud C terminer et on va lui
+dire d'installer aussi ses skills. Bam
+bam bam bam bam bam bam. OK, il est en
+train de télécharger depuis le repos. Ça
+y est, réotionn installé. Vérifie la
+structure du projet. Parfait. Je crois
+que tout est installé. Maintenant, on va
+lui on va lui installer le skills.
+Installe ce skills remotion dans Claude
+pour que ça soit plus simple pour moi.
+Apparemment, c'est un des meilleurs et
+je lui balance le lien du skills et bam.
+La commande attend le interactif l'agent
+nana.
+OK. Motion B par skill motion installer
+NPX vidéo my vidéo nana. Parfait. Il me
+demande si je veux créer une vidéo
+spécifique. Et ben
+même pour ça, vous pouvez pas me prendre
+la tête là. J'ai juste venu sur Claude
+d'ici et lui demande. Je suis en train
+de faire une vidéo sur Remoton et j'ai
+besoin de faire une vidéo avec Remotion.
+Du coup, donne-moi des idées de
+génération de vidéos avec mootion pour
+tester pour ma vidéo. OK, on lance ça.
+Des mot technique compteur animé
+barre de progression data visual
+graphique
+vis
+recommandation. OK OK OK
+ce que je vais faire là, je vais le
+fourir d'abord des assettes et comme
+hier, j'ai généré quelques miniatures,
+ce que je vais faire, je vais le mettre
+dans un dossier minia que je vais le
+laisser dans téléchargement. Ensuite, je
+copier le lien du service. OK. Où est-ce
+que je copie l'URL déjà ? Copier le lien
+en tant que chemin. Parfait. Je reviens
+dans CL code et je lui dis euh OK, je
+prends tout ça. Démmo technique euh suis
+pas sûr. Je sais pas qu'est-ce que ma
+souris a ces derniers temps. OK, je
+copie ça. Je viens dans CL code et je
+lui balance. Et en plus de ça, je t'ai
+mis quelques miniatures
+dans ce dossier pour la vidéo. OK. Là
+maintenant je vais recopier le lien
+copier to et bam et on va le recevoir.
+On va voir qu'est-ce que Remoion est
+capable de faire. Oh là là les gars
+c'est fascinant. Si vous voyez ce truc
+là gros projet j'adore. Mais laisse-moi
+d'abord voir les miniatures actuell tac
+tic tac tac tac. OK. Ah ouais si ça
+fonctionne correctement ce que je vais
+faire créer un MCP et le connecter avec
+Cloud App. comme ça depuis Coop je peux
+lancer des des pontes et lui qui de me
+générer des vidéos avec le MCP deion et
+bam il va me ranger sa dernière dosser
+directement il faurait même plus besoin
+de venir le faire à la mer c'est pas
+fantastique ça. OK là qu'est-ce que me
+dit ? OK OK OK
+j'aime bien découvrir ça.
+Qu'est-ce qu'il me dit là ? J'ai créé
+toutes les compositions. Je lance la
+création en parallèle par catégorie. OK,
+du coup je mets ça dans le dossier Madbé
+source démo. On va essayer d'aller voir
+ça. Là on est dans MacBook Pro. My vidéo
+my vidéo. K on a quoi là ? Source. Ah
+ouais voilà les skills. Emotion best
+practic source
+la démo. OK là me fout quoi ? du code
+pour vis ici. OK, on va le laisser
+terminer. On va voir.
+OK, remotion Google font her. OK,
+parfait. Là, il est en train de compiler
+et il y a des erreurs. Quelques erreurs
+d'attana.
+Parfait. Tu coures les erreurs. Parfait.
+Il a terminé. Et qu'est-ce qu'il a fait
+déjà ? une composition animate counter
+barana description
+ok ok ok pour lancer le studio NPX la
+composition NPX CD my OK ce qu'on va
+faire on va juste venir là copier ça OK
+du coup ça me retrouver dans dossier et
+MacBook Pro là ouvrir. Bon, on va lancer
+une nouvelle fenêtre et je vais lancer
+ça. C'est quoi ça ? On va ouvrir une
+nouvelle fenêtre et contrôle commande V
+et ensuite bam en sport. Qu'est-ce qui
+nous a sorti comme vidéo ? OK, on vo
+waouh,
+c'est une dinguerie. Il a juste fait une
+animation là, je comprends pas. On va
+lui demander quelque chose d'assez
+pousser un peu plus. Là, je t'ai fourni
+des miniatures mais tu m'as fait quelque
+chose d'assez plat. Juste un compteur.
+J'aimerais quelque chose de ultra
+moderne avec des animations, des slides
+et du texte. Je laisse ça à ta
+créativité et fais-moi voir quelque
+chose de waouh avec plein d'animations à
+l'intérieur, pas juste un compteur. Je
+te laisse aussi du copyright. Right.
+Copyright copyright. Ah là là vraiment
+vraiment vraiment.
+Bon, on va le laisser faire copyright.
+Boum boum boum boum boum boum. On va
+voir ce qui va générer cette fois. Ça
+reste assez simple d'utilisation à ce
+que je vois. Ah ouais, il m'en a fait
+plusieurs ba en fait. OK,
+la progress NPX la test installion.
+C'est quoi tout ça ? C'est quoi ça ?
+Reven
+taux de satisfaction. Revenue client
+Tribal Enterprise. OK, il avait donc
+fait tout ça. Ah ouais, c'est pas mal,
+pas mal, pas mal du tout. OK. Et et ça
+c'est quoi ? C'est des compositions des
+mots techniques. Du coup, on va revenir
+sur truc ici. Ah ouais, j'ai vu que tu
+m'as fait plein de dossier avec
+plusieurs vidéos à l'intérieur. C'est
+pas ce que je voulais. Je voulais une
+seule vidéo avec tout à l'intérieur. Je
+vais te fournir un peu le design de mon
+site internet et en fonction de ça, tu
+vas utiliser ce style et ce qu'on va
+faire, on va aller chercher le site de
+tribaler
+comme c'est euh on va retourner sur bam.
+Voilà. On va le laisser bouiller et voir
+ce qu'il peut faire compris toutes ces
+scènes et ensuite je vais assembler en
+une seule vidéo avec des transitions
+séries. Laisse-moi aussi récupérer le
+style de ton site. OK, il est en train
+de fête sur site, c'est parfait. Ou bien
+les gars là il a accès au site, il a
+reçu les data. Les datas. OK, le site
+est au JavaScriptant.
+Je peux pas extraire le CSS directement
+mais je connais ton univers visuel grâce
+aux miniatures.
+Je continue la création nanani nanana
+avec le style de tribal. OK. Est-ce que
+je vais pas lui fournir une capture
+d'écran directement ? Pourquoi pas ?
+Pourquoi pas ? Pourquoi pas ? H OK, on
+va laisser faire tout simplement. H
+parce que là si je décide de faire une
+capture, je risque d'avoir la caméra à
+l'intérieur.
+OK. OK l'assemblage finale en sur
+composition
+transition series. OK, il nous faut quoi
+là maintenant ? J'espère que je n'aurais
+pas lancer ça. OK. Wouh ! Là il a tout
+supprimé et n'a pas encore compléur.
+Je supprime les anciens dossiers
+inutiles. OK, tu n'as pas l'accès à ça.
+Tu ne peux pas supprimer. C'est top. Et
+les gars, est-ce que vous êtes prêts à
+voir le rendu comme moi ? va découvrir
+ce que Claude Code nous propose. OK,
+voyons voir. Waouh !
+Claude Code L qui c dan. Oh les gars,
+c'est pas magique ça. Ah ouais,
+dinguerie dinguerie les gars, c'est une
+dinguerie. Vous voyez ce que je vois là
+? Mais non, mais jeen abuser. Ah ouais !
+Ah ouais ! Ah ouais ! Ah ouais ! Ah
+ouais ! Ah ouais ! Qu'est-ce que ça
+donne si on lui fournit de l'audio,
+c'est-à-dire des switch et tout ? OK, je
+vais essayer de voir là.
+fix OK musique là est ce que je fais
+retrouver le chemin exactement vidéo qui
+motion non arriv en arrière musique ok
+pourquoi pas switch switch ok c'est
+parfait quel est le dossier s fix pack
+complet ok je vais donc lui fournir ça
+copier le lien rajoute des bruitages
+pour
+Dynamie comment mais les gars est-ce que
+vous voyez dans
+juste dingue. Il y a quelques années
+c'était quasiment impossible de faire ça
+et là clairement tu viens juste avec
+quelques promptes. Tu a des trucs qui
+qui te sortent en fait.
+Incroyable incroyable incroyable les
+gars. Je suis stupéfait. Maintenant je
+mets à jour Ron pour injecter les
+britage au bon moment à chaque scène.
+Tac tac. OK on va voir ce qu'il va
+faire. ce qu'il va faire les gars. La
+vidéo c'est longue, je vous préviens.
+Donc prenez votre temps pour suivre,
+c'est pas grave. C'est une dinguerie.
+C'est une dinguerie. OK.
+OK.
+Waouh !
+C'est une grille les gars.
+W
+je suis choqué les gars. Je suis choqué.
+C'est insane.
+Les gars, il devait en abuser. Est-ce
+que vous comprenez ça ?
+Bah du coup, je crois que on va terminer
+la vidéo sur ça et voilà quoi. Si vous
+avez aimé la vidéo, n'hésitez pas à me
+le dire dans les commentaires. Si vous
+aimez ce titre de contenu, je vais en
+produire beaucoup plus souvent. Et
+voilà, à bientôt les bottes. Pace. Yes.

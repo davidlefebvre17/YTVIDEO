@@ -1,0 +1,383 @@
+This animation was created in just two
+minutes. And guys, this one within just
+three minutes. None of them required any
+traditional video editing software. So,
+how is all of this possible? Well, guys,
+the answer is the motion integrated with
+clawed code. And I need to show you this
+because it honestly it just changes
+everything about how motion graphics get
+made. And guys, here's what I mean. If
+you are a video editor, you can create
+custom animated segments for your
+projects. That means the title cards,
+the lower thirds, the transitions
+without ever opening an editing
+software. So guys, if you are building a
+SAS or an app, then you can just
+generate polished product demos that
+show exactly how your software works.
+And if you're running a business, you
+can turn your website into a
+professional explainer video in just a
+few [music] minutes. So, let me explain
+what's actually happening over here.
+Okay, so Remotion is a framework that
+creates animations using code. But
+here's the key part. You don't write any
+of the code. Claude code does all of
+that for you. So, just kind of think of
+it like this. You give Claude a prompt
+describing the motion graphic that you
+want. Then Claude writes all of the
+Remotion code behind the scenes. The
+Motion then renders that code into an
+actual video file and you get a
+professional result without [music]
+touching a single line of code. I mean
+guys, just take a look at this. This
+product demo has custom animations timed
+perfectly with the message. It uses
+specific fonts, specific colors, and has
+multiple scenes that flow together
+seamlessly. Guys, this is real motion
+design. And guys, everything that you
+need, the setup guide, the commands, the
+prompts, all of that is in our free
+school [music] community, guys. There
+are already 12,000 creators already
+inside, guys. Go and check it out. I
+guarantee you, you are going to love it.
+The link is in the description below.
+But right now, let's hop over to the PC.
+Okay guys, so now that we are over to
+the PC, guys, let's get into the
+installation. Okay, so for this method,
+what you are going to need is VS Code.
+Okay. And the best part is guys, it is
+free and also you are going to need a
+Claude Pro subscription which [music] is
+about 20 $20 a month. So that's
+basically it guys. Okay. And now let me
+walk you through everything step by
+step. Okay. So what you're going to do
+is you're going to open VS Code and then
+you're going to go to the terminal at
+the top menu and then you're going to
+click on new terminal. And then you'll
+see a terminal window appear at the
+bottom of your screen and then this is
+actually where we will run our
+installation command. Okay. So now
+here's the exact command that you're
+going to need. So you can just copy it
+from the free school guide. Everything
+is in the description below guys. And
+then you are going to go ahead and
+you're going to paste that [music] into
+your terminal. And then you're going to
+hit enter. And guys, basically this
+command just downloads the the motion
+skill and it installs it for claw to
+use. So you'll see some prompts come up
+and then all you need to do is basically
+just follow along and it's pretty
+straightforward if I'm being honest. And
+the whole process takes about 30 to
+let's say 60 seconds. So guys, once it's
+done, you'll see a message that confirms
+that Remotion has been installed. And
+now, let's verify that it actually
+worked. Okay. So, let's just do a quick
+test and I want to show you guys how
+easy this is. So, I'll give Claude a
+simple prompt for a coffee video. Okay.
+And now I want you to watch what happens
+next. Okay. So, now Claude is actually
+starting to work. It's writing the code
+and it's setting up the composition. So,
+here we can see guys, it is getting to
+work. And just like that guys, we now
+have a motion graphic and we went from
+nothing to a rendered animation in
+literally just less than a minute. So
+now if you want the full claw desktop
+experience with co-work then that's also
+$100 a month as an extra option. So it
+[music] has better file management for
+complex projects but for creating motion
+graphics VS [music] Code it works just
+as well and it's a fifth of the price.
+So you are saving money. Okay, so now
+let's go to some actual examples. Okay,
+so first up for the editing. So let's
+say you are editing a video and you need
+an animation title sequence, a lower
+third or a custom transition. So
+normally you would have to jump into
+After Effects. Then you have to spend
+about 30 minutes to an hour just
+building it out and then you would have
+to render it and then you would import
+it back into your timeline which is
+pretty difficult guys. So with Remotion
+and Claude you can actually just
+describe what you want and everything
+that's done in literally just a [music]
+few minutes. So, let me show you guys
+how all of this works. Okay, so I need
+animation intro for a YouTube video.
+Okay, so I'll type out my prompt and
+then I want you guys to watch how Claude
+will work through this. So, it's now
+setting up the composition. It's
+creating the animation. It's styling
+everything. And here is the result. Here
+we go, guys. Take a look at this. So, as
+you can see, it's clean. It's
+professional. It's exactly what I
+described. And now I can export this and
+I can drop it straight into my edit. And
+guys, here is where it gets even more
+powerful. So, let's say we have a client
+and let's say that client wants a
+different color scheme. [music] And all
+I have to do is I just tell Claude,
+"Change the accent color to blue and
+make the text white." [music] And then
+just like that, done. No hunting through
+After Effects layers, no rrendering, and
+just hoping that you got it right. Just
+describe what you want and it happens.
+Okay guys, so now let's talk about
+building product demos. So, as a SAS
+founder or app developer, you need to
+show people how your software works. So,
+let's just be honest. Screen recordings
+with a voice over, it can only get you
+so far. With Remotion, you can create a
+polished product demo that actually
+looks like you hired a motion design
+team. So, let's build one right now and
+let me show you guys. So, I'm going to
+create a demo for a meditation app.
+Okay, so here's the prompt. So, [music]
+guys, this is a more complex request.
+So, it has multiple scenes. There's
+specific animations, UI mockups, and I
+want you guys to watch how Claude
+actually handles all of this. Okay, so
+here's the result. Look at this. Okay,
+so the app interface, it animates
+[music] in the features get highlighted.
+Everything flows together and this would
+take hours into traditional software.
+Literally [music] hours. Okay guys, so
+now let's iterate. So maybe I want the
+transition to be faster and let's say I
+want to add a pricing section at the
+end. Okay, then I'll just tell Claude
+exactly that and I want you guys to see
+this. So see how quickly that is
+updated. So now the transitions are
+snappier and we have a new pricing scene
+and this workflow guys this is the
+workflow that changes everything. You
+are not fighting the software. You are
+just having a simple conversation and
+it's giving you exactly what you want.
+Okay guys and the last example that I
+really want us to go through is the one
+that's if you are a business owner.
+Okay. So let's say you own a business.
+Let's say that you have a website and
+you want to turn your key message into a
+professional explainer video. So, I'm
+going to give Claude my website URL and
+I'm going to ask it to create a motion
+graphic based on what it finds there.
+Okay. So, now Claude is pulling the
+information from the site, the brand
+colors, the services, the key selling
+points, and now let's build out the
+animation. Okay, so here's the result,
+guys. Just look at this. The color
+palette matches the brand. The messaging
+is pulled directly from the website and
+the animations just look amazing. And
+the best part is it looks super
+professional. And this is a real
+explainer video for your business
+created in minutes based on content that
+you already have. And let's say you want
+to change something. Okay, then [music]
+it's basically just the same process.
+You say make the text larger and slow
+down the transitions between sections.
+and then claude actually adjust it
+renders and there you have an updated
+version. Now guys let me give you five
+pro tips. Okay, so this is going to get
+you better results with your plants. So
+the first thing guys is be specific
+about your timing. Okay, so instead of
+saying slow fade, say 2 fade in. Um
+Claude actually understands exact
+durations and it will create much more
+precise animations. So the more specific
+you are with timing, the more control
+until you have over the final result.
+And then guys, the second thing is
+mention your brand assets. So if you
+have a logo file or specific images,
+just tell Claude to use the logo from my
+files [music] and it can actually
+incorporate your actual assets directly
+into the motion graphic. And guys, this
+is making a truly custom a custom
+[music] design for your brand. And the
+third thing guys is describe the vibe
+that you are going for. [music] So words
+like energetic or minimal or corporate
+or playful or even calming guys help
+Claude understand the overall feel that
+you want. And this affects everything
+from the animation speed to the color
+choices to how elements move on the
+screen. And then the fourth thing guys
+that I want you guys to remember is
+specify your aspect ratios up front. So
+if you're making content for Instagram
+stories or Tik Tok then say create a
+vertical 9x6 video for YouTube say
+create a 16x9 horizontal video and this
+saves you from having to recreate the
+whole thing in [music] a different
+format later on. And guys the fifth
+thing is break complex projects into
+scenes. Okay. So instead of asking for
+one massive 15 scene video, describe it
+as scene one shows this, scene two
+transitions like that, scene three ends
+with this. And this helps Claude
+structure the video better and it gives
+you more control over the flow. Now
+guys, here is where it gets really
+powerful. Okay, so you can integrate the
+motion directly into the apps that you
+are building with clawed code. So motion
+graphic generation becomes just another
+feature in your project. So, let me show
+you what I mean, okay? With a let's
+let's just do a real example, okay? So,
+let's build a simple meal planning app,
+okay? So, users input their dietary
+preferences and then the app will
+actually generate a weekly meal plan
+with recipes. So, it's pretty standard
+stuff, [music] but now we're actually
+going to prompt it to create a simple
+animation with each meal plan. So, that
+becomes a visual hook for the app users.
+So, that motion graphic gets generated
+automatically. The app pulls the meal
+data, the ingredients with the timing,
+the everything, guys. Remotion turns it
+into a branded animation. So there's no
+manual editing for you. It just happens
+when you click generate my [music] plan.
+So when you install the Votion skill in
+your Claude code project, it becomes
+available alongside everything else that
+you're building. So you can take a
+generation based on user actions or data
+changes. Claude handles the code, the
+motion, it enters the video, and your
+app delivers it. And the key thing here
+is that VMotion isn't just for making
+individual motion graphics. It's
+programmable video engine you can build
+into anything. And that's what makes the
+[music] difference. It's not just a
+tool. It's basically think about it as a
+building block. Okay. So now before you
+run out guys and you start creating some
+stuff, let me save you a whole lot of
+frustration while you are in the design
+process. So here are two mistakes that I
+made when I first started. Okay, so
+mistake number one is asking too much at
+once. Okay, we've all been there, guys.
+So I try to create like 30 second videos
+with 10 different scenes in one prompt
+and claude all it does is claude just
+gets confused and then what happens is
+if it gets confused [music] your result
+ends up just being a complete mess. So
+break it down give everything in stages
+[music] and then just describe it scene
+by scene. And now guys mistake number
+two was not iterating enough. So your
+first iteration might be 80% there but
+then don't settle. Tell Claude what to
+adjust. Don't just accept it. Don't just
+be okay with where you are. Change the
+colors, adjust [music] the timing, tweak
+the text, do whatever you need to in
+order to get you 100% of the way. The
+iteration is where all of the magic
+happens, guys. And now, guys, let me be
+honest about the limitations. Okay? So,
+this is best for motion graphics. So,
+animation, text, shapes, transitions,
+UI, mockups. So, if you actually need
+video clips of people or places, then
+you still need to film that or you need
+to use stock footage. And sometimes, if
+I'm being honest, guys, the timing just
+isn't quite right or an element just
+doesn't animate exactly how you pictured
+it. And I mean, that is pretty normal.
+So, you give Claude feedback and it does
+adjust. But guys, that's [music] just an
+important thing to pay attention to when
+it comes to the limitations. But, as you
+guys can see, there's a whole lot of
+amazing things that is going on with
+this tool. [music] So, I want you guys
+to check it out. Let me know in the
+comments what do you guys think of it.
+And there we have it, guys. But I want
+you to think about what all of this
+actually means. Okay? So, six months
+ago, if you wanted motion graphics for
+your business, you had three options.
+You could either spend months learning
+After Effects, you could pay a designer
+$300 to $500 per video, or you could
+settle for generic templates that look
+like everyone else's content. Now, you
+could create custom professional motion
+graphics by simply just describing what
+you want. And guys, this isn't just a
+cool tool. This is the kind of tool that
+is going to take your design game to the
+next level. You don't need a degree. All
+you need to do is just follow what we
+went through in today's video step by
+step and you are going to be designing
+some incredible things. And guys, if you
+want all of the complete resources, the
+templates, and a step-by-step guide,
+then all you need to do is join our free
+school community, guys. The link is in
+the description below. And guys, I just
+want to say thank you so much for
+watching. And also, guys, don't forget
+to drop a comment down below, guys. And
+also give this video a like and share it
+out. So, that is it for this one, guys.
+It's been a whole lot of fun. Thank you
+so much for watching. Give this video a
+like and also subscribe to the channel
+so that you never miss another video.
