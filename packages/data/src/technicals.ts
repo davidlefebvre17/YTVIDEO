@@ -105,7 +105,9 @@ export function computeMultiTFAnalysis(
   const daily1yTrend = detectMTFTrend(daily1y, 20);
 
   // Volatility 20d: annualized std dev of daily returns
-  const last21 = daily3yCandles.slice(-21);
+  // Filter out null closes (Yahoo returns null for today's unfinished session)
+  const validCandles = daily3yCandles.filter(c => c.c != null);
+  const last21 = validCandles.slice(-21);
   const returns: number[] = [];
   for (let i = 1; i < last21.length; i++) {
     returns.push((last21[i].c - last21[i - 1].c) / last21[i - 1].c);
@@ -116,13 +118,13 @@ export function computeMultiTFAnalysis(
 
   // Volume vs 20d average — require 10+ non-zero days for reliable signal
   // Futures roll days and forex (no volume) are excluded from the calculation
-  const last20d = daily3yCandles.slice(-20);
+  const last20d = validCandles.slice(-20);
   const validVols20 = last20d.filter((c) => c.v > 0);
   const avgVol20 =
     validVols20.length >= 10
       ? validVols20.reduce((s, c) => s + c.v, 0) / validVols20.length
       : 0;
-  const lastVol = daily3yCandles[daily3yCandles.length - 1].v;
+  const lastVol = validCandles[validCandles.length - 1].v;
   const volumeVsAvg = avgVol20 > 0 ? Math.min(lastVol / avgVol20, 20) : 1;
 
   const recentBreakout = currentPrice >= high52w * 0.99;

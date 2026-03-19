@@ -421,8 +421,9 @@ export function flagAssets(snapshot: DailySnapshot): SnapshotFlagged {
       const zScore = absPct / dailyVol;
       score += Math.min(zScore * 0.5, 5); // cap at 5 pts
     } else if (absPct > 2) {
-      // Fallback for assets without multiTF (promus, etc.)
-      score += (absPct - 2) * 0.5;
+      // Fallback for assets without vol20d — use steeper curve for big moves
+      // +5% → 2.25, +10% → 8.0 (accelerating, not linear)
+      score += (absPct - 2) * 0.5 + (absPct > 4 ? (absPct - 4) * 0.5 : 0);
     }
 
     flagged.push({
