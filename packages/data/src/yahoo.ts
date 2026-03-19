@@ -356,10 +356,16 @@ export function buildSnapshotFromCandles(
   if (targetIdx < 0) return null;
 
   const candle = dailyCandles[targetIdx];
-  // For prevCandle, skip any null-close entries
+  // For prevCandle, skip any null-close entries AND same-date duplicates
+  const targetDatePrefix = dailyCandles[targetIdx].date.startsWith(targetDate)
+    ? targetDate
+    : dailyCandles[targetIdx].date.slice(0, 10);
   let prevCandle: Candle | null = null;
   for (let i = targetIdx - 1; i >= 0; i--) {
-    if (dailyCandles[i].c !== null) { prevCandle = dailyCandles[i]; break; }
+    if (dailyCandles[i].c !== null && !dailyCandles[i].date.startsWith(targetDatePrefix)) {
+      prevCandle = dailyCandles[i];
+      break;
+    }
   }
 
   const price = candle.c;
