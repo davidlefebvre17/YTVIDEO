@@ -413,8 +413,15 @@ export function flagAssets(snapshot: DailySnapshot): SnapshotFlagged {
     for (const flag of flags) {
       score += FLAG_WEIGHT[flag] ?? 1;
     }
-    // Amplitude bonus: +0.5 per % above 2%, so -12% → +5.0, +6% → +2.0
-    if (absPct > 2) {
+    // Amplitude bonus: volatility-adjusted z-score
+    // A +5% on KOSPI (vol 15%) is exceptional, +5% on BTC (vol 60%) is routine
+    const vol20d = asset.multiTF?.daily1y?.volatility20d;
+    if (vol20d && vol20d > 0 && absPct > 0.5) {
+      const dailyVol = vol20d / 16; // annualized → daily (√252 ≈ 16)
+      const zScore = absPct / dailyVol;
+      score += Math.min(zScore * 0.5, 5); // cap at 5 pts
+    } else if (absPct > 2) {
+      // Fallback for assets without multiTF (promus, etc.)
       score += (absPct - 2) * 0.5;
     }
 
