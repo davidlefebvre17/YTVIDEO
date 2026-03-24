@@ -1,7 +1,7 @@
 import type {
   EpisodeScript, ScriptSection, DailySnapshot, AssetSnapshot, OverlayType, EpisodeDirection,
 } from "@yt-maker/core";
-import type { RawBeat } from "./types";
+import type { RawBeat, AnalysisBundle, SegmentAnalysis } from "./types";
 
 const WORDS_PER_SEC = 2.5;
 const MIN_BEAT_SEC = 6;
@@ -466,7 +466,13 @@ export function mapChartTimingsToBeats(
 export function generateBeats(
   script: EpisodeScript,
   snapshot: DailySnapshot,
+  analysis?: AnalysisBundle,
 ): RawBeat[] {
+  // Build segment → analysis lookup
+  const segAnalysis = new Map<string, SegmentAnalysis>();
+  if (analysis?.segments) {
+    for (const seg of analysis.segments) segAnalysis.set(seg.segmentId, seg);
+  }
   const assetNames = snapshot.assets.map(a => a.name);
   const beats: RawBeat[] = [];
   let cumSec = 0;
@@ -529,9 +535,186 @@ export function generateBeats(
     mapChartTimingsToBeats(beats, script.direction.chartTimings);
   }
 
-  capOverlayRatio(beats, 0.40);
+  // ── Enrich overlays with C2 analysis data ──
+  if (analysis) {
+    enrichOverlaysFromAnalysis(beats, segAnalysis, snapshot.assets);
+  }
+
+  // ── Deduplicate consecutive charts on same asset ──
+  dedupeConsecutiveCharts(beats);
+
+  capOverlayRatio(beats, 0.50); // raised from 0.40 — more overlays when C2 data available
 
   return beats;
+}
+
+// ── Enrich overlays from C2 AnalysisBundle ──────────────────
+
+function enrichOverlaysFromAnalysis(
+  beats: RawBeat[],
+  segAnalysis: Map<string, SegmentAnalysis>,
+  allAssets: AssetSnapshot[],
+): void {
+  // Track which C2 data has been used per segment to avoid duplicates
+  const usedCausalChain = new Set<string>();
+  const usedScenario = new Set<string>();
+
+  for (const beat of beats) {
+    const seg = segAnalysis.get(beat.segmentId);
+    if (!seg) continue;
+    const lower = beat.narrationChunk.toLowerCase();
+
+    // 1. CAUSAL CHAIN: Replace regex-based chains with C2's structured chain
+    if (seg.causalChain && !usedCausalChain.has(beat.segmentId)) {
+      const hasCausalKeyword = /parce que|à cause|entraîne|provoque|déclenche|car |donc |résultat|conséquence|mécanisme|pourquoi|signal|impact|pression|logique|chaîne/i.test(lower);
+      // Also trigger on 3rd beat of segment (if no keyword matched earlier, force it)
+      const beatIndexInSeg = beats.filter(b => b.segmentId === beat.segmentId).indexOf(beat);
+      const forceOnThirdBeat = beatIndexInSeg === 2 && !hasCausalKeyword;
+
+      if (hasCausalKeyword || beat.overlayHint === 'causal_chain' || forceOnThirdBeat) {
+        beat.overlayHint = 'causal_chain';
+        const steps = seg.causalChain.split(/→|➜|⟶/).map(s => s.trim()).filter(s => s.length > 0);
+        beat.overlayData = { steps: steps.slice(0, 5) };
+        usedCausalChain.add(beat.segmentId);
+        continue;
+      }
+    }
+
+    // 2. SCENARIO FORK: Use C2's structured scenarios instead of regex
+    if (seg.scenarios && !usedScenario.has(beat.segmentId)) {
+      const hasScenarioKeyword = /si |scénario|haussier|baissier|pourrait|revisiter|cible|objectif/i.test(lower);
+      if (hasScenarioKeyword || beat.overlayHint === 'scenario_fork') {
+        beat.overlayHint = 'scenario_fork';
+        beat.overlayData = {
+          trunk: seg.segmentId,
+          bull: `${seg.scenarios.bullish.target} — ${seg.scenarios.bullish.condition}`.slice(0, 100),
+          bear: `${seg.scenarios.bearish.target} — ${seg.scenarios.bearish.condition}`.slice(0, 100),
+          probBull: (seg.scenarios.bullish as any).probability,
+          probBear: (seg.scenarios.bearish as any).probability,
+        };
+        usedScenario.add(beat.segmentId);
+        continue;
+      }
+    }
+
+    // 3. CHART ENRICHMENT: Add S/R levels, RSI, and price from C2 chartInstructions
+    if (beat.overlayHint === 'chart' || beat.overlayHint === 'chart_zone') {
+      const data = beat.overlayData as Record<string, unknown> | undefined;
+      if (!data) continue;
+
+      const symbol = data.symbol as string;
+      if (!symbol) continue;
+
+      // Find relevant chartInstructions from C2 for this asset
+      const instructions = seg.chartInstructions?.filter(ci => ci.asset === symbol) ?? [];
+
+      // Enrich with levels from chartInstructions
+      const levels: Array<{ value: number; label: string; type: string }> = [];
+      let rsiValue: number | undefined;
+
+      for (const ci of instructions) {
+        if (ci.type === 'support_line' && ci.value) {
+          levels.push({ value: ci.value, label: ci.label ?? `Support ${ci.value}`, type: 'support' });
+        }
+        if (ci.type === 'resistance_line' && ci.value) {
+          levels.push({ value: ci.value, label: ci.label ?? `Résistance ${ci.value}`, type: 'resistance' });
+        }
+        if (ci.type === 'gauge_rsi' && ci.value) {
+          rsiValue = ci.value;
+        }
+      }
+
+      // Also extract SMA200 from technicalReading if mentioned in narration
+      if (seg.technicalReading && /sma.?200|moyenne.?200/i.test(lower)) {
+        const sma200Match = seg.technicalReading.match(/SMA200[:\s=]*(\d[\d.,]*)/i);
+        if (sma200Match) {
+          const val = parseFloat(sma200Match[1].replace(',', '.'));
+          if (!isNaN(val) && !levels.some(l => Math.abs(l.value - val) < 1)) {
+            levels.push({ value: val, label: 'SMA 200', type: 'sma' });
+          }
+        }
+      }
+
+      // Get asset price for display
+      const asset = allAssets.find(a => a.symbol === symbol);
+
+      // Merge enriched data
+      beat.overlayData = {
+        ...data,
+        price: asset?.price,
+        changePct: asset?.changePct,
+        levels: levels.length > 0 ? levels : (data.levels ?? []),
+        rsi: rsiValue,
+        candleCount: asset?.candles?.length ?? (data as any).candleCount ?? 0,
+      };
+    }
+
+    // 4. UPGRADE stat to chart: if narration discusses a price level and C2 has chart data
+    if (beat.overlayHint === 'stat' && seg.chartInstructions?.length) {
+      const hasPriceLevel = /à\s+\d|niveau|résistance|support|sma|moyenne mobile/i.test(lower);
+      if (hasPriceLevel) {
+        const data = beat.overlayData as Record<string, unknown> | undefined;
+        const symbol = findMentionedAsset(beat.narrationChunk, beat.assets ?? [], allAssets, undefined)?.symbol;
+        if (symbol) {
+          const instructions = seg.chartInstructions.filter(ci => ci.asset === symbol);
+          if (instructions.length > 0) {
+            const asset = allAssets.find(a => a.symbol === symbol);
+            const levels = instructions
+              .filter(ci => ci.type.includes('line') && ci.value)
+              .map(ci => ({ value: ci.value!, label: ci.label ?? '', type: ci.type.replace('_line', '') }));
+
+            const rsiInstr = instructions.find(ci => ci.type === 'gauge_rsi');
+
+            beat.overlayHint = 'chart';
+            beat.overlayData = {
+              symbol,
+              name: asset?.name,
+              price: asset?.price,
+              changePct: asset?.changePct,
+              levels,
+              rsi: rsiInstr?.value,
+              candleCount: asset?.candles?.length ?? 0,
+            };
+          }
+        }
+      }
+    }
+
+    // 5. STAT ENRICHMENT: add coreMechanism as context when available
+    if (beat.overlayHint === 'stat' && seg.coreMechanism) {
+      const data = beat.overlayData as Record<string, unknown> | undefined;
+      if (data && !data.context) {
+        (data as any).context = seg.coreMechanism;
+      }
+    }
+  }
+}
+
+// ── Deduplicate consecutive charts on same asset ─────────────
+// Max 2 consecutive chart overlays on the same asset — remove extras
+function dedupeConsecutiveCharts(beats: RawBeat[]): void {
+  let consecutiveCount = 0;
+  let lastChartSymbol: string | null = null;
+
+  for (const beat of beats) {
+    const isChart = beat.overlayHint === 'chart' || beat.overlayHint === 'chart_zone';
+    const symbol = isChart ? (beat.overlayData as any)?.symbol : null;
+
+    if (isChart && symbol === lastChartSymbol) {
+      consecutiveCount++;
+      if (consecutiveCount > 2) {
+        // Convert excess chart to stat (show just the number, not full chart)
+        beat.overlayHint = 'none';
+        beat.overlayData = undefined;
+      }
+    } else if (isChart) {
+      consecutiveCount = 1;
+      lastChartSymbol = symbol;
+    } else {
+      consecutiveCount = 0;
+      lastChartSymbol = null;
+    }
+  }
 }
 
 const OVERLAY_PRIORITY: Record<string, number> = {

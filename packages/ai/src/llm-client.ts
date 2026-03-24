@@ -1,6 +1,6 @@
 // ─── Provider types ──────────────────────────────────────────────
 
-type LLMProvider = "openrouter" | "anthropic";
+type LLMProvider = "openrouter" | "anthropic" | "gemini";
 export type LLMRole = "fast" | "balanced" | "quality";
 
 interface ProviderConfig {
@@ -44,6 +44,18 @@ const ANTHROPIC_MODELS: Record<LLMRole, string> = {
 const ANTHROPIC_MAX_TOKENS_DEFAULT = 8192;
 const ANTHROPIC_VERSION = "2023-06-01";
 
+// ─── Gemini config ──────────────────────────────────────────────
+
+const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
+
+const GEMINI_MODELS: Record<LLMRole, string> = {
+  fast: "gemini-2.5-flash",
+  balanced: "gemini-2.5-pro",
+  quality: "gemini-3.1-pro",
+};
+
+const GEMINI_MAX_TOKENS_DEFAULT = 8192;
+
 // ─── Shared ──────────────────────────────────────────────────────
 
 const MAX_RETRIES = 3;
@@ -60,6 +72,14 @@ function getProviderConfig(): ProviderConfig {
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
       throw new Error("ANTHROPIC_API_KEY environment variable is required when LLM_PROVIDER=anthropic");
+    }
+    return { provider, apiKey };
+  }
+
+  if (provider === "gemini") {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error("GEMINI_API_KEY environment variable is required when LLM_PROVIDER=gemini");
     }
     return { provider, apiKey };
   }
@@ -146,6 +166,42 @@ async function callAnthropic(
   return block?.text ?? "";
 }
 
+// ─── Gemini call ────────────────────────────────────────────────
+
+async function callGemini(
+  apiKey: string,
+  model: string,
+  systemPrompt: string,
+  userMessage: string,
+  maxTokens: number = GEMINI_MAX_TOKENS_DEFAULT,
+): Promise<string> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 300_000); // 5 min timeout
+  const url = `${GEMINI_BASE}/${model}:generateContent?key=${apiKey}`;
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: systemPrompt }] },
+      contents: [{ role: "user", parts: [{ text: userMessage }] }],
+      generationConfig: {
+        maxOutputTokens: maxTokens,
+        responseMimeType: "application/json",
+      },
+    }),
+    signal: controller.signal,
+  }).finally(() => clearTimeout(timeoutId));
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`Gemini ${response.status} [${model}]: ${errorBody}`);
+  }
+
+  const data = await response.json();
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+  return text;
+}
+
 // ─── Unified entry point ─────────────────────────────────────────
 
 function extractJSON(text: string): string {
@@ -219,6 +275,42 @@ export async function generateStructuredJSON<T>(
       }
     }
     throw new Error(`Anthropic [${model}] failed after ${MAX_RETRIES} attempts. Last error: ${lastError?.message}`);
+  }
+
+  if (config.provider === "gemini") {
+    const model = GEMINI_MODELS[role];
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      try {
+        console.log(`  LLM: ${model} [${role}] (attempt ${attempt + 1}/${MAX_RETRIES})`);
+        const text = await callGemini(config.apiKey, model, systemPrompt, userMessage, maxTokens);
+        const jsonStr = extractJSON(text);
+        try {
+          return JSON.parse(jsonStr) as T;
+        } catch {
+          console.warn(`  Malformed JSON (attempt ${attempt + 1}), retrying... Preview: ${jsonStr.slice(0, 200)}`);
+          lastError = new Error(`JSON parse failed on attempt ${attempt + 1}`);
+          await sleep(RETRY_DELAY_MS);
+          continue;
+        }
+      } catch (err) {
+        lastError = err as Error;
+        const msg = lastError.message;
+
+        if (msg.includes("429") || msg.includes("RATE") || msg.includes("RESOURCE_EXHAUSTED")) {
+          console.warn(`  Rate-limited, waiting ${RETRY_DELAY_MS / 1000}s...`);
+          await sleep(RETRY_DELAY_MS);
+          continue;
+        }
+        if (msg.includes("503") || msg.includes("overloaded")) {
+          console.warn(`  Gemini overloaded, waiting ${RETRY_DELAY_MS / 1000}s...`);
+          await sleep(RETRY_DELAY_MS);
+          continue;
+        }
+        // Non-retryable
+        break;
+      }
+    }
+    throw new Error(`Gemini [${model}] failed after ${MAX_RETRIES} attempts. Last error: ${lastError?.message}`);
   }
 
   // OpenRouter: cascade through models for the role

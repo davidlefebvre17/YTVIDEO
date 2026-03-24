@@ -20,12 +20,20 @@ const episode = JSON.parse(fs.readFileSync(episodePath, "utf-8"));
 const script: EpisodeScript = episode.script;
 const snapshot: DailySnapshot = episode.snapshot;
 
+// Load C2 analysis if available (enriches overlays with levels, RSI, causal chains)
+const analysisPath = path.resolve(__dirname, "..", "data", "pipeline", "2026-03-20", "analysis.json");
+let analysis: any = undefined;
+if (fs.existsSync(analysisPath)) {
+  analysis = JSON.parse(fs.readFileSync(analysisPath, "utf-8"));
+  console.log(`Analysis loaded: ${analysis.segments?.length ?? 0} segments`);
+}
+
 console.log(`Script: "${script.title}" — ${script.sections.length} sections, ${script.totalDurationSec}s`);
 
 async function main() {
   // ── P7a: Beat Generator (CODE) ──
   console.log("\n=== P7a: Beat Generator ===");
-  const rawBeats = generateBeats(script, snapshot);
+  const rawBeats = generateBeats(script, snapshot, analysis);
   console.log(`  ${rawBeats.length} beats generated`);
   console.log(`  Overlays: ${rawBeats.filter(b => b.overlayHint !== 'none').length}/${rawBeats.length}`);
   console.log(`  Segments: ${[...new Set(rawBeats.map(b => b.segmentId))].join(', ')}`);
