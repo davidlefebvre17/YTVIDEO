@@ -150,7 +150,7 @@ function buildC3UserPrompt(
 
   // Research context (historical articles)
   if (researchContext) {
-    prompt += `## CONTEXTE HISTORIQUE (NewsMemory — articles ANTÉRIEURS au ${editorial.date})\n`;
+    prompt += `## CONTEXTE HISTORIQUE (NewsMemory — articles ANTÉRIEURS au ${anchors.snapLabel})\n`;
     prompt += `Ces articles sont des ARCHIVES. Tu peux t'en servir pour :\n`;
     prompt += `- Situer un move dans son arc narratif ("ça fait deux semaines que...", "depuis l'annonce de...")\n`;
     prompt += `- Faire des callbacks naturels à des événements passés quand c'est pertinent\n`;

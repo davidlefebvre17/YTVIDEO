@@ -2,6 +2,7 @@ import type { SnapshotFlagged } from "../types";
 import type { DailySnapshot } from "@yt-maker/core";
 import { readFileSync, readdirSync } from "fs";
 import { join } from "path";
+import { labelEventDate } from "./temporal-anchors";
 
 export interface PoliticalTrigger {
   actor: string;
@@ -298,11 +299,11 @@ export function buildBriefingPack(
       reasons: s.reason ?? [],
     }));
 
-  // ── Calendar highlights ──
+  // ── Calendar highlights (today's events — labeled "hier" from viewer perspective) ──
   const calendarHighlights = (flagged.events ?? [])
     .filter(e => e.impact === 'high' || e.impact === 'medium')
     .slice(0, 5)
-    .map(e => `${e.time ?? '?'} ${e.name} (${e.currency}, ${e.impact})${e.actual ? ` résultat:${e.actual}` : ` consensus:${e.forecast ?? '?'}`}`);
+    .map(e => `hier ${e.time ?? '?'} ${e.name} (${e.currency}, ${e.impact})${e.actual ? ` résultat:${e.actual}` : ` consensus:${e.forecast ?? '?'}`}`);
 
   // ── Earnings in 3 buckets ──
   // Priority score: watchlist asset > named company > large EPS surprise > default
@@ -342,8 +343,8 @@ export function buildBriefingPack(
   const upcoming = (snapshot.earningsUpcoming ?? [])
     .slice(0, 10)
     .map(e => {
-      const tag = e.date === tomorrowStr ? ' ⚡ DEMAIN' : '';
-      return `${e.symbol} ${e.date} [${e.hour}]${tag}`;
+      const dateLabel = labelEventDate(e.date, snapshot.date);
+      return `${e.symbol} ${dateLabel} [${e.hour}]`;
     });
 
   const earningsBuckets: EarningsBucket = { reported, pending, upcoming };
@@ -396,13 +397,13 @@ export function buildBriefingPack(
     }
   }
 
-  // ── Upcoming high-impact events (J+1 to J+7) ──
+  // ── Upcoming high-impact events (J+1 to J+7) — labeled with temporal context ──
   const upcomingHighImpact = (snapshot.upcomingEvents ?? [])
     .filter(e => e.impact === 'high')
     .slice(0, 10)
     .map(e => {
-      const tag = e.date === tomorrowStr ? ' ⚡ DEMAIN' : '';
-      return `${e.date} ${e.time ?? '?'} ${e.name} (${e.currency})${tag}`;
+      const dateLabel = labelEventDate(e.date, snapshot.date);
+      return `${dateLabel} ${e.time ?? '?'} ${e.name} (${e.currency})`;
     });
 
   // ── Sentiment trend (F&G over last 7 days from previous snapshots) ──

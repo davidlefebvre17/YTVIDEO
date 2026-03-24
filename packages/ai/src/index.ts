@@ -51,6 +51,7 @@ export type {
 export {
   generateSegmentAudio,
   generateEpisodeAudio,
+  generateBeatAudio,
   checkEdgeTTS,
   VOICES,
 } from "./p7-audio";
@@ -58,6 +59,7 @@ export type {
   TTSSegment,
   TTSResult,
   AudioManifest,
+  BeatAudioManifest,
 } from "./p7-audio";
 
 // Visual Storyboard (P7 C7)
@@ -70,3 +72,6 @@ export type {
   VisualSource,
   VisualComponentType,
 } from "./p7-visual";
+
+// ComfyUI Cloud (image generation)
+export { ComfyUIClient } from "./comfyui";

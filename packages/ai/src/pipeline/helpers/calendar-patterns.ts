@@ -3,6 +3,7 @@
  * Code-only, no LLM. Injected into C1 prompt.
  */
 import type { EconomicEvent } from "@yt-maker/core";
+import { labelEventDate } from "./temporal-anchors";
 
 export interface CalendarPattern {
   type: 'central_bank_cluster' | 'macro_data_cluster' | 'earnings_mega_week' | 'triple_witching';
@@ -35,20 +36,21 @@ export function detectCalendarPatterns(
   todayEvents: EconomicEvent[],
   upcomingEvents: EconomicEvent[],
   yesterdayEvents: EconomicEvent[],
+  snapshotDate?: string,
 ): CalendarPattern[] {
   const patterns: CalendarPattern[] = [];
+  const snapDate = snapshotDate ?? todayEvents[0]?.date ?? new Date().toISOString().slice(0, 10);
 
   // ── Central bank cluster: 2+ CB rate decisions within 48h ──
   const allEvents = [
-    ...yesterdayEvents.map(e => ({ ...e, when: 'hier' })),
-    ...todayEvents.map(e => ({ ...e, when: 'aujourd\'hui' })),
+    ...yesterdayEvents.map(e => ({ ...e, when: labelEventDate(e.date, snapDate) })),
+    ...todayEvents.map(e => ({ ...e, when: labelEventDate(e.date, snapDate) })),
     ...upcomingEvents.filter(e => {
-      // Only next 2 days
-      const today = new Date();
-      const evDate = new Date(e.date);
-      const diffDays = (evDate.getTime() - today.getTime()) / 86400000;
-      return diffDays <= 2;
-    }).map(e => ({ ...e, when: e.date })),
+      const snapD = new Date(snapDate + 'T12:00:00Z');
+      const evDate = new Date(e.date + 'T12:00:00Z');
+      const diffDays = (evDate.getTime() - snapD.getTime()) / 86400000;
+      return diffDays <= 3;
+    }).map(e => ({ ...e, when: labelEventDate(e.date, snapDate) })),
   ];
 
   const cbDecisions: Array<{ cb: string; currency: string; when: string; actual?: string }> = [];

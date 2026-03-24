@@ -124,7 +124,7 @@ export async function fetchMarketSnapshot(
       ]);
 
       if (dailyCandles.length >= 10) {
-        asset.dailyCandles = dailyCandles;
+        asset.dailyCandles = daily3yCandles.length > dailyCandles.length ? daily3yCandles : dailyCandles;
 
         // Multi-TF FIRST (provides true 52w range + ATH + SMA200 for drama score)
         const multiTF = computeMultiTFAnalysis(weeklyCandles, daily3yCandles, asset.price);

@@ -9,7 +9,7 @@
   "dependencies": {
     "@remotion/cli": "^4.0.421",
     "@remotion/player": "^4.0.421",
-    "@remotion/transitions": "^4.0.436",
+    "@remotion/transitions": "^4.0.425",
     "@yt-maker/core": "*",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",

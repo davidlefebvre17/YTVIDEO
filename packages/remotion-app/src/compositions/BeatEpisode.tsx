@@ -1,16 +1,12 @@
 import React, { useMemo } from "react";
-import { AbsoluteFill, useVideoConfig } from "remotion";
-import { TransitionSeries } from "@remotion/transitions";
-import { fade } from "@remotion/transitions/fade";
-import { slide } from "@remotion/transitions/slide";
-import { wipe } from "@remotion/transitions/wipe";
-import { linearTiming, springTiming } from "@remotion/transitions";
+import { AbsoluteFill, Sequence, useCurrentFrame, useVideoConfig, interpolate } from "remotion";
 import type { EpisodeScript, AssetSnapshot, NewsItem, Beat, BeatTransition } from "@yt-maker/core";
 import { BRAND } from "@yt-maker/core";
 import { BeatSequence } from "../scenes/beat/BeatSequence";
 import { InkSubtitle, type SubtitleLine } from "../scenes/shared/InkSubtitle";
 import { GrainOverlay } from "../scenes/shared/GrainOverlay";
 import { DisclaimerBar } from "../scenes/shared/DisclaimerBar";
+import { BeatAudioTrack } from "../audio/BeatAudioTrack";
 
 export interface BeatEpisodeProps {
   script: EpisodeScript;
@@ -21,41 +17,18 @@ export interface BeatEpisodeProps {
 }
 
 function getEffectiveDuration(beat: Beat): number {
-  if (beat.timing.audioDurationSec !== undefined) {
+  if (beat.timing?.audioDurationSec !== undefined) {
     return beat.timing.audioDurationSec;
   }
-  return beat.timing.estimatedDurationSec;
+  return beat.timing?.estimatedDurationSec ?? beat.durationSec;
 }
 
 function getTransitionDurationFrames(type: BeatTransition): number {
   switch (type) {
-    case 'cut': return 1;
-    case 'fade': return 15;
-    case 'slide_left': return 15;
-    case 'slide_up': return 15;
-    case 'wipe': return 20;
-    case 'cross_dissolve': return 24;
-    default: return 15;
-  }
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function mapTransition(type: BeatTransition): { presentation: any; timing: any } {
-  switch (type) {
-    case 'cut':
-      return { presentation: fade(), timing: linearTiming({ durationInFrames: 1 }) };
-    case 'fade':
-      return { presentation: fade(), timing: linearTiming({ durationInFrames: 15 }) };
-    case 'slide_left':
-      return { presentation: slide({ direction: 'from-right' }), timing: springTiming({ config: { damping: 14 } }) };
-    case 'slide_up':
-      return { presentation: slide({ direction: 'from-bottom' }), timing: linearTiming({ durationInFrames: 15 }) };
-    case 'wipe':
-      return { presentation: wipe({ direction: 'from-left' }), timing: linearTiming({ durationInFrames: 20 }) };
-    case 'cross_dissolve':
-      return { presentation: fade(), timing: linearTiming({ durationInFrames: 24 }) };
-    default:
-      return { presentation: fade(), timing: linearTiming({ durationInFrames: 15 }) };
+    case 'cut': return 2;
+    case 'fade': return 10;
+    case 'cross_dissolve': return 15;
+    default: return 10;
   }
 }
 
@@ -81,6 +54,33 @@ function buildSubtitleLines(beats: Beat[], fps: number): SubtitleLine[] {
   return lines;
 }
 
+const CrossfadeBeat: React.FC<{
+  beat: Beat;
+  assets: AssetSnapshot[];
+  accentColor: string;
+  durationInFrames: number;
+  fadeFrames: number;
+}> = ({ beat, assets, accentColor, durationInFrames, fadeFrames }) => {
+  const frame = useCurrentFrame();
+
+  const fadeIn = interpolate(frame, [0, fadeFrames], [0, 1], {
+    extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
+  });
+  const fadeOut = interpolate(
+    frame,
+    [durationInFrames - fadeFrames, durationInFrames],
+    [1, 0],
+    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
+  );
+  const opacity = Math.min(fadeIn, fadeOut);
+
+  return (
+    <AbsoluteFill style={{ opacity }}>
+      <BeatSequence beat={beat} assets={assets} accentColor={accentColor} />
+    </AbsoluteFill>
+  );
+};
+
 export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
   script,
   beats,
@@ -92,29 +92,43 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
 
   const subtitleLines = useMemo(() => buildSubtitleLines(beats, fps), [beats, fps]);
 
+  const beatTimings = useMemo(() => {
+    let cumFrames = 0;
+    return beats.map((beat) => {
+      const dur = Math.max(15, Math.round(getEffectiveDuration(beat) * fps));
+      const fadeFrames = getTransitionDurationFrames(beat.transitionOut);
+      const start = Math.max(0, cumFrames - fadeFrames);
+      const overlap = cumFrames > 0 ? fadeFrames : 0;
+      const result = { start: cumFrames === 0 ? 0 : start, duration: dur + overlap, fadeFrames };
+      cumFrames += dur - fadeFrames;
+      return result;
+    });
+  }, [beats, fps]);
+
   return (
     <AbsoluteFill style={{ backgroundColor: BRAND.colors.cream }}>
-      <TransitionSeries>
-        {beats.map((beat, i) => {
-          const durationInFrames = Math.max(15, Math.round(getEffectiveDuration(beat) * fps));
-          const isLast = i === beats.length - 1;
-          const trans = !isLast ? mapTransition(beat.transitionOut) : null;
+      {beats.map((beat, i) => {
+        const t = beatTimings[i];
+        return (
+          <Sequence key={beat.id} from={t.start} durationInFrames={t.duration}>
+            <CrossfadeBeat
+              beat={beat}
+              assets={assets}
+              accentColor={accentColor}
+              durationInFrames={t.duration}
+              fadeFrames={t.fadeFrames}
+            />
+          </Sequence>
+        );
+      })}
 
-          return (
-            <React.Fragment key={beat.id}>
-              <TransitionSeries.Sequence durationInFrames={durationInFrames}>
-                <BeatSequence beat={beat} assets={assets} accentColor={accentColor} />
-              </TransitionSeries.Sequence>
-              {trans && (
-                <TransitionSeries.Transition
-                  presentation={trans.presentation}
-                  timing={trans.timing}
-                />
-              )}
-            </React.Fragment>
-          );
-        })}
-      </TransitionSeries>
+      {/* ── Audio: voix TTS + SFX éditoriaux ── */}
+      <BeatAudioTrack
+        beats={beats}
+        beatTimings={beatTimings}
+        fps={fps}
+        direction={script.direction}
+      />
 
       <InkSubtitle lines={subtitleLines} />
       <GrainOverlay opacity={0.04} />

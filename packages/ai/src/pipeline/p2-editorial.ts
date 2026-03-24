@@ -126,6 +126,7 @@ function buildC1UserPrompt(
     flagged.events ?? [],
     flagged.upcomingEvents ?? [],
     flagged.yesterdayEvents ?? [],
+    flagged.date,
   );
   if (calendarPatterns.length) {
     prompt += formatCalendarPatterns(calendarPatterns);

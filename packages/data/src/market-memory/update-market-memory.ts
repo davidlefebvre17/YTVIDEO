@@ -182,7 +182,7 @@ export function applyHaikuEnrichment(results: HaikuEnrichmentResult[]): void {
     const memory = loadMemory(result.symbol);
     if (!memory) continue;
 
-    for (const update of result.zone_updates) {
+    for (const update of result.zone_updates ?? []) {
       const zone = memory.zones.find((z) => Math.abs(z.level - update.level) < z.level * 0.001);
       if (zone) {
         zone.last_behavior = update.last_behavior;

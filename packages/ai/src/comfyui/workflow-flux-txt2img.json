@@ -2,7 +2,7 @@
   "1": {
     "class_type": "CheckpointLoaderSimple",
     "inputs": {
-      "ckpt_name": "flux1-dev.safetensors"
+      "ckpt_name": "flux1-dev-fp8.safetensors"
     }
   },
   "2": {
@@ -15,22 +15,29 @@
   "3": {
     "class_type": "EmptyLatentImage",
     "inputs": {
-      "width": 1920,
-      "height": 1080,
+      "width": 1344,
+      "height": 768,
       "batch_size": 1
+    }
+  },
+  "8": {
+    "class_type": "FluxGuidance",
+    "inputs": {
+      "guidance": 3.5,
+      "conditioning": ["2", 0]
     }
   },
   "4": {
     "class_type": "KSampler",
     "inputs": {
       "seed": -1,
-      "steps": 25,
-      "cfg": 3.5,
+      "steps": 30,
+      "cfg": 1.0,
       "sampler_name": "euler",
-      "scheduler": "normal",
+      "scheduler": "simple",
       "denoise": 1.0,
       "model": ["1", 0],
-      "positive": ["2", 0],
+      "positive": ["8", 0],
       "negative": ["5", 0],
       "latent_image": ["3", 0]
     }

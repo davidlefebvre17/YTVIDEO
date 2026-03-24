@@ -1,12 +1,16 @@
 import React from "react";
 import { useCurrentFrame, useVideoConfig, interpolate, Img, staticFile } from "remotion";
 import type { ImageEffect } from "@yt-maker/core";
+import { BRAND } from "@yt-maker/core";
 
 interface BackgroundImageProps {
   src: string;
   effect: ImageEffect;
   durationInFrames: number;
 }
+
+const isRealImage = (src: string) =>
+  src.startsWith('http') || src.startsWith('data:') || src.includes('/ep-') || src.includes('editorial/');
 
 export const BackgroundImage: React.FC<BackgroundImageProps> = ({
   src,
@@ -46,18 +50,22 @@ export const BackgroundImage: React.FC<BackgroundImageProps> = ({
       break;
   }
 
+  if (!isRealImage(src)) {
+    return (
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        background: `linear-gradient(135deg, ${BRAND.colors.cream}, ${BRAND.colors.creamDark})`,
+      }} />
+    );
+  }
+
   const imageSrc = src.startsWith('http') || src.startsWith('data:')
     ? src
     : staticFile(src);
 
   return (
-    <div
-      style={{
-        position: 'absolute',
-        inset: 0,
-        overflow: 'hidden',
-      }}
-    >
+    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
       <Img
         src={imageSrc}
         style={{

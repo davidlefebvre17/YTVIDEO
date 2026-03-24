@@ -1,5 +1,6 @@
 import type { EpisodeSummary, PrevContext } from "../types";
 import type { DailySnapshot } from "@yt-maker/core";
+import { labelEventDate } from "./temporal-anchors";
 
 /**
  * Extract forward-looking items from a snapshot:
@@ -8,15 +9,18 @@ import type { DailySnapshot } from "@yt-maker/core";
 function buildForwardLooking(snapshot: DailySnapshot | undefined): string[] {
   if (!snapshot) return [];
   const items: string[] = [];
+  const snapDate = snapshot.date;
 
   for (const e of snapshot.earningsUpcoming ?? []) {
     const label = e.name ? `${e.name} (${e.symbol})` : e.symbol;
-    items.push(`Résultats ${label} attendus le ${e.date}`);
+    const dateLabel = labelEventDate(e.date, snapDate);
+    items.push(`Résultats ${label} attendus ${dateLabel}`);
   }
 
   for (const ev of snapshot.upcomingEvents ?? []) {
     if (ev.impact === 'high') {
-      items.push(`${ev.name} (${ev.currency}) prévu le ${ev.date}`);
+      const dateLabel = labelEventDate(ev.date, snapDate);
+      items.push(`${ev.name} (${ev.currency}) prévu ${dateLabel}`);
     }
   }
 

@@ -5,6 +5,7 @@ import type {
   FlaggedAsset,
 } from "./types";
 import { loadMemory } from "@yt-maker/data";
+import { buildTemporalAnchors } from "./helpers/temporal-anchors";
 
 // ── Known bad patterns ──────────────────────────────────
 
@@ -283,6 +284,82 @@ export function validateMechanical(
         suggestedFix: 'Si non vérifié, utiliser "parmi les rares" au lieu de "seul"',
         source: 'code',
       });
+    }
+  }
+
+  // 12. Day-of-week consistency: verify day names match actual dates
+  if (flagged) {
+    const anchors = buildTemporalAnchors(flagged.date);
+    const JOURS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+    // Match patterns like "dimanche soir", "ce lundi", "mardi prochain", "demain dimanche"
+    const dayMentions = fullText.matchAll(
+      /(?:demain|après-demain|ce|prochain|hier)\s+(dimanche|lundi|mardi|mercredi|jeudi|vendredi|samedi)/gi
+    );
+    for (const m of dayMentions) {
+      const mentionedDay = m[1].toLowerCase();
+      const prefix = m[0].toLowerCase().replace(/\s+\S+$/, '').trim(); // "demain", "ce", etc.
+
+      let expectedDay: string | undefined;
+      if (prefix === 'demain') {
+        // "demain" = pubDate + 1 = snapDate + 2
+        const d = new Date(Date.UTC(
+          parseInt(anchors.snapDate.slice(0, 4)),
+          parseInt(anchors.snapDate.slice(5, 7)) - 1,
+          parseInt(anchors.snapDate.slice(8, 10)) + 2,
+        ));
+        expectedDay = JOURS[d.getUTCDay()];
+      } else if (prefix === 'hier') {
+        // "hier" = snapDate (from viewer's perspective)
+        const d = new Date(anchors.snapDate + 'T12:00:00Z');
+        expectedDay = JOURS[d.getUTCDay()];
+      } else if (prefix === 'ce' || prefix === 'aujourd\'hui') {
+        // "ce vendredi" = pubDate
+        const d = new Date(anchors.pubDate + 'T12:00:00Z');
+        expectedDay = JOURS[d.getUTCDay()];
+      }
+
+      if (expectedDay && mentionedDay !== expectedDay) {
+        issues.push({
+          type: 'compliance',
+          description: `"${m[0]}" incorrect — ${prefix} = ${expectedDay}, pas ${mentionedDay} (snap: ${anchors.snapDate}, pub: ${anchors.pubDate})`,
+          severity: 'blocker',
+          suggestedFix: `Remplacer "${mentionedDay}" par "${expectedDay}"`,
+          source: 'code',
+        });
+      }
+    }
+
+    // Also check standalone "Powell parle dimanche" pattern — day name after a verb + temporal context
+    const standaloneDayRefs = fullText.matchAll(
+      /(?:parle|intervient|publie|décide|annonce|vote|réunit)\s+(?:ce\s+)?(dimanche|lundi|mardi|mercredi|jeudi|vendredi|samedi)/gi
+    );
+    for (const m of standaloneDayRefs) {
+      const mentionedDay = m[1].toLowerCase();
+      // Cross-reference with upcomingEvents and events to verify the day name
+      const allEvents = [
+        ...(flagged.events ?? []),
+        ...(flagged.upcomingEvents ?? []),
+        ...(flagged.yesterdayEvents ?? []),
+      ];
+      // Find if there's a matching event and check its actual day
+      for (const ev of allEvents) {
+        const evDate = new Date(ev.date + 'T12:00:00Z');
+        const actualDay = JOURS[evDate.getUTCDay()];
+        // Check if the narration sentence likely refers to this event
+        const evWords = ev.name.toLowerCase().split(/\s+/);
+        const context = m.input?.slice(Math.max(0, (m.index ?? 0) - 50), (m.index ?? 0) + m[0].length + 50).toLowerCase() ?? '';
+        const mentionsEvent = evWords.some(w => w.length > 3 && context.includes(w));
+        if (mentionsEvent && mentionedDay !== actualDay) {
+          issues.push({
+            type: 'compliance',
+            description: `"${m[0]}" — l'événement "${ev.name}" est le ${ev.date} (${actualDay}), pas ${mentionedDay}`,
+            severity: 'blocker',
+            suggestedFix: `Remplacer "${mentionedDay}" par "${actualDay}"`,
+            source: 'code',
+          });
+          break;
+        }
+      }
     }
   }
 

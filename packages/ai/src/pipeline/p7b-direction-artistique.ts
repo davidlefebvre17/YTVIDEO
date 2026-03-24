@@ -20,6 +20,22 @@ const VALID_EMOTIONS = new Set<string>([
   'tension', 'analyse', 'revelation', 'contexte', 'impact', 'respiration', 'conclusion',
 ]);
 
+// Map approximate emotion values to valid ones
+function normalizeEmotion(raw: string | undefined): BeatEmotion {
+  if (!raw) return 'contexte';
+  const lower = raw.toLowerCase().trim();
+  if (VALID_EMOTIONS.has(lower)) return lower as BeatEmotion;
+  // Fuzzy mapping
+  if (lower.includes('tension') || lower.includes('stress') || lower.includes('peur') || lower.includes('fear')) return 'tension';
+  if (lower.includes('analy') || lower.includes('explic') || lower.includes('pédag') || lower.includes('mecan')) return 'analyse';
+  if (lower.includes('revel') || lower.includes('surpr') || lower.includes('paradox') || lower.includes('ironi')) return 'revelation';
+  if (lower.includes('impact') || lower.includes('choc') || lower.includes('shock') || lower.includes('drama')) return 'impact';
+  if (lower.includes('respir') || lower.includes('calm') || lower.includes('pause') || lower.includes('repos')) return 'respiration';
+  if (lower.includes('conclu') || lower.includes('synth') || lower.includes('closing') || lower.includes('final')) return 'conclusion';
+  if (lower.includes('context') || lower.includes('intro') || lower.includes('etabl') || lower.includes('descr')) return 'contexte';
+  return 'contexte';
+}
+
 function validateDirection(dir: BeatDirection, beatIds: Set<string>): BeatDirection {
   return {
     beatId: dir.beatId,
@@ -29,7 +45,7 @@ function validateDirection(dir: BeatDirection, beatIds: Set<string>): BeatDirect
     overlayNotes: dir.overlayNotes,
     imageEffect: VALID_EFFECTS.has(dir.imageEffect) ? dir.imageEffect as ImageEffect : 'ken_burns_in',
     transitionOut: VALID_TRANSITIONS.has(dir.transitionOut) ? dir.transitionOut as BeatTransition : 'fade',
-    emotion: VALID_EMOTIONS.has(dir.emotion) ? dir.emotion as BeatEmotion : 'contexte',
+    emotion: normalizeEmotion(dir.emotion ?? (dir as any).narrativeRole),
   };
 }
 
@@ -38,12 +54,12 @@ function buildFallback(beats: RawBeat[]): C7DirectionResult {
     visualIdentity: {
       colorTemperature: 'neutral',
       lightingRegister: 'soft_natural',
-      photographicStyle: 'editorial documentary, neutral tones, medium contrast',
-      forbiddenElements: ['neon', 'dramatic_red', 'extreme_angles', 'text_in_image'],
+      photographicStyle: 'WSJ hedcut stipple illustration, black ink crosshatching on cream paper, selective color accents, editorial documentary',
+      forbiddenElements: ['cartoon_style', 'neon', 'text_labels', 'abstract_concepts', 'bright_red', 'modern_flat_design'],
     },
     directions: beats.map(b => ({
       beatId: b.id,
-      imageDirection: 'Documentary editorial scene, soft natural light, clean composition',
+      imageDirection: 'WSJ hedcut stipple illustration, institutional building in ink crosshatching on cream paper',
       overlay: b.overlayHint as (OverlayType | 'none'),
       imageEffect: 'ken_burns_in' as ImageEffect,
       transitionOut: (b.isSegmentEnd ? 'cross_dissolve' : 'fade') as BeatTransition,
@@ -62,7 +78,7 @@ async function callC7Chunk(
 ): Promise<C7DirectionResult> {
   const { system, user } = buildC7Prompt(beats, direction.moodMusic, direction.arc, assets);
   console.log(`    C7 chunk ${chunkLabel}: ${beats.length} beats → Sonnet...`);
-  return generateStructuredJSON<C7DirectionResult>(system, user, { role: 'balanced', maxTokens: 8000 });
+  return generateStructuredJSON<C7DirectionResult>(system, user, { role: 'balanced', maxTokens: 16000 });
 }
 
 export async function runC7Direction(
@@ -135,9 +151,11 @@ export async function runC7Direction(
     if (!identity.photographicStyle) identity.photographicStyle = 'editorial documentary';
     if (!identity.forbiddenElements) identity.forbiddenElements = [];
 
+    const reuseCount = validatedDirections.filter(d => d.imageReuse).length;
     const overlayCount = validatedDirections.filter(d => d.overlay !== 'none').length;
-    const ratio = overlayCount / validatedDirections.length;
-    console.log(`  C7: ${validatedDirections.length} directions, ${overlayCount} overlays (${Math.round(ratio * 100)}%), identity: ${identity.colorTemperature}/${identity.lightingRegister}`);
+    const uniqueImages = validatedDirections.length - reuseCount;
+    console.log(`  C7: ${validatedDirections.length} directions, ${overlayCount} overlays (${Math.round(overlayCount / validatedDirections.length * 100)}%), identity: ${identity.colorTemperature}/${identity.lightingRegister}`);
+    console.log(`  Reuse: ${reuseCount} (C7) → ${uniqueImages} unique images`);
 
     return { visualIdentity: identity, directions: validatedDirections };
   } catch (err) {

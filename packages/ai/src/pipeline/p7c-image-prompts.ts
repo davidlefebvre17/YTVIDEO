@@ -7,30 +7,32 @@ import { generateStructuredJSON } from "../llm-client";
 // ── Mood → style suffix (appended by code, NOT by LLM) ─────
 
 const MOOD_SUFFIX: Record<string, string> = {
-  tension_geopolitique: ', dramatic lighting, high contrast, desaturated, photojournalistic',
-  risk_off_calme: ', cool tones, soft lighting, serene, editorial photography',
-  bullish_momentum: ', warm golden lighting, dynamic angle, vibrant, cinematic',
-  neutre_analytique: ', neutral tones, clean composition, professional, documentary style',
-  incertitude: ', overcast, muted colors, atmospheric haze, contemplative mood',
+  tension_geopolitique: ', dramatic ink shading, high contrast crosshatching, tense composition',
+  risk_off_calme: ', lighter ink density, more cream paper visible, serene wide composition',
+  bullish_momentum: ', confident bold linework, warm selective accents, dynamic angle',
+  neutre_analytique: ', even stipple density, balanced composition, precise linework',
+  incertitude: ', loose crosshatching, atmospheric ink wash, contemplative framing',
 };
 
 // ── Emotion → fallback prompt (when LLM fails) ─────────────
 
 const EMOTION_FALLBACK: Record<string, string> = {
-  tension: 'Dimly lit trading desk with multiple screens showing market data, quiet tension, editorial photography',
-  analyse: 'Clean modern office desk with financial newspaper and coffee, soft morning light, documentary style',
-  revelation: 'Architectural detail of modern glass building, light breaking through, clean editorial composition',
-  contexte: 'Aerial view of urban landscape at golden hour, wide documentary shot, warm tones',
-  impact: 'Empty trading floor after hours, soft ambient lighting, contemplative atmosphere',
-  respiration: 'Calm harbor at dawn with still water reflections, peaceful, wide angle documentary',
-  conclusion: 'Panoramic city skyline at dawn, financial district emerging from morning fog, serene wide angle',
+  tension: 'Silhouette of a figure at a desk in dark office, tense posture, hands clasped',
+  analyse: 'Stack of financial newspapers on wooden desk, reading glasses beside them, morning light',
+  revelation: 'Dramatic light breaking through tall windows of institutional building, long shadows',
+  contexte: 'Aerial view of financial district skyline at dusk, distant buildings',
+  impact: 'Close-up of a gavel striking on marble surface, sharp detail',
+  respiration: 'Calm harbor at sunrise, still water, distant cranes, soft horizon light',
+  conclusion: 'Panoramic city skyline at dawn, financial district emerging from morning fog',
 };
 
 // ── Forbidden words filter ──────────────────────────────────
 
 const FORBIDDEN_WORDS = [
   'text', 'words', 'title', 'label', 'logo', 'brand', 'sign', 'writing',
-  'letters', 'face', 'portrait', 'selfie', 'headshot', 'looking at camera',
+  'letters', 'selfie', 'headshot', 'looking at camera', 'cartoon', 'caricature',
+  'black background', 'dark background', 'black velvet', 'dark surface', 'black surface',
+  'noir background', 'on black', 'against black', 'dark backdrop',
 ];
 
 function sanitizePrompt(prompt: string): string {
@@ -46,10 +48,12 @@ function sanitizePrompt(prompt: string): string {
 
 // ── Style suffix builder ────────────────────────────────────
 
-export function buildStyleSuffix(identity: EpisodeVisualIdentity, mood: string): string {
+// STYLE PREFIX — goes FIRST in every prompt (Flux weighs early tokens more heavily)
+const STYLE_PREFIX = 'WSJ hedcut stipple pen and ink illustration on aged cream paper, fine crosshatching and dot shading, black ink dominant. ';
+
+export function buildStyleSuffix(_identity: EpisodeVisualIdentity, mood: string): string {
   const moodPart = MOOD_SUFFIX[mood] ?? MOOD_SUFFIX.neutre_analytique;
-  const stylePart = identity.photographicStyle ? `, ${identity.photographicStyle}` : '';
-  return `${stylePart}${moodPart}, wide 16:9 composition`;
+  return `${moodPart}, wide 16:9 composition`;
 }
 
 // ── Main function ───────────────────────────────────────────
@@ -77,56 +81,62 @@ export async function runC8ImagePrompts(
 
   const suffix = buildStyleSuffix(visualIdentity, mood);
 
-  try {
-    console.log(`  C8 Image Prompts: ${toGenerate.length} directions → Haiku...`);
-    const { system, user } = buildC8Prompt(toGenerate, visualIdentity);
+  // Chunk C8 calls to avoid maxTokens overflow (Haiku can't handle 100+ prompts at once)
+  const C8_CHUNK_SIZE = 30;
+  const promptMap = new Map<string, string>();
 
-    const llmResult = await generateStructuredJSON<Array<{ id: string; prompt: string }>>(
-      system, user, { role: 'fast' },
-    );
+  console.log(`  C8 Image Prompts: ${toGenerate.length} directions → Haiku...`);
 
-    const promptMap = new Map<string, string>();
-    if (Array.isArray(llmResult)) {
-      for (const item of llmResult) {
-        if (item.id && item.prompt) {
-          promptMap.set(item.id, item.prompt);
+  for (let i = 0; i < toGenerate.length; i += C8_CHUNK_SIZE) {
+    const chunk = toGenerate.slice(i, i + C8_CHUNK_SIZE);
+    const chunkNum = Math.floor(i / C8_CHUNK_SIZE) + 1;
+    const totalChunks = Math.ceil(toGenerate.length / C8_CHUNK_SIZE);
+
+    try {
+      if (totalChunks > 1) console.log(`    C8 chunk ${chunkNum}/${totalChunks}: ${chunk.length} directions...`);
+      const { system, user } = buildC8Prompt(chunk, visualIdentity);
+
+      const llmResult = await generateStructuredJSON<Array<{ id: string; prompt: string }>>(
+        system, user, { role: 'fast' },
+      );
+
+      if (Array.isArray(llmResult)) {
+        for (const item of llmResult) {
+          if (item.id && item.prompt) {
+            promptMap.set(item.id, item.prompt);
+          }
         }
       }
-    }
-
-    for (const dir of toGenerate) {
-      let prompt = promptMap.get(dir.beatId) ?? '';
-
-      if (!prompt) {
-        prompt = EMOTION_FALLBACK[dir.emotion] ?? EMOTION_FALLBACK.contexte;
+    } catch (err) {
+      console.warn(`    C8 chunk ${chunkNum} failed: ${(err as Error).message.slice(0, 80)}`);
+      // Fallback for this chunk only — other chunks still work
+      for (const dir of chunk) {
+        const fallback = EMOTION_FALLBACK[dir.emotion] ?? EMOTION_FALLBACK.contexte;
+        promptMap.set(dir.beatId, fallback);
       }
-
-      prompt = sanitizePrompt(prompt);
-      prompt = prompt + suffix;
-
-      results.push({
-        beatId: dir.beatId,
-        imagePrompt: prompt,
-        skip: false,
-      });
-    }
-
-    const generated = results.filter(r => !r.skip).length;
-    console.log(`  C8: ${generated} prompts generated, ${skipped.length} skipped (reuse)`);
-
-  } catch (err) {
-    console.warn(`  C8 Image Prompts failed: ${(err as Error).message.slice(0, 100)}`);
-    console.warn('  Using emotion-based fallback prompts');
-
-    for (const dir of toGenerate) {
-      const fallback = EMOTION_FALLBACK[dir.emotion] ?? EMOTION_FALLBACK.contexte;
-      results.push({
-        beatId: dir.beatId,
-        imagePrompt: sanitizePrompt(fallback) + suffix,
-        skip: false,
-      });
     }
   }
+
+  for (const dir of toGenerate) {
+    let prompt = promptMap.get(dir.beatId) ?? '';
+
+    if (!prompt) {
+      prompt = EMOTION_FALLBACK[dir.emotion] ?? EMOTION_FALLBACK.contexte;
+    }
+
+    prompt = sanitizePrompt(prompt);
+    // Style PREFIX (Flux weighs early tokens more) + content + mood suffix
+    prompt = STYLE_PREFIX + prompt + suffix;
+
+    results.push({
+      beatId: dir.beatId,
+      imagePrompt: prompt,
+      skip: false,
+    });
+  }
+
+  const generated = results.filter(r => !r.skip).length;
+  console.log(`  C8: ${generated} prompts generated, ${skipped.length} skipped (reuse)`);
 
   results.sort((a, b) => {
     const aIdx = directions.findIndex(d => d.beatId === a.beatId);

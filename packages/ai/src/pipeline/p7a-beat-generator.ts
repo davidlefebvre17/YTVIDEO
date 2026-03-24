@@ -4,8 +4,8 @@ import type {
 import type { RawBeat } from "./types";
 
 const WORDS_PER_SEC = 2.5;
-const MIN_BEAT_SEC = 3;
-const MAX_BEAT_SEC = 10;
+const MIN_BEAT_SEC = 6;
+const MAX_BEAT_SEC = 12;
 const MIN_BEAT_WORDS = Math.floor(MIN_BEAT_SEC * WORDS_PER_SEC);
 
 // ── Sentence boundaries for French narration ────────────────
@@ -84,37 +84,177 @@ export function classifyOverlay(chunk: string, assetNames: string[]): OverlayTyp
 
 // ── Overlay data resolver ───────────────────────────────────
 
+// Match asset mentioned in narration chunk — uses DIRECT_MATCH_RULES from tagging-rules (700+ patterns)
+import { DIRECT_MATCH_RULES, STOCK_ALIAS_RULES } from "../memory/tagging-rules";
+
+// Build a flat lookup: pattern → symbol (built once, reused)
+let _patternCache: Array<{ pattern: string; symbol: string; wordBoundary: boolean }> | null = null;
+
+function getPatternCache() {
+  if (_patternCache) return _patternCache;
+  _patternCache = [];
+  for (const rule of [...DIRECT_MATCH_RULES, ...STOCK_ALIAS_RULES]) {
+    for (const p of rule.patterns) {
+      _patternCache.push({ pattern: p.toLowerCase(), symbol: rule.asset, wordBoundary: rule.word_boundary ?? false });
+    }
+  }
+  // Sort longer patterns first (avoid "or" matching before "l'or s'effondre")
+  _patternCache.sort((a, b) => b.pattern.length - a.pattern.length);
+  return _patternCache;
+}
+
+function findMentionedAsset(
+  chunk: string,
+  segmentAssets: string[],
+  allAssets: AssetSnapshot[],
+  lastMentioned?: string,
+): AssetSnapshot | undefined {
+  const lower = chunk.toLowerCase();
+  const findAsset = (sym: string) => allAssets.find(a => a.symbol === sym);
+  const patterns = getPatternCache();
+
+  // 1. Try pattern match on SEGMENT assets first (highest priority)
+  const segSet = new Set(segmentAssets);
+  for (const entry of patterns) {
+    if (!segSet.has(entry.symbol)) continue;
+    if (entry.wordBoundary) {
+      const re = new RegExp(`\\b${entry.pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+      if (re.test(lower)) {
+        const asset = findAsset(entry.symbol);
+        if (asset) return asset;
+      }
+    } else {
+      if (lower.includes(entry.pattern)) {
+        const asset = findAsset(entry.symbol);
+        if (asset) return asset;
+      }
+    }
+  }
+
+  // 2. Try pattern match on ALL assets (broader search)
+  for (const entry of patterns) {
+    if (entry.wordBoundary) {
+      const re = new RegExp(`\\b${entry.pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+      if (re.test(lower)) {
+        const asset = findAsset(entry.symbol);
+        if (asset) return asset;
+      }
+    } else {
+      if (lower.includes(entry.pattern)) {
+        const asset = findAsset(entry.symbol);
+        if (asset) return asset;
+      }
+    }
+  }
+
+  // 3. Try asset name match (for assets not in tagging rules)
+  for (const sym of segmentAssets) {
+    const asset = findAsset(sym);
+    if (asset && lower.includes(asset.name.toLowerCase())) return asset;
+  }
+
+  // 4. Fallback to last mentioned asset in this segment (pronoun resolution: "le prix", "il")
+  if (lastMentioned) {
+    const asset = findAsset(lastMentioned);
+    if (asset) return asset;
+  }
+
+  // 5. Fallback to first segment asset
+  return segmentAssets[0] ? findAsset(segmentAssets[0]) : undefined;
+}
+
+/**
+ * Like findMentionedAsset but returns undefined if no EXPLICIT mention found.
+ * Used for context tracking — we don't want fallbacks to overwrite the last known asset.
+ */
+function findExplicitAsset(
+  chunk: string,
+  segmentAssets: string[],
+  allAssets: AssetSnapshot[],
+): AssetSnapshot | undefined {
+  const lower = chunk.toLowerCase();
+  const findAsset = (sym: string) => allAssets.find(a => a.symbol === sym);
+  const patterns = getPatternCache();
+
+  // Only pattern match — no fallback
+  for (const entry of patterns) {
+    if (entry.wordBoundary) {
+      const re = new RegExp(`\\b${entry.pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+      if (re.test(lower)) {
+        const asset = findAsset(entry.symbol);
+        if (asset) return asset;
+      }
+    } else {
+      if (lower.includes(entry.pattern)) {
+        const asset = findAsset(entry.symbol);
+        if (asset) return asset;
+      }
+    }
+  }
+
+  // Also try asset name match
+  for (const a of allAssets) {
+    if (lower.includes(a.name.toLowerCase())) return a;
+  }
+
+  return undefined; // Nothing explicitly mentioned
+}
+
+
 export function resolveOverlayData(
   chunk: string,
   overlayType: OverlayType,
   assets: AssetSnapshot[],
   segmentAssets: string[],
   snapshot: DailySnapshot,
+  lastMentioned?: string,
 ): Record<string, unknown> {
   const findAsset = (sym: string) => assets.find(a => a.symbol === sym);
   const lower = chunk.toLowerCase();
 
   switch (overlayType) {
     case 'stat': {
+      // Try to extract number from chunk (digit format: "6506", "98,23", "2.17%")
       const numMatch = chunk.match(/([\d]+[,.]?[\d]*)\s*([%$€])/);
-      const wordMatch = chunk.match(/(moins|plus)\s+(\w+)\s+(virgule\s+\w+\s+)?pour\s+cent/i);
+      // French spoken format: "un virgule cinquante et un pour cent"
+      const frenchPctMatch = chunk.match(/(moins|plus)\s+([\w\s]+?)pour\s+cent/i);
       let value = numMatch ? parseFloat(numMatch[1].replace(',', '.')) : undefined;
-      const suffix = numMatch ? numMatch[2] : '%';
-      if (wordMatch && value === undefined) {
-        value = 0;
-      }
-      const negative = lower.includes('moins') || lower.includes('perd') || lower.includes('recule') || lower.includes('lâche') || lower.includes('baisse');
-      if (value !== undefined && negative && value > 0) value = -value;
+      let suffix = numMatch ? numMatch[2] : '%';
 
-      const matchedSym = segmentAssets.find(s => {
-        const a = findAsset(s);
-        return a && lower.includes(a.name.toLowerCase());
-      }) ?? segmentAssets[0];
-      const asset = matchedSym ? findAsset(matchedSym) : undefined;
+      // Try to extract price (e.g., "à 6506", "à 98 dollars 23")
+      // Price is NEVER negated — it's an absolute level
+      let isPrice = false;
+      if (value === undefined) {
+        const priceMatch = chunk.match(/à\s+([\d\s]+(?:dollars?\s*\d*)?)/i);
+        if (priceMatch) {
+          const raw = priceMatch[1].replace(/dollars?\s*/i, '.').replace(/\s/g, '');
+          const parsed = parseFloat(raw);
+          if (!isNaN(parsed) && parsed > 1) { value = parsed; suffix = ''; isPrice = true; }
+        }
+      }
+
+      if (frenchPctMatch && value === undefined) {
+        // Can't parse French words to numbers easily, use asset changePct
+        value = undefined; // Will fallback to asset data below
+      }
+
+      // Only negate percentages, never prices
+      if (!isPrice) {
+        const negative = lower.includes('moins') || lower.includes('perd') || lower.includes('recule') || lower.includes('lâche') || lower.includes('baisse') || lower.includes('cède');
+        if (value !== undefined && negative && value > 0) value = -value;
+      }
+
+      const asset = findMentionedAsset(chunk, segmentAssets, assets, lastMentioned);
+
+      // If no number extracted, use asset's changePct
+      if (value === undefined && asset) {
+        value = asset.changePct;
+        suffix = '%';
+      }
 
       return {
-        value: value ?? asset?.changePct ?? 0,
-        label: asset?.name ?? matchedSym ?? '',
+        value: value ?? 0,
+        label: asset?.name ?? '',
         suffix,
         prefix: '',
       };
@@ -122,12 +262,12 @@ export function resolveOverlayData(
 
     case 'chart':
     case 'chart_zone': {
-      const sym = segmentAssets.find(s => {
-        const a = findAsset(s);
-        return a && lower.includes(a.name.toLowerCase());
-      }) ?? segmentAssets[0];
-      const asset = sym ? findAsset(sym) : undefined;
-      if (!asset) return {};
+      const asset = findMentionedAsset(chunk, segmentAssets, assets, lastMentioned);
+      if (!asset) {
+        // Fallback: use last mentioned or first segment asset as stat instead
+        const fb = lastMentioned ? findAsset(lastMentioned) : (segmentAssets[0] ? findAsset(segmentAssets[0]) : undefined);
+        return fb ? { symbol: fb.symbol, name: fb.name, price: fb.price, changePct: fb.changePct, candleCount: 0, levels: [] } : {};
+      }
 
       const levels: Array<{ value: number; label: string }> = [];
       const levelMatch = chunk.match(/(\d[\d\s]*\d|\d+)\s*(dollars?|\$)/gi);
@@ -149,42 +289,58 @@ export function resolveOverlayData(
     }
 
     case 'causal_chain': {
-      const parts = chunk
-        .split(/parce que|à cause de|en raison de|entraîne|provoque|déclenche|mécaniquement|du coup|ce qui/i)
-        .map(s => s.trim())
-        .filter(s => s.length > 3 && s.length < 80);
-      return { steps: parts.length >= 2 ? parts.slice(0, 5) : [chunk.slice(0, 60)] };
+      const sentences = chunk.split(/[.!?]+/).map(s => s.trim()).filter(s => s.length > 5);
+      if (sentences.length >= 3) {
+        return { steps: sentences.slice(0, 5).map(s => s.length > 50 ? s.slice(0, 47) + '...' : s) };
+      }
+      const segAssets = segmentAssets.slice(0, 3).map(s => findAsset(s)?.name ?? s);
+      if (segAssets.length >= 2) {
+        return { steps: segAssets.map((name, i) => i === 0 ? `${name} ↓` : `→ ${name}`) };
+      }
+      return { steps: [chunk.slice(0, 50)] };
     }
 
     case 'comparison': {
-      const matched = segmentAssets
-        .filter(s => { const a = findAsset(s); return a && lower.includes(a.name.toLowerCase()); })
-        .slice(0, 4)
-        .map(s => {
-          const a = findAsset(s)!;
-          return { symbol: a.symbol, label: a.name, value: a.price, changePct: a.changePct };
-        });
-      return { assets: matched.length >= 2 ? matched : [] };
+      const all = segmentAssets.slice(0, 4).map(s => {
+        const a = findAsset(s);
+        return a ? { symbol: a.symbol, label: a.name, value: a.price, changePct: a.changePct } : null;
+      }).filter(Boolean);
+      return { assets: all.length >= 2 ? all : [] };
     }
 
     case 'scenario_fork': {
-      const bullMatch = chunk.match(/si\s+.*?(hausse|casse|franchit|dépasse).*?(?=[.]|$)/i);
-      const bearMatch = chunk.match(/(?:en revanche|sinon|si\s+.*?(baisse|cède|perd|recule)).*?(?=[.]|$)/i);
-      const mainAsset = segmentAssets[0] ? findAsset(segmentAssets[0]) : undefined;
+      const mainAsset = findMentionedAsset(chunk, segmentAssets, assets);
+      const sentences = chunk.split(/[.!?]+/).map(s => s.trim()).filter(s => s.length > 10);
+      const bullSentence = sentences.find(s => /hausse|casse|franchit|dépasse|haussier|monte|rebond/i.test(s));
+      const bearSentence = sentences.find(s => /baisse|cède|perd|recule|baissier|descend|chute/i.test(s));
       return {
         trunk: mainAsset?.name ?? segmentAssets[0] ?? '',
-        bull: bullMatch?.[0]?.trim() ?? '',
-        bear: bearMatch?.[0]?.trim() ?? '',
+        bull: bullSentence?.slice(0, 80) ?? `Scénario haussier ${mainAsset?.name ?? ''}`,
+        bear: bearSentence?.slice(0, 80) ?? `Scénario baissier ${mainAsset?.name ?? ''}`,
       };
     }
 
     case 'headline': {
-      const relevantNews = snapshot.news.find(n =>
-        segmentAssets.some(s => n.title.toLowerCase().includes(s.toLowerCase()) || lower.includes(n.title.toLowerCase().slice(0, 30)))
-      );
-      return relevantNews
-        ? { title: relevantNews.title, source: relevantNews.source }
-        : {};
+      // Search by asset name (not symbol) and by narration keywords
+      const assetNames = segmentAssets.map(s => findAsset(s)?.name?.toLowerCase()).filter(Boolean) as string[];
+      const chunkWords = lower.split(/\s+/).filter(w => w.length > 4).slice(0, 5);
+
+      const relevantNews = snapshot.news.find(n => {
+        const titleLower = n.title.toLowerCase();
+        // Match by asset name in title
+        if (assetNames.some(name => titleLower.includes(name.split(' ')[0].toLowerCase()))) return true;
+        // Match by narration keyword overlap (at least 2 words in common)
+        const matches = chunkWords.filter(w => titleLower.includes(w));
+        return matches.length >= 2;
+      });
+      if (relevantNews) {
+        return { title: relevantNews.title, source: relevantNews.source };
+      }
+      // Fallback: use first high-relevance news of the day
+      const fallbackNews = snapshot.news.find(n => n.lang === 'fr') ?? snapshot.news[0];
+      return fallbackNews
+        ? { title: fallbackNews.title, source: fallbackNews.source }
+        : { title: 'Actualité du jour', source: '' };
     }
 
     case 'heatmap': {
@@ -324,14 +480,29 @@ export function generateBeats(
 
     const segmentAssets = section.assets ?? [];
     const segmentDepth = (section.depth ?? 'focus') as 'flash' | 'focus' | 'deep';
+    let lastMentioned: string | undefined; // track last resolved asset per segment
 
     for (let i = 0; i < chunks.length; i++) {
       const chunk = chunks[i];
       const overlayHint = chunk.text ? classifyOverlay(chunk.text, assetNames) : 'none';
 
       const overlayData = overlayHint !== 'none'
-        ? resolveOverlayData(chunk.text, overlayHint, snapshot.assets, segmentAssets, snapshot)
+        ? resolveOverlayData(chunk.text, overlayHint, snapshot.assets, segmentAssets, snapshot, lastMentioned)
         : undefined;
+
+      // Track which asset was EXPLICITLY mentioned for pronoun resolution in next beats
+      // Only update context if we found a real match (not a fallback to first segment asset)
+      const explicitMatch = chunk.text ? findExplicitAsset(chunk.text, segmentAssets, snapshot.assets) : undefined;
+      if (explicitMatch) {
+        lastMentioned = explicitMatch.symbol;
+      } else if (overlayData) {
+        // If overlay resolved an asset and it's not the segment default, track it
+        const resolved = (overlayData as any).symbol ?? (overlayData as any).label;
+        if (resolved) {
+          const match = snapshot.assets.find(a => a.symbol === resolved || a.name === resolved);
+          if (match && match.symbol !== segmentAssets[0]) lastMentioned = match.symbol;
+        }
+      }
 
       const id = `beat_${String(++beatIndex).padStart(3, '0')}`;
 

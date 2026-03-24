@@ -14,7 +14,7 @@ import { runC8ImagePrompts } from "../packages/ai/src/pipeline/p7c-image-prompts
 import { computeOverlayDelay } from "../packages/ai/src/pipeline/p7a-beat-generator";
 
 // ── Load latest episode ──
-const episodePath = path.resolve(__dirname, "..", "episodes", "2026", "03-18.json");
+const episodePath = path.resolve(__dirname, "..", "episodes", "2026", "03-20.json");
 console.log(`Loading episode: ${episodePath}`);
 const episode = JSON.parse(fs.readFileSync(episodePath, "utf-8"));
 const script: EpisodeScript = episode.script;
@@ -62,8 +62,17 @@ async function main() {
   const beats: Beat[] = rawBeats.map((raw, i) => {
     const dir = c7Result.directions.find(d => d.beatId === raw.id);
     const prompt = imagePrompts.find(p => p.beatId === raw.id);
-    const delay = raw.overlayHint !== 'none'
-      ? computeOverlayDelay(raw.narrationChunk, raw.overlayHint, raw.durationSec * 1000)
+
+    const finalOverlayType = dir?.overlay && dir.overlay !== 'none' ? dir.overlay : null;
+
+    let overlayData = raw.overlayData ?? {};
+    if (finalOverlayType && (finalOverlayType !== raw.overlayHint || Object.keys(overlayData).length === 0)) {
+      const { resolveOverlayData } = require('../packages/ai/src/pipeline/p7a-beat-generator');
+      overlayData = resolveOverlayData(raw.narrationChunk, finalOverlayType, snapshot.assets, raw.assets, snapshot);
+    }
+
+    const delay = finalOverlayType
+      ? computeOverlayDelay(raw.narrationChunk, finalOverlayType, raw.durationSec * 1000)
       : { delayMs: 0 };
 
     return {
@@ -77,11 +86,11 @@ async function main() {
       imagePath: placeholders[i % placeholders.length],
       imageReuse: dir?.imageReuse,
       imageEffect: dir?.imageEffect ?? 'ken_burns_in',
-      overlay: (dir?.overlay && dir.overlay !== 'none') ? {
-        type: dir.overlay,
-        data: raw.overlayData ?? {},
-        position: getPosition(dir.overlay),
-        enterAnimation: getAnimation(dir.overlay),
+      overlay: finalOverlayType ? {
+        type: finalOverlayType,
+        data: overlayData,
+        position: getPosition(finalOverlayType),
+        enterAnimation: getAnimation(finalOverlayType),
         enterDelayMs: delay.delayMs,
         triggerWord: delay.triggerWord,
       } : undefined,

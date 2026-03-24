@@ -62,7 +62,7 @@ export const DIRECT_MATCH_RULES: DirectMatchRule[] = [
   // ==================== INDICES ====================
   {
     id: "direct_sp500",
-    patterns: ["s&p 500", "s&p500", "sp500", "spx", "^gspc", "standard & poor"],
+    patterns: ["s&p 500", "s&p500", "s&p", "sp500", "spx", "^gspc", "standard & poor"],
     asset: "^GSPC",
     word_boundary: false,
   },

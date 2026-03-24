@@ -14,6 +14,7 @@ import { NewspaperEpisode } from "./compositions/NewspaperEpisode";
 import { NewspaperCanvas } from "./scenes/newspaper/NewspaperCanvas";
 import { SAMPLE_SCRIPT, SAMPLE_ASSETS, SAMPLE_NEWS, SAMPLE_STORYBOARD } from "./fixtures/sample-data";
 import { SAMPLE_BEATS } from "./fixtures/sample-beats";
+import REAL_PROPS from "./fixtures/real-beats.json";
 import { BeatEpisode, getEffectiveDuration, getTransitionDurationFrames } from "./compositions/BeatEpisode";
 import type { EpisodeScript, ScriptSection, AssetSnapshot, Beat } from "@yt-maker/core";
 import { BRAND } from "@yt-maker/core";
@@ -289,10 +290,10 @@ export const RemotionRoot: React.FC = () => {
           width={1920}
           height={1080}
           defaultProps={{
-            script: SAMPLE_SCRIPT,
-            beats: SAMPLE_BEATS,
-            assets: SAMPLE_ASSETS,
-            news: SAMPLE_NEWS,
+            script: REAL_PROPS.script as any,
+            beats: REAL_PROPS.beats as any,
+            assets: REAL_PROPS.assets as any,
+            news: REAL_PROPS.news as any,
           }}
           calculateMetadata={({ props }: { props: Record<string, unknown> }) => {
             const beats = (props.beats ?? []) as Beat[];

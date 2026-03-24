@@ -58,3 +58,33 @@ RÈGLES DE RÉDACTION :
 
   return { snapDate: snapshotDate, pubDate, prevDate, snapLabel, pubLabel, prevLabel, snapDayName, pubDayName, block };
 }
+
+/**
+ * Convert any YYYY-MM-DD date into a human-readable temporal label
+ * relative to the viewer (publication day = snapDate + 1).
+ *
+ * Examples (snapshot = 2026-03-20, pub = 2026-03-21):
+ *   "2026-03-19" → "hier (mercredi 19 mars)"       — from viewer's POV: yesterday = snap day - 1
+ *   "2026-03-20" → "hier (jeudi 20 mars)"           — snap day = "hier" for viewer
+ *   "2026-03-21" → "aujourd'hui vendredi 21 mars"   — pub day
+ *   "2026-03-22" → "demain samedi 22 mars"           — pub + 1
+ *   "2026-03-25" → "lundi 25 mars"                   — beyond 48h: day name + date
+ */
+export function labelEventDate(eventDate: string, snapshotDate: string): string {
+  const [sy, sm, sd] = snapshotDate.split('-').map(Number);
+  const snap = new Date(Date.UTC(sy, sm - 1, sd));
+  const pub  = new Date(Date.UTC(sy, sm - 1, sd + 1));
+
+  const [ey, em, ed] = eventDate.split('-').map(Number);
+  const ev = new Date(Date.UTC(ey, em - 1, ed));
+
+  const diffFromPub = Math.round((ev.getTime() - pub.getTime()) / 86400000);
+  const dayName = JOURS_FR[ev.getUTCDay()];
+  const shortLabel = `${dayName} ${ev.getUTCDate()} ${MOIS_FR[ev.getUTCMonth()]}`;
+
+  if (diffFromPub === -2) return `avant-hier (${shortLabel})`;
+  if (diffFromPub === -1) return `hier (${shortLabel})`;
+  if (diffFromPub === 0) return `aujourd'hui ${shortLabel}`;
+  if (diffFromPub === 1) return `demain ${shortLabel}`;
+  return shortLabel;
+}

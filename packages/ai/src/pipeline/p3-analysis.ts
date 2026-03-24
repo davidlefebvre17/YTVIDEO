@@ -9,6 +9,7 @@ import type {
 import type { DailySnapshot, Language } from "@yt-maker/core";
 import type { BriefingPack } from "./helpers/briefing-pack";
 import { formatBriefingPack } from "./helpers/briefing-pack";
+import { buildTemporalAnchors, labelEventDate } from "./helpers/temporal-anchors";
 
 const KNOWLEDGE_DIR = path.resolve(__dirname, "..", "knowledge");
 
@@ -82,7 +83,7 @@ function loadKnowledgeForC2(snapshot: DailySnapshot, selectedSymbols: string[]):
  * Format asset data for C2 prompt.
  * DEEP/FOCUS get full data, FLASH gets minimal.
  */
-function formatAssetForC2(asset: FlaggedAsset, depth: 'DEEP' | 'FOCUS' | 'FLASH'): string {
+function formatAssetForC2(asset: FlaggedAsset, depth: 'DEEP' | 'FOCUS' | 'FLASH', snapshotDate?: string): string {
   const fmt = (n: number) => n.toFixed(asset.price > 100 ? 2 : 4);
   const hi = asset.snapshot.high24h;
   const lo = asset.snapshot.low24h;
@@ -121,7 +122,8 @@ function formatAssetForC2(asset: FlaggedAsset, depth: 'DEEP' | 'FOCUS' | 'FLASH'
         text += `Zones: ${memory.zones.map(z => `${z.type} ${z.level} (${z.touches} touches, dernier: ${z.last_event_type ?? '?'})`).join(' | ')}\n`;
       }
       if (memory.last_events.length) {
-        text += `Events récents: ${memory.last_events.map(e => `${e.date} ${e.event_type}: ${e.detail}`).join(' | ')}\n`;
+        const snapD = snapshotDate ?? new Date().toISOString().slice(0, 10);
+        text += `Events récents: ${memory.last_events.map(e => `${labelEventDate(e.date, snapD)} ${e.event_type}: ${e.detail}`).join(' | ')}\n`;
       }
       if (memory.indicators_daily) {
         const ind = memory.indicators_daily;
@@ -214,6 +216,10 @@ function buildC2UserPrompt(
 ): string {
   let prompt = '';
 
+  // Temporal anchors — so C2 knows what "today/tomorrow/yesterday" mean
+  const anchors = buildTemporalAnchors(editorial.date);
+  prompt += `${anchors.block}\n\n`;
+
   // Plan éditorial
   prompt += `## PLAN ÉDITORIAL\n`;
   prompt += `Thème dominant: ${editorial.dominantTheme}\nFil conducteur: ${editorial.threadSummary}\nMood: ${editorial.moodMarche}\n\n`;
@@ -236,7 +242,7 @@ function buildC2UserPrompt(
     for (const symbol of seg.assets) {
       const asset = flagged.assets.find(a => a.symbol === symbol);
       if (asset) {
-        prompt += formatAssetForC2(asset, seg.depth);
+        prompt += formatAssetForC2(asset, seg.depth, editorial.date);
       }
     }
   }
@@ -246,7 +252,7 @@ function buildC2UserPrompt(
 
   // Research context
   if (researchContext) {
-    prompt += `## CONTEXTE HISTORIQUE (NewsMemory — articles ANTÉRIEURS au ${editorial.date})\n`;
+    prompt += `## CONTEXTE HISTORIQUE (NewsMemory — articles ANTÉRIEURS au ${anchors.snapLabel})\n`;
     prompt += `Ces articles sont des ARCHIVES. Les dates [J-N] indiquent l'ancienneté.\n`;
     prompt += `Utilise-les pour calibrer ta confiance : un move confirmé par 2 semaines d'articles = high, un événement sans précédent récent = medium/speculative.\n`;
     prompt += `Si un article ancien décrit un catalyst qui se matérialise aujourd'hui, cite-le dans sourcesUsed.\n\n`;

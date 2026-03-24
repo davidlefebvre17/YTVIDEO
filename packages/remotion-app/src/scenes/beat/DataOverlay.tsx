@@ -10,6 +10,8 @@ import { HeadlineCard } from "../shared/HeadlineCard";
 import { TextCard } from "../shared/TextCard";
 import { GaugeOverlay } from "../shared/GaugeOverlay";
 import { HeatmapGrid } from "../shared/HeatmapGrid";
+import { type InkLevel } from "../shared/InkChart";
+import { CandlestickChart } from "../shared/CandlestickChart";
 
 interface DataOverlayProps {
   overlay: BeatOverlay;
@@ -87,11 +89,16 @@ export const DataOverlay: React.FC<DataOverlayProps> = ({
   }
 
   const posStyle = POSITION_STYLES[overlay.position] ?? POSITION_STYLES.center;
+  const isChart = overlay.type === 'chart' || overlay.type === 'chart_zone';
+
+  const containerStyle = isChart
+    ? { background: 'rgba(245, 240, 232, 0.92)', padding: '24px 32px', borderRadius: 0 }
+    : OVERLAY_CONTAINER;
 
   return (
     <div style={{ ...posStyle, zIndex: 100 }}>
-      <div style={{ ...OVERLAY_CONTAINER, ...animStyle }}>
-        <OverlayContent type={overlay.type} data={data} accentColor={accentColor} durationInFrames={durationInFrames} />
+      <div style={{ ...containerStyle, ...animStyle }}>
+        <OverlayContent type={overlay.type} data={data} assets={assets} accentColor={accentColor} durationInFrames={durationInFrames} />
       </div>
     </div>
   );
@@ -100,11 +107,12 @@ export const DataOverlay: React.FC<DataOverlayProps> = ({
 interface OverlayContentProps {
   type: string;
   data: Record<string, unknown>;
+  assets: AssetSnapshot[];
   accentColor: string;
   durationInFrames: number;
 }
 
-const OverlayContent: React.FC<OverlayContentProps> = ({ type, data, accentColor, durationInFrames }) => {
+const OverlayContent: React.FC<OverlayContentProps> = ({ type, data, assets, accentColor, durationInFrames }) => {
   switch (type) {
     case 'stat':
       return (
@@ -182,23 +190,57 @@ const OverlayContent: React.FC<OverlayContentProps> = ({ type, data, accentColor
     }
 
     case 'chart':
-    case 'chart_zone':
+    case 'chart_zone': {
+      const sym = (data.symbol as string) ?? '';
+      const asset = assets.find(a => a.symbol === sym);
+      const candles = asset?.dailyCandles ?? asset?.candles ?? [];
+
+      if (candles.length < 5) {
+        return (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontFamily: BRAND.fonts.mono, fontSize: 14, color: BRAND.colors.inkLight }}>{sym}</span>
+            <span style={{ fontFamily: BRAND.fonts.condensed, fontSize: 28, color: BRAND.colors.ink }}>
+              {(data.price as number)?.toLocaleString() ?? ''}
+            </span>
+          </div>
+        );
+      }
+
+      const levels: InkLevel[] = ((data.levels as any[]) ?? []).map(l => ({
+        value: l.value,
+        label: l.label ?? `${l.value}`,
+        type: 'support' as const,
+      }));
+
+      const chartW = 1400;
+      const chartH = 650;
+
       return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-          <span style={{ fontFamily: BRAND.fonts.mono, fontSize: 14, color: BRAND.colors.inkLight }}>
-            {(data.symbol as string) ?? ''}
-          </span>
-          <span style={{ fontFamily: BRAND.fonts.condensed, fontSize: 28, color: BRAND.colors.ink }}>
-            {(data.price as number)?.toLocaleString() ?? ''}
-          </span>
-          <span style={{
-            fontFamily: BRAND.fonts.mono, fontSize: 16,
-            color: ((data.changePct as number) ?? 0) >= 0 ? '#1a6b3a' : '#8b1a1a',
-          }}>
-            {((data.changePct as number) ?? 0) >= 0 ? '+' : ''}{((data.changePct as number) ?? 0).toFixed(1)}%
-          </span>
+        <div style={{ width: chartW, height: chartH + 40 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, padding: '0 8px' }}>
+            <span style={{ fontFamily: BRAND.fonts.display, fontSize: 22, color: BRAND.colors.ink }}>
+              {asset?.name ?? sym}
+            </span>
+            <span style={{
+              fontFamily: BRAND.fonts.condensed, fontSize: 26,
+              color: (asset?.changePct ?? 0) >= 0 ? '#1a6b3a' : '#8b1a1a',
+            }}>
+              {asset?.price?.toLocaleString()} ({(asset?.changePct ?? 0) >= 0 ? '+' : ''}{(asset?.changePct ?? 0).toFixed(2)}%)
+            </span>
+          </div>
+          <CandlestickChart
+            candles={candles}
+            levels={levels}
+            accentColor={accentColor}
+            width={chartW}
+            height={chartH}
+            drawDuration={45}
+            showVolume
+            showSMA
+          />
         </div>
       );
+    }
 
     default:
       return null;
