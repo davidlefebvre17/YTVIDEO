@@ -232,7 +232,7 @@ export const DIRECT_MATCH_RULES: DirectMatchRule[] = [
   {
     id: "direct_silver",
     patterns: [
-      "silver", "argent metal", "xagusd", "xag/usd", "si=f", "silver price",
+      "silver", "argent metal", "l'argent", "xagusd", "xag/usd", "si=f", "silver price",
       "cours de l argent", "once d argent", "silver futures"
     ],
     asset: "SI=F",

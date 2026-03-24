@@ -33,7 +33,7 @@ console.log(`Script: "${script.title}" — ${script.sections.length} sections, $
 async function main() {
   // ── P7a: Beat Generator (CODE) ──
   console.log("\n=== P7a: Beat Generator ===");
-  const rawBeats = generateBeats(script, snapshot, analysis);
+  const rawBeats = await generateBeats(script, snapshot, analysis);
   console.log(`  ${rawBeats.length} beats generated`);
   console.log(`  Overlays: ${rawBeats.filter(b => b.overlayHint !== 'none').length}/${rawBeats.length}`);
   console.log(`  Segments: ${[...new Set(rawBeats.map(b => b.segmentId))].join(', ')}`);
