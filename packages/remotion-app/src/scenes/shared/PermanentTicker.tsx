@@ -95,7 +95,7 @@ export const PermanentTicker: React.FC<PermanentTickerProps> = ({
           fontWeight: 600,
           color: changeColor,
         }}>
-          {sign}{changePct.toFixed(2)}%
+          {sign}{(typeof changePct === "number" ? changePct : 0).toFixed(2)}%
         </span>
       </div>
     </div>

@@ -108,7 +108,7 @@ export const HeatmapGrid: React.FC<HeatmapGridProps> = ({
                 }}
               >
                 {sign}
-                {sector.change.toFixed(2)}%
+                {(typeof sector.change === "number" ? sector.change : 0).toFixed(2)}%
               </div>
               <div
                 style={{

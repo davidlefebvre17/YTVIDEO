@@ -109,7 +109,7 @@ export const MultiAssetBadge: React.FC<MultiAssetBadgeProps> = ({
                     ? asset.price.toLocaleString('fr-FR', {
                         maximumFractionDigits: 2,
                       })
-                    : asset.price.toFixed(2)}
+                    : (typeof asset.price === "number" ? asset.price : 0).toFixed(2)}
                 </div>
               )}
               <div
@@ -121,7 +121,7 @@ export const MultiAssetBadge: React.FC<MultiAssetBadgeProps> = ({
                 }}
               >
                 {sign}
-                {asset.changePct.toFixed(2)}%
+                {(typeof asset.changePct === 'number' ? asset.changePct : 0).toFixed(2)}%
               </div>
               {asset.name && (
                 <div

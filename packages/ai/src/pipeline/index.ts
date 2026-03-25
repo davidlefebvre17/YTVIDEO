@@ -42,6 +42,8 @@ export type { BeatAnnotation } from "./p7a5-beat-annotator";
 export { runC7Direction } from "./p7b-direction-artistique";
 export { runC8ImagePrompts, buildStyleSuffix } from "./p7c-image-prompts";
 export { runImageGeneration } from "./p7d-image-generation";
+export { adaptForTTS } from "./p7-c6-tts-adaptation";
+export type { TTSBeat } from "./p7-c6-tts-adaptation";
 export { buildBriefingPack, formatBriefingPack } from "./helpers/briefing-pack";
 export { runNewsDigest, formatNewsDigest } from "./p1b-news-digest";
 export type { NewsDigest, NewsDigestEvent } from "./p1b-news-digest";

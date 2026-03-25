@@ -32,7 +32,8 @@ export const AnimatedStat: React.FC<AnimatedStatProps> = ({
   const frame = useCurrentFrame();
   const rel = Math.max(0, frame - startFrame);
 
-  const currentValue = interpolate(rel, [0, durationFrames], [0, value], {
+  const safeValue = typeof value === 'number' && Number.isFinite(value) ? value : 0;
+  const currentValue = interpolate(rel, [0, durationFrames], [0, safeValue], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
   });

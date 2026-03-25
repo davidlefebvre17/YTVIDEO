@@ -72,7 +72,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
             fontWeight: 700,
             marginTop: 4,
           }}>
-            {asset.price.toFixed(2)}
+            {(typeof asset.price === "number" ? asset.price : 0).toFixed(2)}
           </div>
         </div>
         <div style={{
@@ -84,7 +84,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
           alignItems: "center",
           gap: 4,
         }}>
-          {arrow} {isUp ? "+" : ""}{asset.changePct.toFixed(2)}%
+          {arrow} {isUp ? "+" : ""}{(typeof asset.changePct === "number" ? asset.changePct : 0).toFixed(2)}%
         </div>
       </div>
       <Sparkline
