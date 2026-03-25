@@ -75,8 +75,9 @@ async function callC7Chunk(
   direction: EpisodeDirection,
   assets: AssetSnapshot[],
   chunkLabel: string,
+  editorialVisuals?: Record<string, string>,
 ): Promise<C7DirectionResult> {
-  const { system, user } = buildC7Prompt(beats, direction.moodMusic, direction.arc, assets);
+  const { system, user } = buildC7Prompt(beats, direction.moodMusic, direction.arc, assets, editorialVisuals);
   console.log(`    C7 chunk ${chunkLabel}: ${beats.length} beats → Sonnet...`);
   return generateStructuredJSON<C7DirectionResult>(system, user, { role: 'balanced', maxTokens: 16000 });
 }
@@ -85,7 +86,7 @@ export async function runC7Direction(
   rawBeats: RawBeat[],
   direction: EpisodeDirection,
   assets: AssetSnapshot[],
-  options: { lang: Language },
+  options: { lang: Language; editorialVisuals?: Record<string, string> },
 ): Promise<C7DirectionResult> {
   const beatIds = new Set(rawBeats.map(b => b.id));
 
@@ -94,19 +95,21 @@ export async function runC7Direction(
 
     let result: C7DirectionResult;
 
+    const ev = options.editorialVisuals;
+
     if (rawBeats.length <= CHUNK_SIZE) {
-      result = await callC7Chunk(rawBeats, direction, assets, '1/1');
+      result = await callC7Chunk(rawBeats, direction, assets, '1/1', ev);
     } else {
       const chunks: RawBeat[][] = [];
       for (let i = 0; i < rawBeats.length; i += CHUNK_SIZE) {
         chunks.push(rawBeats.slice(i, i + CHUNK_SIZE));
       }
 
-      const firstResult = await callC7Chunk(chunks[0], direction, assets, `1/${chunks.length}`);
+      const firstResult = await callC7Chunk(chunks[0], direction, assets, `1/${chunks.length}`, ev);
       const allDirections = [...(firstResult.directions ?? [])];
 
       for (let c = 1; c < chunks.length; c++) {
-        const chunkResult = await callC7Chunk(chunks[c], direction, assets, `${c + 1}/${chunks.length}`);
+        const chunkResult = await callC7Chunk(chunks[c], direction, assets, `${c + 1}/${chunks.length}`, ev);
         if (Array.isArray(chunkResult.directions)) {
           allDirections.push(...chunkResult.directions);
         }

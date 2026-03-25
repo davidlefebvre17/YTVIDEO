@@ -17,25 +17,30 @@ export function buildC8Prompt(
 
 MISSION: Convert each visual direction (in French) into an optimized English prompt for Flux 1 Dev that produces WSJ hedcut-style editorial illustrations.
 
-IMPORTANT: Do NOT include style instructions (hedcut, stipple, crosshatching, cream paper, 16:9) in your prompts — the system appends the style automatically. Focus ONLY on CONTENT: what is in the scene, the composition, the lighting, the mood.
+CRITICAL STYLE RULE: Every prompt MUST describe a PEN AND INK DRAWING, not a photograph.
+- ALWAYS write prompts as if describing an illustration drawn with ink on paper
+- Use art vocabulary: "ink drawing of", "sketched", "rendered in crosshatching", "stipple shading"
+- NEVER use photographic terms: "glowing", "soft focus", "bokeh", "lens flare", "shallow depth of field", "HDR", "cinematic lighting", "photorealistic", "blurred background"
+- The subject is drawn/illustrated, NOT photographed
 
 COLOR ACCENTS: Mention selective color when relevant:
-  • "with golden color accent" for precious metals
-  • "with orange color accent" for oil/energy
-  • "with cool blue accent" for tech/crypto
-  • Everything else: no color mention (will be black ink)
+  • "with golden ink wash accent" for precious metals
+  • "with orange ink accent" for oil/energy
+  • "with cool blue ink accent" for tech/crypto
+  • Everything else: black ink only
 
 RULES:
-- Write in natural English SENTENCES (subject first, details after)
-- Each prompt: 30-50 words (CONTENT ONLY, no style words)
-- Describe human figures by PHYSICAL TRAITS: "silver-haired man in dark suit at podium" NOT "Jerome Powell"
-- Human figures shown as silhouettes, from behind, in profile, or at distance — NEVER front-facing portraits
-- Physical/tangible metaphors OK: melting, crumbling, sinking, splitting, towering
+- Start every prompt with the SUBJECT drawn in ink: "Ink drawing of..." or "Pen and ink illustration of..."
+- Each prompt: 30-50 words
+- Describe human figures by PHYSICAL TRAITS: "silver-haired man in dark suit" NOT "Jerome Powell"
+- Human figures CAN be shown face visible, 3/4 profile — editorial portrait illustration style
+- Make scenes IMPACTFUL and NARRATIVE: characters in action, metaphors visible, irony in composition
+- Physical/tangible metaphors encouraged: melting, crumbling, sinking, splitting, towering, cracking
 - Max 3 focal elements per image (Flux limitation — more = muddy result)
 - Split compositions: "left half shows X, right half shows Y, sharp vertical divide"
-- NEVER include readable text, labels, logos, signs, or writing in the image
-- NEVER use words: "text", "label", "sign", "logo", "writing", "letters", "caption"
-- NEVER describe dark, black, or colored backgrounds — the background is ALWAYS aged cream/beige paper (enforced by style prefix). Do not write "black background", "dark surface", "black velvet", etc.
+- Background is ALWAYS cream/ivory paper — never dark, never black
+- NEVER include readable text, labels, logos, signs in the image
+- NEVER use words: "text", "label", "sign", "logo", "writing", "glowing", "soft focus", "bokeh", "cinematic"
 
 NARRATIVE AWARENESS:
 - The direction includes a "narrativeRole" — use it to calibrate emotional intensity

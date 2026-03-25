@@ -201,6 +201,8 @@ export interface NarrationSegment {
   transitionTo?: string;
   durationSec: number;
   wordCount: number;
+  /** Editorial visual concept from Opus — narrative illustration idea for this segment */
+  editorialVisual?: string;
 }
 
 export interface NarrationBlock {

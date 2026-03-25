@@ -14,14 +14,14 @@ import { runC8ImagePrompts } from "../packages/ai/src/pipeline/p7c-image-prompts
 import { computeOverlayDelay } from "../packages/ai/src/pipeline/p7a-beat-generator";
 
 // ── Load latest episode ──
-const episodePath = path.resolve(__dirname, "..", "episodes", "2026", "03-20.json");
+const episodePath = path.resolve(__dirname, "..", "episodes", "2026", "03-23.json");
 console.log(`Loading episode: ${episodePath}`);
 const episode = JSON.parse(fs.readFileSync(episodePath, "utf-8"));
 const script: EpisodeScript = episode.script;
 const snapshot: DailySnapshot = episode.snapshot;
 
 // Load C2 analysis if available (enriches overlays with levels, RSI, causal chains)
-const analysisPath = path.resolve(__dirname, "..", "data", "pipeline", "2026-03-20", "analysis.json");
+const analysisPath = path.resolve(__dirname, "..", "data", "pipeline", "2026-03-23", "analysis.json");
 let analysis: any = undefined;
 if (fs.existsSync(analysisPath)) {
   analysis = JSON.parse(fs.readFileSync(analysisPath, "utf-8"));
@@ -45,7 +45,18 @@ async function main() {
     moodMusic: 'neutre_analytique' as const,
     thumbnailMoment: { segmentId: 'seg_1', reason: '', emotionalTone: '' },
   };
-  const c7Result = await runC7Direction(rawBeats, direction, snapshot.assets, { lang: script.lang });
+  // Extract editorial visual concepts from Opus (P4) if available
+  const editorialVisuals: Record<string, string> = {};
+  for (const sec of script.sections) {
+    if ((sec as any).editorialVisual) {
+      editorialVisuals[sec.id] = (sec as any).editorialVisual;
+    }
+  }
+  if (Object.keys(editorialVisuals).length) {
+    console.log(`  Editorial visuals from Opus: ${Object.keys(editorialVisuals).length} segments`);
+  }
+
+  const c7Result = await runC7Direction(rawBeats, direction, snapshot.assets, { lang: script.lang, editorialVisuals });
   console.log(`  Identity: ${c7Result.visualIdentity.colorTemperature} / ${c7Result.visualIdentity.lightingRegister}`);
   console.log(`  Style: ${c7Result.visualIdentity.photographicStyle}`);
   const reuses = c7Result.directions.filter(d => d.imageReuse).length;
@@ -74,10 +85,6 @@ async function main() {
     const finalOverlayType = dir?.overlay && dir.overlay !== 'none' ? dir.overlay : null;
 
     let overlayData = raw.overlayData ?? {};
-    if (finalOverlayType && (finalOverlayType !== raw.overlayHint || Object.keys(overlayData).length === 0)) {
-      const { resolveOverlayData } = require('../packages/ai/src/pipeline/p7a-beat-generator');
-      overlayData = resolveOverlayData(raw.narrationChunk, finalOverlayType, snapshot.assets, raw.assets, snapshot);
-    }
 
     const delay = finalOverlayType
       ? computeOverlayDelay(raw.narrationChunk, finalOverlayType, raw.durationSec * 1000)

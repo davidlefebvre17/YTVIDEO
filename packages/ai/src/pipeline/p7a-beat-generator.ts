@@ -137,7 +137,7 @@ export async function generateBeats(
   }
 
   // Step 3: Safety cap
-  capOverlayRatio(beats, 0.55);
+  capOverlayRatio(beats, 0.65);
 
   return beats;
 }
@@ -149,10 +149,10 @@ function mergeAnnotations(beats: RawBeat[], annotations: BeatAnnotation[]): void
 
   for (const beat of beats) {
     const ann = annMap.get(beat.id);
-    if (!ann) continue;
+    if (!ann || ann.overlayType === 'none') continue;
 
     beat.overlayHint = ann.overlayType;
-    beat.overlayData = ann.overlaySpec ?? undefined;
+    beat.overlayData = normalizeOverlayData(ann.overlayType, ann.overlaySpec, ann.primaryAsset);
 
     // Store annotation fields in beat for downstream use (C7, Remotion)
     (beat as any).emotion = ann.emotion;
@@ -162,6 +162,108 @@ function mergeAnnotations(beats: RawBeat[], annotations: BeatAnnotation[]): void
     (beat as any).isKeyMoment = ann.isKeyMoment;
     (beat as any).triggerWord = ann.triggerWord;
     (beat as any).primaryAsset = ann.primaryAsset;
+  }
+}
+
+/**
+ * Normalize Haiku overlay data to the format expected by Remotion DataOverlay.
+ */
+function normalizeOverlayData(
+  type: string,
+  spec: Record<string, unknown> | null,
+  primaryAsset: string | null,
+): Record<string, unknown> | undefined {
+  if (!spec) return undefined;
+
+  switch (type) {
+    case 'stat': {
+      // Haiku: { value, unit/format/suffix, asset/label }
+      // Remotion expects: { value, suffix, label, prefix }
+      return {
+        value: spec.value ?? 0,
+        suffix: spec.suffix ?? spec.unit ?? spec.format ?? '%',
+        label: spec.label ?? spec.asset ?? primaryAsset ?? '',
+        prefix: spec.prefix ?? '',
+      };
+    }
+
+    case 'chart':
+    case 'chart_zone': {
+      // Haiku: { asset, levels: [num, num], type, labels }
+      // Remotion expects: { symbol, name, price, changePct, levels: [{value, label, type}], rsi, candleCount }
+      const levels = Array.isArray(spec.levels)
+        ? spec.levels.map((l: any, i: number) => {
+            if (typeof l === 'number') {
+              const labels = Array.isArray(spec.labels) ? spec.labels : [];
+              return { value: l, label: (labels as string[])[i] ?? `${l}`, type: 'level' };
+            }
+            return l; // already {value, label, type}
+          })
+        : [];
+      return {
+        symbol: spec.asset ?? spec.symbol ?? primaryAsset,
+        name: spec.name ?? spec.asset ?? primaryAsset,
+        price: spec.price,
+        changePct: spec.changePct,
+        levels,
+        rsi: spec.rsi,
+        candleCount: spec.candleCount ?? 0,
+      };
+    }
+
+    case 'causal_chain': {
+      // Haiku: { steps: [str, str, ...] } — matches Remotion
+      return spec;
+    }
+
+    case 'scenario_fork': {
+      // Haiku: { bullish: { target, condition }, bearish: { target, condition } }
+      // Remotion expects: { trunk, bull, bear }
+      const bull = spec.bullish as any;
+      const bear = spec.bearish as any;
+      return {
+        trunk: spec.trunk ?? primaryAsset ?? '',
+        bull: bull ? `${bull.target ?? ''} — ${bull.condition ?? ''}`.trim() : (spec.bull as string) ?? '',
+        bear: bear ? `${bear.target ?? ''} — ${bear.condition ?? ''}`.trim() : (spec.bear as string) ?? '',
+      };
+    }
+
+    case 'comparison': {
+      // Haiku: { assets: [sym, sym], values: [num, num], labels: [str, str] }
+      // Remotion expects: { assets: [{ symbol, label, value, changePct }] }
+      const symbols = (spec.assets ?? []) as string[];
+      const values = (spec.values ?? []) as number[];
+      const labels = (spec.labels ?? symbols) as string[];
+      return {
+        assets: symbols.map((sym, i) => ({
+          symbol: sym,
+          label: labels[i] ?? sym,
+          changePct: values[i] ?? 0,
+        })),
+      };
+    }
+
+    case 'gauge': {
+      // Haiku: { type, value, asset } or { label, value, min, max }
+      // Remotion expects: { label, value, min, max }
+      return {
+        label: spec.label ?? spec.type ?? spec.asset ?? '',
+        value: spec.value ?? 0,
+        min: spec.min ?? 0,
+        max: spec.max ?? 100,
+      };
+    }
+
+    case 'headline': {
+      // Haiku: { text, actor, source } — Remotion expects: { title, source }
+      return {
+        title: spec.title ?? spec.text ?? '',
+        source: spec.source ?? spec.actor ?? '',
+      };
+    }
+
+    default:
+      return spec;
   }
 }
 

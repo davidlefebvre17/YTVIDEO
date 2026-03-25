@@ -34,6 +34,7 @@ export function buildC7Prompt(
   mood: MoodTag,
   arc: ArcBeat[],
   assets: AssetSnapshot[],
+  editorialVisuals?: Record<string, string>,
 ): { system: string; user: string } {
 
   const system = `Tu es un directeur artistique qui pense comme un caricaturiste éditorial du Wall Street Journal ou du New York Times.
@@ -68,14 +69,22 @@ Tu utiliseras ces éléments comme FONDATIONS pour les 100+ beats à venir.
 
 Style : **WSJ hedcut — illustration à l'encre noire sur papier crème, hachures croisées, accents couleur sélectifs UNIQUEMENT sur éléments clés du récit**
 
-Rules absolues :
+Règles absolues :
 - Format 16:9 large toujours
 - Noir et blanc dominant (encre, hachures)
 - Accents couleur : OR sur or/métaux précieux, ORANGE sur pétrole, BLEU sur tech, GRIS sur crypto
-- PAS de visages identifiables (silhouettes, profils, dos)
-- PAS de texte, labels, symboles dans l'image
-- Jamais cartoon/caricature — documentaire éditorial, sérieux, intelligent
-- Détails physiques tangibles UNIQUEMENT : objets, architecture, paysage, figures, lumière
+- PERSONNAGES RECONNAISSABLES encouragés : décris-les par TRAITS PHYSIQUES distinctifs (pas par nom)
+  • "homme aux cheveux blonds en arrière, costume sombre, cravate rouge" = Trump
+  • "homme aux cheveux argentés, lunettes, costume sombre, au podium" = Powell
+  • "femme aux cheveux courts gris, tailleur sombre" = Lagarde
+  Les personnages doivent être VUS (face, profil 3/4, composition éditoriale), pas des silhouettes de dos
+- IMPACT SATIRIQUE : les images doivent RACONTER l'histoire avec ironie, contraste, métaphore visuelle
+  • Split compositions (gauche/droite avec fissure au milieu)
+  • Personnages en action (jouant aux échecs, portant des lingots, regardant un écran qui s'effondre)
+  • Objets symboliques fracturés, fondus, renversés
+- PAS de texte, labels, symboles écrits dans l'image
+- Le style reste ÉDITORIAL SÉRIEUX (The Economist, NYT) — pas cartoon humoristique ni caricature exagérée
+- Détails physiques tangibles : objets, architecture, paysage, figures humaines, lumière
 
 ## PHASE 3 : RYTHME VISUEL — ALTERNER LES ÉCHELLES
 
@@ -156,7 +165,7 @@ Retourne un JSON strict :
     "colorTemperature": "warm" | "cool" | "neutral",
     "lightingRegister": "soft_natural" | "golden_hour" | "overcast" | "studio_warm",
     "photographicStyle": "WSJ hedcut — black ink crosshatching, cream paper, selective color accents (gold/orange/blue only), documentary editorial style, no text, 16:9 wide format",
-    "forbiddenElements": ["identifiable_faces", "cartoon_style", "neon", "text_labels", "abstract_concepts", "bright_red", "modern_flat_design"]
+    "forbiddenElements": ["cartoon_exaggeration", "neon", "text_labels", "abstract_concepts", "bright_red", "modern_flat_design"]
   },
   "directions": [
     {
@@ -188,6 +197,13 @@ Retourne un JSON strict :
 ## Actifs clés
 ${assetSummary}
 
+## Concepts visuels éditoriaux (Opus — point de départ OBLIGATOIRE)
+${editorialVisuals && Object.keys(editorialVisuals).length > 0
+  ? Object.entries(editorialVisuals).map(([seg, concept]) => `- **${seg}**: ${concept}`).join('\n')
+  : '(Aucun concept fourni — invente des scènes narratives percutantes)'}
+
+RÈGLE : ces concepts viennent du rédacteur en chef (Opus). Tu DOIS les utiliser comme BASE pour tes directions image. Tu peux adapter la composition mais PAS remplacer par des scènes décoratives (bureaux vides, smartphones sur table = INTERDIT).
+
 ## Beats à diriger (${beats.length} beats)
 
 ${JSON.stringify(compacted, null, 0)}
@@ -207,7 +223,7 @@ ${JSON.stringify(compacted, null, 0)}
 
 RAPPEL CRITIQUE :
 - Chaque beat a une image (pas de vides)
-- Pas de noms/visages identifiables (traits physiques seulement)
+- Personnages par traits physiques (pas de noms) — FACES VISIBLES encouragées
 - Échelles alternes (macro/moyen/micro)
 - Continuité des personnages across beats
 - Métaphores TANGIBLES (pas abstraites)`;

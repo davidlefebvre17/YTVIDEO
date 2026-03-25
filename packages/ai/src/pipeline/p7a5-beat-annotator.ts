@@ -116,14 +116,16 @@ Pour CHAQUE beat:
 1. **primaryAsset** (string|null): Identifie l'actif principal mentionné (symbole ticker exact). Résous les pronoms en lisant les beats précédents. Si aucun actif: null.
 
 2. **overlayType** (enum): Classe le type d'overlay visuel:
-   - 'chart': InkChart avec narration sur ligne ou bougie
-   - 'stat': Chiffre géant animé (count-up)
-   - 'causal_chain': Chaîne causale visuelle (steps)
-   - 'scenario_fork': Fork bullish/bearish animé
-   - 'gauge': RSI, Fear&Greed ou autre jauge circulaire
-   - 'comparison': 2 barres ou split-screen (J-1 vs J0)
-   - 'headline': Titre ou déclaration politique
-   - 'none': Pas d'overlay, fond seul
+   - 'chart': Quand la narration mentionne un PRIX, un NIVEAU technique (support, résistance, SMA, moyenne mobile), ou un RSI → TOUJOURS chart. Inclure levels et rsi dans overlaySpec.
+   - 'stat': Quand la narration donne un CHIFFRE CLÉ (variation %, prix absolu, volume) SANS contexte de niveaux techniques → stat avec count-up animé
+   - 'causal_chain': Quand la narration EXPLIQUE un mécanisme cause→effet entre actifs
+   - 'scenario_fork': Quand la narration présente des SCÉNARIOS haussier/baissier avec cibles
+   - 'gauge': RSI extrême (<30 ou >70), Fear&Greed, VIX → jauge circulaire
+   - 'comparison': Quand la narration COMPARE explicitement 2+ actifs côte à côte
+   - 'headline': Quand la narration cite une ACTUALITÉ spécifique ou déclaration politique
+   - 'none': Transitions, contexte général, respiration — pas de données à afficher
+
+   RÈGLE CRITIQUE : dès que la narration cite un PRIX ou NIVEAU (ex: "à 6506", "SMA 200 à 6624", "résistance à 99", "RSI à 30"), c'est TOUJOURS un chart ou gauge, JAMAIS "none".
 
 3. **overlaySpec** (object|null): Données structurées type-spécifiques:
    - chart: { asset, levels: [support, resistance], type: "price_line"|"zone_highlight"|... }
@@ -168,7 +170,7 @@ Pour CHAQUE beat:
 
 - **C2 verbatim**: Si overlayType='causal_chain', copie exactement C2.causalChain dans overlaySpec.steps. Idem pour scenario_fork.
 - **Extraction numérique**: "un virgule cinquante et un pour cent" → {value: 1.51, format: "%"}
-- **Ratio overlay**: Max 55% de beats avec overlay (non-'none')
+- **Ratio overlay**: Max 65% de beats avec overlay (non-'none') — privilégie les données visuelles
 - **Pas 3 consécutifs**: Interdiction de 3 beats consécutifs avec le même overlayType
 - **Asset validation**: primaryAsset doit exister dans la snapshot ou être null
 - **triggerWord**: Doit être trouvé dans narrationChunk (case-insensitive)

@@ -68,6 +68,13 @@ export const BackgroundImage: React.FC<BackgroundImageProps> = ({
     <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
       <Img
         src={imageSrc}
+        onError={(e) => {
+          // Fallback to cream gradient if image fails to load
+          (e.target as HTMLImageElement).style.display = 'none';
+          if (e.target instanceof HTMLImageElement && e.target.parentElement) {
+            e.target.parentElement.style.background = `linear-gradient(135deg, ${BRAND.colors.cream}, ${BRAND.colors.creamDark})`;
+          }
+        }}
         style={{
           width,
           height,

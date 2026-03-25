@@ -42,7 +42,7 @@ function loadPrevContextFromEpisodes(currentDate: string, maxEntries = 15): Prev
   return { entries };
 }
 import { runWeeklyJob } from "@yt-maker/ai";
-import type { EpisodeType, Language, EpisodeManifestEntry } from "@yt-maker/core";
+import type { EpisodeType, Language, EpisodeManifestEntry, DailySnapshot } from "@yt-maker/core";
 
 // Parse CLI args
 function parseArgs() {
@@ -69,6 +69,7 @@ async function main() {
   const lang = (opts.lang as Language) || "fr";
   const skipTts = !!opts["skip-tts"];
   const skipRender = !!opts["no-render"];
+  const skipFetch = !!opts["skip-fetch"];
   // Default to yesterday — videos are morning recaps of the previous trading day
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
@@ -85,16 +86,22 @@ async function main() {
     console.warn(`  Tagger initialization warning: ${(err as Error).message}`);
   }
 
-  // 1. Fetch market data
-  console.log("\n--- Step 1: Fetching market data ---");
-  const snapshot = await fetchMarketSnapshot(date);
-
-  // Save snapshot
+  // 1. Fetch market data (or load existing snapshot with --skip-fetch)
   const dataDir = path.resolve(__dirname, "..", "data");
   if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
   const snapshotPath = path.join(dataDir, `snapshot-${date}.json`);
-  fs.writeFileSync(snapshotPath, JSON.stringify(snapshot, null, 2));
-  console.log(`Snapshot saved: ${snapshotPath}`);
+
+  let snapshot: DailySnapshot;
+  if (skipFetch && fs.existsSync(snapshotPath)) {
+    console.log("\n--- Step 1: Loading existing snapshot (--skip-fetch) ---");
+    snapshot = JSON.parse(fs.readFileSync(snapshotPath, "utf-8"));
+    console.log(`Snapshot loaded: ${snapshotPath} (${snapshot.assets?.length ?? 0} assets)`);
+  } else {
+    console.log("\n--- Step 1: Fetching market data ---");
+    snapshot = await fetchMarketSnapshot(date);
+    fs.writeFileSync(snapshotPath, JSON.stringify(snapshot, null, 2));
+    console.log(`Snapshot saved: ${snapshotPath}`);
+  }
 
   // 1a. Tag & store news in SQLite (D2)
   console.log("\n--- Step 1a: Tagging and storing news (D2 News Memory) ---");
