@@ -109,6 +109,26 @@ const NewspaperCanvasStatic: React.FC<Record<string, unknown>> = (props) => (
   <NewspaperCanvas script={props.script as EpisodeScript} accentColor={BRAND.colors.accentDefault} />
 );
 
+const LOREM = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.";
+const EmptyNewspaperPage: React.FC = () => (
+  <NewspaperPage
+    title=""
+    date={new Date().toISOString().split("T")[0]}
+    segments={[
+      { id: "seg_1", title: "", depth: "deep", narration: LOREM + " " + LOREM },
+      { id: "seg_2", title: "", depth: "deep", narration: LOREM + " " + LOREM },
+      { id: "seg_3", title: "", depth: "focus", narration: LOREM },
+      { id: "seg_4", title: "", depth: "focus", narration: LOREM },
+      { id: "seg_5", title: "", depth: "flash", narration: LOREM },
+      { id: "seg_6", title: "", depth: "flash", narration: LOREM },
+    ]}
+    threadSummary="Les marchés décortiqués, chaque soir. Analyse éditoriale indépendante des mouvements de la journée. Les marchés décortiqués, chaque soir."
+    showTypewriter={false}
+  />
+);
+
+import { NewspaperPage } from "./scenes/shared/NewspaperPage";
+
 // Fallback sections for legacy Scenes folder when script uses pipeline format
 const FALLBACK_SECTION = (type: string): ScriptSection => ({
   id: type, type: type as any, title: type, narration: '', durationSec: 10, visualCues: [],
@@ -373,6 +393,15 @@ export const RemotionRoot: React.FC = () => {
           defaultProps={{
             script: SAMPLE_SCRIPT,
           }}
+        />
+        {/* Empty newspaper page — for Veo lastFrame transition */}
+        <Composition
+          id="EmptyNewspaper"
+          component={EmptyNewspaperPage}
+          durationInFrames={30}
+          fps={30}
+          width={1920}
+          height={1080}
         />
       </Folder>
 

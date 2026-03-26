@@ -38,6 +38,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@fal-ai/client": "^1.9.5",
     "@remotion/transitions": "^4.0.425",
     "better-sqlite3": "^12.6.2",
     "dotenv": "^17.3.1",

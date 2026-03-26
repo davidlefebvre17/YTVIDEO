@@ -446,9 +446,68 @@ async function main() {
     }
 
     saveToEpisode(date, "audio-manifest.json", audioManifest);
+
+    // ── Step 5b: Generate owl audio (intro, transitions, closing) ──
+    console.log("  Generating owl audio...");
+    const owlAudioDir = path.join(epDir, "audio", "owl");
+    if (!fs.existsSync(owlAudioDir)) fs.mkdirSync(owlAudioDir, { recursive: true });
+    const owlPublicDir = path.resolve(__dirname, "..", "packages", "remotion-app", "public", "audio", "owl");
+    if (!fs.existsSync(owlPublicDir)) fs.mkdirSync(owlPublicDir, { recursive: true });
+
+    const owlTexts: Array<{ id: string; text: string }> = [];
+
+    // owlIntro
+    if (script.owlIntro) owlTexts.push({ id: "owl_intro", text: script.owlIntro });
+
+    // owlTransitions per segment
+    for (const sec of script.sections) {
+      if (sec.owlTransition) owlTexts.push({ id: `owl_tr_${sec.id}`, text: sec.owlTransition });
+    }
+
+    // owlClosing
+    if (script.owlClosing) owlTexts.push({ id: "owl_closing", text: script.owlClosing });
+
+    const generatedOwlPaths: Record<string, string> = {};
+    if (owlTexts.length > 0) {
+      // Generate each owl audio as a separate beat
+      const owlBeats = owlTexts.map(t => ({
+        id: t.id, segmentId: "owl", narrationChunk: t.text,
+        durationSec: t.text.split(/\s+/).length / 2.5,
+        timing: { estimatedDurationSec: t.text.split(/\s+/).length / 2.5 },
+        audioPath: "", imagePath: "", imagePrompt: "", imageEffect: "static" as any,
+        transitionOut: "fade" as any, emotion: "contexte" as any, overlay: null,
+      }));
+      const { manifest: owlManifest } = await generateBeatAudio(
+        owlBeats as any, lang, owlAudioDir, "audio/owl",
+        { skipExisting: false },
+      );
+      // Copy to public + track paths
+      for (const ob of owlBeats) {
+        if (!ob.audioPath) continue;
+        const filename = path.basename(ob.audioPath);
+        const src = path.join(owlAudioDir, filename);
+        const dst = path.join(owlPublicDir, filename);
+        if (fs.existsSync(src)) fs.copyFileSync(src, dst);
+        generatedOwlPaths[ob.id] = `audio/owl/${filename}`;
+      }
+      console.log(`  ${owlTexts.length} owl audio clips generated`);
+    }
+
+    // Store owl audio paths for props
+    saveToEpisode(date, "owl-audio-paths.json", generatedOwlPaths);
+
   } else {
     console.log("\n═══ Step 5: TTS SKIPPED (--skip-tts) ═══");
   }
+
+  // Load owl audio paths (from current or previous run)
+  let owlAudioPaths: Record<string, string> = {};
+  try {
+    const owlPathsFile = path.join(epDir, "owl-audio-paths.json");
+    if (fs.existsSync(owlPathsFile)) {
+      owlAudioPaths = JSON.parse(fs.readFileSync(owlPathsFile, "utf-8"));
+    }
+  } catch {}
 
   // ════════════════════════════════════════════════════════════
   // STEP 6: SAVE EPISODE + RENDER
@@ -459,11 +518,19 @@ async function main() {
   saveToEpisode(date, "beats.json", beats);
 
   // Build and save Remotion props
+  const owlTransitionAudios: Record<string, string> = {};
+  for (const sec of script.sections) {
+    const key = `owl_tr_${sec.id}`;
+    if (owlAudioPaths[key]) owlTransitionAudios[sec.id] = owlAudioPaths[key];
+  }
   const remotionProps = {
     script,
     beats,
     assets: snapshot.assets,
     news: snapshot.news,
+    owlIntroAudio: owlAudioPaths["owl_intro"] || undefined,
+    owlClosingAudio: owlAudioPaths["owl_closing"] || undefined,
+    owlTransitionAudios,
   };
   const propsPath = saveRemotionProps(date, remotionProps);
   console.log(`  Props saved: ${propsPath}`);

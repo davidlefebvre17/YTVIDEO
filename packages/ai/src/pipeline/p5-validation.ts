@@ -31,9 +31,12 @@ const ANGLICISM_FIXES: [RegExp, string][] = [
 
 function getAllNarration(draft: DraftScript): string {
   const parts = [
+    draft.owlIntro ?? '',
     draft.coldOpen?.narration ?? '',
     draft.thread?.narration ?? '',
     ...draft.segments.map(s => s.narration),
+    ...draft.segments.map(s => s.owlTransition ?? ''),
+    draft.owlClosing ?? '',
     draft.closing?.narration ?? '',
   ];
   return parts.join(' ');
@@ -389,23 +392,34 @@ function fixAnglicisms(draft: DraftScript): void {
 // ── Semantic validation (Haiku C4) ──────────────────────
 
 function buildC4SystemPrompt(): string {
-  return `Tu es un validateur éditorial pour une émission de marché financier. Tu vérifies la qualité et la compliance d'un script.
+  return `Tu es un validateur éditorial pour Owl Street Journal — une vidéo quotidienne d'analyse financière. Le narrateur est un hibou anthropomorphe qui TUTOIE le spectateur. Tout le texte est parlé à voix haute.
 
 RÔLE : Identifier les problèmes. Tu NE réécris PAS le script entier — tu corriges uniquement les problèmes mineurs (warnings).
 
+STRUCTURE DU SCRIPT :
+- owlIntro : accueil du hibou (salutation + date + disclaimer + abonne-toi)
+- coldOpen : fait choc (télégraphique)
+- thread : fil conducteur
+- segments[] : chacun avec narration + owlTransition (phrase courte du hibou entre segments)
+- owlClosing : mot de la fin du hibou
+- closing : conclusion factuelle
+Tous ces champs sont PARLÉS. Ne supprime aucun de ces champs.
+
 VÉRIFICATIONS :
-1. COMPLIANCE : Aucune recommandation directe, même déguisée ("le bon moment pour...", "on devrait...")
-2. TON : Jamais retail ("t'as vu", "c'est dingue", "pépite", "to the moon")
-3. COHÉRENCE TEMPORELLE : J vs J-1 clairement distingués, pas d'ambiguïté
-4. CONTINUITÉS : Si le plan éditorial mentionne une continuité J-1, elle DOIT être dans la narration
-5. CONFIANCE : Le ton doit correspondre au confidenceLevel (speculative → conditionnel, high → direct)
+1. COMPLIANCE : Aucune recommandation directe, même déguisée ("le bon moment pour...", "on devrait..."). Le disclaimer est dans owlIntro — pas besoin de le répéter.
+2. TUTOIEMENT : Le hibou TUTOIE toujours. Jamais "vous". Corrige en blocker si vouvoiement détecté.
+3. TON : Sobre, humble, enseignant. Jamais retail ("t'as vu", "c'est dingue", "pépite", "to the moon"). Jamais racoleur.
+4. COHÉRENCE TEMPORELLE : J vs J-1 clairement distingués, pas d'ambiguïté
+5. CONTINUITÉS : Si le plan éditorial mentionne une continuité J-1, elle DOIT être dans la narration
+6. CONFIANCE : Le ton doit correspondre au confidenceLevel (speculative → conditionnel, high → direct)
+7. VOIX : Pas de sigles imprononçables (SMA200 → "moyenne mobile deux cents jours"). Chiffres écrits pour être lus.
 
 RÈGLES :
-- severity = "blocker" : recommandation directe, ton retail persistant, continuité manquante
-- severity = "warning" : transition maladroite, formulation améliorable
+- severity = "blocker" : recommandation directe, vouvoiement, ton retail persistant, continuité manquante
+- severity = "warning" : transition maladroite, formulation améliorable, sigle imprononçable
 - Pour les warnings : propose un suggestedFix ET corrige directement dans validatedScript
 - NE PAS inventer de problèmes — si le script est bon, retourne status: "pass"
-- Tu peux modifier le texte pour corriger des warnings mais JAMAIS changer le sens ou la structure
+- Tu peux modifier le texte pour corriger des warnings mais JAMAIS changer le sens, la structure, ou supprimer owlIntro/owlClosing/owlTransition
 
 SORTIE : JSON strict avec status, issues[], et validatedScript (le script éventuellement modifié).`;
 }
@@ -463,6 +477,9 @@ function mergeValidatedScript(original: DraftScript, validated: DraftScript | un
     ...original,
     // Preserve metadata from original (C4 never sees this)
     metadata: original.metadata,
+    // Preserve owl fields (C4 doesn't touch these)
+    owlIntro: original.owlIntro,
+    owlClosing: original.owlClosing,
     // Merge cold open narration if C4 provided one
     coldOpen: original.coldOpen ? {
       ...original.coldOpen,

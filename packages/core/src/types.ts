@@ -43,6 +43,8 @@ export interface ScriptSection {
   assets?: string[];
   /** Concept visuel éditorial (Opus C3) — scène narrative pour le directeur artistique C7 */
   editorialVisual?: string;
+  /** Phrase de transition du hibou avant ce segment */
+  owlTransition?: string;
 }
 
 export interface EpisodeDirection {
@@ -92,6 +94,10 @@ export interface EpisodeScript {
   segmentCount: number;
   coverageTopics: string[];
   direction?: EpisodeDirection;
+  /** Owl intro speech (welcome + date + disclaimer) */
+  owlIntro?: string;
+  /** Owl closing speech (recap + subscribe + goodbye) */
+  owlClosing?: string;
 }
 
 export interface MultiTimeframeAnalysis {

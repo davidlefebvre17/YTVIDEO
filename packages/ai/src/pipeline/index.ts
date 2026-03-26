@@ -122,6 +122,7 @@ export function toEpisodeScript(
     topic: seg.topic,
     assets: seg.assets,
     editorialVisual: seg.editorialVisual,
+    owlTransition: seg.owlTransition,
     data: {
       depth: seg.depth,
       topic: seg.topic,
@@ -156,6 +157,8 @@ export function toEpisodeScript(
       moodMusic: directed.moodMusic,
       thumbnailMoment: directed.thumbnailMoment,
     },
+    owlIntro: script.owlIntro,
+    owlClosing: script.owlClosing,
   };
 }
 

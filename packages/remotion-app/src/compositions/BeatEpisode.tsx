@@ -15,6 +15,9 @@ import {
   useCurrentFrame,
   useVideoConfig,
   interpolate,
+  Video,
+  Audio,
+  staticFile,
 } from "remotion";
 import type {
   EpisodeScript,
@@ -42,8 +45,64 @@ export interface BeatEpisodeProps {
   script: EpisodeScript;
   beats: Beat[];
   assets?: AssetSnapshot[];
+  /** Owl intro audio path (played over owl video clips) */
+  owlIntroAudio?: string;
+  /** Owl closing audio path */
+  owlClosingAudio?: string;
+  /** Owl transition audio paths per segment */
+  owlTransitionAudios?: Record<string, string>;
   [key: string]: unknown;
 }
+
+// ── Owl video clips ──────────────────────────────────────────
+const OWL_INTRO_SRC = staticFile("owl-video/owl_intro_std_1080p.mp4");
+const OWL_DIVE_SRC = staticFile("owl-video/owl_clip2_kling.mp4");
+const OWL_INTRO_FRAMES = 240; // 8s @ 30fps
+const OWL_DIVE_FRAMES = 300; // 10s @ 30fps
+const OWL_CROSSFADE = 20; // crossfade from dive video into NewspaperPage
+const OWL_CLIP_OVERLAP = 15; // overlap between intro and dive for smooth transition
+
+/** Owl clip with fade-out at end */
+const OwlClipFade: React.FC<{
+  durationInFrames: number;
+  fadeOutFrames: number;
+  children: React.ReactNode;
+}> = ({ durationInFrames, fadeOutFrames, children }) => {
+  const frame = useCurrentFrame();
+  const op = interpolate(frame, [durationInFrames - fadeOutFrames, durationInFrames], [1, 0], {
+    extrapolateLeft: "clamp", extrapolateRight: "clamp",
+  });
+  return <AbsoluteFill style={{ opacity: op }}>{children}</AbsoluteFill>;
+};
+
+/** Owl dive clip: fade-in at start, crossfade to newspaper at end */
+const OwlDiveWithCrossfade: React.FC<{
+  durationInFrames: number;
+  children: React.ReactNode;
+}> = ({ durationInFrames, children }) => {
+  const frame = useCurrentFrame();
+  // Fade in at start (overlaps with intro clip)
+  const fadeIn = interpolate(frame, [0, OWL_CLIP_OVERLAP], [0, 1], {
+    extrapolateLeft: "clamp", extrapolateRight: "clamp",
+  });
+  // Fade out at end (crossfade to newspaper)
+  const fadeStart = durationInFrames - OWL_CROSSFADE;
+  const videoOp = interpolate(frame, [fadeStart, durationInFrames], [1, 0], {
+    extrapolateLeft: "clamp", extrapolateRight: "clamp",
+  });
+  const pageOp = interpolate(frame, [fadeStart, durationInFrames], [0, 1], {
+    extrapolateLeft: "clamp", extrapolateRight: "clamp",
+  });
+  const combinedVideoOp = Math.min(fadeIn, videoOp);
+  return (
+    <AbsoluteFill>
+      <AbsoluteFill style={{ opacity: pageOp }}>{children}</AbsoluteFill>
+      <AbsoluteFill style={{ opacity: combinedVideoOp }}>
+        <Video src={OWL_DIVE_SRC} style={{ width: "100%", height: "100%" }} />
+      </AbsoluteFill>
+    </AbsoluteFill>
+  );
+};
 
 // ── Constants ────────────────────────────────────────────────
 const DISCLAIMER_FRAMES = 90; // 3s
@@ -165,7 +224,8 @@ export function computeNewspaperDuration(
     ? groupDurationFrames(groups.get("closing")!, fps) + 60
     : MIN_CLOSING_FRAMES;
 
-  return DISCLAIMER_FRAMES + newspaperIntro + segTotal + closingDur;
+  const owlTotal = OWL_INTRO_FRAMES + OWL_DIVE_FRAMES - OWL_CLIP_OVERLAP;
+  return owlTotal + newspaperIntro + segTotal + closingDur;
 }
 
 // ── CrossfadeBeat ────────────────────────────────────────────
@@ -206,6 +266,9 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
   script,
   beats,
   assets = [],
+  owlIntroAudio,
+  owlClosingAudio,
+  owlTransitionAudios = {},
 }) => {
   const { fps } = useVideoConfig();
   const mood = script.direction?.moodMusic ?? "neutre_analytique";
@@ -262,8 +325,10 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
     );
 
     // Section start times (absolute frames)
+    // Owl intro + dive replaces disclaimer; newspaper intro follows
+    const owlTotalFrames = OWL_INTRO_FRAMES + OWL_DIVE_FRAMES - OWL_CLIP_OVERLAP;
     const sectionStarts = new Map<string, number>();
-    let preCum = DISCLAIMER_FRAMES;
+    let preCum = owlTotalFrames;
     for (const id of PRE_SEGMENT_IDS) {
       if (beatGroups.has(id)) {
         sectionStarts.set(id, preCum);
@@ -280,7 +345,7 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
       zoomOutStart: number;
       end: number;
     }
-    let segCum = DISCLAIMER_FRAMES + newspaperIntroFrames;
+    let segCum = owlTotalFrames + newspaperIntroFrames;
     const segs: SegTiming[] = segmentIds.map((segId, i) => {
       const dur = groupDurationFrames(
         beatGroups.get(segId) ?? [],
@@ -372,14 +437,27 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
   // ── Render ──
   return (
     <AbsoluteFill style={{ backgroundColor: BRAND.colors.cream }}>
-      {/* ── 1. Disclaimer (3s) ── */}
-      <Sequence from={0} durationInFrames={DISCLAIMER_FRAMES}>
-        <DisclaimerScene />
+      {/* ── 1. Owl Intro clip (8s) — fades out at end ── */}
+      <Sequence from={0} durationInFrames={OWL_INTRO_FRAMES}>
+        <OwlClipFade durationInFrames={OWL_INTRO_FRAMES} fadeOutFrames={OWL_CLIP_OVERLAP}>
+          <Video src={OWL_INTRO_SRC} style={{ width: "100%", height: "100%" }} />
+        </OwlClipFade>
       </Sequence>
 
-      {/* ── 2. Newspaper intro (pre-segment audio plays over this) ── */}
+      {/* ── 2. Owl Dive clip (10s) — fades in at start, crossfades to newspaper at end ── */}
+      <Sequence from={OWL_INTRO_FRAMES - OWL_CLIP_OVERLAP} durationInFrames={OWL_DIVE_FRAMES}>
+        <OwlDiveWithCrossfade durationInFrames={OWL_DIVE_FRAMES}>
+          <NewspaperPage
+            {...npProps}
+            activeSegmentIdx={0}
+            showTypewriter
+          />
+        </OwlDiveWithCrossfade>
+      </Sequence>
+
+      {/* ── 3. Newspaper intro (pre-segment audio plays over this) ── */}
       <Sequence
-        from={DISCLAIMER_FRAMES}
+        from={OWL_INTRO_FRAMES + OWL_DIVE_FRAMES - OWL_CLIP_OVERLAP}
         durationInFrames={timings.newspaperIntroFrames}
       >
         <NewspaperPage
@@ -502,7 +580,34 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
         />
       </Sequence>
 
-      {/* ── Audio: voice TTS + SFX ── */}
+      {/* ── Owl audio: intro over video clips ── */}
+      {owlIntroAudio && (
+        <Sequence from={0} durationInFrames={OWL_INTRO_FRAMES + OWL_DIVE_FRAMES}>
+          <Audio src={staticFile(owlIntroAudio)} volume={1} />
+        </Sequence>
+      )}
+
+      {/* ── Owl audio: transitions between segments (over cream background) ── */}
+      {timings.segTimings.map((st, i) => {
+        const audioPath = owlTransitionAudios[st.segId];
+        if (!audioPath || i === 0) return null; // no transition before first segment
+        return (
+          <Sequence key={`owl-tr-${st.segId}`}
+            from={st.zoomInStart - BETWEEN_FRAMES}
+            durationInFrames={BETWEEN_FRAMES + ZOOM_FRAMES}>
+            <Audio src={staticFile(audioPath)} volume={1} />
+          </Sequence>
+        );
+      })}
+
+      {/* ── Owl audio: closing ── */}
+      {owlClosingAudio && (
+        <Sequence from={timings.closingStart} durationInFrames={timings.closingDur}>
+          <Audio src={staticFile(owlClosingAudio)} volume={1} />
+        </Sequence>
+      )}
+
+      {/* ── Beat audio: voice TTS + SFX ── */}
       <BeatAudioTrack
         beats={beats}
         beatTimings={timings.allBeatTimings}
