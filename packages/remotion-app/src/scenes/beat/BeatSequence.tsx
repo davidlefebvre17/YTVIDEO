@@ -21,7 +21,10 @@ export const BeatSequence: React.FC<BeatSequenceProps> = ({
 }) => {
   const { fps } = useVideoConfig();
   const durationInFrames = Math.round(beat.durationSec * fps);
-  const delayFrames = beat.overlay ? Math.round((beat.overlay.enterDelayMs ?? 0) / 1000 * fps) : 0;
+  // Charts appear quickly (max 15 frames delay), other overlays use configured delay
+  const isChart = beat.overlay?.type === 'chart' || beat.overlay?.type === 'chart_zone';
+  const rawDelay = beat.overlay ? Math.round((beat.overlay.enterDelayMs ?? 0) / 1000 * fps) : 0;
+  const delayFrames = isChart ? Math.min(rawDelay, 15) : rawDelay;
   const showPrompt = isPlaceholder(beat.imagePath) && beat.imagePrompt;
 
   return (
@@ -95,7 +98,9 @@ export const BeatSequence: React.FC<BeatSequenceProps> = ({
             overlay={beat.overlay}
             assets={assets}
             accentColor={accentColor}
-            durationInFrames={durationInFrames - delayFrames}
+            durationInFrames={isChart
+              ? Math.round((durationInFrames - delayFrames) * 1.3)
+              : durationInFrames - delayFrames}
           />
         </Sequence>
       )}

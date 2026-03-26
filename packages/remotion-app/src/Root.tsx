@@ -15,7 +15,8 @@ import { NewspaperCanvas } from "./scenes/newspaper/NewspaperCanvas";
 import { SAMPLE_SCRIPT, SAMPLE_ASSETS, SAMPLE_NEWS, SAMPLE_STORYBOARD } from "./fixtures/sample-data";
 import { SAMPLE_BEATS } from "./fixtures/sample-beats";
 import REAL_PROPS from "./fixtures/real-beats.json";
-import { BeatEpisode, getEffectiveDuration, getTransitionDurationFrames } from "./compositions/BeatEpisode";
+import EPISODE_INDEX from "./fixtures/episode-index.json";
+import { BeatEpisode, computeNewspaperDuration } from "./compositions/BeatEpisode";
 import type { EpisodeScript, ScriptSection, AssetSnapshot, Beat } from "@yt-maker/core";
 import { BRAND } from "@yt-maker/core";
 
@@ -297,19 +298,45 @@ export const RemotionRoot: React.FC = () => {
           }}
           calculateMetadata={({ props }: { props: Record<string, unknown> }) => {
             const beats = (props.beats ?? []) as Beat[];
-            const fps = 30;
-            const totalBeatFrames = beats.reduce(
-              (sum, b) => sum + Math.max(15, Math.round(getEffectiveDuration(b) * fps)), 0
-            );
-            const transitionOverlap = beats.slice(0, -1).reduce((sum, b) => {
-              return sum + getTransitionDurationFrames(b.transitionOut);
-            }, 0);
+            const script = props.script as EpisodeScript;
             return {
-              durationInFrames: Math.max(30, totalBeatFrames - transitionOverlap),
-              fps, width: 1920, height: 1080,
+              durationInFrames: Math.max(30, computeNewspaperDuration(beats, script, 30)),
+              fps: 30, width: 1920, height: 1080,
             };
           }}
         />
+
+        {/* ── Per-episode compositions from episode-index.json ── */}
+        {EPISODE_INDEX.entries.map((entry) => {
+          const props = (EPISODE_INDEX.props as Record<string, any>)[entry.date];
+          if (!props?.script) return null;
+          const label = `${entry.date} — ${entry.title.slice(0, 40)}`;
+          return (
+            <Composition
+              key={entry.date}
+              id={`EP-${entry.date}`}
+              component={BeatEpisode}
+              durationInFrames={300}
+              fps={30}
+              width={1920}
+              height={1080}
+              defaultProps={{
+                script: props.script as any,
+                beats: (props.beats ?? []) as any,
+                assets: (props.assets ?? []) as any,
+                news: (props.news ?? []) as any,
+              }}
+              calculateMetadata={({ props: p }: { props: Record<string, unknown> }) => {
+                const b = (p.beats ?? []) as Beat[];
+                const s = p.script as EpisodeScript;
+                return {
+                  durationInFrames: Math.max(30, b.length > 0 ? computeNewspaperDuration(b, s, 30) : (s.totalDurationSec ?? 300) * 30),
+                  fps: 30, width: 1920, height: 1080,
+                };
+              }}
+            />
+          );
+        })}
       </Folder>
 
       <Folder name="Newspaper">

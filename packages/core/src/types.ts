@@ -41,6 +41,8 @@ export interface ScriptSection {
   depth?: "flash" | "focus" | "deep";
   topic?: string;
   assets?: string[];
+  /** Concept visuel éditorial (Opus C3) — scène narrative pour le directeur artistique C7 */
+  editorialVisual?: string;
 }
 
 export interface EpisodeDirection {
@@ -54,7 +56,7 @@ export interface EpisodeDirection {
     toSegmentId: string;
     type: 'cut' | 'fade' | 'wipe' | 'zoom_out' | 'slide';
     durationMs: number;
-    soundEffect?: 'silence' | 'sting' | 'swoosh' | 'none';
+    soundEffect?: 'silence' | 'none' | 'swoosh' | 'typing' | 'sting' | 'bell' | 'stamp' | 'pen' | 'ticker' | 'clock' | 'unfold' | 'close' | 'cabinet';
     vocalShift?: string;
   }>;
   chartTimings: Array<{
@@ -232,6 +234,10 @@ export interface StockScreenResult {
   reason: string[];           // ["mover_up", "volume_spike", "52w_high"]
   technicals?: TechnicalIndicators;
   earningsDetail?: EarningsDetail;
+  /** GICS sector or Finnhub industry (from company-profiles.json) */
+  sector?: string;
+  /** One-line description for LLM context ("Chinese food delivery platform") */
+  description?: string;
 }
 
 export interface PolymarketMarket {

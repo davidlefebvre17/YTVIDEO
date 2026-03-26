@@ -1,7 +1,9 @@
 /**
  * Génère l'audio TTS pour chaque beat individuellement.
  *
- * Utilise edge-tts-node (Node.js pur, pas de Python).
+ * Providers : edge-tts (gratuit) | fish (Fish Audio S2-Pro, ~$0.15/épisode)
+ * Switch via TTS_PROVIDER env var (default: edge).
+ *
  * Chaque beat reçoit son propre fichier MP3.
  * Après génération, beat.audioPath et beat.timing.audioDurationSec sont remplis.
  *
@@ -12,8 +14,20 @@
 import { existsSync, mkdirSync, writeFileSync, statSync } from 'fs';
 import { join } from 'path';
 import type { Beat, Language } from '@yt-maker/core';
+import { fishTTS, FISH_PRESETS } from './fish-tts';
 
-// Lazy import edge-tts-node (optionnel dependency)
+// ─── TTS Provider ───────────────────────────────────────────────
+
+type TTSProvider = 'edge' | 'fish';
+
+function getTTSProvider(): TTSProvider {
+  const provider = process.env.TTS_PROVIDER || 'edge';
+  if (provider === 'fish' || provider === 'fish-audio') return 'fish';
+  return 'edge';
+}
+
+// ─── Edge TTS (lazy import) ─────────────────────────────────────
+
 let MsEdgeTTS: any;
 let OUTPUT_FORMAT: any;
 
@@ -25,14 +39,17 @@ async function loadEdgeTTS() {
   }
 }
 
-/** Voix par langue */
-const VOICES: Record<string, string> = {
+/** Voix Edge par langue */
+const EDGE_VOICES: Record<string, string> = {
   fr: 'fr-FR-DeniseNeural',
   en: 'en-US-AriaNeural',
 };
 
+// ─── Shared utils ───────────────────────────────────────────────
+
 export interface BeatAudioManifest {
   date: string;
+  provider: TTSProvider;
   totalDurationSec: number;
   beats: Array<{
     beatId: string;
@@ -45,6 +62,40 @@ export interface BeatAudioManifest {
   }>;
 }
 
+/** Convert integer string to French words (0-9999) */
+function numberToFrench(n: string): string {
+  const num = parseInt(n, 10);
+  if (isNaN(num)) return n;
+  if (num === 0) return 'zéro';
+  const units = ['', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf',
+    'dix', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize', 'dix-sept', 'dix-huit', 'dix-neuf'];
+  const tens = ['', '', 'vingt', 'trente', 'quarante', 'cinquante', 'soixante', 'soixante', 'quatre-vingt', 'quatre-vingt'];
+  if (num < 20) return units[num];
+  if (num < 100) {
+    const t = Math.floor(num / 10);
+    const u = num % 10;
+    if (t === 7 || t === 9) return tens[t] + '-' + units[10 + u]; // soixante-dix, quatre-vingt-dix
+    if (u === 0) return tens[t] + (t === 8 ? 's' : '');
+    if (u === 1 && t !== 8) return tens[t] + ' et un';
+    return tens[t] + '-' + units[u];
+  }
+  if (num < 1000) {
+    const h = Math.floor(num / 100);
+    const rest = num % 100;
+    const hPart = h === 1 ? 'cent' : units[h] + ' cent';
+    if (rest === 0) return hPart + (h > 1 ? 's' : '');
+    return hPart + ' ' + numberToFrench(String(rest));
+  }
+  if (num < 10000) {
+    const th = Math.floor(num / 1000);
+    const rest = num % 1000;
+    const thPart = th === 1 ? 'mille' : numberToFrench(String(th)) + ' mille';
+    if (rest === 0) return thPart;
+    return thPart + ' ' + numberToFrench(String(rest));
+  }
+  return n; // > 9999: keep as-is
+}
+
 /** Nettoyer le texte pour TTS — supprimer symboles non-prononçables */
 function sanitizeForTTS(text: string): string {
   return text
@@ -53,23 +104,52 @@ function sanitizeForTTS(text: string): string {
     .replace(/#{1,6}\s/g, '')
     .replace(/—/g, ' — ')
     .replace(/\.\.\./g, '…')
+    // Chiffres → lettres (pour prononciation TTS)
+    .replace(/(\d+)[.,](\d+)\s*%/g, (_, a, b) => `${numberToFrench(a)} virgule ${numberToFrench(b)} pour cent`)
+    .replace(/(\d+)\s*%/g, (_, n) => `${numberToFrench(n)} pour cent`)
+    .replace(/(\d+)[.,](\d+)\s*\$/g, (_, a, b) => `${numberToFrench(a)} dollars ${numberToFrench(b)}`)
+    .replace(/(\d+)\s*\$/g, (_, n) => `${numberToFrench(n)} dollars`)
+    .replace(/(\d+)[.,](\d+)\s*€/g, (_, a, b) => `${numberToFrench(a)} euros ${numberToFrench(b)}`)
+    .replace(/(\d+)\s*€/g, (_, n) => `${numberToFrench(n)} euros`)
+    .replace(/\b(\d{1,4})\b/g, (_, n) => numberToFrench(n))
     // Symboles financiers → texte
     .replace(/\+(\d)/g, 'plus $1')
     .replace(/%/g, ' pour cent')
     .replace(/\$/g, ' dollars')
     .replace(/€/g, ' euros')
+    // Mots anglais → prononciation française
+    .replace(/\bstablecoins?\b/gi, 'stéïbeul coïne')
+    .replace(/\brally\b/gi, 'rallye')
+    .replace(/\bspread\b/gi, 'sprède')
+    .replace(/\bhedge\b/gi, 'hèdje')
+    .replace(/\bshort squeeze\b/gi, 'shorte squize')
+    .replace(/\bsqueeze\b/gi, 'squize')
+    .replace(/\bbreakout\b/gi, 'brèkaoutt')
+    .replace(/\bpullback\b/gi, 'poulbak')
+    .replace(/\bcarry trade\b/gi, 'carry trèïde')
+    .replace(/\bFear\s*(?:&|and|et)\s*Greed\b/gi, 'Fir ande Gride')
+    .replace(/\bClarity Act\b/gi, 'Claritty Acte')
+    .replace(/\bdovish\b/gi, 'doviche')
+    .replace(/\bhawkish\b/gi, 'hokiche')
+    .replace(/\bBig\s*Four\b/gi, 'Bigue For')
     // Abréviations
     .replace(/\bWTI\b/g, 'W.T.I.')
     .replace(/\bDXY\b/g, 'D.X.Y.')
     .replace(/\bRSI\b/g, 'R.S.I.')
     .replace(/\bCOT\b/g, 'C.O.T.')
-    .replace(/\bSMA200\b/g, 'S.M.A. 200')
-    .replace(/\bSMA50\b/g, 'S.M.A. 50')
+    .replace(/\bSMA200\b/g, 'S.M.A. deux cents')
+    .replace(/\bSMA50\b/g, 'S.M.A. cinquante')
+    .replace(/\bSMA20\b/g, 'S.M.A. vingt')
     .replace(/\bEMA\b/g, 'E.M.A.')
     .replace(/\bFed\b/g, 'Fède')
     .replace(/\bBCE\b/g, 'B.C.E.')
     .replace(/\bS&P\b/g, 'S. and P.')
     .replace(/\bETF\b/g, 'E.T.F.')
+    .replace(/\bUSDC\b/g, 'U.S.D.C.')
+    .replace(/\bUSDT\b/g, 'U.S.D.T.')
+    .replace(/\bAUD\b/g, 'A.U.D.')
+    .replace(/\bCPI\b/g, 'C.P.I.')
+    .replace(/\bPMI\b/g, 'P.M.I.')
     .replace(/&/g, ' et ')
     .replace(/\s+/g, ' ')
     .trim();
@@ -81,9 +161,39 @@ function estimateDuration(text: string): number {
   return (words / 150) * 60;
 }
 
+// ─── Per-beat TTS generation ────────────────────────────────────
+
+async function generateBeatWithEdge(
+  tts: any,
+  sanitized: string,
+  mp3Path: string,
+): Promise<void> {
+  await tts.toFile(mp3Path, sanitized);
+}
+
+async function generateBeatWithFish(
+  sanitized: string,
+  mp3Path: string,
+  preset?: keyof typeof FISH_PRESETS,
+  speed?: number,
+): Promise<void> {
+  const p = preset ? FISH_PRESETS[preset] : FISH_PRESETS.FOCUS;
+  await fishTTS({
+    text: sanitized,
+    outputPath: mp3Path,
+    format: 'mp3',
+    speed: speed ?? p.speed,
+    temperature: p.temperature,
+    topP: p.topP,
+    repetitionPenalty: p.repetitionPenalty,
+  });
+}
+
+// ─── Main entry point ───────────────────────────────────────────
+
 /**
- * Génère un fichier MP3 par beat via edge-tts-node.
- * Mute beat.audioPath et beat.timing.audioDurationSec en place.
+ * Génère un fichier MP3 par beat.
+ * Provider sélectionné via TTS_PROVIDER env (edge | fish).
  *
  * @param beats - Beats à traiter
  * @param lang - Langue ('fr' | 'en')
@@ -99,21 +209,34 @@ export async function generateBeatAudio(
     voice?: string;
     /** Sauter les beats qui ont déjà un audioPath existant */
     skipExisting?: boolean;
+    /** Speed multiplier (Fish Audio only, default 1.0) */
+    speed?: number;
   }
 ): Promise<{ beats: Beat[]; manifest: BeatAudioManifest }> {
-  await loadEdgeTTS();
+  const provider = getTTSProvider();
 
   if (!existsSync(outputDir)) mkdirSync(outputDir, { recursive: true });
 
-  const voice = options?.voice ?? VOICES[lang] ?? VOICES.fr;
-  const tts = new MsEdgeTTS({});
-  await tts.setMetadata(voice, OUTPUT_FORMAT.AUDIO_24KHZ_96KBITRATE_MONO_MP3);
+  // Init provider
+  let edgeTts: any = null;
+  let voice: string;
+
+  if (provider === 'edge') {
+    await loadEdgeTTS();
+    voice = options?.voice ?? EDGE_VOICES[lang] ?? EDGE_VOICES.fr;
+    edgeTts = new MsEdgeTTS({});
+    await edgeTts.setMetadata(voice, OUTPUT_FORMAT.AUDIO_24KHZ_96KBITRATE_MONO_MP3);
+  } else {
+    voice = process.env.FISH_VOICE_ID ?? 'fish-s2-pro';
+  }
+
+  const OWL_VOICE_ID = process.env.FISH_OWL_VOICE_ID;
 
   const results: Array<{ beatId: string; mp3Path: string; relativePath: string; durationSec: number }> = [];
   let successCount = 0;
   let skipCount = 0;
 
-  console.log(`\n  Generating TTS for ${beats.length} beats (${voice})...`);
+  console.log(`\n  Generating TTS for ${beats.length} beats (${provider}: ${voice})...`);
 
   for (const beat of beats) {
     // Skip beats sans narration
@@ -127,7 +250,6 @@ export async function generateBeatAudio(
 
     // Skip si déjà généré
     if (options?.skipExisting && existsSync(mp3Path) && statSync(mp3Path).size > 100) {
-      // Use estimated duration for skipped beats
       const dur = estimateDuration(beat.narrationChunk);
       beat.audioPath = relativePath;
       beat.timing = { ...beat.timing, audioDurationSec: dur };
@@ -139,9 +261,13 @@ export async function generateBeatAudio(
 
     try {
       const sanitized = sanitizeForTTS(beat.narrationChunk);
-      await tts.toFile(mp3Path, sanitized);
 
-      // Estimer la durée (edge-tts-node ne retourne pas de durée)
+      if (provider === 'fish') {
+        await generateBeatWithFish(sanitized, mp3Path, undefined, options?.speed);
+      } else {
+        await generateBeatWithEdge(edgeTts, sanitized, mp3Path);
+      }
+
       const durationSec = estimateDuration(sanitized);
 
       // Muter le beat en place
@@ -167,6 +293,7 @@ export async function generateBeatAudio(
   let currentSec = 0;
   const manifest: BeatAudioManifest = {
     date: new Date().toISOString().slice(0, 10),
+    provider,
     totalDurationSec: 0,
     beats: results.map(({ beatId, mp3Path, relativePath, durationSec }) => {
       const entry = {
@@ -189,7 +316,7 @@ export async function generateBeatAudio(
 
   console.log(
     `  ${successCount} beats audio generated, ${skipCount} skipped` +
-    ` (${manifest.totalDurationSec.toFixed(1)}s total)`
+    ` (${manifest.totalDurationSec.toFixed(1)}s total) [${provider}]`
   );
   console.log(`  Manifest: ${manifestPath}`);
 

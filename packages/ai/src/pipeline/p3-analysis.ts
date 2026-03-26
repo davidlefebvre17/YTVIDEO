@@ -97,7 +97,7 @@ function formatAssetForC2(asset: FlaggedAsset, depth: 'DEEP' | 'FOCUS' | 'FLASH'
   // Full data for DEEP/FOCUS
   const t = asset.snapshot.technicals;
   if (t) {
-    text += `SMA20: ${fmt(t.ema9)} | SMA50: ${fmt(t.ema21)} | RSI: ${t.rsi14.toFixed(0)} | Trend: ${t.trend}\n`;
+    text += `EMA9: ${fmt(t.ema9)} | EMA21: ${fmt(t.ema21)} | RSI: ${t.rsi14.toFixed(0)} | Trend: ${t.trend}\n`;
     text += `Supports: ${t.supports.map(fmt).join(', ') || '—'} | Résistances: ${t.resistances.map(fmt).join(', ') || '—'}\n`;
     text += `Volume: ${t.volumeAnomaly > 1.2 ? `+${((t.volumeAnomaly - 1) * 100).toFixed(0)}% vs moy` : 'normal'}\n`;
   }

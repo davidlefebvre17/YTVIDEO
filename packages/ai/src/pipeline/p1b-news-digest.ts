@@ -8,7 +8,7 @@ import type { NewsItem } from "@yt-maker/core";
 
 export interface NewsDigestEvent {
   headline: string;
-  category: 'regulation' | 'central_bank' | 'geopolitical' | 'macro_data' | 'ma_deal' | 'earnings' | 'institutional' | 'other';
+  category: 'regulation' | 'central_bank' | 'geopolitical' | 'macro_data' | 'corporate' | 'market_structure' | 'institutional' | 'political_context' | 'other';
   importance: 'game_changer' | 'significant' | 'notable';
   linkedAssets: string[];
   sourceTitle: string;

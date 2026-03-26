@@ -76,56 +76,120 @@ export const FrontPage: React.FC<FrontPageProps> = ({
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
 
+  // Masthead fade in
+  const mastheadOpacity = interpolate(
+    frame,
+    [0, 8],
+    [0, 1],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+  );
+
   return (
     <AbsoluteFill style={{ backgroundColor: BRAND.colors.cream, opacity: pageOpacity }}>
-      {/* Header bar */}
+      {/* ─── Masthead: OWL STREET JOURNAL ─── */}
       <div
         style={{
           position: "absolute",
           top: 0,
           left: 0,
           right: 0,
-          height: 50,
           display: "flex",
-          justifyContent: "space-between",
+          flexDirection: "column",
           alignItems: "center",
-          paddingLeft: 40,
-          paddingRight: 40,
-          borderBottom: `1px solid ${BRAND.colors.rule}`,
+          paddingTop: 14,
+          paddingBottom: 8,
+          borderBottom: `2px solid ${BRAND.colors.ink}`,
+          opacity: mastheadOpacity,
         }}
       >
-        <span
+        {/* Top rule */}
+        <div
           style={{
-            fontFamily: BRAND.fonts.mono,
-            fontSize: 11,
-            letterSpacing: "0.15em",
-            textTransform: "uppercase",
-            color: BRAND.colors.inkLight,
+            width: "calc(100% - 80px)",
+            height: 1,
+            backgroundColor: BRAND.colors.rule,
+            marginBottom: 10,
+          }}
+        />
+        {/* Main title */}
+        <h1
+          style={{
+            fontFamily: BRAND.fonts.display,
+            fontSize: 72,
+            fontWeight: 900,
+            color: BRAND.colors.ink,
+            margin: 0,
+            letterSpacing: "-0.01em",
+            lineHeight: 1,
+            textAlign: "center",
           }}
         >
-          TRADINGRECAP
-        </span>
-        <span
+          Owl Street Journal
+        </h1>
+        {/* Date + edition line */}
+        <div
           style={{
-            fontFamily: BRAND.fonts.body,
-            fontSize: 13,
-            color: BRAND.colors.inkLight,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            width: "calc(100% - 80px)",
+            marginTop: 6,
           }}
         >
-          {date}
-        </span>
+          <span
+            style={{
+              fontFamily: BRAND.fonts.mono,
+              fontSize: 11,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: BRAND.colors.inkLight,
+            }}
+          >
+            Recap Quotidien
+          </span>
+          <span
+            style={{
+              fontFamily: BRAND.fonts.body,
+              fontSize: 13,
+              color: BRAND.colors.inkLight,
+            }}
+          >
+            {date}
+          </span>
+          <span
+            style={{
+              fontFamily: BRAND.fonts.mono,
+              fontSize: 11,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: BRAND.colors.inkLight,
+            }}
+          >
+            TradingRecap
+          </span>
+        </div>
+        {/* Bottom double rule */}
+        <div
+          style={{
+            width: "calc(100% - 80px)",
+            marginTop: 6,
+            borderTop: `1px solid ${BRAND.colors.rule}`,
+            height: 3,
+            borderBottom: `1px solid ${BRAND.colors.rule}`,
+          }}
+        />
       </div>
 
       {/* Main content area */}
       <div
         style={{
           position: "absolute",
-          top: 50,
+          top: 130,
           left: 0,
           right: 0,
           bottom: 0,
           display: "flex",
-          padding: "24px 40px",
+          padding: "16px 40px",
           gap: 32,
         }}
       >

@@ -1,4 +1,5 @@
 export { BRAND } from "./brand";
+export { ASSET_NAMES, ASSET_ALIASES, ASSET_DESCRIPTIONS, assetName, assetAliases, assetDescription } from "./asset-names";
 export type { BrandColors } from "./brand";
 
 export type {

@@ -7,6 +7,33 @@ import { join } from "path";
 interface IndexConstituent {
   symbol: string;
   name: string;
+  sector?: string;
+  description?: string;
+}
+
+interface CompanyProfileEntry {
+  symbol: string;
+  name: string;
+  sector?: string;
+  finnhubIndustry?: string;
+  description?: string;
+  correlation?: string;
+  index?: string;
+}
+
+/** Lazy-loaded company profiles for sector/description enrichment */
+let _profileMap: Map<string, CompanyProfileEntry> | null = null;
+
+function loadProfileMap(): Map<string, CompanyProfileEntry> {
+  if (_profileMap) return _profileMap;
+  _profileMap = new Map();
+  const filePath = join(process.cwd(), "data", "company-profiles.json");
+  if (!existsSync(filePath)) return _profileMap;
+  try {
+    const data: CompanyProfileEntry[] = JSON.parse(readFileSync(filePath, "utf-8"));
+    for (const p of data) _profileMap.set(p.symbol, p);
+  } catch { /* non-critical */ }
+  return _profileMap;
 }
 
 type IndexName = "SP500" | "CAC40" | "DAX40" | "FTSE100" | "NIKKEI50" | "HSI30";
@@ -167,6 +194,21 @@ export async function screenStocks(): Promise<StockScreenResult[]> {
   if (allResults.length > 0) {
     console.log(`  [screening] Deep-dive: enriching ${Math.min(allResults.length, 30)} top movers...`);
     await enrichMovers(allResults);
+  }
+
+  // Enrich with sector + description from company-profiles.json + index files
+  const profiles = loadProfileMap();
+  let enrichedCount = 0;
+  for (const result of allResults) {
+    const profile = profiles.get(result.symbol);
+    if (profile) {
+      result.sector = profile.sector ?? profile.finnhubIndustry;
+      result.description = profile.description;
+      if (result.sector || result.description) enrichedCount++;
+    }
+  }
+  if (enrichedCount > 0) {
+    console.log(`  [screening] Enriched ${enrichedCount}/${allResults.length} movers with sector/description`);
   }
 
   console.log(`Screening complete: ${allResults.length} flagged stocks`);

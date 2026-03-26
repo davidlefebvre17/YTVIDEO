@@ -203,6 +203,8 @@ export interface NarrationSegment {
   wordCount: number;
   /** Editorial visual concept from Opus — narrative illustration idea for this segment */
   editorialVisual?: string;
+  /** Owl mascot transition phrase for introducing the next segment (3-8 words) */
+  owlTransition?: string;
 }
 
 export interface NarrationBlock {
@@ -218,10 +220,12 @@ export interface DraftScript {
   date: string;
   title: string;
   description: string;
+  owlIntro?: string;
   coldOpen: NarrationBlock;
   titleCard: NarrationBlock;
   thread: NarrationBlock;
   segments: NarrationSegment[];
+  owlClosing?: string;
   closing: NarrationBlock;
   metadata: {
     totalWordCount: number;
@@ -450,11 +454,17 @@ export interface BeatDirection {
   imageEffect: ImageEffect;
   transitionOut: BeatTransition;
   emotion: BeatEmotion;
+  narrativeRole?: string;
 }
 
 export interface C7DirectionResult {
   visualIdentity: EpisodeVisualIdentity;
   directions: BeatDirection[];
+  storyElements?: {
+    characters?: string[];
+    paradoxes?: string[];
+    metaphors?: string[];
+  };
 }
 
 export interface ImagePromptResult {

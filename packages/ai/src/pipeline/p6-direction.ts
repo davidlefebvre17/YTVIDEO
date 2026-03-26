@@ -23,11 +23,37 @@ MOODS MUSICAUX :
 - neutre_analytique : minimal, focus voix
 - incertitude : textures instables, pauses
 
-EFFETS SONORES :
-- silence : pause dramatique (200-500ms)
-- sting : accent musical court
-- swoosh : transition rapide
-- none : enchaînement direct
+EFFETS SONORES (soundEffect par transition — CHAQUE transition DOIT en avoir un) :
+
+Transitions :
+- typing : séquence de frappe machine à écrire (OBLIGATOIRE pour cold_open→thread et thread→seg_1)
+- sting : touche de typewriter, accent sec (changement de sujet, rupture thématique)
+- swoosh : froissement de papier (continuité thématique entre segments proches)
+- bell : retour chariot + ding (fin de segment DEEP, conclusion analytique importante)
+- stamp : tampon/letterpress (verdict, conclusion définitive, chiffre historique)
+
+Ouverture/Fermeture :
+- unfold : déploiement journal (OBLIGATOIRE en premier — hook/cold_open)
+- close : fermeture portfolio cuir (OBLIGATOIRE — dernier segment→closing)
+
+Contextuels :
+- pen : plume qui gratte (quand un chart se dessine)
+- ticker : ticker tape mécanique (quand le ticker défile apparaît)
+- clock : tic d'horloge (suspense, countdown avant chiffre clé)
+- cabinet : tiroir classeur (callback "hier on disait...")
+
+- silence : pause dramatique (max 1 par épisode, avant un moment grave)
+- none : INTERDIT
+
+RÈGLE CRITIQUE : "none" est INTERDIT. Chaque transition DOIT avoir un soundEffect.
+Placement typique :
+  hook→cold_open : unfold (on ouvre le journal)
+  cold_open→thread : typing (on tape les nouvelles)
+  thread→seg_1 : sting (lancement premier sujet)
+  seg DEEP→seg : bell (conclusion DEEP) ou stamp (verdict)
+  seg→seg (même thème) : swoosh (continuité)
+  seg→seg (changement thème) : sting (rupture)
+  seg→closing : close (on ferme le portfolio)
 
 RÈGLES :
 1. ARC DE TENSION : montée (segments 1-2) → pic (drama max) → respiration (FLASH) → closing mémorable
@@ -38,19 +64,19 @@ RÈGLES :
 6. Tu ne MODIFIES JAMAIS la narration — elle est figée depuis C3/C4
 7. AUDIO BREAKPOINTS : Pour chaque segment, découper la narration en sous-segments selon le pacing naturel.
    - Identifie les ruptures de rythme dans la narration (fait dense → explication → montée → respiration)
-   - Chaque sous-segment = pacingTag + wordIndex de début/fin + paramètres ElevenLabs estimés
+   - Chaque sous-segment = pacingTag + wordIndex de début/fin + paramètres Fish Audio estimés
    - Maximum 3 sous-segments par DEEP, 2 par FOCUS, 1 par FLASH
    - Les segments cold_open et thread sont des sous-segments uniques
-   PACING TAGS et paramètres ElevenLabs typiques :
-   • lent_martelé : speed=0.82, stability=0.85, style=0.6 (cold open dramatique)
-   • pose_fluide : speed=0.93, stability=0.72, style=0.3 (thread, fluide)
-   • rapide : speed=1.08-1.10, stability=0.62-0.65, style=0.6-0.7 (info dense)
-   • posé : speed=0.88-0.93, stability=0.75-0.80, style=0.2-0.3 (analyse)
-   • tension : speed=0.87-0.88, stability=0.78-0.82, style=0.45-0.55 (build-up)
-   • analytique : speed=0.95, stability=0.75, style=0.2 (données)
-   • synthèse : speed=0.92, stability=0.78, style=0.2 (closing recap)
-   • engagement : speed=0.97, stability=0.70, style=0.45 (CTA)
-   • teaser : speed=1.04, stability=0.68, style=0.5 (teaser demain)
+   PACING TAGS et paramètres Fish Audio typiques :
+   • lent_martelé : tempo=0.82, emotion=grave (cold open dramatique)
+   • pose_fluide : tempo=0.93, emotion=calme (thread, fluide)
+   • rapide : tempo=1.08-1.10, emotion=emphase (info dense)
+   • posé : tempo=0.88-0.93, emotion=calme (analyse)
+   • tension : tempo=0.87-0.88, emotion=grave (build-up)
+   • analytique : tempo=0.95, emotion=calme (données)
+   • synthèse : tempo=0.92, emotion=calme (closing recap)
+   • engagement : tempo=0.97, emotion=emphase (CTA)
+   • teaser : tempo=1.04, emotion=confident (teaser demain)
 
 SORTIE : JSON strict.`;
 }
@@ -78,7 +104,7 @@ function buildC5UserPrompt(
     const endSec = startSec + seg.durationSec;
     const analysisForSeg = analysis.segments.find(s => s.segmentId === seg.segmentId);
     prompt += `### ${seg.segmentId} [${seg.depth}] (${startSec}-${endSec}s)\n`;
-    prompt += `"${seg.narration.slice(0, 200)}${seg.narration.length > 200 ? '...' : ''}"\n`;
+    prompt += `"${seg.narration}"\n`;
     if (analysisForSeg?.chartInstructions?.length) {
       prompt += `Chart instructions (C2): ${JSON.stringify(analysisForSeg.chartInstructions)}\n`;
     }
@@ -135,7 +161,7 @@ function buildC5UserPrompt(
       "endWordIndex": 999,
       "pacingTag": "lent_martelé",
       "durationSec": 7,
-      "elevenLabsParams": { "speed": 0.82, "stability": 0.85, "style": 0.6 }
+      "fishAudioParams": { "tempo": 0.82, "emotion": "grave" }
     },
     {
       "segmentId": "seg_1",
@@ -144,7 +170,7 @@ function buildC5UserPrompt(
       "endWordIndex": 80,
       "pacingTag": "rapide",
       "durationSec": 33,
-      "elevenLabsParams": { "speed": 1.08, "stability": 0.65, "style": 0.7 }
+      "fishAudioParams": { "tempo": 1.08, "emotion": "emphase" }
     },
     {
       "segmentId": "seg_1",
@@ -153,7 +179,7 @@ function buildC5UserPrompt(
       "endWordIndex": 220,
       "pacingTag": "tension",
       "durationSec": 50,
-      "elevenLabsParams": { "speed": 0.88, "stability": 0.80, "style": 0.55 }
+      "fishAudioParams": { "tempo": 0.88, "emotion": "grave" }
     }
   ]
 }`;

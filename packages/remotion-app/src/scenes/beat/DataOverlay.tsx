@@ -1,7 +1,7 @@
 import React from "react";
 import { useCurrentFrame, useVideoConfig, interpolate, spring, Sequence } from "remotion";
 import type { BeatOverlay, AssetSnapshot } from "@yt-maker/core";
-import { BRAND } from "@yt-maker/core";
+import { BRAND, ASSET_NAMES } from "@yt-maker/core";
 import { AnimatedStat } from "../shared/AnimatedStat";
 import { CausalChain, type CausalStep } from "../shared/CausalChain";
 import { MultiAssetBadge, type AssetBadge } from "../shared/MultiAssetBadge";
@@ -26,16 +26,19 @@ const POSITION_STYLES: Record<string, React.CSSProperties> = {
     display: 'flex', alignItems: 'center', justifyContent: 'center',
   },
   bottom_third: {
-    position: 'absolute', bottom: BRAND.layout.disclaimerH + 16, left: BRAND.layout.safeH, right: BRAND.layout.safeH,
-    display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-start',
+    position: 'absolute', top: BRAND.layout.safeV, right: BRAND.layout.safeH,
+    display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end',
+    maxWidth: 500,
   },
   lower_third: {
-    position: 'absolute', bottom: BRAND.layout.disclaimerH + 16, left: BRAND.layout.safeH, right: BRAND.layout.safeH,
-    display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-start',
+    position: 'absolute', top: BRAND.layout.safeV, left: BRAND.layout.safeH,
+    display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start',
+    maxWidth: 500,
   },
   top_right: {
     position: 'absolute', top: BRAND.layout.safeV, right: BRAND.layout.safeH,
     display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end',
+    maxWidth: 400,
   },
   full: {
     position: 'absolute', inset: 0,
@@ -43,12 +46,66 @@ const POSITION_STYLES: Record<string, React.CSSProperties> = {
   },
 };
 
-const OVERLAY_CONTAINER: React.CSSProperties = {
-  background: 'rgba(245, 240, 232, 0.82)',
-  borderRadius: 10,
-  padding: '16px 24px',
-  boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-};
+function getContainerStyle(type: string, accentColor: string): React.CSSProperties {
+  const baseStyle: React.CSSProperties = {
+    background: `rgba(${245}, ${240}, ${232}, 0.82)`,
+    padding: '16px 24px',
+  };
+
+  switch (type) {
+    case 'stat':
+      return {
+        ...baseStyle,
+        borderRadius: 0,
+        borderTop: `2px solid ${BRAND.colors.rule}`,
+        borderBottom: `2px solid ${BRAND.colors.rule}`,
+      };
+    case 'causal_chain':
+      return {
+        ...baseStyle,
+        borderRadius: 0,
+        borderLeft: `4px solid ${accentColor}`,
+        paddingLeft: '20px',
+      };
+    case 'headline':
+      return {
+        ...baseStyle,
+        borderRadius: 0,
+        borderLeft: `4px solid ${accentColor}`,
+        paddingLeft: '20px',
+      };
+    case 'chart':
+    case 'chart_zone':
+      return {
+        background: 'rgba(245, 240, 232, 0.92)',
+        padding: '24px 32px',
+        borderRadius: 0,
+        backdropFilter: 'blur(4px)',
+      };
+    case 'gauge':
+      return {
+        ...baseStyle,
+        borderRadius: 0,
+        borderTop: `2px solid ${BRAND.colors.rule}`,
+        borderBottom: `2px solid ${BRAND.colors.rule}`,
+        padding: '20px 32px',
+        minWidth: 220,
+      };
+    case 'scenario_fork':
+      return {
+        ...baseStyle,
+        borderRadius: 0,
+        borderTop: `1px solid ${BRAND.colors.rule}`,
+        borderBottom: `1px solid ${BRAND.colors.rule}`,
+      };
+    default:
+      return {
+        ...baseStyle,
+        borderRadius: 0,
+        borderTop: `1px solid ${BRAND.colors.rule}`,
+      };
+  }
+}
 
 export const DataOverlay: React.FC<DataOverlayProps> = ({
   overlay,
@@ -89,15 +146,22 @@ export const DataOverlay: React.FC<DataOverlayProps> = ({
   }
 
   const posStyle = POSITION_STYLES[overlay.position] ?? POSITION_STYLES.center;
-  const isChart = overlay.type === 'chart' || overlay.type === 'chart_zone';
+  const containerStyle = getContainerStyle(overlay.type, accentColor);
 
-  const containerStyle = isChart
-    ? { background: 'rgba(245, 240, 232, 0.92)', padding: '24px 32px', borderRadius: 0 }
-    : OVERLAY_CONTAINER;
+  const exitStart = durationInFrames - 8;
+  const exitOpacity = interpolate(frame, [exitStart, durationInFrames], [1, 0], {
+    extrapolateLeft: 'clamp',
+    extrapolateRight: 'clamp',
+  });
+
+  const combinedAnimStyle = {
+    ...animStyle,
+    opacity: (animStyle.opacity as number | undefined) ? (animStyle.opacity as number) * exitOpacity : exitOpacity,
+  };
 
   return (
     <div style={{ ...posStyle, zIndex: 100 }}>
-      <div style={{ ...containerStyle, ...animStyle }}>
+      <div style={{ ...containerStyle, ...combinedAnimStyle }}>
         <OverlayContent type={overlay.type} data={data} assets={assets} accentColor={accentColor} durationInFrames={durationInFrames} />
       </div>
     </div>
@@ -112,13 +176,146 @@ interface OverlayContentProps {
   durationInFrames: number;
 }
 
+/** Replace Yahoo symbols with human names.
+ *  Symbols with special chars (^, =, -, .) → safe exact match.
+ *  Plain tickers (AAPL, META) → word boundary to avoid "Or" → "Realty Incomer".
+ *  Single-char tickers (O, A, C, F) → skipped entirely. */
+function replaceSymbol(text: string, sym: string, name: string): string {
+  if (sym.length < 2 || !text.includes(sym)) return text;
+  // Symbols with special chars are unambiguous — safe for exact replace
+  if (/[^A-Za-z0-9]/.test(sym)) {
+    return text.split(sym).join(name);
+  }
+  // Plain tickers: require word boundaries (not preceded/followed by letter/digit)
+  const re = new RegExp(`(?<![a-zA-ZÀ-ÿ0-9])${sym}(?![a-zA-ZÀ-ÿ0-9])`, 'g');
+  return text.replace(re, name);
+}
+
+// Financial abbreviations → readable French
+const ABBREV_FR: Record<string, string> = {
+  'BCE': 'Banque Centrale Européenne',
+  'ECB': 'Banque Centrale Européenne',
+  'FOMC': 'Réunion de la Fed',
+  'CPI': 'Indice des Prix',
+  'PPI': 'Prix à la Production',
+  'PMI': 'Indice des Directeurs d\'Achat',
+  'NFP': 'Créations d\'Emploi US',
+  'COT': 'Positions des Traders',
+  'RSI': 'Force Relative',
+  'SMA': 'Moyenne Mobile',
+  'EMA': 'Moyenne Mobile Exp.',
+  'ATH': 'Plus Haut Historique',
+  'ATL': 'Plus Bas Historique',
+  'DXY': 'Dollar Index',
+  'VIX': 'Indice de Volatilité',
+  'IPO': 'Introduction en Bourse',
+  'ETF': 'Fonds Indiciel',
+  'YoY': 'Sur un an',
+  'MoM': 'Sur un mois',
+  'QoQ': 'Sur un trimestre',
+  'GDP': 'PIB',
+  'QE': 'Assouplissement Quantitatif',
+  'QT': 'Resserrement Quantitatif',
+  'OPEC': 'OPEP',
+  'WTI': 'Pétrole WTI',
+  'F&G': 'Peur & Avidité',
+};
+
+function humanize(text: string, assets: AssetSnapshot[]): string {
+  if (!text) return text;
+  let out = text;
+  // 1. Financial abbreviations → readable French
+  for (const [abbr, full] of Object.entries(ABBREV_FR)) {
+    out = replaceSymbol(out, abbr, full);
+  }
+  // 2. ASSET_NAMES — concise French names ("Or", not "Gold (XAUUSD)")
+  for (const [sym, name] of Object.entries(ASSET_NAMES)) {
+    out = replaceSymbol(out, sym, name);
+  }
+  // 3. Fallback: remaining symbols from live assets
+  for (const a of assets) {
+    if (a.name && a.symbol) {
+      out = replaceSymbol(out, a.symbol, a.name);
+    }
+  }
+  return out;
+}
+
+/** Two-phase chart: full view → crossfade → zoomed last 15 candles */
+const ChartWithZoom: React.FC<{
+  allCandles: any[]; zoomCandles: any[]; hasZoom: boolean;
+  levels: InkLevel[]; accentColor: string;
+  chartW: number; chartH: number;
+  assetName: string; price?: number; changePct: number;
+  durationInFrames: number;
+}> = ({ allCandles, zoomCandles, hasZoom, levels, accentColor, chartW, chartH, assetName, price, changePct, durationInFrames }) => {
+  const frame = useCurrentFrame();
+
+  // Phase 1: full chart (0 → 60% of duration)
+  // Phase 2: zoomed chart (60% → 100%)
+  const switchFrame = Math.round(durationInFrames * 0.65);
+  const crossfadeDur = 12;
+
+  const fullOp = hasZoom
+    ? interpolate(frame, [switchFrame, switchFrame + crossfadeDur], [1, 0], {
+        extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
+      })
+    : 1;
+  const zoomOp = hasZoom
+    ? interpolate(frame, [switchFrame, switchFrame + crossfadeDur], [0, 1], {
+        extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
+      })
+    : 0;
+
+  const header = (label: string) => (
+    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, padding: '0 8px' }}>
+      <span style={{ fontFamily: BRAND.fonts.display, fontSize: 22, color: BRAND.colors.ink }}>
+        {assetName}
+        {label && <span style={{ fontFamily: BRAND.fonts.mono, fontSize: 11, color: BRAND.colors.inkLight, marginLeft: 12 }}>{label}</span>}
+      </span>
+      <span style={{
+        fontFamily: BRAND.fonts.condensed, fontSize: 26,
+        color: changePct >= 0 ? '#1a6b3a' : '#8b1a1a',
+      }}>
+        {price?.toLocaleString()} ({changePct >= 0 ? '+' : ''}{changePct.toFixed(2)}%)
+      </span>
+    </div>
+  );
+
+  return (
+    <div style={{ width: chartW, height: chartH + 40, position: 'relative' }}>
+      {/* Full chart */}
+      <div style={{ position: 'absolute', inset: 0, opacity: fullOp }}>
+        {header('')}
+        <CandlestickChart
+          candles={allCandles} levels={levels} accentColor={accentColor}
+          width={chartW} height={chartH} drawDuration={45}
+          showVolume showSMA zoomLast={0}
+        />
+      </div>
+
+      {/* Zoomed chart (last 15 candles) — fades in */}
+      {hasZoom && zoomOp > 0 && (
+        <div style={{ position: 'absolute', inset: 0, opacity: zoomOp }}>
+          {header('120 DERNIÈRES SÉANCES')}
+          <CandlestickChart
+            candles={zoomCandles} levels={levels} accentColor={accentColor}
+            width={chartW} height={chartH} drawDuration={8}
+            showVolume showSMA={false} zoomLast={0}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
+
 const OverlayContent: React.FC<OverlayContentProps> = ({ type, data, assets, accentColor, durationInFrames }) => {
   switch (type) {
     case 'stat':
       return (
         <AnimatedStat
           value={(data.value as number) ?? 0}
-          label={(data.label as string) ?? ''}
+          label={humanize((data.label as string) ?? '', assets)}
           prefix={(data.prefix as string) ?? ''}
           suffix={(data.suffix as string) ?? '%'}
           decimals={Math.abs((data.value as number) ?? 0) < 10 ? 1 : 0}
@@ -128,26 +325,30 @@ const OverlayContent: React.FC<OverlayContentProps> = ({ type, data, assets, acc
       );
 
     case 'causal_chain': {
-      const steps: CausalStep[] = ((data.steps as string[]) ?? []).map(s => ({ label: s }));
+      const steps: CausalStep[] = ((data.steps as string[]) ?? []).map(s => ({ label: humanize(s, assets) }));
       return <CausalChain steps={steps} accentColor={accentColor} />;
     }
 
     case 'comparison': {
-      const badges: AssetBadge[] = ((data.assets as any[]) ?? []).map(a => ({
-        symbol: a.symbol ?? '',
-        name: a.label ?? a.name ?? '',
-        changePct: a.changePct ?? 0,
-        price: a.value ?? a.price,
-      }));
+      const badges: AssetBadge[] = ((data.assets as any[]) ?? []).map(a => {
+        const sym = a.symbol ?? '';
+        const found = assets.find(x => x.symbol === sym);
+        return {
+          symbol: found?.name ?? a.label ?? sym,
+          name: a.label ?? found?.name ?? '',
+          changePct: a.changePct ?? found?.changePct ?? 0,
+          price: a.value ?? a.price ?? found?.price,
+        };
+      });
       return <MultiAssetBadge assets={badges} accentColor={accentColor} />;
     }
 
     case 'scenario_fork':
       return (
         <ScenarioFork
-          trunk={(data.trunk as string) ?? ''}
-          bullish={{ condition: (data.bull as string) ?? '', target: '' }}
-          bearish={{ condition: (data.bear as string) ?? '', target: '' }}
+          trunk={humanize((data.trunk as string) ?? '', assets)}
+          bullish={{ condition: humanize((data.bull as string) ?? '', assets), target: humanize((data.bullTarget as string) ?? '', assets) }}
+          bearish={{ condition: humanize((data.bear as string) ?? '', assets), target: humanize((data.bearTarget as string) ?? '', assets) }}
           accentColor={accentColor}
         />
       );
@@ -155,7 +356,7 @@ const OverlayContent: React.FC<OverlayContentProps> = ({ type, data, assets, acc
     case 'headline':
       return (
         <HeadlineCard
-          title={(data.title as string) ?? ''}
+          title={humanize((data.title as string) ?? '', assets)}
           source={(data.source as string) ?? undefined}
           accentColor={accentColor}
         />
@@ -164,8 +365,8 @@ const OverlayContent: React.FC<OverlayContentProps> = ({ type, data, assets, acc
     case 'text_card':
       return (
         <TextCard
-          text={(data.text as string) ?? ''}
-          subtitle={(data.subtitle as string) ?? undefined}
+          text={humanize((data.text as string) ?? '', assets)}
+          subtitle={humanize((data.subtitle as string) ?? '', assets)}
           accentColor={accentColor}
         />
       );
@@ -173,7 +374,7 @@ const OverlayContent: React.FC<OverlayContentProps> = ({ type, data, assets, acc
     case 'gauge':
       return (
         <GaugeOverlay
-          label={(data.label as string) ?? ''}
+          label={humanize((data.label as string) ?? '', assets)}
           value={(data.value as number) ?? 0}
           min={(data.min as number) ?? 0}
           max={(data.max as number) ?? 100}
@@ -193,12 +394,12 @@ const OverlayContent: React.FC<OverlayContentProps> = ({ type, data, assets, acc
     case 'chart_zone': {
       const sym = (data.symbol as string) ?? '';
       const asset = assets.find(a => a.symbol === sym);
-      const candles = asset?.dailyCandles ?? asset?.candles ?? [];
+      const allCandles = asset?.dailyCandles ?? asset?.candles ?? [];
 
-      if (candles.length < 5) {
+      if (allCandles.length < 5) {
         return (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-            <span style={{ fontFamily: BRAND.fonts.mono, fontSize: 14, color: BRAND.colors.inkLight }}>{sym}</span>
+            <span style={{ fontFamily: BRAND.fonts.mono, fontSize: 14, color: BRAND.colors.inkLight }}>{asset?.name ?? sym}</span>
             <span style={{ fontFamily: BRAND.fonts.condensed, fontSize: 28, color: BRAND.colors.ink }}>
               {(data.price as number)?.toLocaleString() ?? ''}
             </span>
@@ -214,32 +415,23 @@ const OverlayContent: React.FC<OverlayContentProps> = ({ type, data, assets, acc
 
       const chartW = 1400;
       const chartH = 650;
+      const ZOOM_N = 120;
+      const zoomCandles = allCandles.slice(-ZOOM_N);
+      const hasZoom = allCandles.length > ZOOM_N;
 
-      return (
-        <div style={{ width: chartW, height: chartH + 40 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, padding: '0 8px' }}>
-            <span style={{ fontFamily: BRAND.fonts.display, fontSize: 22, color: BRAND.colors.ink }}>
-              {asset?.name ?? sym}
-            </span>
-            <span style={{
-              fontFamily: BRAND.fonts.condensed, fontSize: 26,
-              color: (asset?.changePct ?? 0) >= 0 ? '#1a6b3a' : '#8b1a1a',
-            }}>
-              {asset?.price?.toLocaleString()} ({(asset?.changePct ?? 0) >= 0 ? '+' : ''}{(asset?.changePct ?? 0).toFixed(2)}%)
-            </span>
-          </div>
-          <CandlestickChart
-            candles={candles}
-            levels={levels}
-            accentColor={accentColor}
-            width={chartW}
-            height={chartH}
-            drawDuration={45}
-            showVolume
-            showSMA
-          />
-        </div>
-      );
+      return <ChartWithZoom
+        allCandles={allCandles}
+        zoomCandles={zoomCandles}
+        hasZoom={hasZoom}
+        levels={levels}
+        accentColor={accentColor}
+        chartW={chartW}
+        chartH={chartH}
+        assetName={asset?.name ?? sym}
+        price={asset?.price}
+        changePct={asset?.changePct ?? 0}
+        durationInFrames={durationInFrames}
+      />;
     }
 
     default:

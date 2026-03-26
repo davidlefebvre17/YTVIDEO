@@ -213,7 +213,7 @@ function buildHaikuInput(beats: RawBeat[], snapshot: DailySnapshot, analysis: An
   // Segments with C2 data
   const segments = analysis.segments.map(seg => ({
     id: seg.segmentId,
-    topic: seg.technicalReading?.slice(0, 100) || 'N/A',
+    topic: seg.narrativeHook || 'N/A',
     causalChain: seg.causalChain,
     scenarios: seg.scenarios,
     technicalReading: seg.technicalReading,

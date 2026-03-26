@@ -32,15 +32,17 @@ COLOR ACCENTS: Mention selective color when relevant:
 RULES:
 - Start every prompt with the SUBJECT drawn in ink: "Ink drawing of..." or "Pen and ink illustration of..."
 - Each prompt: 30-50 words
-- Describe human figures by PHYSICAL TRAITS: "silver-haired man in dark suit" NOT "Jerome Powell"
+- USE REAL NAMES for public figures: "Donald Trump", "Jerome Powell", "Christine Lagarde", "Larry Fink" — Flux knows them and generates recognizable faces
+- USE REAL NAMES for landmarks: "NYSE trading floor", "Eccles Building", "ECB Frankfurt", "Wall Street Bull", "Goldman Sachs tower", "White House"
+- Financial symbols allowed as graphic elements: ₿ $ € ¥
 - Human figures CAN be shown face visible, 3/4 profile — editorial portrait illustration style
 - Make scenes IMPACTFUL and NARRATIVE: characters in action, metaphors visible, irony in composition
 - Physical/tangible metaphors encouraged: melting, crumbling, sinking, splitting, towering, cracking
 - Max 3 focal elements per image (Flux limitation — more = muddy result)
 - Split compositions: "left half shows X, right half shows Y, sharp vertical divide"
 - Background is ALWAYS cream/ivory paper — never dark, never black
-- NEVER include readable text, labels, logos, signs in the image
-- NEVER use words: "text", "label", "sign", "logo", "writing", "glowing", "soft focus", "bokeh", "cinematic"
+- NEVER include readable sentences, paragraphs, or long text in the image
+- NEVER use words: "glowing", "soft focus", "bokeh", "cinematic", "photorealistic"
 
 NARRATIVE AWARENESS:
 - The direction includes a "narrativeRole" — use it to calibrate emotional intensity
@@ -70,7 +72,7 @@ OUTPUT: JSON array:
 
   const user = `Convert these ${compact.length} editorial directions into Flux prompts.
 
-REMINDER: WSJ hedcut stipple style, black ink on cream paper, selective color accents only on key elements. Describe figures by physical traits, never names. Max 3 focal elements. Natural English sentences, subject first.
+REMINDER: WSJ hedcut stipple style, black ink on cream paper, selective color accents only on key elements. USE REAL NAMES for public figures (Trump, Powell, Lagarde) and landmarks (NYSE, Eccles Building, ECB). Financial symbols (₿ $ €) allowed. Max 3 focal elements. Natural English sentences, subject first.
 
 ${JSON.stringify(compact, null, 0)}`;
 

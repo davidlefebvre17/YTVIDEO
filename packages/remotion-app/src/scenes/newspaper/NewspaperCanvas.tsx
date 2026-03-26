@@ -59,7 +59,7 @@ export const NewspaperCanvas: React.FC<NewspaperCanvasProps> = ({
             color: BRAND.colors.ink,
           }}
         >
-          TRADINGRECAP
+          OWL STREET JOURNAL
         </span>
         <span
           style={{
@@ -224,7 +224,7 @@ export const NewspaperCanvas: React.FC<NewspaperCanvasProps> = ({
               color: BRAND.colors.inkLight,
             }}
           >
-            TRADINGRECAP — {dateFormatted}
+            OWL STREET JOURNAL — {dateFormatted}
           </span>
         </div>
       </div>

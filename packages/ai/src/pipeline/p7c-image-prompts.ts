@@ -14,25 +14,53 @@ const MOOD_SUFFIX: Record<string, string> = {
   incertitude: ', loose crosshatching, atmospheric ink wash, contemplative framing',
 };
 
-// ── Emotion → fallback prompt (when LLM fails) ─────────────
+// ── Emotion → fallback prompts (when LLM fails) ─────────────
 
-const EMOTION_FALLBACK: Record<string, string> = {
-  tension: 'Silhouette of a figure at a desk in dark office, tense posture, hands clasped',
-  analyse: 'Stack of financial newspapers on wooden desk, reading glasses beside them, morning light',
-  revelation: 'Dramatic light breaking through tall windows of institutional building, long shadows',
-  contexte: 'Aerial view of financial district skyline at dusk, distant buildings',
-  impact: 'Close-up of a gavel striking on marble surface, sharp detail',
-  respiration: 'Calm harbor at sunrise, still water, distant cranes, soft horizon light',
-  conclusion: 'Panoramic city skyline at dawn, financial district emerging from morning fog',
+const EMOTION_FALLBACK: Record<string, string[]> = {
+  tension: [
+    'Silhouette of a figure at a desk in dark office, tense posture, hands clasped',
+    'Deep shadows falling across a leather briefcase, tension lines sharp and defined',
+    'Hunched shoulders of a trader staring at charts, ink crosshatching emphasizing stress',
+  ],
+  analyse: [
+    'Stack of financial newspapers on wooden desk, reading glasses beside them, morning light',
+    'Opened financial reports with analytical notes, pencil marks crossing data points',
+    'Magnifying glass examining market ticker tape, meticulous detail in stippling',
+  ],
+  revelation: [
+    'Dramatic light breaking through tall windows of institutional building, long shadows',
+    'Lightbulb moment illustrated as vertical rays piercing through institutional stone facade',
+    'Unveiling of a document, corner lifting to reveal hidden numbers beneath',
+  ],
+  contexte: [
+    'Aerial view of financial district skyline at dusk, distant buildings',
+    'Wide establishing shot of stock exchange exterior, bustling entrance steps',
+    'Bird\'s-eye view of trading floor layout, positions marked with careful stipple',
+  ],
+  impact: [
+    'Close-up of a gavel striking on marble surface, sharp detail',
+    'Impact wave radiating from central point, concentric circles in bold linework',
+    'Domino effect illustration, falling pieces rendered in crisp ink',
+  ],
+  respiration: [
+    'Calm harbor at sunrise, still water, distant cranes, soft horizon light',
+    'Empty trading floor at dawn, peaceful silence before opening bell',
+    'Peaceful landscape with minimal ink density, breathing space in composition',
+  ],
+  conclusion: [
+    'Panoramic city skyline at dawn, financial district emerging from morning fog',
+    'Final page of a ledger being closed, symbolic ink line completing the entry',
+    'Sunset over financial district, markets closed for the day, calm resolution',
+  ],
 };
 
 // ── Forbidden words filter ──────────────────────────────────
 
 const FORBIDDEN_WORDS = [
-  'text', 'words', 'title', 'label', 'logo', 'brand', 'sign', 'writing',
-  'letters', 'selfie', 'headshot', 'looking at camera', 'cartoon', 'caricature',
+  'selfie', 'headshot', 'looking at camera', 'cartoon', 'caricature',
   'black background', 'dark background', 'black velvet', 'dark surface', 'black surface',
   'noir background', 'on black', 'against black', 'dark backdrop',
+  'glowing', 'soft focus', 'bokeh', 'cinematic', 'photorealistic', 'lens flare',
 ];
 
 function sanitizePrompt(prompt: string): string {
@@ -111,7 +139,8 @@ export async function runC8ImagePrompts(
       console.warn(`    C8 chunk ${chunkNum} failed: ${(err as Error).message.slice(0, 80)}`);
       // Fallback for this chunk only — other chunks still work
       for (const dir of chunk) {
-        const fallback = EMOTION_FALLBACK[dir.emotion] ?? EMOTION_FALLBACK.contexte;
+        const fallbackArr = EMOTION_FALLBACK[dir.emotion] ?? EMOTION_FALLBACK.contexte;
+        const fallback = fallbackArr[Math.floor(Math.random() * fallbackArr.length)];
         promptMap.set(dir.beatId, fallback);
       }
     }
@@ -121,7 +150,8 @@ export async function runC8ImagePrompts(
     let prompt = promptMap.get(dir.beatId) ?? '';
 
     if (!prompt) {
-      prompt = EMOTION_FALLBACK[dir.emotion] ?? EMOTION_FALLBACK.contexte;
+      const fallbackArr = EMOTION_FALLBACK[dir.emotion] ?? EMOTION_FALLBACK.contexte;
+      prompt = fallbackArr[Math.floor(Math.random() * fallbackArr.length)];
     }
 
     prompt = sanitizePrompt(prompt);

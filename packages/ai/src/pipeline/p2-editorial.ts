@@ -296,7 +296,7 @@ function fallbackEditorialPlan(flagged: SnapshotFlagged): EditorialPlan {
 }
 
 /**
- * Run C1 Haiku — editorial selection.
+ * Run C1 Sonnet — editorial selection.
  */
 export async function runC1Editorial(input: {
   flagged: SnapshotFlagged;
@@ -322,7 +322,7 @@ export async function runC1Editorial(input: {
     userPrompt += `\n\n## FEEDBACK (corrige ces erreurs)\n${input.feedback.join('\n')}`;
   }
 
-  console.log('  P2 C1 Haiku — sélection éditoriale...');
+  console.log('  P2 C1 Sonnet — sélection éditoriale...');
 
   try {
     const plan = await generateStructuredJSON<EditorialPlan>(

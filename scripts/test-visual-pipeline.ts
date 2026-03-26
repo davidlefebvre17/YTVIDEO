@@ -54,6 +54,8 @@ async function main() {
   }
   if (Object.keys(editorialVisuals).length) {
     console.log(`  Editorial visuals from Opus: ${Object.keys(editorialVisuals).length} segments`);
+  } else {
+    console.warn(`  ⚠ No editorialVisuals found in script — C7 will improvise without Opus guidance`);
   }
 
   const c7Result = await runC7Direction(rawBeats, direction, snapshot.assets, { lang: script.lang, editorialVisuals });

@@ -108,7 +108,7 @@ export const BeatAudioTrack: React.FC<BeatAudioTrackProps> = ({
       sectionChangeCount++;
     }
 
-    // ── 3. Transition SFX (sting/swoosh du pipeline) ──
+    // ── 3. Transition SFX (sting/swoosh/bell/stamp etc. du pipeline) ──
     if (isNewSection) {
       const sfxTag = transitionSfxMap.get(beat.segmentId);
       const category = soundEffectToCategory(sfxTag);
@@ -125,6 +125,24 @@ export const BeatAudioTrack: React.FC<BeatAudioTrackProps> = ({
           </Sequence>
         );
       }
+    }
+
+    // ── 4. Contextual SFX (auto: based on segment type) ──
+    // unfold on first beat (hook), close on last beat (closing)
+    if (i === 0 && beat.segmentId === 'hook') {
+      elements.push(
+        <Sequence key={`unfold-${beat.id}`} from={0} durationInFrames={Math.round(2 * fps)}>
+          <Audio src={getSfxPath('unfold', 0)} volume={SFX_VOLUME.unfold * sfxVolume} />
+        </Sequence>
+      );
+    }
+    if (i === beats.length - 1 && beat.segmentId === 'closing') {
+      const closeStart = Math.max(0, timing.start + timing.duration - Math.round(2 * fps));
+      elements.push(
+        <Sequence key={`close-${beat.id}`} from={closeStart} durationInFrames={Math.round(2 * fps)}>
+          <Audio src={getSfxPath('close', 0)} volume={SFX_VOLUME.close * sfxVolume} />
+        </Sequence>
+      );
     }
 
     prevSegmentId = beat.segmentId;

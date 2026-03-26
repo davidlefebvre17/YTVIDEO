@@ -15,6 +15,7 @@ import { buildEpisodeSummaries, formatRecentScriptsForC3 } from "./helpers/episo
 import { buildCausalBrief } from "./helpers/causal-brief";
 import { buildBriefingPack } from "./helpers/briefing-pack";
 import { runNewsDigest } from "./p1b-news-digest";
+import { saveIntermediate as saveToEpisodeIntermediate } from "../episode-folder";
 import type {
   PipelineOptions,
   PipelineResult,
@@ -48,6 +49,7 @@ export { buildBriefingPack, formatBriefingPack } from "./helpers/briefing-pack";
 export { runNewsDigest, formatNewsDigest } from "./p1b-news-digest";
 export type { NewsDigest, NewsDigestEvent } from "./p1b-news-digest";
 export type { BriefingPack, PoliticalTrigger, ScreenMover, EarningsBucket, COTHighlight, COTDivergence, SentimentTrend } from "./helpers/briefing-pack";
+export { episodeDir, createEpisodeDir, saveToEpisode, saveIntermediate as saveToEpisodeIntermediate, syncImagesToPublic, syncAudioToPublic, saveRemotionProps, saveEpisodeData } from "../episode-folder";
 
 /**
  * Format weekly brief as string for C1 prompt.
@@ -77,15 +79,10 @@ function formatWeeklyBrief(): string {
 
 /**
  * Save intermediate pipeline result for debugging.
+ * Delegates to episode-folder for centralized management.
  */
 function saveIntermediate(date: string, name: string, data: unknown): void {
-  try {
-    const dir = join(process.cwd(), "data", "pipeline", date);
-    if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-    writeFileSync(join(dir, `${name}.json`), JSON.stringify(data, null, 2));
-  } catch {
-    // Non-critical — skip silently
-  }
+  saveToEpisodeIntermediate(date, name, data);
 }
 
 /**
@@ -124,6 +121,7 @@ export function toEpisodeScript(
     depth: seg.depth.toLowerCase() as "flash" | "focus" | "deep",
     topic: seg.topic,
     assets: seg.assets,
+    editorialVisual: seg.editorialVisual,
     data: {
       depth: seg.depth,
       topic: seg.topic,
@@ -321,8 +319,47 @@ export async function runPipeline(
     };
   }
 
+  // ── Build asset context for C3 (description + aliases from profiles) ──
+  const { assetDescription, assetAliases } = await import("@yt-maker/core");
+  const { getProfileContext } = await import("../company-profiles");
+  const assetContext: Record<string, string> = {};
+
+  // Collect all symbols mentioned in editorial plan + stockScreen
+  const allSymbols = new Set<string>();
+  for (const seg of editorial.segments) {
+    for (const sym of seg.assets) allSymbols.add(sym);
+  }
+  for (const asset of snapshot.assets) allSymbols.add(asset.symbol);
+  if (snapshot.stockScreen) {
+    for (const stock of snapshot.stockScreen) allSymbols.add(stock.symbol);
+  }
+
+  // Build context: description + aliases for each symbol
+  for (const sym of allSymbols) {
+    const desc = assetDescription(sym);
+    const aliases = assetAliases(sym);
+    const stockDesc = snapshot.stockScreen?.find(s => s.symbol === sym)?.description;
+
+    let ctx = '';
+    const resolvedDesc = desc ?? stockDesc;
+    if (resolvedDesc) ctx = resolvedDesc;
+    else {
+      const profile = getProfileContext(sym);
+      if (profile) ctx = profile;
+    }
+
+    if (aliases.length > 0) {
+      ctx += (ctx ? ' | Surnoms: ' : 'Surnoms: ') + aliases.join(', ');
+    }
+
+    if (ctx) assetContext[sym] = ctx;
+  }
+
   // ── P4: C3 Opus — Rédaction ────────────────────────────
   console.log("\nP4 — C3 Opus (rédaction)...");
+  if (Object.keys(assetContext).length) {
+    console.log(`  Asset context: ${Object.keys(assetContext).length} assets with descriptions`);
+  }
   let draft = await runC3Writing({
     editorial,
     analysis,
@@ -331,6 +368,7 @@ export async function runPipeline(
     knowledgeTier1,
     researchContext,
     lang,
+    assetContext,
   });
   stats.llmCalls++;
   saveIntermediate(snapshot.date, "episode_draft", draft);

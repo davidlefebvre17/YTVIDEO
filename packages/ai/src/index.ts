@@ -4,7 +4,7 @@ export { generateScript, formatSnapshotForPrompt } from "./script-generator";
 export type { PrevContext, PrevEntry } from "./script-generator";
 export { getDailyRecapSystemPrompt } from "./prompts/daily-recap";
 export { loadKnowledge } from "./knowledge-loader";
-export { readManifest, getNextEpisodeNumber, getRecentEpisodes, appendToManifest } from "./episode-history";
+export { readManifest, getNextEpisodeNumber, getRecentEpisodes, appendToManifest, loadEpisodeData } from "./episode-history";
 export { buildThemesDuJour, computeAssetSignal, detectMarketRegime, scoreTheme } from "./editorial-score";
 export { clusterNews, buildThemesFromClusters } from "./news-clusterer";
 export type { ClusteredResult } from "./news-clusterer";
@@ -29,8 +29,21 @@ export type {
   PipelineOptions, PipelineResult, PipelineStats,
   EditorialPlan, AnalysisBundle, DraftScript, DirectedEpisode,
   ValidationResult, SnapshotFlagged, FlaggedAsset, WordBudget, CausalBrief,
-  SegmentDepth, ConfidenceLevel, MoodTag,
+  SegmentDepth, ConfidenceLevel, MoodTag, RawBeat,
 } from "./pipeline";
+
+// Pipeline P7 — Beat visual pipeline
+export { generateBeats, chunkNarration, computeOverlayDelay } from "./pipeline";
+export { annotateBeats } from "./pipeline";
+export type { BeatAnnotation } from "./pipeline";
+export { runC7Direction } from "./pipeline";
+export { runC8ImagePrompts, buildStyleSuffix } from "./pipeline";
+export { runImageGeneration } from "./pipeline";
+export { adaptForTTS } from "./pipeline";
+export type { TTSBeat } from "./pipeline";
+
+// Episode folder management
+export { episodeDir, createEpisodeDir, saveToEpisode, saveToEpisodeIntermediate, syncImagesToPublic, syncAudioToPublic, saveRemotionProps, saveEpisodeData } from "./pipeline";
 
 // News Memory (D2)
 export {

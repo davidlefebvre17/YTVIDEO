@@ -1,6 +1,27 @@
+/**
+ * BeatEpisode — Newspaper-flow video composition (E3 plan).
+ *
+ * Flow: Disclaimer → NewspaperPage (with pre-segment audio)
+ *       → [ZoomIn → Beats → ZoomOut → Between] × N
+ *       → Closing NewspaperPage
+ *
+ * The newspaper page is the HOME BASE — the viewer sees the full "edition"
+ * then dives into each segment via zoom transitions.
+ */
 import React, { useMemo } from "react";
-import { AbsoluteFill, Sequence, useCurrentFrame, useVideoConfig, interpolate } from "remotion";
-import type { EpisodeScript, AssetSnapshot, NewsItem, Beat, BeatTransition } from "@yt-maker/core";
+import {
+  AbsoluteFill,
+  Sequence,
+  useCurrentFrame,
+  useVideoConfig,
+  interpolate,
+} from "remotion";
+import type {
+  EpisodeScript,
+  AssetSnapshot,
+  Beat,
+  BeatTransition,
+} from "@yt-maker/core";
 import { BRAND } from "@yt-maker/core";
 import { BeatSequence } from "../scenes/beat/BeatSequence";
 import { InkSubtitle, type SubtitleLine } from "../scenes/shared/InkSubtitle";
@@ -8,54 +29,146 @@ import { GrainOverlay } from "../scenes/shared/GrainOverlay";
 import { DisclaimerBar } from "../scenes/shared/DisclaimerBar";
 import { BeatAudioTrack } from "../audio/BeatAudioTrack";
 import { DisclaimerScene } from "../scenes/shared/DisclaimerScene";
-import { FrontPage } from "../scenes/shared/FrontPage";
 import { TypewriterTitle } from "../scenes/shared/TypewriterTitle";
+import {
+  NewspaperPage,
+  computeSegmentRects,
+  type SegmentCard,
+} from "../scenes/shared/NewspaperPage";
+import { ZoomTransition } from "../scenes/shared/ZoomTransition";
 
+// ── Props ────────────────────────────────────────────────────
 export interface BeatEpisodeProps {
   script: EpisodeScript;
   beats: Beat[];
   assets?: AssetSnapshot[];
-  news?: NewsItem[];
   [key: string]: unknown;
 }
 
-function getEffectiveDuration(beat: Beat): number {
-  if (beat.timing?.audioDurationSec !== undefined) {
-    return beat.timing.audioDurationSec;
-  }
-  return beat.timing?.estimatedDurationSec ?? beat.durationSec;
+// ── Constants ────────────────────────────────────────────────
+const DISCLAIMER_FRAMES = 90; // 3s
+const ZOOM_FRAMES = 45; // 1.5s
+const BETWEEN_FRAMES = 20; // 0.67s pause on newspaper between segments
+const CROSSFADE_FRAMES = 25; // overlap between zoom end and first beat
+const MIN_NEWSPAPER_FRAMES = 600; // 20s minimum newspaper intro
+const MIN_CLOSING_FRAMES = 150; // 5s minimum closing
+
+const PRE_SEGMENT_IDS = ["hook", "title_card", "thread"];
+
+// ── Beat helpers ─────────────────────────────────────────────
+
+export function getEffectiveDuration(beat: Beat): number {
+  return (
+    beat.timing?.audioDurationSec ??
+    beat.timing?.estimatedDurationSec ??
+    beat.durationSec
+  );
 }
 
-function getTransitionDurationFrames(type: BeatTransition): number {
+export function getTransitionDurationFrames(type: BeatTransition): number {
   switch (type) {
-    case 'cut': return 2;
-    case 'fade': return 10;
-    case 'cross_dissolve': return 15;
-    default: return 10;
+    case "cut":
+      return 2;
+    case "fade":
+      return 10;
+    case "cross_dissolve":
+      return 15;
+    default:
+      return 10;
   }
 }
 
-function buildSubtitleLines(beats: Beat[], fps: number): SubtitleLine[] {
+/** Group beats by segmentId, preserving insertion order. */
+function groupBeatsBySegment(beats: Beat[]): Map<string, Beat[]> {
+  const map = new Map<string, Beat[]>();
+  for (const b of beats) {
+    if (!map.has(b.segmentId)) map.set(b.segmentId, []);
+    map.get(b.segmentId)!.push(b);
+  }
+  return map;
+}
+
+/** Duration of a beat group in frames, accounting for crossfade overlaps. */
+function groupDurationFrames(beats: Beat[], fps: number): number {
+  let total = 0;
+  for (let i = 0; i < beats.length; i++) {
+    const dur = Math.max(
+      15,
+      Math.round(getEffectiveDuration(beats[i]) * fps),
+    );
+    total +=
+      i === 0
+        ? dur
+        : dur - getTransitionDurationFrames(beats[i - 1].transitionOut);
+  }
+  return Math.max(0, total);
+}
+
+/** Layout beats sequentially with crossfade overlaps. */
+function layoutBeats(
+  beats: Beat[],
+  sectionStart: number,
+  fps: number,
+): Array<{ start: number; duration: number; fadeFrames: number }> {
   let cumFrames = 0;
-  const lines: SubtitleLine[] = [];
-
-  for (const beat of beats) {
-    const dur = getEffectiveDuration(beat);
-    const durationFrames = Math.round(dur * fps);
-
-    if (beat.narrationChunk && beat.narrationChunk.length > 3) {
-      lines.push({
-        text: beat.narrationChunk,
-        startFrame: cumFrames,
-        endFrame: cumFrames + durationFrames,
-      });
+  return beats.map((beat, i) => {
+    const dur = Math.max(
+      15,
+      Math.round(getEffectiveDuration(beat) * fps),
+    );
+    if (i === 0) {
+      const result = { start: sectionStart, duration: dur, fadeFrames: 0 };
+      cumFrames = dur;
+      return result;
     }
+    const prevFade = getTransitionDurationFrames(
+      beats[i - 1].transitionOut,
+    );
+    const start = sectionStart + cumFrames - prevFade;
+    const result = {
+      start,
+      duration: dur + prevFade,
+      fadeFrames: prevFade,
+    };
+    cumFrames += dur - prevFade;
+    return result;
+  });
+}
 
-    cumFrames += durationFrames;
+// ── Total duration (used by calculateMetadata in Root.tsx) ────
+
+export function computeNewspaperDuration(
+  beats: Beat[],
+  script: EpisodeScript,
+  fps: number,
+): number {
+  const groups = groupBeatsBySegment(beats);
+
+  const preSegDur = PRE_SEGMENT_IDS.reduce(
+    (sum, id) => sum + groupDurationFrames(groups.get(id) ?? [], fps),
+    0,
+  );
+  const newspaperIntro = Math.max(MIN_NEWSPAPER_FRAMES, preSegDur + 60);
+
+  const segIds = script.sections
+    .filter((s) => s.type === "segment")
+    .map((s) => s.id);
+  let segTotal = 0;
+  for (let i = 0; i < segIds.length; i++) {
+    const dur = groupDurationFrames(groups.get(segIds[i]) ?? [], fps);
+    // CROSSFADE_FRAMES overlap means beats start earlier, reducing total
+    segTotal += ZOOM_FRAMES + dur + ZOOM_FRAMES - CROSSFADE_FRAMES;
+    if (i < segIds.length - 1) segTotal += BETWEEN_FRAMES;
   }
 
-  return lines;
+  const closingDur = groups.has("closing")
+    ? groupDurationFrames(groups.get("closing")!, fps) + 60
+    : MIN_CLOSING_FRAMES;
+
+  return DISCLAIMER_FRAMES + newspaperIntro + segTotal + closingDur;
 }
+
+// ── CrossfadeBeat ────────────────────────────────────────────
 
 const CrossfadeBeat: React.FC<{
   beat: Beat;
@@ -65,24 +178,29 @@ const CrossfadeBeat: React.FC<{
   fadeFrames: number;
 }> = ({ beat, assets, accentColor, durationInFrames, fadeFrames }) => {
   const frame = useCurrentFrame();
-
-  const fadeIn = interpolate(frame, [0, fadeFrames], [0, 1], {
-    extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
+  const ff = Math.max(1, fadeFrames);
+  const fadeIn = interpolate(frame, [0, ff], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
   });
   const fadeOut = interpolate(
     frame,
-    [durationInFrames - fadeFrames, durationInFrames],
+    [durationInFrames - ff, durationInFrames],
     [1, 0],
-    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
   );
-  const opacity = Math.min(fadeIn, fadeOut);
-
   return (
-    <AbsoluteFill style={{ opacity }}>
-      <BeatSequence beat={beat} assets={assets} accentColor={accentColor} />
+    <AbsoluteFill style={{ opacity: Math.min(fadeIn, fadeOut) }}>
+      <BeatSequence
+        beat={beat}
+        assets={assets}
+        accentColor={accentColor}
+      />
     </AbsoluteFill>
   );
 };
+
+// ── Main Component ───────────────────────────────────────────
 
 export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
   script,
@@ -90,99 +208,312 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
   assets = [],
 }) => {
   const { fps } = useVideoConfig();
-  const mood = script.direction?.moodMusic ?? 'neutre_analytique';
-  const accentColor = BRAND.moodAccent[mood] ?? BRAND.colors.accentDefault;
+  const mood = script.direction?.moodMusic ?? "neutre_analytique";
+  const accentColor =
+    BRAND.moodAccent[mood] ?? BRAND.colors.accentDefault;
 
-  const subtitleLines = useMemo(() => buildSubtitleLines(beats, fps), [beats, fps]);
+  // ── Step 1: Group and classify beats ──
+  const beatGroups = useMemo(
+    () => groupBeatsBySegment(beats),
+    [beats],
+  );
 
-  // Intro offset: 90 frames (Disclaimer) + 210 frames (FrontPage) = 300 frames (10s)
-  const introOffsetFrames = 300;
+  const segmentIds = useMemo(
+    () =>
+      script.sections
+        .filter((s) => s.type === "segment")
+        .map((s) => s.id),
+    [script.sections],
+  );
 
-  const beatTimings = useMemo(() => {
-    let cumFrames = introOffsetFrames;
-    return beats.map((beat) => {
-      const dur = Math.max(15, Math.round(getEffectiveDuration(beat) * fps));
-      const fadeFrames = getTransitionDurationFrames(beat.transitionOut);
-      const start = Math.max(introOffsetFrames, cumFrames - fadeFrames);
-      const overlap = cumFrames > introOffsetFrames ? fadeFrames : 0;
-      const result = { start, duration: dur + overlap, fadeFrames };
-      cumFrames += dur - fadeFrames;
-      return result;
+  // ── Step 2: Segment cards for NewspaperPage ──
+  const segmentCards: SegmentCard[] = useMemo(
+    () =>
+      segmentIds.map((id) => {
+        const section = script.sections.find((s) => s.id === id);
+        const firstBeat = (beatGroups.get(id) ?? [])[0];
+        return {
+          id,
+          title: section?.title ?? id,
+          depth: section?.depth,
+          imageSrc: firstBeat?.imagePath,
+          narration: section?.narration,
+        };
+      }),
+    [segmentIds, script.sections, beatGroups],
+  );
+
+  const segmentRects = useMemo(
+    () => computeSegmentRects(segmentCards.length, segmentCards),
+    [segmentCards],
+  );
+
+  // ── Step 3: Compute all frame timings ──
+  const timings = useMemo(() => {
+    // Pre-segment audio duration
+    const preSegDur = PRE_SEGMENT_IDS.reduce(
+      (sum, id) =>
+        sum + groupDurationFrames(beatGroups.get(id) ?? [], fps),
+      0,
+    );
+    const newspaperIntroFrames = Math.max(
+      MIN_NEWSPAPER_FRAMES,
+      preSegDur + 60,
+    );
+
+    // Section start times (absolute frames)
+    const sectionStarts = new Map<string, number>();
+    let preCum = DISCLAIMER_FRAMES;
+    for (const id of PRE_SEGMENT_IDS) {
+      if (beatGroups.has(id)) {
+        sectionStarts.set(id, preCum);
+        preCum += groupDurationFrames(beatGroups.get(id)!, fps);
+      }
+    }
+
+    // Segment zoom timings
+    interface SegTiming {
+      segIdx: number;
+      segId: string;
+      zoomInStart: number;
+      beatsStart: number;
+      zoomOutStart: number;
+      end: number;
+    }
+    let segCum = DISCLAIMER_FRAMES + newspaperIntroFrames;
+    const segs: SegTiming[] = segmentIds.map((segId, i) => {
+      const dur = groupDurationFrames(
+        beatGroups.get(segId) ?? [],
+        fps,
+      );
+      const zoomInStart = segCum;
+      // Beats start CROSSFADE_FRAMES before zoom ends (overlap for smooth transition)
+      const beatsStart = zoomInStart + ZOOM_FRAMES - CROSSFADE_FRAMES;
+      const zoomOutStart = beatsStart + dur;
+      const isLast = i === segmentIds.length - 1;
+      const end =
+        zoomOutStart + ZOOM_FRAMES + (isLast ? 0 : BETWEEN_FRAMES);
+      sectionStarts.set(segId, beatsStart);
+      segCum = end;
+      return {
+        segIdx: i,
+        segId,
+        zoomInStart,
+        beatsStart,
+        zoomOutStart,
+        end,
+      };
     });
-  }, [beats, fps]);
 
-  // Build front page segment list from script sections
-  const frontPageSegments = script.sections.map((section) => ({
-    title: section.title,
-    depth: section.depth,
-  }));
+    // Closing
+    const closingStart = segCum;
+    sectionStarts.set("closing", closingStart);
+    const closingDur = beatGroups.has("closing")
+      ? groupDurationFrames(beatGroups.get("closing")!, fps) + 60
+      : MIN_CLOSING_FRAMES;
 
-  // Find first beat's image for hero
-  const firstBeatImage = beats.length > 0 ? beats[0].imagePath : undefined;
+    // Per-section beat layouts
+    const sectionLayouts = new Map<
+      string,
+      Array<{ start: number; duration: number; fadeFrames: number }>
+    >();
+    for (const [segId, segBeats] of beatGroups) {
+      const start = sectionStarts.get(segId) ?? 0;
+      sectionLayouts.set(segId, layoutBeats(segBeats, start, fps));
+    }
 
-  // Track previous segment ID for TypewriterTitle
-  let prevSegmentId = '';
+    // Build allBeatTimings aligned with beats array
+    const allBeatTimings = beats.map((beat) => {
+      const sectionBeats = beatGroups.get(beat.segmentId) ?? [];
+      const idx = sectionBeats.indexOf(beat);
+      const layout = sectionLayouts.get(beat.segmentId) ?? [];
+      return layout[idx] ?? { start: 0, duration: 30, fadeFrames: 0 };
+    });
 
+    return {
+      newspaperIntroFrames,
+      segTimings: segs,
+      closingStart,
+      closingDur,
+      allBeatTimings,
+    };
+  }, [beats, beatGroups, segmentIds, fps]);
+
+  // ── Step 4: Subtitle lines ──
+  const subtitleLines = useMemo(
+    (): SubtitleLine[] =>
+      beats
+        .map((beat, i) => {
+          const t = timings.allBeatTimings[i];
+          if (
+            !t ||
+            !beat.narrationChunk ||
+            beat.narrationChunk.length < 3
+          )
+            return null;
+          return {
+            text: beat.narrationChunk,
+            startFrame: t.start,
+            endFrame: t.start + t.duration,
+          };
+        })
+        .filter((l): l is SubtitleLine => l !== null),
+    [beats, timings.allBeatTimings],
+  );
+
+  // ── Shared newspaper props ──
+  const npProps = {
+    title: script.title,
+    date: script.date,
+    segments: segmentCards,
+    threadSummary: script.threadSummary ?? "",
+  };
+
+  // ── Render ──
   return (
     <AbsoluteFill style={{ backgroundColor: BRAND.colors.cream }}>
-      {/* Feature 1: Full-page Disclaimer (3 seconds) */}
-      <Sequence from={0} durationInFrames={90}>
+      {/* ── 1. Disclaimer (3s) ── */}
+      <Sequence from={0} durationInFrames={DISCLAIMER_FRAMES}>
         <DisclaimerScene />
       </Sequence>
 
-      {/* Feature 2: Newspaper Front Page (7 seconds) */}
-      <Sequence from={90} durationInFrames={210}>
-        <FrontPage
-          title={script.title}
-          date={script.date}
-          segments={frontPageSegments}
-          heroImageSrc={firstBeatImage}
-          threadSummary={script.threadSummary}
+      {/* ── 2. Newspaper intro (pre-segment audio plays over this) ── */}
+      <Sequence
+        from={DISCLAIMER_FRAMES}
+        durationInFrames={timings.newspaperIntroFrames}
+      >
+        <NewspaperPage
+          {...npProps}
+          activeSegmentIdx={0}
+          showTypewriter
         />
       </Sequence>
 
-      {/* Main beat sequences (offset by 300 frames) */}
-      {beats.map((beat, i) => {
-        const t = beatTimings[i];
-        const isSegmentStart = beat.segmentId !== prevSegmentId;
-        const section = script.sections.find((s) => s.id === beat.segmentId);
-        prevSegmentId = beat.segmentId;
+      {/* ── 3. Segment zoom loops ── */}
+      {timings.segTimings.map((st, i) => {
+        const segBeats = beatGroups.get(st.segId) ?? [];
+        const section = script.sections.find((s) => s.id === st.segId);
+        const rect = segmentRects[i];
+        if (!rect || segBeats.length === 0) return null;
 
         return (
-          <Sequence key={beat.id} from={t.start} durationInFrames={t.duration}>
-            <CrossfadeBeat
-              beat={beat}
-              assets={assets}
-              accentColor={accentColor}
-              durationInFrames={t.duration}
-              fadeFrames={t.fadeFrames}
-            />
+          <React.Fragment key={st.segId}>
+            {/* Zoom In → newspaper zooms toward segment image */}
+            <Sequence
+              from={st.zoomInStart}
+              durationInFrames={ZOOM_FRAMES}
+            >
+              <ZoomTransition
+                direction="in"
+                sourceRect={rect}
+                durationInFrames={ZOOM_FRAMES}
+              >
+                <NewspaperPage
+                  {...npProps}
+                  activeSegmentIdx={i}
+                  showTypewriter={false}
+                />
+              </ZoomTransition>
+            </Sequence>
 
-            {/* Feature 3: Typewriter segment title overlay */}
-            {isSegmentStart && section && (
-              <TypewriterTitle
-                text={section.title}
-                durationInFrames={Math.min(60, Math.round(1.5 * fps))}
-                accentColor={accentColor}
-              />
+            {/* Beats play full-screen (first beat overlaps zoom-in end for smooth crossfade) */}
+            {segBeats.map((beat, j) => {
+              const globalIdx = beats.indexOf(beat);
+              const bt = timings.allBeatTimings[globalIdx];
+              if (!bt) return null;
+              // First beat gets extra fade-in frames to blend with zoom
+              const effectiveFade = j === 0
+                ? Math.max(bt.fadeFrames, CROSSFADE_FRAMES)
+                : bt.fadeFrames;
+              return (
+                <Sequence
+                  key={beat.id}
+                  from={bt.start}
+                  durationInFrames={bt.duration}
+                >
+                  <CrossfadeBeat
+                    beat={beat}
+                    assets={assets}
+                    accentColor={accentColor}
+                    durationInFrames={bt.duration}
+                    fadeFrames={effectiveFade}
+                  />
+                  {/* Segment title overlay on first beat */}
+                  {j === 0 && section && (
+                    <TypewriterTitle
+                      text={section.title}
+                      durationInFrames={Math.min(
+                        60,
+                        Math.round(1.5 * fps),
+                      )}
+                      accentColor={accentColor}
+                    />
+                  )}
+                </Sequence>
+              );
+            })}
+
+            {/* Zoom Out → back to newspaper */}
+            <Sequence
+              from={st.zoomOutStart}
+              durationInFrames={ZOOM_FRAMES}
+            >
+              <ZoomTransition
+                direction="out"
+                sourceRect={rect}
+                durationInFrames={ZOOM_FRAMES}
+              >
+                <NewspaperPage
+                  {...npProps}
+                  activeSegmentIdx={
+                    i < segmentIds.length - 1 ? i + 1 : -1
+                  }
+                  showTypewriter={false}
+                />
+              </ZoomTransition>
+            </Sequence>
+
+            {/* Brief pause on newspaper between segments */}
+            {i < segmentIds.length - 1 && BETWEEN_FRAMES > 0 && (
+              <Sequence
+                from={st.zoomOutStart + ZOOM_FRAMES}
+                durationInFrames={BETWEEN_FRAMES}
+              >
+                <NewspaperPage
+                  {...npProps}
+                  activeSegmentIdx={i + 1}
+                  showTypewriter={false}
+                />
+              </Sequence>
             )}
-          </Sequence>
+          </React.Fragment>
         );
       })}
 
-      {/* ── Audio: voix TTS + SFX éditoriaux ── */}
+      {/* ── 4. Closing (newspaper page, no highlight) ── */}
+      <Sequence
+        from={timings.closingStart}
+        durationInFrames={timings.closingDur}
+      >
+        <NewspaperPage
+          {...npProps}
+          activeSegmentIdx={-1}
+          showTypewriter={false}
+        />
+      </Sequence>
+
+      {/* ── Audio: voice TTS + SFX ── */}
       <BeatAudioTrack
         beats={beats}
-        beatTimings={beatTimings}
+        beatTimings={timings.allBeatTimings}
         fps={fps}
         direction={script.direction}
       />
 
+      {/* ── Viewport-locked overlays ── */}
       <InkSubtitle lines={subtitleLines} />
       <GrainOverlay opacity={0.04} />
       <DisclaimerBar lang={script.lang} />
     </AbsoluteFill>
   );
 };
-
-export { getEffectiveDuration, getTransitionDurationFrames };

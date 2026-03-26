@@ -137,7 +137,7 @@ export async function generateBeats(
   }
 
   // Step 3: Safety cap
-  capOverlayRatio(beats, 0.65);
+  capOverlayRatio(beats, 0.85);
 
   return beats;
 }
