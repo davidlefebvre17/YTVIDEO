@@ -519,6 +519,8 @@ function getDashboardHtml(): string {
     border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
   }
   .panel-header {
     padding: 8px 16px;
@@ -603,11 +605,24 @@ function getDashboardHtml(): string {
   .tab.active .badge { background: rgba(0,180,216,0.2); color: var(--cyan); }
 
   /* ── JSON viewer ── */
+  .data-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
   .json-panel {
     flex: 1;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    min-height: 0;
+  }
+  .json-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 16px;
+    background: var(--bg);
   }
   .json-toolbar {
     display: flex;
