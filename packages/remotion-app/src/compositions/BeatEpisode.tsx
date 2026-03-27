@@ -39,12 +39,15 @@ import {
   type SegmentCard,
 } from "../scenes/shared/NewspaperPage";
 import { ZoomTransition } from "../scenes/shared/ZoomTransition";
+import { ScrollingTicker } from "../scenes/shared/ScrollingTicker";
+import { NewsRollBanner } from "../scenes/shared/NewsRollBanner";
 
 // ── Props ────────────────────────────────────────────────────
 export interface BeatEpisodeProps {
   script: EpisodeScript;
   beats: Beat[];
   assets?: AssetSnapshot[];
+  news?: import("@yt-maker/core").NewsItem[];
   /** Owl intro audio path (played over owl video clips) */
   owlIntroAudio?: string;
   /** Owl closing audio path */
@@ -98,7 +101,7 @@ const OwlDiveWithCrossfade: React.FC<{
     <AbsoluteFill>
       <AbsoluteFill style={{ opacity: pageOp }}>{children}</AbsoluteFill>
       <AbsoluteFill style={{ opacity: combinedVideoOp }}>
-        <Video src={OWL_DIVE_SRC} style={{ width: "100%", height: "100%" }} />
+        <Video src={OWL_DIVE_SRC} style={{ width: "100%", height: "100%" }} volume={0} muted />
       </AbsoluteFill>
     </AbsoluteFill>
   );
@@ -107,7 +110,7 @@ const OwlDiveWithCrossfade: React.FC<{
 // ── Constants ────────────────────────────────────────────────
 const DISCLAIMER_FRAMES = 90; // 3s
 const ZOOM_FRAMES = 45; // 1.5s
-const BETWEEN_FRAMES = 20; // 0.67s pause on newspaper between segments
+const BETWEEN_FRAMES = 90; // 3s pause for owl transition voice between segments
 const CROSSFADE_FRAMES = 25; // overlap between zoom end and first beat
 const MIN_NEWSPAPER_FRAMES = 600; // 20s minimum newspaper intro
 const MIN_CLOSING_FRAMES = 150; // 5s minimum closing
@@ -266,6 +269,7 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
   script,
   beats,
   assets = [],
+  news = [],
   owlIntroAudio,
   owlClosingAudio,
   owlTransitionAudios = {},
@@ -440,7 +444,7 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
       {/* ── 1. Owl Intro clip (8s) — fades out at end ── */}
       <Sequence from={0} durationInFrames={OWL_INTRO_FRAMES}>
         <OwlClipFade durationInFrames={OWL_INTRO_FRAMES} fadeOutFrames={OWL_CLIP_OVERLAP}>
-          <Video src={OWL_INTRO_SRC} style={{ width: "100%", height: "100%" }} />
+          <Video src={OWL_INTRO_SRC} style={{ width: "100%", height: "100%" }} volume={0} muted />
         </OwlClipFade>
       </Sequence>
 
@@ -590,7 +594,7 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
       {/* ── Owl audio: transitions between segments (over cream background) ── */}
       {timings.segTimings.map((st, i) => {
         const audioPath = owlTransitionAudios[st.segId];
-        if (!audioPath || i === 0) return null; // no transition before first segment
+        if (!audioPath || i === 0) return null; // first segment: newspaper intro is the transition
         return (
           <Sequence key={`owl-tr-${st.segId}`}
             from={st.zoomInStart - BETWEEN_FRAMES}
@@ -614,6 +618,29 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
         fps={fps}
         direction={script.direction}
       />
+
+      {/* ── Scrolling ticker — only during segment beats ── */}
+      {timings.segTimings.map((st) => {
+        const segBeats = beatGroups.get(st.segId) ?? [];
+        if (segBeats.length === 0) return null;
+        const firstBeatIdx = beats.indexOf(segBeats[0]);
+        const lastBeatIdx = beats.indexOf(segBeats[segBeats.length - 1]);
+        const firstTiming = timings.allBeatTimings[firstBeatIdx];
+        const lastTiming = timings.allBeatTimings[lastBeatIdx];
+        if (!firstTiming || !lastTiming) return null;
+        const tickerStart = firstTiming.start;
+        const tickerEnd = lastTiming.start + lastTiming.duration;
+        return (
+          <Sequence
+            key={`ticker-${st.segId}`}
+            from={tickerStart}
+            durationInFrames={tickerEnd - tickerStart}
+          >
+            <ScrollingTicker assets={assets} />
+            <NewsRollBanner news={news} />
+          </Sequence>
+        );
+      })}
 
       {/* ── Viewport-locked overlays ── */}
       <InkSubtitle lines={subtitleLines} />

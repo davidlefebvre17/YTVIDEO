@@ -53,6 +53,21 @@ const RSS_FEEDS: FeedConfig[] = [
   { url: "https://news.google.com/rss/search?q=or+petrole+matieres+premieres&hl=fr&gl=FR&ceid=FR:fr", source: "Google News FR", lang: "fr", category: "commodities" },
 ];
 
+/** Strip HTML tags and decode common entities */
+function stripHtml(html: string): string {
+  return html
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&#039;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&apos;/g, "'")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function parseRssDate(dateStr: string | undefined): string {
   if (!dateStr) return new Date().toISOString();
   const d = new Date(dateStr);
@@ -74,13 +89,24 @@ function parseRssXml(xml: string, feed: FeedConfig): NewsItem[] {
     const description = itemXml.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/)?.[1]
       || itemXml.match(/<description>(.*?)<\/description>/)?.[1];
 
+    // content:encoded = richer content (full article or long excerpt)
+    const contentEncoded = itemXml.match(/<content:encoded><!\[CDATA\[([\s\S]*?)\]\]><\/content:encoded>/)?.[1]
+      || itemXml.match(/<content:encoded>([\s\S]*?)<\/content:encoded>/)?.[1];
+
+    // Pick the best available summary: content:encoded > description
+    const rawSummary = contentEncoded || description;
+    // Strip HTML tags, decode entities, trim to reasonable length
+    const summary = rawSummary
+      ? stripHtml(rawSummary).slice(0, 500).trim() || undefined
+      : undefined;
+
     if (title) {
       items.push({
         title: title.trim(),
         source: feed.source,
         url: link.trim(),
         publishedAt: parseRssDate(pubDate),
-        summary: description?.trim(),
+        summary,
         category: feed.category,
         lang: feed.lang,
       });

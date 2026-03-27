@@ -1206,8 +1206,8 @@ export const SAMPLE_ASSETS: AssetSnapshot[] = [
       }
     },
     "technicals": {
-      "ema9": 6831.538989257812,
-      "ema21": 6884.94498046875,
+      "sma20": 6831.538989257812,
+      "sma50": 6884.94498046875,
       "rsi14": 35.44395500446987,
       "trend": "bearish",
       "volumeAnomaly": 0.5989766054945671,
@@ -1435,8 +1435,8 @@ export const SAMPLE_ASSETS: AssetSnapshot[] = [
       }
     },
     "technicals": {
-      "ema9": 22693.2556640625,
-      "ema21": 23113.4384375,
+      "sma20": 22693.2556640625,
+      "sma50": 23113.4384375,
       "rsi14": 40.391101060163344,
       "trend": "bearish",
       "volumeAnomaly": 0.9619544867738834,
@@ -1663,8 +1663,8 @@ export const SAMPLE_ASSETS: AssetSnapshot[] = [
       }
     },
     "technicals": {
-      "ema9": 48712.5951171875,
-      "ema21": 49021.349453125,
+      "sma20": 48712.5951171875,
+      "sma50": 49021.349453125,
       "rsi14": 28.716580424844793,
       "trend": "bearish",
       "volumeAnomaly": 0.9426892766676048,
@@ -1892,8 +1892,8 @@ export const SAMPLE_ASSETS: AssetSnapshot[] = [
       }
     },
     "technicals": {
-      "ema9": 21.949000072479247,
-      "ema21": 18.74200004577637,
+      "sma20": 21.949000072479247,
+      "sma50": 18.74200004577637,
       "rsi14": 62.004090952639984,
       "trend": "bullish",
       "volumeAnomaly": 1,
@@ -2139,8 +2139,8 @@ export const SAMPLE_ASSETS: AssetSnapshot[] = [
       }
     },
     "technicals": {
-      "ema9": 8290.714038085938,
-      "ema21": 8248.6187890625,
+      "sma20": 8290.714038085938,
+      "sma50": 8248.6187890625,
       "rsi14": 37.16727204355354,
       "trend": "neutral",
       "volumeAnomaly": 1.034151589094684,
@@ -2386,8 +2386,8 @@ export const SAMPLE_ASSETS: AssetSnapshot[] = [
       }
     },
     "technicals": {
-      "ema9": 24533.628515625,
-      "ema21": 24756.6054296875,
+      "sma20": 24533.628515625,
+      "sma50": 24756.6054296875,
       "rsi14": 37.87665260637385,
       "trend": "bearish",
       "volumeAnomaly": 1.1046218989353402,
@@ -2633,8 +2633,8 @@ export const SAMPLE_ASSETS: AssetSnapshot[] = [
       }
     },
     "technicals": {
-      "ema9": 10562.83505859375,
-      "ema21": 10350.03001953125,
+      "sma20": 10562.83505859375,
+      "sma50": 10350.03001953125,
       "rsi14": 43.364023372673984,
       "trend": "neutral",
       "volumeAnomaly": 1.0220427476784022,
@@ -2879,8 +2879,8 @@ export const SAMPLE_ASSETS: AssetSnapshot[] = [
       }
     },
     "technicals": {
-      "ema9": 617.3084991455078,
-      "ema21": 613.4010009765625,
+      "sma20": 617.3084991455078,
+      "sma50": 613.4010009765625,
       "rsi14": 39.754154358634054,
       "trend": "neutral",
       "volumeAnomaly": 0.9908634793852578,
@@ -3117,8 +3117,8 @@ export const SAMPLE_ASSETS: AssetSnapshot[] = [
       }
     },
     "technicals": {
-      "ema9": 56249.903125,
-      "ema21": 54529.56390625,
+      "sma20": 56249.903125,
+      "sma50": 54529.56390625,
       "rsi14": 43.587269088764344,
       "trend": "neutral",
       "volumeAnomaly": 1,
@@ -3310,8 +3310,8 @@ export const SAMPLE_ASSETS: AssetSnapshot[] = [
       }
     },
     "technicals": {
-      "ema9": 4122.907336425781,
-      "ema21": 4096.543071289063,
+      "sma20": 4122.907336425781,
+      "sma50": 4096.543071289063,
       "rsi14": 50.62950789123011,
       "trend": "bullish",
       "volumeAnomaly": 1.0182918090410567,
@@ -3530,8 +3530,8 @@ export const SAMPLE_ASSETS: AssetSnapshot[] = [
       }
     },
     "technicals": {
-      "ema9": 26206.9673828125,
-      "ema21": 26525.7943359375,
+      "sma20": 26206.9673828125,
+      "sma50": 26525.7943359375,
       "rsi14": 41.85422508115164,
       "trend": "bearish",
       "volumeAnomaly": 1,
@@ -3741,8 +3741,8 @@ export const SAMPLE_ASSETS: AssetSnapshot[] = [
       }
     },
     "technicals": {
-      "ema9": 5657.053002929688,
-      "ema21": 5156.40140625,
+      "sma20": 5657.053002929688,
+      "sma50": 5156.40140625,
       "rsi14": 50.39665507057901,
       "trend": "neutral",
       "volumeAnomaly": 0.6765471198550743,
@@ -3934,8 +3934,8 @@ export const SAMPLE_ASSETS: AssetSnapshot[] = [
       }
     },
     "technicals": {
-      "ema9": 14246.426708984374,
-      "ema21": 14131.5578515625,
+      "sma20": 14246.426708984374,
+      "sma50": 14131.5578515625,
       "rsi14": 54.61999450450705,
       "trend": "bullish",
       "volumeAnomaly": 0.9804002111676339,
@@ -4171,8 +4171,8 @@ export const SAMPLE_ASSETS: AssetSnapshot[] = [
       }
     },
     "technicals": {
-      "ema9": 98.37174949645996,
-      "ema21": 98.10789962768554,
+      "sma20": 98.37174949645996,
+      "sma50": 98.10789962768554,
       "rsi14": 66.4815566532848,
       "trend": "bullish",
       "volumeAnomaly": 1,
@@ -4418,8 +4418,8 @@ export const SAMPLE_ASSETS: AssetSnapshot[] = [
       }
     },
     "technicals": {
-      "ema9": 1.1713150084018706,
-      "ema21": 1.1748343849182128,
+      "sma20": 1.1713150084018706,
+      "sma50": 1.1748343849182128,
       "rsi14": 32.86629349516974,
       "trend": "bearish",
       "volumeAnomaly": 1,
@@ -4663,8 +4663,8 @@ export const SAMPLE_ASSETS: AssetSnapshot[] = [
       }
     },
     "technicals": {
-      "ema9": 156.2681999206543,
-      "ema21": 156.29437957763673,
+      "sma20": 156.2681999206543,
+      "sma50": 156.29437957763673,
       "rsi14": 65.71241944598262,
       "trend": "neutral",
       "volumeAnomaly": 1,
@@ -4909,8 +4909,8 @@ export const SAMPLE_ASSETS: AssetSnapshot[] = [
       }
     },
     "technicals": {
-      "ema9": 1.3456610023975373,
-      "ema21": 1.3519588804244995,
+      "sma20": 1.3456610023975373,
+      "sma50": 1.3519588804244995,
       "rsi14": 39.34335044919906,
       "trend": "bearish",
       "volumeAnomaly": 1,
@@ -5155,8 +5155,8 @@ export const SAMPLE_ASSETS: AssetSnapshot[] = [
       }
     },
     "technicals": {
-      "ema9": 0.7758444041013718,
-      "ema21": 0.7810618793964386,
+      "sma20": 0.7758444041013718,
+      "sma50": 0.7810618793964386,
       "rsi14": 61.309405395100995,
       "trend": "neutral",
       "volumeAnomaly": 1,
@@ -5402,8 +5402,8 @@ export const SAMPLE_ASSETS: AssetSnapshot[] = [
       }
     },
     "technicals": {
-      "ema9": 0.7071196258068084,
-      "ema21": 0.6946426069736481,
+      "sma20": 0.7071196258068084,
+      "sma50": 0.6946426069736481,
       "rsi14": 52.55596464279336,
       "trend": "bullish",
       "volumeAnomaly": 1,
@@ -5649,8 +5649,8 @@ export const SAMPLE_ASSETS: AssetSnapshot[] = [
       }
     },
     "technicals": {
-      "ema9": 1.3650819957256317,
-      "ema21": 1.3701613998413087,
+      "sma20": 1.3650819957256317,
+      "sma50": 1.3701613998413087,
       "rsi14": 48.91002762456512,
       "trend": "bearish",
       "volumeAnomaly": 1,

@@ -92,11 +92,29 @@ function main() {
       }
     }
 
+    // Load owl audio paths if available
+    let owlIntroAudio: string | undefined;
+    let owlClosingAudio: string | undefined;
+    const owlTransitionAudios: Record<string, string> = {};
+    const owlPathsFile = path.join(dir, "owl-audio-paths.json");
+    if (fs.existsSync(owlPathsFile)) {
+      const owlPaths = JSON.parse(fs.readFileSync(owlPathsFile, "utf-8"));
+      owlIntroAudio = owlPaths["owl_intro"];
+      owlClosingAudio = owlPaths["owl_closing"];
+      for (const sec of script.sections || []) {
+        const key = `owl_tr_${sec.id}`;
+        if (owlPaths[key]) owlTransitionAudios[sec.id] = owlPaths[key];
+      }
+    }
+
     propsMap[entry.date] = {
       script,
       beats,
       assets: snapshot.assets ?? [],
       news: snapshot.news ?? [],
+      owlIntroAudio,
+      owlClosingAudio,
+      owlTransitionAudios,
     };
   }
 

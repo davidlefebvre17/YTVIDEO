@@ -21,8 +21,10 @@ interface CandlestickChartProps {
   showVolume?: boolean;
   showSMA?: boolean;
   smaWindows?: [number, number, number];
-  /** @deprecated Use two CandlestickChart instances for zoom effect */
+  /** @deprecated */
   zoomLast?: number;
+  /** Only DISPLAY the last N candles visually, but use ALL candles for SMA calculation */
+  displayLast?: number;
 }
 
 const PAD_H = BRAND.chart.padH;
@@ -72,6 +74,7 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({
   showSMA = true,
   smaWindows = [20, 50, 200],
   zoomLast = 15,
+  displayLast = 0,
 }) => {
   const frame = useCurrentFrame();
   const relFrame = Math.max(0, frame - startFrame);
@@ -97,11 +100,15 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({
 
   const maxVol = useMemo(() => Math.max(...cleanCandles.map(c => c.v || 0), 1), [cleanCandles]);
 
+  // displayLast: only SHOW last N candles, but SMA uses all cleanCandles
+  const displayStart = displayLast > 0 ? Math.max(0, cleanCandles.length - displayLast) : 0;
+  const displayCount = displayLast > 0 ? Math.min(displayLast, cleanCandles.length) : cleanCandles.length;
+
   const innerW = width - 2 * PAD_H;
-  const candleStep = cleanCandles.length > 0 ? innerW / cleanCandles.length : innerW;
+  const candleStep = displayCount > 0 ? innerW / displayCount : innerW;
   const candleBodyW = Math.max(BRAND.chart.candleMinWidth, candleStep * BRAND.chart.candleBodyRatio);
 
-  const visibleCount = interpolate(relFrame, [0, drawDuration], [0, cleanCandles.length], {
+  const visibleCount = interpolate(relFrame, [0, drawDuration], [0, displayCount], {
     extrapolateLeft: "clamp", extrapolateRight: "clamp",
   });
 
@@ -113,7 +120,8 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({
     const innerH = priceH - 2 * PAD_V;
     return PAD_V + (1 - (price - minP) / range) * innerH;
   };
-  const iToX = (i: number) => PAD_H + (i + 0.5) * candleStep;
+  // Map candle index to X position (offset by displayStart)
+  const iToX = (i: number) => PAD_H + (i - displayStart + 0.5) * candleStep;
 
   const smaData = useMemo(() => {
     if (!showSMA) return [];
@@ -170,11 +178,13 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({
 
         {/* Candles */}
         {cleanCandles.map((c, i) => {
-          if (i >= visibleCount) return null;
+          if (i < displayStart) return null;
+          const dispIdx = i - displayStart;
+          if (dispIdx >= visibleCount) return null;
           const x = iToX(i);
           const isGreen = c.c >= c.o;
           const color = isGreen ? BRAND.colors.accentBull : BRAND.colors.accentBear;
-          const age = visibleCount - i;
+          const age = visibleCount - dispIdx;
           const exp = interpolate(Math.max(0, age), [0, 5], [0, 1], {
             extrapolateLeft: "clamp", extrapolateRight: "clamp",
           });
@@ -200,8 +210,8 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({
         {showSMA && smaData.map((data, idx) => {
           const style = smaStyles[idx];
           const points: string[] = [];
-          const maxI = Math.min(Math.floor(visibleCount), data.length);
-          for (let i = 0; i < maxI; i++) {
+          const maxI = Math.min(displayStart + Math.floor(visibleCount), data.length);
+          for (let i = displayStart; i < maxI; i++) {
             if (data[i] === null) continue;
             points.push(`${iToX(i).toFixed(1)},${priceToY(data[i]!).toFixed(1)}`);
           }
@@ -253,7 +263,8 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({
           <g>
             <rect x={0} y={priceH} width={width} height={volH} fill={BRAND.colors.creamDark} />
             {cleanCandles.map((c, i) => {
-              if (i >= visibleCount) return null;
+              if (i < displayStart) return null;
+              if (i - displayStart >= visibleCount) return null;
               const x = iToX(i);
               const barH = ((c.v || 0) / maxVol) * (volH - 8);
               const isGreen = c.c >= c.o;
@@ -275,8 +286,8 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({
           const y70 = rsiTop + PAD_V + (1 - 70 / 100) * rsiInnerH;
           const y30 = rsiTop + PAD_V + (1 - 30 / 100) * rsiInnerH;
           const pts: string[] = [];
-          const maxI = Math.min(Math.floor(visibleCount), rsiValues.length);
-          for (let i = 0; i < maxI; i++) {
+          const maxI = Math.min(displayStart + Math.floor(visibleCount), rsiValues.length);
+          for (let i = displayStart; i < maxI; i++) {
             if (rsiValues[i] === null) continue;
             const x = iToX(i);
             const y = rsiTop + PAD_V + (1 - rsiValues[i]! / 100) * rsiInnerH;

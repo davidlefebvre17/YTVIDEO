@@ -1,5 +1,6 @@
 export { fetchAllAssets, fetchAssetSnapshot, fetchDailyCandles, fetchWeeklyCandles, fetchDaily3yCandles, fetchDailyMaxCandles, fetchSparkChanges, DEFAULT_ASSETS } from "./yahoo";
 export { fetchNews } from "./news";
+export { enrichNewsSummaries } from "./article-extractor";
 export { fetchEconomicCalendar } from "./calendar";
 export { fetchSupabaseCalendar } from "./supabase-calendar";
 export { fetchMarketSnapshot } from "./market-snapshot";

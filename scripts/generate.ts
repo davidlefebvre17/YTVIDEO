@@ -11,7 +11,7 @@ import "dotenv/config";
 import * as fs from "fs";
 import * as path from "path";
 import { execSync } from "child_process";
-import { fetchMarketSnapshot, updateAllMarketMemory, isWeeklyJobDay, applyHaikuEnrichment, loadMemory } from "@yt-maker/data";
+import { fetchMarketSnapshot, updateAllMarketMemory, isWeeklyJobDay, applyHaikuEnrichment, loadMemory, enrichNewsSummaries } from "@yt-maker/data";
 import type { ZoneEvent, HaikuEnrichmentResult } from "@yt-maker/data";
 import {
   generateScript, getNextEpisodeNumber, appendToManifest,
@@ -141,6 +141,11 @@ async function main() {
   } else {
     console.log("\n═══ Step 1: Fetching market data ═══");
     snapshot = await fetchMarketSnapshot(date);
+
+    // Enrich news summaries via article extraction (articles sans summary)
+    console.log("\n── Step 1.0: Enriching news summaries ──");
+    snapshot.news = await enrichNewsSummaries(snapshot.news);
+
     fs.writeFileSync(snapshotFilePath, JSON.stringify(snapshot, null, 2));
     console.log(`  Snapshot saved: ${snapshotFilePath}`);
   }

@@ -38,11 +38,14 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@extractus/article-extractor": "^8.0.20",
     "@fal-ai/client": "^1.9.5",
+    "@remotion/noise": "^4.0.425",
     "@remotion/transitions": "^4.0.425",
     "better-sqlite3": "^12.6.2",
     "dotenv": "^17.3.1",
     "edge-tts-node": "^1.5.7",
-    "msedge-tts": "^2.0.4"
+    "msedge-tts": "^2.0.4",
+    "music-metadata": "^11.12.3"
   }
 }

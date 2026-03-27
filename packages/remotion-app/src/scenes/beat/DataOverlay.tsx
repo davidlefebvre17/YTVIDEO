@@ -221,6 +221,10 @@ const ABBREV_FR: Record<string, string> = {
   'F&G': 'Peur & Avidité',
 };
 
+// ASSET_NAMES sorted by key length descending — longer symbols first (CL=F before CL)
+const SORTED_ASSET_ENTRIES = Object.entries(ASSET_NAMES)
+  .sort(([a], [b]) => b.length - a.length);
+
 function humanize(text: string, assets: AssetSnapshot[]): string {
   if (!text) return text;
   let out = text;
@@ -228,15 +232,16 @@ function humanize(text: string, assets: AssetSnapshot[]): string {
   for (const [abbr, full] of Object.entries(ABBREV_FR)) {
     out = replaceSymbol(out, abbr, full);
   }
-  // 2. ASSET_NAMES — concise French names ("Or", not "Gold (XAUUSD)")
-  for (const [sym, name] of Object.entries(ASSET_NAMES)) {
-    out = replaceSymbol(out, sym, name);
-  }
-  // 3. Fallback: remaining symbols from live assets
-  for (const a of assets) {
+  // 2. Live assets first (longest symbols, most accurate names)
+  const sortedAssets = [...assets].sort((a, b) => b.symbol.length - a.symbol.length);
+  for (const a of sortedAssets) {
     if (a.name && a.symbol) {
       out = replaceSymbol(out, a.symbol, a.name);
     }
+  }
+  // 3. ASSET_NAMES fallback (sorted longest first — CL=F before CL)
+  for (const [sym, name] of SORTED_ASSET_ENTRIES) {
+    out = replaceSymbol(out, sym, name);
   }
   return out;
 }
@@ -253,8 +258,9 @@ const ChartWithZoom: React.FC<{
 
   // Phase 1: full chart (0 → 60% of duration)
   // Phase 2: zoomed chart (60% → 100%)
-  const switchFrame = Math.round(durationInFrames * 0.65);
-  const crossfadeDur = 12;
+  // Full chart for 50%, zoom for 50%
+  const switchFrame = Math.round(durationInFrames * 0.5);
+  const crossfadeDur = 10;
 
   const fullOp = hasZoom
     ? interpolate(frame, [switchFrame, switchFrame + crossfadeDur], [1, 0], {
@@ -289,7 +295,7 @@ const ChartWithZoom: React.FC<{
         {header('')}
         <CandlestickChart
           candles={allCandles} levels={levels} accentColor={accentColor}
-          width={chartW} height={chartH} drawDuration={45}
+          width={chartW} height={chartH} drawDuration={30}
           showVolume showSMA zoomLast={0}
         />
       </div>
@@ -297,11 +303,11 @@ const ChartWithZoom: React.FC<{
       {/* Zoomed chart (last 15 candles) — fades in */}
       {hasZoom && zoomOp > 0 && (
         <div style={{ position: 'absolute', inset: 0, opacity: zoomOp }}>
-          {header('120 DERNIÈRES SÉANCES')}
+          {header('ZOOM')}
           <CandlestickChart
             candles={zoomCandles} levels={levels} accentColor={accentColor}
             width={chartW} height={chartH} drawDuration={8}
-            showVolume showSMA={false} zoomLast={0}
+            showVolume showSMA zoomLast={0} displayLast={200}
           />
         </div>
       )}
@@ -347,8 +353,14 @@ const OverlayContent: React.FC<OverlayContentProps> = ({ type, data, assets, acc
       return (
         <ScenarioFork
           trunk={humanize((data.trunk as string) ?? '', assets)}
-          bullish={{ condition: humanize((data.bull as string) ?? '', assets), target: humanize((data.bullTarget as string) ?? '', assets) }}
-          bearish={{ condition: humanize((data.bear as string) ?? '', assets), target: humanize((data.bearTarget as string) ?? '', assets) }}
+          bullish={{
+            condition: humanize((data.bullCondition as string) ?? (data.bull as string) ?? '', assets),
+            target: humanize((data.bullTarget as string) ?? '', assets),
+          }}
+          bearish={{
+            condition: humanize((data.bearCondition as string) ?? (data.bear as string) ?? '', assets),
+            target: humanize((data.bearTarget as string) ?? '', assets),
+          }}
           accentColor={accentColor}
         />
       );
@@ -415,9 +427,11 @@ const OverlayContent: React.FC<OverlayContentProps> = ({ type, data, assets, acc
 
       const chartW = 1400;
       const chartH = 650;
-      const ZOOM_N = 120;
-      const zoomCandles = allCandles.slice(-ZOOM_N);
-      const hasZoom = allCandles.length > ZOOM_N;
+      const ZOOM_DISPLAY = 200;
+      // Pass 450 candles so SMA 200 has enough lookback data from the start
+      const ZOOM_WITH_LOOKBACK = ZOOM_DISPLAY + 250;
+      const zoomCandles = allCandles.slice(-ZOOM_WITH_LOOKBACK);
+      const hasZoom = allCandles.length > ZOOM_DISPLAY;
 
       return <ChartWithZoom
         allCandles={allCandles}

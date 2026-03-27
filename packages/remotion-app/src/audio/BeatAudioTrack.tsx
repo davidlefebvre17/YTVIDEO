@@ -80,7 +80,7 @@ export const BeatAudioTrack: React.FC<BeatAudioTrackProps> = ({
         <Sequence
           key={`voice-${beat.id}`}
           from={timing.start}
-          durationInFrames={timing.duration}
+          durationInFrames={timing.duration + 15}
         >
           <Audio
             src={audioSrc}

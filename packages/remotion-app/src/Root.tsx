@@ -345,6 +345,9 @@ export const RemotionRoot: React.FC = () => {
                 beats: (props.beats ?? []) as any,
                 assets: (props.assets ?? []) as any,
                 news: (props.news ?? []) as any,
+                owlIntroAudio: props.owlIntroAudio as any,
+                owlClosingAudio: props.owlClosingAudio as any,
+                owlTransitionAudios: (props.owlTransitionAudios ?? {}) as any,
               }}
               calculateMetadata={({ props: p }: { props: Record<string, unknown> }) => {
                 const b = (p.beats ?? []) as Beat[];

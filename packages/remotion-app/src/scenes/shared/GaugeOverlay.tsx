@@ -27,14 +27,18 @@ export const GaugeOverlay: React.FC<GaugeOverlayProps> = ({
 }) => {
   const frame = useCurrentFrame();
   const rel = frame - startFrame;
+  const safeValue = typeof value === "number" && Number.isFinite(value) ? value : 0;
+  const safeMin = typeof min === "number" && Number.isFinite(min) ? min : 0;
+  const safeMax = typeof max === "number" && Number.isFinite(max) ? max : 100;
 
   const progress = interpolate(rel, [0, durationFrames], [0, 1], {
     extrapolateRight: "clamp", extrapolateLeft: "clamp",
   });
 
-  const normalizedValue = Math.max(0, Math.min(1, (value - min) / (max - min)));
+  const range = safeMax - safeMin || 1;
+  const normalizedValue = Math.max(0, Math.min(1, (safeValue - safeMin) / range));
   const currentAngle = normalizedValue * progress * 180;
-  const currentValue = interpolate(rel, [0, durationFrames], [0, value], {
+  const currentValue = interpolate(rel, [0, durationFrames], [0, safeValue], {
     extrapolateRight: "clamp", extrapolateLeft: "clamp",
   });
 

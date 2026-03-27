@@ -1,11 +1,20 @@
 /**
- * ScenarioFork — "Le Verdict" editorial fork.
- * Two dramatic columns face off: bull vs bear.
- * Central question stamps in, ink divider draws, panels slide from sides,
- * target prices stamp in last for dramatic effect.
+ * ScenarioFork — Animated chart that splits into bull/bear paths.
+ *
+ * 1. Mini price chart draws itself (evolvePath)
+ * 2. Chart SPLITS: green line up, red line down
+ * 3. Markers follow each branch (getPointAtLength)
+ * 4. Price targets spring in at endpoints
+ * 5. Conditions fade in below
  */
-import React from "react";
-import { useCurrentFrame, interpolate } from "remotion";
+import React, { useMemo } from "react";
+import {
+  useCurrentFrame,
+  useVideoConfig,
+  interpolate,
+  spring,
+} from "remotion";
+import { evolvePath, getPointAtLength, getLength } from "@remotion/paths";
 import { BRAND } from "@yt-maker/core";
 
 interface ScenarioForkProps {
@@ -16,6 +25,31 @@ interface ScenarioForkProps {
   accentColor?: string;
 }
 
+// Chart dimensions — sized for 1920x1080 overlay
+const W = 1100;
+const H = 440;
+const CX = W * 0.38; // split point X (slightly left of center)
+const CHART_TOP = 60;
+const CHART_BOT = 380;
+const CHART_MID = (CHART_TOP + CHART_BOT) / 2;
+const RIGHT_END = W - 60;
+const BRANCH_LEN = RIGHT_END - CX;
+
+// Base price line (recent trend — slightly downward ending at split)
+const BASE_PATH = `M 50 ${CHART_MID - 40} C 140 ${CHART_MID - 60}, 200 ${CHART_MID + 25}, 260 ${CHART_MID - 15} C 320 ${CHART_MID - 50}, 370 ${CHART_MID + 15}, ${CX} ${CHART_MID}`;
+
+// Bull path — curves upward from split
+const BULL_PATH = `M ${CX} ${CHART_MID} C ${CX + BRANCH_LEN * 0.15} ${CHART_MID - 35}, ${CX + BRANCH_LEN * 0.35} ${CHART_MID - 15}, ${CX + BRANCH_LEN * 0.5} ${CHART_MID - 55} C ${CX + BRANCH_LEN * 0.65} ${CHART_MID - 80}, ${CX + BRANCH_LEN * 0.8} ${CHART_MID - 50}, ${RIGHT_END} ${CHART_MID - 95}`;
+
+// Bear path — curves downward from split
+const BEAR_PATH = `M ${CX} ${CHART_MID} C ${CX + BRANCH_LEN * 0.15} ${CHART_MID + 35}, ${CX + BRANCH_LEN * 0.35} ${CHART_MID + 15}, ${CX + BRANCH_LEN * 0.5} ${CHART_MID + 55} C ${CX + BRANCH_LEN * 0.65} ${CHART_MID + 80}, ${CX + BRANCH_LEN * 0.8} ${CHART_MID + 50}, ${RIGHT_END} ${CHART_MID + 95}`;
+
+/** Try to extract a short price label from a condition string (old format fallback) */
+function extractTarget(condition: string): string {
+  const m = condition.match(/(\d[\d\s,.]*\$)/);
+  return m ? m[1].trim() : '';
+}
+
 export const ScenarioFork: React.FC<ScenarioForkProps> = ({
   trunk,
   bullish,
@@ -23,289 +57,216 @@ export const ScenarioFork: React.FC<ScenarioForkProps> = ({
   startFrame = 0,
 }) => {
   const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
   const rel = frame - startFrame;
+  const time = rel / fps;
 
-  // 1. Question stamps in
-  const qScale = interpolate(rel, [0, 10], [1.15, 1], {
-    extrapolateLeft: "clamp", extrapolateRight: "clamp",
-  });
-  const qOp = interpolate(rel, [0, 6], [0, 1], {
-    extrapolateLeft: "clamp", extrapolateRight: "clamp",
-  });
+  // Resolve targets (new format has them split, old format we extract from condition)
+  const bullTarget = bullish.target || extractTarget(bullish.condition);
+  const bearTarget = bearish.target || extractTarget(bearish.condition);
 
-  // 2. Accent underline draws
-  const underlineW = interpolate(rel, [6, 20], [0, 100], {
-    extrapolateLeft: "clamp", extrapolateRight: "clamp",
-  });
+  // Path lengths
+  const bullLen = useMemo(() => getLength(BULL_PATH), []);
+  const bearLen = useMemo(() => getLength(BEAR_PATH), []);
 
-  // 3. Center divider draws
-  const dividerH = interpolate(rel, [12, 26], [0, 100], {
+  // ── Phase 1: Base chart draws (0-25f) ──
+  const baseDraw = interpolate(rel, [0, 25], [0, 1], {
     extrapolateLeft: "clamp", extrapolateRight: "clamp",
   });
-  const dividerOp = interpolate(rel, [12, 18], [0, 1], {
-    extrapolateLeft: "clamp", extrapolateRight: "clamp",
-  });
+  const baseEvolve = evolvePath(baseDraw, BASE_PATH);
 
-  // 4. Bull panel slides from left
-  const bullX = interpolate(rel, [16, 30], [-80, 0], {
-    extrapolateLeft: "clamp", extrapolateRight: "clamp",
-  });
-  const bullOp = interpolate(rel, [16, 26], [0, 1], {
+  // ── Phase 2: Split label appears (20-28f) ──
+  const splitOp = interpolate(rel, [20, 28], [0, 1], {
     extrapolateLeft: "clamp", extrapolateRight: "clamp",
   });
 
-  // 5. Bear panel slides from right
-  const bearX = interpolate(rel, [20, 34], [80, 0], {
+  // ── Phase 3: Bull + Bear paths draw simultaneously (25-55f) ──
+  const branchDraw = interpolate(rel, [25, 55], [0, 1], {
     extrapolateLeft: "clamp", extrapolateRight: "clamp",
   });
-  const bearOp = interpolate(rel, [20, 30], [0, 1], {
-    extrapolateLeft: "clamp", extrapolateRight: "clamp",
+  const bullEvolve = evolvePath(branchDraw, BULL_PATH);
+  const bearEvolve = evolvePath(branchDraw, BEAR_PATH);
+
+  // ── Phase 3b: Markers follow paths ──
+  const bullMarkerPos = branchDraw > 0 ? getPointAtLength(BULL_PATH, branchDraw * bullLen) : null;
+  const bearMarkerPos = branchDraw > 0 ? getPointAtLength(BEAR_PATH, branchDraw * bearLen) : null;
+
+  // ── Phase 4: Targets stamp in (52-62f) ──
+  const targetScale = spring({
+    frame: Math.max(0, rel - 52), fps,
+    config: { stiffness: 180, damping: 12 },
   });
 
-  // 6. Targets stamp in
-  const targetScale = interpolate(rel, [32, 42], [1.3, 1], {
-    extrapolateLeft: "clamp", extrapolateRight: "clamp",
-  });
-  const targetOp = interpolate(rel, [32, 38], [0, 1], {
-    extrapolateLeft: "clamp", extrapolateRight: "clamp",
-  });
-
-  // 7. Prob bars fill
-  const probFill = interpolate(rel, [40, 58], [0, 1], {
+  // ── Phase 5: Conditions fade (58-70f) ──
+  const condOp = interpolate(rel, [58, 70], [0, 1], {
     extrapolateLeft: "clamp", extrapolateRight: "clamp",
   });
 
   return (
     <div style={{
       display: "flex", flexDirection: "column", alignItems: "center",
-      width: "100%", maxWidth: 860,
+      width: "100%", maxWidth: 1200,
     }}>
-      {/* ── Question ── */}
+      {/* Trunk question / asset label */}
       <div style={{
-        opacity: qOp,
-        transform: `scale(${qScale})`,
-        transformOrigin: "center",
-        textAlign: "center",
-        marginBottom: 6,
+        opacity: interpolate(rel, [0, 8], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
+        fontFamily: BRAND.fonts.display, fontSize: 28, fontWeight: 700,
+        fontStyle: "italic", color: BRAND.colors.ink, textAlign: "center",
+        borderBottom: `2px solid ${BRAND.colors.ink}`, padding: "10px 24px",
+        width: "100%", marginBottom: 10,
+        letterSpacing: "0.02em",
       }}>
-        <div style={{
-          fontFamily: BRAND.fonts.display, fontSize: 22,
-          fontWeight: 700, fontStyle: "italic",
-          color: BRAND.colors.ink, lineHeight: 1.3,
-        }}>
-          {trunk}
-        </div>
+        {trunk}
       </div>
 
-      {/* Accent underline */}
-      <div style={{
-        width: `${underlineW}%`, height: 2,
-        backgroundColor: BRAND.colors.ink,
-        marginBottom: 16,
-      }} />
+      {/* Main SVG chart area */}
+      <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ overflow: "visible" }}>
 
-      {/* ── Two panels + center divider ── */}
+        {/* Faint grid lines */}
+        {[CHART_TOP, CHART_MID, CHART_BOT].map((y, i) => (
+          <line key={i} x1={40} y1={y} x2={W - 40} y2={y}
+            stroke={BRAND.colors.chartGrid} strokeWidth={1} strokeDasharray="4 8" opacity={0.5} />
+        ))}
+
+        {/* Base price line — draws itself */}
+        <path
+          d={BASE_PATH}
+          fill="none" stroke={BRAND.colors.ink} strokeWidth={3.5}
+          strokeLinecap="round"
+          strokeDasharray={baseEvolve.strokeDasharray}
+          strokeDashoffset={baseEvolve.strokeDashoffset}
+          style={{ filter: `drop-shadow(0 1px 3px rgba(0,0,0,0.15))` }}
+        />
+
+        {/* Split point pulse */}
+        <circle cx={CX} cy={CHART_MID} r={8 + Math.sin(time * 4) * 2.5}
+          fill="none" stroke={BRAND.colors.ink} strokeWidth={2}
+          opacity={splitOp * 0.5}
+        />
+        <circle cx={CX} cy={CHART_MID} r={4}
+          fill={BRAND.colors.ink} opacity={splitOp}
+        />
+
+        {/* Bull path — green, curves upward */}
+        <path
+          d={BULL_PATH}
+          fill="none" stroke={BRAND.colors.accentBull} strokeWidth={3.5}
+          strokeLinecap="round"
+          strokeDasharray={bullEvolve.strokeDasharray}
+          strokeDashoffset={bullEvolve.strokeDashoffset}
+          style={{ filter: `drop-shadow(0 0 6px ${BRAND.colors.accentBull}50)` }}
+        />
+        {branchDraw > 0.3 && (
+          <path
+            d={BULL_PATH + ` L ${RIGHT_END} ${CHART_MID} L ${CX} ${CHART_MID} Z`}
+            fill={BRAND.colors.accentBull}
+            opacity={0.06 * branchDraw}
+          />
+        )}
+
+        {/* Bear path — red, curves downward */}
+        <path
+          d={BEAR_PATH}
+          fill="none" stroke={BRAND.colors.accentBear} strokeWidth={3.5}
+          strokeLinecap="round"
+          strokeDasharray={bearEvolve.strokeDasharray}
+          strokeDashoffset={bearEvolve.strokeDashoffset}
+          style={{ filter: `drop-shadow(0 0 6px ${BRAND.colors.accentBear}50)` }}
+        />
+        {branchDraw > 0.3 && (
+          <path
+            d={BEAR_PATH + ` L ${RIGHT_END} ${CHART_MID} L ${CX} ${CHART_MID} Z`}
+            fill={BRAND.colors.accentBear}
+            opacity={0.06 * branchDraw}
+          />
+        )}
+
+        {/* Bull marker — follows the green line */}
+        {bullMarkerPos && (
+          <g>
+            <circle cx={bullMarkerPos.x} cy={bullMarkerPos.y}
+              r={6} fill={BRAND.colors.accentBull}
+              style={{ filter: `drop-shadow(0 0 8px ${BRAND.colors.accentBull})` }}
+            />
+            <circle cx={bullMarkerPos.x} cy={bullMarkerPos.y}
+              r={12 + Math.sin(time * 6) * 3} fill="none"
+              stroke={BRAND.colors.accentBull} strokeWidth={1.5} opacity={0.35}
+            />
+          </g>
+        )}
+
+        {/* Bear marker — follows the red line */}
+        {bearMarkerPos && (
+          <g>
+            <circle cx={bearMarkerPos.x} cy={bearMarkerPos.y}
+              r={6} fill={BRAND.colors.accentBear}
+              style={{ filter: `drop-shadow(0 0 8px ${BRAND.colors.accentBear})` }}
+            />
+            <circle cx={bearMarkerPos.x} cy={bearMarkerPos.y}
+              r={12 + Math.sin(time * 6) * 3} fill="none"
+              stroke={BRAND.colors.accentBear} strokeWidth={1.5} opacity={0.35}
+            />
+          </g>
+        )}
+
+        {/* Bull target (end of green line) */}
+        {bullTarget && targetScale > 0 && (
+          <g transform={`translate(${RIGHT_END}, ${CHART_MID - 95}) scale(${targetScale})`}>
+            <rect x={-70} y={-20} width={140} height={40} rx={4}
+              fill={BRAND.colors.cream} stroke={BRAND.colors.accentBull} strokeWidth={2} />
+            <text x={0} y={7} textAnchor="middle"
+              fontFamily={BRAND.fonts.condensed} fontSize={24} fontWeight={700} fill={BRAND.colors.accentBull}>
+              ▲ {bullTarget}
+            </text>
+          </g>
+        )}
+
+        {/* Bear target (end of red line) */}
+        {bearTarget && targetScale > 0 && (
+          <g transform={`translate(${RIGHT_END}, ${CHART_MID + 95}) scale(${targetScale})`}>
+            <rect x={-70} y={-20} width={140} height={40} rx={4}
+              fill={BRAND.colors.cream} stroke={BRAND.colors.accentBear} strokeWidth={2} />
+            <text x={0} y={7} textAnchor="middle"
+              fontFamily={BRAND.fonts.condensed} fontSize={24} fontWeight={700} fill={BRAND.colors.accentBear}>
+              ▼ {bearTarget}
+            </text>
+          </g>
+        )}
+
+        {/* HAUSSIER / BAISSIER labels */}
+        <text x={CX + BRANCH_LEN * 0.5} y={CHART_TOP - 8}
+          textAnchor="middle" fontFamily={BRAND.fonts.mono} fontSize={13}
+          letterSpacing="0.15em" fill={BRAND.colors.accentBull}
+          opacity={branchDraw}>
+          HAUSSIER
+        </text>
+        <text x={CX + BRANCH_LEN * 0.5} y={CHART_BOT + 24}
+          textAnchor="middle" fontFamily={BRAND.fonts.mono} fontSize={13}
+          letterSpacing="0.15em" fill={BRAND.colors.accentBear}
+          opacity={branchDraw}>
+          BAISSIER
+        </text>
+      </svg>
+
+      {/* Conditions below chart */}
       <div style={{
-        display: "flex", width: "100%",
-        position: "relative", minHeight: 200,
+        display: "flex", width: "100%", gap: 40, opacity: condOp, marginTop: 10,
       }}>
-        {/* Center divider */}
         <div style={{
-          position: "absolute",
-          left: "50%", top: 0,
-          width: 1, height: `${dividerH}%`,
-          backgroundColor: BRAND.colors.rule,
-          opacity: dividerOp,
-          transform: "translateX(-50%)",
-        }} />
-
-        {/* "ou" circle on divider */}
-        <div style={{
-          position: "absolute",
-          left: "50%", top: "40%",
-          transform: "translate(-50%, -50%)",
-          width: 32, height: 32,
-          borderRadius: "50%",
-          backgroundColor: BRAND.colors.cream,
-          border: `1.5px solid ${BRAND.colors.rule}`,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          opacity: dividerOp,
-          zIndex: 2,
+          flex: 1, fontFamily: BRAND.fonts.body, fontSize: 18, fontStyle: "italic",
+          color: BRAND.colors.inkMid, lineHeight: 1.5, textAlign: "center",
+          borderTop: `2px solid ${BRAND.colors.accentBull}`,
+          paddingTop: 10,
         }}>
-          <span style={{
-            fontFamily: BRAND.fonts.mono, fontSize: 9,
-            letterSpacing: "0.1em", color: BRAND.colors.inkLight,
-          }}>
-            OU
-          </span>
+          {bullish.condition}
         </div>
-
-        {/* ── Bull panel ── */}
         <div style={{
-          flex: 1,
-          opacity: bullOp,
-          transform: `translateX(${bullX}px)`,
-          paddingRight: 24,
+          flex: 1, fontFamily: BRAND.fonts.body, fontSize: 18, fontStyle: "italic",
+          color: BRAND.colors.inkMid, lineHeight: 1.5, textAlign: "center",
+          borderTop: `2px solid ${BRAND.colors.accentBear}`,
+          paddingTop: 10,
         }}>
-          {/* Arrow + label */}
-          <div style={{
-            display: "flex", alignItems: "center", gap: 10,
-            marginBottom: 12,
-          }}>
-            <svg width={28} height={28} viewBox="0 0 28 28">
-              <polygon points="14,2 26,22 2,22"
-                fill={BRAND.colors.accentBull} />
-            </svg>
-            <span style={{
-              fontFamily: BRAND.fonts.condensed, fontSize: 20,
-              letterSpacing: "0.15em",
-              color: BRAND.colors.accentBull,
-            }}>
-              HAUSSIER
-            </span>
-          </div>
-
-          {/* Condition */}
-          <div style={{
-            fontFamily: BRAND.fonts.body, fontSize: 17,
-            fontStyle: "italic",
-            color: BRAND.colors.inkMid, lineHeight: 1.6,
-            marginBottom: 16,
-            borderLeft: `3px solid ${BRAND.colors.accentBull}40`,
-            paddingLeft: 14,
-          }}>
-            {bullish.condition}
-          </div>
-
-          {/* Target — stamps in */}
-          {bullish.target && (
-            <div style={{
-              opacity: targetOp,
-              transform: `scale(${targetScale})`,
-              transformOrigin: "left center",
-            }}>
-              <div style={{
-                fontFamily: BRAND.fonts.mono, fontSize: 9,
-                letterSpacing: "0.15em", color: BRAND.colors.inkLight,
-                marginBottom: 4,
-              }}>
-                CIBLE
-              </div>
-              <div style={{
-                fontFamily: BRAND.fonts.condensed, fontSize: 40,
-                color: BRAND.colors.accentBull, lineHeight: 1,
-              }}>
-                {bullish.target}
-              </div>
-            </div>
-          )}
-
-          {/* Prob bar */}
-          {bullish.prob != null && (
-            <div style={{ marginTop: 14 }}>
-              <div style={{
-                width: "80%", height: 6,
-                backgroundColor: BRAND.colors.creamDark,
-                borderRadius: 3,
-              }}>
-                <div style={{
-                  width: `${bullish.prob * probFill}%`, height: "100%",
-                  backgroundColor: BRAND.colors.accentBull,
-                  borderRadius: 3,
-                }} />
-              </div>
-              <span style={{
-                fontFamily: BRAND.fonts.condensed, fontSize: 16,
-                color: BRAND.colors.accentBull, marginTop: 4, display: "block",
-              }}>
-                {Math.round(bullish.prob * probFill)}%
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* ── Bear panel ── */}
-        <div style={{
-          flex: 1,
-          opacity: bearOp,
-          transform: `translateX(${bearX}px)`,
-          paddingLeft: 24,
-        }}>
-          {/* Arrow + label */}
-          <div style={{
-            display: "flex", alignItems: "center", gap: 10,
-            marginBottom: 12,
-          }}>
-            <svg width={28} height={28} viewBox="0 0 28 28">
-              <polygon points="14,26 26,6 2,6"
-                fill={BRAND.colors.accentBear} />
-            </svg>
-            <span style={{
-              fontFamily: BRAND.fonts.condensed, fontSize: 20,
-              letterSpacing: "0.15em",
-              color: BRAND.colors.accentBear,
-            }}>
-              BAISSIER
-            </span>
-          </div>
-
-          {/* Condition */}
-          <div style={{
-            fontFamily: BRAND.fonts.body, fontSize: 17,
-            fontStyle: "italic",
-            color: BRAND.colors.inkMid, lineHeight: 1.6,
-            marginBottom: 16,
-            borderLeft: `3px solid ${BRAND.colors.accentBear}40`,
-            paddingLeft: 14,
-          }}>
-            {bearish.condition}
-          </div>
-
-          {/* Target — stamps in */}
-          {bearish.target && (
-            <div style={{
-              opacity: targetOp,
-              transform: `scale(${targetScale})`,
-              transformOrigin: "left center",
-            }}>
-              <div style={{
-                fontFamily: BRAND.fonts.mono, fontSize: 9,
-                letterSpacing: "0.15em", color: BRAND.colors.inkLight,
-                marginBottom: 4,
-              }}>
-                CIBLE
-              </div>
-              <div style={{
-                fontFamily: BRAND.fonts.condensed, fontSize: 40,
-                color: BRAND.colors.accentBear, lineHeight: 1,
-              }}>
-                {bearish.target}
-              </div>
-            </div>
-          )}
-
-          {/* Prob bar */}
-          {bearish.prob != null && (
-            <div style={{ marginTop: 14 }}>
-              <div style={{
-                width: "80%", height: 6,
-                backgroundColor: BRAND.colors.creamDark,
-                borderRadius: 3,
-              }}>
-                <div style={{
-                  width: `${bearish.prob * probFill}%`, height: "100%",
-                  backgroundColor: BRAND.colors.accentBear,
-                  borderRadius: 3,
-                }} />
-              </div>
-              <span style={{
-                fontFamily: BRAND.fonts.condensed, fontSize: 16,
-                color: BRAND.colors.accentBear, marginTop: 4, display: "block",
-              }}>
-                {Math.round(bearish.prob * probFill)}%
-              </span>
-            </div>
-          )}
+          {bearish.condition}
         </div>
       </div>
     </div>
