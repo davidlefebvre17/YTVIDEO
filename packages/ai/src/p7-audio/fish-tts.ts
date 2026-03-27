@@ -68,6 +68,10 @@ function getFishConfig() {
  * Retourne le chemin du fichier et la taille en bytes.
  */
 export async function fishTTS(opts: FishTTSOptions): Promise<FishTTSResult> {
+  if (!opts.text?.trim()) {
+    throw new Error('Fish TTS: text is empty');
+  }
+
   const { apiKey, voiceId: defaultVoiceId } = getFishConfig();
   const voiceId = opts.voiceId ?? defaultVoiceId;
   const format = opts.format ?? 'mp3';

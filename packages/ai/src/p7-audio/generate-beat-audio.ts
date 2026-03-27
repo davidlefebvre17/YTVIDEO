@@ -62,10 +62,10 @@ export interface BeatAudioManifest {
   }>;
 }
 
-/** Convert integer string to French words (0-9999) */
+/** Convert integer string to French words (0-999999999) */
 function numberToFrench(n: string): string {
   const num = parseInt(n, 10);
-  if (isNaN(num)) return n;
+  if (isNaN(num) || num < 0) return n;
   if (num === 0) return 'zéro';
   const units = ['', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf',
     'dix', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize', 'dix-sept', 'dix-huit', 'dix-neuf'];
@@ -74,7 +74,7 @@ function numberToFrench(n: string): string {
   if (num < 100) {
     const t = Math.floor(num / 10);
     const u = num % 10;
-    if (t === 7 || t === 9) return tens[t] + '-' + units[10 + u]; // soixante-dix, quatre-vingt-dix
+    if (t === 7 || t === 9) return tens[t] + '-' + units[10 + u];
     if (u === 0) return tens[t] + (t === 8 ? 's' : '');
     if (u === 1 && t !== 8) return tens[t] + ' et un';
     return tens[t] + '-' + units[u];
@@ -86,14 +86,21 @@ function numberToFrench(n: string): string {
     if (rest === 0) return hPart + (h > 1 ? 's' : '');
     return hPart + ' ' + numberToFrench(String(rest));
   }
-  if (num < 10000) {
+  if (num < 1000000) {
     const th = Math.floor(num / 1000);
     const rest = num % 1000;
     const thPart = th === 1 ? 'mille' : numberToFrench(String(th)) + ' mille';
     if (rest === 0) return thPart;
     return thPart + ' ' + numberToFrench(String(rest));
   }
-  return n; // > 9999: keep as-is
+  if (num < 1000000000) {
+    const mil = Math.floor(num / 1000000);
+    const rest = num % 1000000;
+    const milPart = mil === 1 ? 'un million' : numberToFrench(String(mil)) + ' millions';
+    if (rest === 0) return milPart;
+    return milPart + ' ' + numberToFrench(String(rest));
+  }
+  return n;
 }
 
 /** Nettoyer le texte pour TTS — supprimer symboles non-prononçables */
@@ -111,27 +118,13 @@ function sanitizeForTTS(text: string): string {
     .replace(/(\d+)\s*\$/g, (_, n) => `${numberToFrench(n)} dollars`)
     .replace(/(\d+)[.,](\d+)\s*€/g, (_, a, b) => `${numberToFrench(a)} euros ${numberToFrench(b)}`)
     .replace(/(\d+)\s*€/g, (_, n) => `${numberToFrench(n)} euros`)
-    .replace(/\b(\d{1,4})\b/g, (_, n) => numberToFrench(n))
+    .replace(/\b(\d{1,9})\b/g, (_, n) => numberToFrench(n))
     // Symboles financiers → texte
     .replace(/\+(\d)/g, 'plus $1')
     .replace(/%/g, ' pour cent')
     .replace(/\$/g, ' dollars')
     .replace(/€/g, ' euros')
-    // Mots anglais → prononciation française
-    .replace(/\bstablecoins?\b/gi, 'stéïbeul coïne')
-    .replace(/\brally\b/gi, 'rallye')
-    .replace(/\bspread\b/gi, 'sprède')
-    .replace(/\bhedge\b/gi, 'hèdje')
-    .replace(/\bshort squeeze\b/gi, 'shorte squize')
-    .replace(/\bsqueeze\b/gi, 'squize')
-    .replace(/\bbreakout\b/gi, 'brèkaoutt')
-    .replace(/\bpullback\b/gi, 'poulbak')
-    .replace(/\bcarry trade\b/gi, 'carry trèïde')
-    .replace(/\bFear\s*(?:&|and|et)\s*Greed\b/gi, 'Fir ande Gride')
-    .replace(/\bClarity Act\b/gi, 'Claritty Acte')
-    .replace(/\bdovish\b/gi, 'doviche')
-    .replace(/\bhawkish\b/gi, 'hokiche')
-    .replace(/\bBig\s*Four\b/gi, 'Bigue For')
+    // Mots anglais — laisser tels quels, Fish Audio les prononce mieux que la phonétisation
     // Abréviations
     .replace(/\bWTI\b/g, 'W.T.I.')
     .replace(/\bDXY\b/g, 'D.X.Y.')

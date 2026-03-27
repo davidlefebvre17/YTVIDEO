@@ -130,8 +130,8 @@ Pour CHAQUE beat:
 3. **overlaySpec** (object|null): Données structurées type-spécifiques:
    - chart: { asset, levels: [support, resistance], type: "price_line"|"zone_highlight"|... }
    - stat: { asset, value, unit, format: "%" ou "€" }
-   - causal_chain: { steps: ["step1", "step2", ...] } — verbatim from C2
-   - scenario_fork: { bullish: {target, condition}, bearish: {target, condition} } — verbatim from C2
+   - causal_chain: { steps: ["step1", "step2", ...] } — les maillons du raisonnement que le narrateur explique DANS CE BEAT. Chaque step = un maillon logique. Illustre la parole en cours.
+   - scenario_fork: { trunk: "question posée par le narrateur", asset: "SYMBOL", bullTarget: "prix cible", bullCondition: "condition en langage simple", bearTarget: "prix cible", bearCondition: "condition en langage simple" }
    - gauge: { type: "rsi"|"fear_greed", value, asset }
    - comparison: { assets: [symbol1, symbol2], values: [val1, val2] }
    - headline: { text, actor?, source? }
@@ -168,7 +168,7 @@ Pour CHAQUE beat:
 
 ## Contraintes
 
-- **C2 verbatim**: Si overlayType='causal_chain', copie exactement C2.causalChain dans overlaySpec.steps. Idem pour scenario_fork.
+- **Chaîne causale = ce que le narrateur enseigne MAINTENANT**: Si overlayType='causal_chain', lis le narrationChunk du beat et extrais le MÉCANISME que le narrateur est en train d'expliquer. Les steps illustrent la logique de la narration en cours, pas un résumé du segment. Si le narrateur dit "quand les taux montent, l'or perd de son attrait", les steps doivent être : "Taux réels montent → Coût d'opportunité augmente → Or moins attractif vs obligations → Pression vendeuse". Chaque step est un maillon du raisonnement, pas un fait daté.
 - **Extraction numérique**: "un virgule cinquante et un pour cent" → {value: 1.51, format: "%"}
 - **Ratio overlay**: Max 65% de beats avec overlay (non-'none') — privilégie les données visuelles
 - **Pas 3 consécutifs**: Interdiction de 3 beats consécutifs avec le même overlayType
