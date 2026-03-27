@@ -873,7 +873,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "cb-bce-mandat-transmission",
@@ -916,7 +916,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "critical",
       "related_chunks": [
         "cb-bce-fragmentation",
@@ -954,7 +954,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "medium",
       "related_chunks": [
         "cb-divergences-mecanismes",
@@ -998,7 +998,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "cb-boj-mandat-specificites",
@@ -1045,7 +1045,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "medium",
       "related_chunks": [
         "cb-boj-carry-trade",
@@ -1085,7 +1085,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "cb-boj-carry-trade",
@@ -1134,7 +1134,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "cb-fed-pivot-signals",
@@ -1182,7 +1182,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "medium",
       "related_chunks": [
         "cb-divergences-mecanismes",
@@ -1235,7 +1235,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "cb-divergences-historiques",
@@ -1286,7 +1286,7 @@
         ]
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "cb-fed-dual-mandate",
@@ -1330,7 +1330,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "critical",
       "related_chunks": [
         "cb-fed-transmission",
@@ -1415,7 +1415,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "medium",
       "related_chunks": [
         "cb-fed-qe-qt-bilan",
@@ -1461,7 +1461,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "cb-fed-dual-mandate",
@@ -1508,7 +1508,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "critical",
       "related_chunks": [
         "cb-fed-transmission",
@@ -1596,7 +1596,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "critical",
       "related_chunks": [
         "cb-fed-dual-mandate",
@@ -1678,7 +1678,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "cb-fed-pivot-signals",
@@ -1726,7 +1726,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "cb-patterns-fed-put",
@@ -1762,7 +1762,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "cot-signaux-cles",
@@ -1798,7 +1798,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "medium",
       "related_chunks": [
         "cot-signaux-cles",
@@ -1868,7 +1868,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "cot-categories-traders",
@@ -1910,7 +1910,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "critical",
       "related_chunks": [
         "geo-regle-fondamentale",
@@ -1956,7 +1956,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "geo-moyen-orient-chaine",
@@ -2000,7 +2000,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "geo-tarifs-chaine",
@@ -2205,7 +2205,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "geo-krachs-patterns",
@@ -2243,7 +2243,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "medium",
       "related_chunks": [
         "geo-moyen-orient-chaine",
@@ -2364,7 +2364,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "medium",
       "related_chunks": [
         "geo-moyen-orient-chaine",
@@ -2408,7 +2408,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "geo-moyen-orient-gravite",
@@ -2445,7 +2445,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "geo-moyen-orient-chaine",
@@ -2517,7 +2517,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "critical",
       "related_chunks": [
         "geo-regle-fondamentale",
@@ -2555,7 +2555,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "medium",
       "related_chunks": [
         "geo-3-phases-conflit",
@@ -2587,7 +2587,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "critical",
       "related_chunks": [
         "geo-priorite-geopolitique",
@@ -2668,7 +2668,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "geo-russie-ukraine-ble",
@@ -2709,7 +2709,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "medium",
       "related_chunks": [
         "geo-russie-ukraine-chaine",
@@ -2742,7 +2742,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "geo-regle-fondamentale",
@@ -2785,7 +2785,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "medium",
       "related_chunks": [
         "geo-tarifs-chaine",
@@ -2833,7 +2833,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "critical",
       "related_chunks": [
         "geo-tarifs-obligataire",
@@ -2918,7 +2918,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "geo-tarifs-chaine",
@@ -3010,7 +3010,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "critical",
       "related_chunks": [
         "asset-jpy-refuge",
@@ -3062,7 +3062,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "critical",
       "related_chunks": [
         "inter-dollar-cascade",
@@ -3112,7 +3112,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "critical",
       "related_chunks": [
         "inter-or-refuge",
@@ -3157,7 +3157,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "medium",
       "related_chunks": [
         "inter-dollar-cascade",
@@ -3246,7 +3246,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "inter-taux-moteur-forex",
@@ -3325,7 +3325,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "inter-bitcoin-hybride",
@@ -3379,7 +3379,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "critical",
       "related_chunks": [
         "inter-taux-moteur-forex",
@@ -3480,7 +3480,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "inter-vix-peur",
@@ -3569,7 +3569,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "critical",
       "related_chunks": [
         "inter-vix-peur",
@@ -3615,7 +3615,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "critical",
       "related_chunks": [
         "inter-yield-spread",
@@ -3655,7 +3655,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": true,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "critical",
       "related_chunks": [
         "inter-regimes-marche",
@@ -3697,7 +3697,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "inter-taux-moteur-forex",
@@ -3825,7 +3825,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "macro-fed-decisions",
@@ -3868,7 +3868,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "critical",
       "related_chunks": [
         "macro-recession-signals",
@@ -3910,7 +3910,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "medium",
       "related_chunks": [
         "macro-treasury-yields",
@@ -4033,7 +4033,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "critical",
       "related_chunks": [
         "macro-inflation-cpi",
@@ -4076,7 +4076,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "critical",
       "related_chunks": [
         "macro-treasury-yields",
@@ -4120,7 +4120,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "macro-recession-signals",
@@ -4162,7 +4162,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "macro-treasury-yields",
@@ -4204,7 +4204,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "macro-recession-signals",
@@ -4247,7 +4247,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "critical",
       "related_chunks": [
         "macro-yield-curve",
@@ -4291,7 +4291,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": true,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "critical",
       "related_chunks": [
         "macro-yield-curve",
@@ -4416,7 +4416,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "critical",
       "related_chunks": [
         "macro-treasury-yields",
@@ -4858,7 +4858,7 @@
         ]
       },
       "always_if_symbol": true,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "macro-fear-greed-crypto",
@@ -4902,7 +4902,7 @@
         ]
       },
       "always_if_symbol": true,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "medium",
       "related_chunks": [
         "season-energie",
@@ -4951,7 +4951,7 @@
         ]
       },
       "always_if_symbol": true,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "macro-carry-trade-tarifs",
@@ -5002,7 +5002,7 @@
         ]
       },
       "always_if_symbol": true,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "macro-inflation-cpi",
@@ -5047,7 +5047,7 @@
         ]
       },
       "always_if_symbol": true,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "medium",
       "related_chunks": [
         "season-indices-actions",
@@ -5101,7 +5101,7 @@
         ]
       },
       "always_if_symbol": true,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "season-etfs-sectoriels",
@@ -5151,7 +5151,7 @@
         ]
       },
       "always_if_symbol": true,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "macro-vix-zones",
@@ -5191,7 +5191,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "critical",
       "related_chunks": [
         "ta-rsi-zones",
@@ -5226,7 +5226,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "ta-hierarchy",
@@ -5258,7 +5258,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "medium",
       "related_chunks": [
         "ta-support-resistance",
@@ -5286,7 +5286,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "ta-confluences",
@@ -5329,7 +5329,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "medium",
       "related_chunks": [
         "ta-hierarchy",
@@ -5361,7 +5361,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "ta-confluences",
@@ -5392,7 +5392,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "high",
       "related_chunks": [
         "ta-fibonacci",
@@ -5423,7 +5423,7 @@
         "seasonality_months": []
       },
       "always_if_symbol": false,
-      "always_if_theme": true,
+      "always_if_theme": false,
       "priority": "medium",
       "related_chunks": [
         "ta-confluences",

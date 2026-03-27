@@ -12,7 +12,7 @@ conditions:
   any_symbol_move: false
   seasonality_months: []
 always_if_symbol: false
-always_if_theme: true
+always_if_theme: false
 priority: "critical"
 related_chunks: ["cb-bce-fragmentation", "cb-patterns-hawkish-cuts", "cb-divergences-mecanismes"]
 ---

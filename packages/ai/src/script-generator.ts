@@ -356,8 +356,10 @@ export function formatSnapshotForPrompt(
 
     if (asset.technicals) {
       const t = asset.technicals;
+      const sma20 = (t as any).sma20 ?? (t as any).ema9;
+      const sma50 = (t as any).sma50 ?? (t as any).ema21;
       text += `Court terme (1 mois):\n`;
-      text += `  SMA20: ${fmt(t.sma20)} | SMA50: ${fmt(t.sma50)} | Prix ${asset.price > t.sma20 ? "AU-DESSUS" : "EN-DESSOUS"} de la SMA\n`;
+      text += `  SMA20: ${fmt(sma20)} | SMA50: ${fmt(sma50)} | Prix ${asset.price > sma20 ? "AU-DESSUS" : "EN-DESSOUS"} de la SMA\n`;
       text += `  RSI14: ${t.rsi14.toFixed(0)}${t.rsi14 < 30 ? " ⚠️ SURVENTE" : t.rsi14 > 70 ? " ⚠️ SURACHAT" : ""}\n`;
       text += `  Trend: ${t.trend.toUpperCase()} | Volume: ${t.volumeAnomaly > 1.2 ? `+${(t.volumeAnomaly * 100 - 100).toFixed(0)}% vs moy.20j` : t.volumeAnomaly < 0.8 ? `-${(100 - t.volumeAnomaly * 100).toFixed(0)}% vs moy.20j` : "normal"}\n`;
       text += `  Supports: ${t.supports.map(fmt).join(", ") || "—"} | Résistances: ${t.resistances.map(fmt).join(", ") || "—"}\n`;

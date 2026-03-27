@@ -12,7 +12,7 @@ conditions:
   any_symbol_move: false
   seasonality_months: [1, 4, 5, 6, 9, 10, 11, 12]
 always_if_symbol: true
-always_if_theme: true
+always_if_theme: false
 priority: "medium"
 related_chunks: ["season-indices-actions", "season-energie", "macro-triple-witching"]
 ---

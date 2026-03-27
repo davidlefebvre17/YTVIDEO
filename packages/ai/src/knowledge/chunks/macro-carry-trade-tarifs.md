@@ -12,7 +12,7 @@ conditions:
   any_symbol_move: false
   seasonality_months: []
 always_if_symbol: false
-always_if_theme: true
+always_if_theme: false
 priority: "high"
 related_chunks: ["macro-fed-decisions", "macro-inflation-cpi"]
 ---

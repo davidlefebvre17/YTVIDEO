@@ -12,7 +12,7 @@ conditions:
   any_symbol_move: true
   seasonality_months: []
 always_if_symbol: false
-always_if_theme: true
+always_if_theme: false
 priority: "medium"
 related_chunks: ["geo-tarifs-chaine", "geo-tarifs-obligataire"]
 ---

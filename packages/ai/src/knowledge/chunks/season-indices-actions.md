@@ -12,7 +12,7 @@ conditions:
   any_symbol_move: false
   seasonality_months: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 always_if_symbol: true
-always_if_theme: true
+always_if_theme: false
 priority: "high"
 related_chunks: ["season-etfs-sectoriels", "macro-triple-witching"]
 ---

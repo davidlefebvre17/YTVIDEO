@@ -12,7 +12,7 @@ conditions:
   any_symbol_move: false
   seasonality_months: [1, 4, 8, 9, 10, 11, 12]
 always_if_symbol: true
-always_if_theme: true
+always_if_theme: false
 priority: "high"
 related_chunks: ["macro-fear-greed-crypto", "season-indices-actions"]
 ---

@@ -12,7 +12,7 @@ conditions:
   any_symbol_move: false
   seasonality_months: [1, 2, 3, 4, 5, 6, 7, 8]
 always_if_symbol: true
-always_if_theme: true
+always_if_theme: false
 priority: "medium"
 related_chunks: ["season-energie", "macro-pmi-gdp-retail"]
 ---
