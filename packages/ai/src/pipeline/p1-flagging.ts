@@ -353,7 +353,7 @@ export function flagAssets(snapshot: DailySnapshot): SnapshotFlagged {
     if (asset.technicals) {
       const prevClose = getPrevClose(asset);
       if (prevClose !== undefined) {
-        const { ema9: sma20, ema21: sma50 } = asset.technicals;
+        const { sma20, sma50 } = asset.technicals;
         const crossSma20 = (prevClose < sma20 && asset.price >= sma20) ||
                            (prevClose > sma20 && asset.price <= sma20);
         const crossSma50 = (prevClose < sma50 && asset.price >= sma50) ||

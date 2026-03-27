@@ -357,7 +357,7 @@ export function formatSnapshotForPrompt(
     if (asset.technicals) {
       const t = asset.technicals;
       text += `Court terme (1 mois):\n`;
-      text += `  SMA20: ${fmt(t.ema9)} | SMA50: ${fmt(t.ema21)} | Prix ${asset.price > t.ema9 ? "AU-DESSUS" : "EN-DESSOUS"} de la SMA\n`;
+      text += `  SMA20: ${fmt(t.sma20)} | SMA50: ${fmt(t.sma50)} | Prix ${asset.price > t.sma20 ? "AU-DESSUS" : "EN-DESSOUS"} de la SMA\n`;
       text += `  RSI14: ${t.rsi14.toFixed(0)}${t.rsi14 < 30 ? " ⚠️ SURVENTE" : t.rsi14 > 70 ? " ⚠️ SURACHAT" : ""}\n`;
       text += `  Trend: ${t.trend.toUpperCase()} | Volume: ${t.volumeAnomaly > 1.2 ? `+${(t.volumeAnomaly * 100 - 100).toFixed(0)}% vs moy.20j` : t.volumeAnomaly < 0.8 ? `-${(100 - t.volumeAnomaly * 100).toFixed(0)}% vs moy.20j` : "normal"}\n`;
       text += `  Supports: ${t.supports.map(fmt).join(", ") || "—"} | Résistances: ${t.resistances.map(fmt).join(", ") || "—"}\n`;

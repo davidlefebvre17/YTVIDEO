@@ -254,8 +254,8 @@ export function computeTechnicals(
     multiTFBonus;
 
   return {
-    ema9: sma20,
-    ema21: sma50,
+    sma20,
+    sma50,
     rsi14,
     trend,
     volumeAnomaly,

@@ -144,8 +144,8 @@ export interface AssetSnapshot {
 }
 
 export interface TechnicalIndicators {
-  ema9: number;   // SMA20
-  ema21: number;  // SMA50
+  sma20: number;
+  sma50: number;
   rsi14: number;
   trend: "bullish" | "bearish" | "neutral";
   volumeAnomaly: number; // ratio vs 20d average
