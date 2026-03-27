@@ -81,6 +81,7 @@ async function main() {
   const skipRender = !!opts["no-render"];
   const skipFetch = !!opts["skip-fetch"];
   const skipScript = !!opts["skip-script"];
+  const startFrom = opts["start-from"] as string | undefined;
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
   const date = (opts.date as string) || yesterday.toISOString().split("T")[0];
@@ -262,7 +263,7 @@ async function main() {
     script = await generateScript(snapshot, { type, lang, episodeNumber, newsDb, prevContext });
   } else {
     console.log("  Mode: PIPELINE C1→C5");
-    pipelineResult = await runPipeline({ snapshot, lang, episodeNumber, newsDb, prevContext });
+    pipelineResult = await runPipeline({ snapshot, lang, episodeNumber, newsDb, prevContext, startFrom: startFrom as any });
     script = toEpisodeScript(pipelineResult.directedEpisode, episodeNumber, lang);
     console.log(`  Stats: ${pipelineResult.stats.llmCalls} LLM, ${pipelineResult.stats.retries} retries, ${(pipelineResult.stats.totalDurationMs / 1000).toFixed(1)}s`);
   }

@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, writeFileSync, copyFileSync } from "fs";
+import { existsSync, mkdirSync, writeFileSync, readFileSync, copyFileSync } from "fs";
 import { join, basename } from "path";
 
 const ROOT = join(__dirname, "..", "..", "..");
@@ -77,6 +77,21 @@ export function saveIntermediate(
     console.warn(
       `Failed to save intermediate ${name}: ${(err as Error).message}`
     );
+  }
+}
+
+/**
+ * Load a pipeline intermediate from episode folder.
+ * Returns null if file doesn't exist.
+ */
+export function loadIntermediate<T = unknown>(date: string, name: string): T | null {
+  const dir = episodeDir(date);
+  const filePath = join(dir, "pipeline", `${name}.json`);
+  if (!existsSync(filePath)) return null;
+  try {
+    return JSON.parse(readFileSync(filePath, "utf-8")) as T;
+  } catch {
+    return null;
   }
 }
 

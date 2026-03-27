@@ -15,15 +15,19 @@ import { buildEpisodeSummaries, formatRecentScriptsForC3 } from "./helpers/episo
 import { buildCausalBrief } from "./helpers/causal-brief";
 import { buildBriefingPack } from "./helpers/briefing-pack";
 import { runNewsDigest } from "./p1b-news-digest";
-import { saveIntermediate as saveToEpisodeIntermediate } from "../episode-folder";
+import { saveIntermediate as saveToEpisodeIntermediate, loadIntermediate } from "../episode-folder";
 import type {
   PipelineOptions,
   PipelineResult,
   PipelineStats,
+  PipelineStage,
   DirectedEpisode,
   DraftScript,
   NarrationBlock,
   NarrationSegment,
+  SnapshotFlagged,
+  EditorialPlan,
+  AnalysisBundle,
 } from "./types";
 
 // Re-export everything
@@ -177,11 +181,23 @@ export async function runPipeline(
   };
   const t0 = Date.now();
 
-  console.log(`\n═══ Pipeline C1→C5 — ${snapshot.date} ═══\n`);
+  const STAGE_ORDER: PipelineStage[] = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6'];
+  const startIdx = options.startFrom ? STAGE_ORDER.indexOf(options.startFrom) : 0;
+  const shouldRun = (stage: PipelineStage) => STAGE_ORDER.indexOf(stage) >= startIdx;
+
+  console.log(`\n═══ Pipeline C1→C5 — ${snapshot.date}${options.startFrom ? ` (from ${options.startFrom})` : ''} ═══\n`);
 
   // ── P1: Pré-filtrage mécanique (code pur) ──────────────
-  console.log("P1 — Pré-filtrage mécanique...");
-  const flagged = flagAssets(snapshot);
+  let flagged: SnapshotFlagged;
+  if (shouldRun('p1')) {
+    console.log("P1 — Pré-filtrage mécanique...");
+    flagged = flagAssets(snapshot);
+  } else {
+    console.log("P1 — Chargement depuis disque...");
+    const loaded = loadIntermediate<SnapshotFlagged>(snapshot.date, "snapshot_flagged");
+    if (!loaded) throw new Error(`startFrom=${options.startFrom}: snapshot_flagged.json not found in episodes/${snapshot.date}`);
+    flagged = loaded;
+  }
   console.log(
     `  ${flagged.assets.length} assets scorés, top: ${flagged.assets
       .slice(0, 3)
@@ -230,58 +246,72 @@ export async function runPipeline(
   }
 
   // ── P1.5: News Digest — extraction événements structurels ──
-  const calendarHighlights = (snapshot.events ?? [])
-    .filter(e => e.impact === 'high')
-    .map(e => `${e.time ?? '?'} ${e.name} (${e.currency}) forecast:${e.forecast ?? '?'} actual:${e.actual ?? '?'}`);
-  const newsDigest = await runNewsDigest(snapshot.news ?? [], calendarHighlights);
-  stats.llmCalls++;
-  if (newsDigest.events.length) {
-    const gc = newsDigest.events.filter(e => e.importance === 'game_changer').length;
-    const sig = newsDigest.events.filter(e => e.importance === 'significant').length;
-    console.log(`  Digest: ${newsDigest.events.length} events (${gc} game-changers, ${sig} significant)`);
+  let newsDigest: Awaited<ReturnType<typeof runNewsDigest>> = { events: [] };
+  if (shouldRun('p1')) {
+    const calendarHighlights = (snapshot.events ?? [])
+      .filter(e => e.impact === 'high')
+      .map(e => `${e.time ?? '?'} ${e.name} (${e.currency}) forecast:${e.forecast ?? '?'} actual:${e.actual ?? '?'}`);
+    newsDigest = await runNewsDigest(snapshot.news ?? [], calendarHighlights);
+    stats.llmCalls++;
+    if (newsDigest.events.length) {
+      const gc = newsDigest.events.filter(e => e.importance === 'game_changer').length;
+      const sig = newsDigest.events.filter(e => e.importance === 'significant').length;
+      console.log(`  Digest: ${newsDigest.events.length} events (${gc} game-changers, ${sig} significant)`);
 
-    // Reinject digest into materialityScore — max boost per asset (not cumulative)
-    const DIGEST_BOOST: Record<string, number> = { game_changer: 3, significant: 2, notable: 0 };
-    const maxBoostPerAsset = new Map<string, number>();
-    for (const event of newsDigest.events) {
-      const boost = DIGEST_BOOST[event.importance] ?? 0;
-      if (boost === 0) continue;
-      for (const sym of event.linkedAssets ?? []) {
-        maxBoostPerAsset.set(sym, Math.max(maxBoostPerAsset.get(sym) ?? 0, boost));
+      // Reinject digest into materialityScore — max boost per asset (not cumulative)
+      const DIGEST_BOOST: Record<string, number> = { game_changer: 3, significant: 2, notable: 0 };
+      const maxBoostPerAsset = new Map<string, number>();
+      for (const event of newsDigest.events) {
+        const boost = DIGEST_BOOST[event.importance] ?? 0;
+        if (boost === 0) continue;
+        for (const sym of event.linkedAssets ?? []) {
+          maxBoostPerAsset.set(sym, Math.max(maxBoostPerAsset.get(sym) ?? 0, boost));
+        }
+      }
+      let boosted = 0;
+      for (const [sym, boost] of maxBoostPerAsset) {
+        const asset = flagged.assets.find(a => a.symbol === sym);
+        if (asset) {
+          asset.materialityScore = Math.round((asset.materialityScore + boost) * 10) / 10;
+          boosted++;
+        }
+      }
+      if (boosted > 0) {
+        flagged.assets.sort((a, b) => b.materialityScore - a.materialityScore);
+        console.log(`  Digest boost: ${boosted} assets adjusted (max per asset), re-sorted`);
       }
     }
-    let boosted = 0;
-    for (const [sym, boost] of maxBoostPerAsset) {
-      const asset = flagged.assets.find(a => a.symbol === sym);
-      if (asset) {
-        asset.materialityScore = Math.round((asset.materialityScore + boost) * 10) / 10;
-        boosted++;
-      }
-    }
-    if (boosted > 0) {
-      flagged.assets.sort((a, b) => b.materialityScore - a.materialityScore);
-      console.log(`  Digest boost: ${boosted} assets adjusted (max per asset), re-sorted`);
-    }
+  } else {
+    console.log("  P1.5 — Skipped (loaded from disk)");
   }
 
   // ── P2: C1 Sonnet — Sélection éditoriale ────────────────
-  console.log("\nP2 — C1 Sonnet (sélection éditoriale)...");
-  const editorial = await runC1Editorial({
-    flagged,
-    episodeSummaries,
-    researchContext,
-    weeklyBrief,
-    briefingPack,
-    newsDigest,
-    lang,
-  });
-  stats.llmCalls++;
-  console.log(
-    `  ${editorial.totalSegments} segments: ${editorial.segments
-      .map((s) => `${s.id}[${s.depth}]`)
-      .join(", ")}`
-  );
-  saveIntermediate(snapshot.date, "editorial", editorial);
+  let editorial: EditorialPlan;
+  if (shouldRun('p2')) {
+    console.log("\nP2 — C1 Sonnet (sélection éditoriale)...");
+    editorial = await runC1Editorial({
+      flagged,
+      episodeSummaries,
+      researchContext,
+      weeklyBrief,
+      briefingPack,
+      newsDigest,
+      lang,
+    });
+    stats.llmCalls++;
+    console.log(
+      `  ${editorial.totalSegments} segments: ${editorial.segments
+        .map((s) => `${s.id}[${s.depth}]`)
+        .join(", ")}`
+    );
+    saveIntermediate(snapshot.date, "editorial", editorial);
+  } else {
+    console.log("\nP2 — Chargement depuis disque...");
+    const loaded = loadIntermediate<EditorialPlan>(snapshot.date, "editorial");
+    if (!loaded) throw new Error(`startFrom=${options.startFrom}: editorial.json not found`);
+    editorial = loaded;
+    console.log(`  ${editorial.totalSegments} segments (loaded)`);
+  }
 
   // ── Knowledge RAG briefing (depends on editorial) ──
   console.log("\n  Knowledge RAG briefing...");
@@ -302,22 +332,31 @@ export async function runPipeline(
   console.log(`  Budget: ${budget.totalTarget} mots cible`);
 
   // ── P3: C2 Sonnet — Analyse ────────────────────────────
-  console.log("\nP3 — C2 Sonnet (analyse)...");
-  const analysis = await runC2Analysis({
-    editorial,
-    flagged,
-    causalBrief,
-    researchContext,
-    snapshot,
-    briefingPack,
-    knowledgeBriefing,
-    lang,
-  });
-  stats.llmCalls++;
-  console.log(
-    `  ${analysis.segments.length} analyses, mood: ${analysis.globalContext.marketMood}`
-  );
-  saveIntermediate(snapshot.date, "analysis", analysis);
+  let analysis: AnalysisBundle;
+  if (shouldRun('p3')) {
+    console.log("\nP3 — C2 Sonnet (analyse)...");
+    analysis = await runC2Analysis({
+      editorial,
+      flagged,
+      causalBrief,
+      researchContext,
+      snapshot,
+      briefingPack,
+      knowledgeBriefing,
+      lang,
+    });
+    stats.llmCalls++;
+    console.log(
+      `  ${analysis.segments.length} analyses, mood: ${analysis.globalContext.marketMood}`
+    );
+    saveIntermediate(snapshot.date, "analysis", analysis);
+  } else {
+    console.log("\nP3 — Chargement depuis disque...");
+    const loaded = loadIntermediate<AnalysisBundle>(snapshot.date, "analysis");
+    if (!loaded) throw new Error(`startFrom=${options.startFrom}: analysis.json not found`);
+    analysis = loaded;
+    console.log(`  ${analysis.segments.length} analyses (loaded)`);
+  }
 
   if (options.stopAt === "p3") {
     return {
