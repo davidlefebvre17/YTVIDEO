@@ -19,7 +19,8 @@
     "backfill-news": "npx tsx scripts/backfill-news.ts",
     "weekly-job": "npx tsx packages/ai/src/market-memory-weekly-job.ts",
     "init-market-memory": "npx tsx scripts/init-market-memory.ts",
-    "typecheck": "tsc --build tsconfig.json"
+    "typecheck": "tsc --build tsconfig.json",
+    "dashboard": "npx tsx scripts/dashboard.ts"
   },
   "keywords": [
     "remotion",
