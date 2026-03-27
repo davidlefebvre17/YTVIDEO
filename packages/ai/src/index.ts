@@ -4,6 +4,7 @@ export { generateScript, formatSnapshotForPrompt } from "./script-generator";
 export type { PrevContext, PrevEntry } from "./script-generator";
 export { getDailyRecapSystemPrompt } from "./prompts/daily-recap";
 export { loadKnowledge } from "./knowledge-loader";
+export { loadKnowledgeBriefing } from "./knowledge/knowledge-briefing";
 export { readManifest, getNextEpisodeNumber, getRecentEpisodes, appendToManifest, loadEpisodeData } from "./episode-history";
 export { buildThemesDuJour, computeAssetSignal, detectMarketRegime, scoreTheme } from "./editorial-score";
 export { clusterNews, buildThemesFromClusters } from "./news-clusterer";

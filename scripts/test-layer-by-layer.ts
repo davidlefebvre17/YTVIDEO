@@ -276,7 +276,7 @@ async function main() {
       analysis,
       budget,
       recentScripts,
-      knowledgeTier1,
+      knowledgeBriefing: knowledgeTier1,
       lang: "fr",
     });
 

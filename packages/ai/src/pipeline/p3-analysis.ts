@@ -97,7 +97,7 @@ function formatAssetForC2(asset: FlaggedAsset, depth: 'DEEP' | 'FOCUS' | 'FLASH'
   // Full data for DEEP/FOCUS
   const t = asset.snapshot.technicals;
   if (t) {
-    text += `EMA9: ${fmt(t.ema9)} | EMA21: ${fmt(t.ema21)} | RSI: ${t.rsi14.toFixed(0)} | Trend: ${t.trend}\n`;
+    text += `SMA20: ${fmt(t.sma20)} | SMA50: ${fmt(t.sma50)} | RSI: ${t.rsi14.toFixed(0)} | Trend: ${t.trend}\n`;
     text += `Supports: ${t.supports.map(fmt).join(', ') || '—'} | Résistances: ${t.resistances.map(fmt).join(', ') || '—'}\n`;
     text += `Volume: ${t.volumeAnomaly > 1.2 ? `+${((t.volumeAnomaly - 1) * 100).toFixed(0)}% vs moy` : 'normal'}\n`;
   }
@@ -170,7 +170,7 @@ RÈGLES :
   • Data: yield_curve (courbe taux), gauge_fear_greed, multi_badge (max 4 assets), heatmap_sectorielle, countdown_event
   • Infographies: causal_chain (chaîne causale), scenario_fork (fork bull/bear), stat_callout (chiffre géant)
 - Pour les types multi-assets: remplir le champ "assets": ["sym1", "sym2"] en plus de "asset" (premier asset)
-- Utilise causal_chain quand le segment a une chaîne causale claire à montrer visuellement
+- Utilise causal_chain pour montrer un MÉCANISME FONDAMENTAL (corrélation, transmission, principe économique), PAS un récit factuel de la journée. Les steps doivent être des principes réutilisables, pas des événements datés.
 - Utilise scenario_fork pour les segments avec 2 scénarios chiffrés bullish/bearish
 - Utilise gauge_rsi quand le RSI est un élément clé (surachat/survente)
 - Utilise chart_comparaison pour les retournements marquants (J-1 vs J0)
@@ -181,8 +181,7 @@ RÈGLES :
   • speculative : extrapolation, pas de catalyst clair
 - Le globalContext identifie les liens ENTRE segments, pas un résumé de chaque segment
 - ZÉRO narration. Analyse brute uniquement.
-- Si l'editorial plan contient un trigger (acteur politique, événement), la chaîne causale DOIT commencer par ce trigger
-- Si aucun trigger n'est défini pour un segment, NE PAS en inventer — commence la causalChain par le fait de marché ou l'événement le plus saillant du segment
+- La causalChain décrit le MÉCANISME sous-jacent, pas la chronologie. Chaque step est un principe général que le spectateur peut réutiliser pour comprendre d'autres situations similaires. Pas de dates, pas de noms propres dans les steps.
 - Pour chaque segment, renseigne sourcesUsed : liste des données utilisées (type + detail)
   Types valides : snapshot_price, news_article, knowledge_base, market_memory, causal_brief, inference
 - Maximum 2 niveaux techniques clés par asset dans technicalReading — les plus pertinents pour la narration, pas tous les indicateurs disponibles
@@ -282,7 +281,7 @@ Retourne un JSON avec cette structure exacte :
       "keyFacts": ["fait 1", "fait 2", "fait 3"],
       "technicalReading": "Synthèse technique",
       "fundamentalContext": "Contexte macro/fondamental",
-      "causalChain": "Optionnel — chaîne causale si applicable",
+      "causalChain": "Optionnel — MÉCANISME fondamental (principe économique, corrélation, transmission), PAS un récit factuel",
       "scenarios": {
         "bullish": { "target": "niveau cible", "condition": "condition de déclenchement", "probability": 0.6 },
         "bearish": { "target": "niveau invalidation", "condition": "condition de déclenchement", "probability": 0.4 }
@@ -326,13 +325,14 @@ export async function runC2Analysis(input: {
   researchContext: string;
   snapshot: DailySnapshot;
   briefingPack?: BriefingPack;
+  knowledgeBriefing?: string;
   lang: Language;
 }): Promise<AnalysisBundle> {
   // Load only Tier 2/3 knowledge for selected assets (NOT full 119K)
   const deepFocusSymbols = input.editorial.segments
     .filter(s => s.depth !== 'FLASH')
     .flatMap(s => s.assets);
-  const knowledge = loadKnowledgeForC2(input.snapshot, deepFocusSymbols);
+  const knowledge = input.knowledgeBriefing || loadKnowledgeForC2(input.snapshot, deepFocusSymbols);
 
   const systemPrompt = buildC2SystemPrompt();
   const userPrompt = buildC2UserPrompt(

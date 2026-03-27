@@ -3,7 +3,7 @@ import { join } from "path";
 import type { EpisodeScript, ScriptSection, Language } from "@yt-maker/core";
 import { loadWeeklyBrief as loadWeeklyBriefRaw } from "@yt-maker/data";
 import { buildResearchContext } from "../memory";
-import { loadKnowledge } from "../knowledge-loader";
+import { loadKnowledgeBriefing } from "../knowledge/knowledge-briefing";
 import { flagAssets } from "./p1-flagging";
 import { runC1Editorial } from "./p2-editorial";
 import { runC2Analysis } from "./p3-analysis";
@@ -221,8 +221,6 @@ export async function runPipeline(
   if (briefingPack.topScreenMovers.length) {
     console.log(`  Screen movers: ${briefingPack.topScreenMovers.slice(0, 5).map(m => `${m.symbol}(${m.changePct.toFixed(1)}%)`).join(', ')}`);
   }
-  const knowledgeTier1 = loadKnowledge(snapshot);
-
   if (options.stopAt === "p1") {
     return {
       directedEpisode: null as unknown as DirectedEpisode,
@@ -285,6 +283,12 @@ export async function runPipeline(
   );
   saveIntermediate(snapshot.date, "editorial", editorial);
 
+  // ── Knowledge RAG briefing (depends on editorial) ──
+  console.log("\n  Knowledge RAG briefing...");
+  const knowledgeBriefing = await loadKnowledgeBriefing(flagged, editorial, snapshot, briefingPack?.politicalTriggers);
+  stats.llmCalls++; // Haiku ranking call
+  console.log(`  Knowledge: ${knowledgeBriefing.length} chars briefing`);
+
   if (options.stopAt === "p2") {
     return {
       directedEpisode: null as unknown as DirectedEpisode,
@@ -306,6 +310,7 @@ export async function runPipeline(
     researchContext,
     snapshot,
     briefingPack,
+    knowledgeBriefing,
     lang,
   });
   stats.llmCalls++;
@@ -368,7 +373,7 @@ export async function runPipeline(
     analysis,
     budget,
     recentScripts,
-    knowledgeTier1,
+    knowledgeBriefing,
     researchContext,
     lang,
     assetContext,
@@ -399,7 +404,7 @@ export async function runPipeline(
       analysis,
       budget,
       recentScripts,
-      knowledgeTier1,
+      knowledgeBriefing,
       researchContext,
       lang,
       feedback: blockers,

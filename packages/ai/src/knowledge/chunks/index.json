@@ -1,0 +1,5553 @@
+{
+  "generatedAt": "2026-03-27",
+  "totalChunks": 133,
+  "taxonomy": {
+    "themes": [
+      "analyse-technique",
+      "banque-centrale",
+      "bce",
+      "boe",
+      "boj",
+      "carry-trade",
+      "chine-taiwan",
+      "confluence",
+      "cot-positioning",
+      "croissance",
+      "dette",
+      "earnings",
+      "emploi",
+      "fed",
+      "geopolitique",
+      "inflation",
+      "liquidite",
+      "m2",
+      "mean-reversion",
+      "momentum",
+      "moyen-orient",
+      "narration",
+      "pib",
+      "pivot",
+      "qe-qt",
+      "recession",
+      "refuge",
+      "risk-off",
+      "risk-on",
+      "rotation-sectorielle",
+      "russie-ukraine",
+      "saisonnalite",
+      "sanctions",
+      "structure-episode",
+      "tarifs",
+      "taux",
+      "ton",
+      "volatilite"
+    ],
+    "flags": [
+      "ATH_PROXIMITY",
+      "CAUSAL_CHAIN",
+      "COT_DIVERGENCE",
+      "EARNINGS_SURPRISE",
+      "EARNINGS_TODAY",
+      "EMA_BREAK",
+      "EXTREME_MOVE",
+      "MACRO_SURPRISE",
+      "NEWS_CLUSTER",
+      "NEWS_LINKED",
+      "POLITICAL_TRIGGER",
+      "PRICE_MOVE",
+      "RSI_EXTREME",
+      "SENTIMENT_EXTREME",
+      "SMA200_CROSS",
+      "VOLUME_SPIKE",
+      "ZONE_EVENT"
+    ],
+    "actors": [
+      "bce",
+      "biden",
+      "boe",
+      "boj",
+      "fed",
+      "lagarde",
+      "poutine",
+      "powell",
+      "trump",
+      "ueda",
+      "xi-jinping"
+    ],
+    "regimes": [
+      "choc-exogene",
+      "incertain",
+      "risk-off",
+      "risk-on",
+      "rotation"
+    ]
+  },
+  "chunks": [
+    {
+      "id": "asset-aud-nzd-commodity",
+      "title": "AUD et NZD — Commodity currencies et proxy Chine",
+      "source": "asset-profiles.md",
+      "symbols": [
+        "AUDUSD=X",
+        "NZDUSD=X",
+        "USDJPY=X",
+        "HG=F"
+      ],
+      "themes": [
+        "carry-trade",
+        "risk-on",
+        "risk-off",
+        "recession"
+      ],
+      "conditions": {
+        "flags": [
+          "PRICE_MOVE",
+          "EXTREME_MOVE",
+          "MACRO_SURPRISE"
+        ],
+        "actors": [],
+        "regimes": [
+          "risk-on",
+          "risk-off",
+          "choc-exogene"
+        ],
+        "vix_above": null,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": true,
+      "always_if_theme": false,
+      "priority": "high",
+      "related_chunks": [
+        "inter-carry-trade",
+        "asset-copper-gas"
+      ],
+      "wordCount": 202,
+      "file": "asset-aud-nzd-commodity.md"
+    },
+    {
+      "id": "asset-bitcoin-crypto",
+      "title": "Bitcoin et Ethereum — Liquidite, cycles et adoption",
+      "source": "asset-profiles.md",
+      "symbols": [
+        "BTC-USD",
+        "ETH-USD",
+        "SOL-USD",
+        "^IXIC",
+        "DX-Y.NYB"
+      ],
+      "themes": [
+        "liquidite",
+        "m2",
+        "risk-on",
+        "momentum"
+      ],
+      "conditions": {
+        "flags": [
+          "PRICE_MOVE",
+          "EXTREME_MOVE",
+          "ATH_PROXIMITY",
+          "VOLUME_SPIKE",
+          "NEWS_LINKED"
+        ],
+        "actors": [
+          "trump"
+        ],
+        "regimes": [
+          "risk-on",
+          "risk-off",
+          "choc-exogene"
+        ],
+        "vix_above": null,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": true,
+      "always_if_theme": false,
+      "priority": "critical",
+      "related_chunks": [
+        "asset-sp500-profile",
+        "asset-dollar-index"
+      ],
+      "wordCount": 192,
+      "file": "asset-bitcoin-crypto.md"
+    },
+    {
+      "id": "asset-cac40-profile",
+      "title": "CAC 40 — Luxe, BCE et dependance Chine",
+      "source": "asset-profiles.md",
+      "symbols": [
+        "^FCHI",
+        "EURUSD=X",
+        "^GSPC"
+      ],
+      "themes": [
+        "bce",
+        "earnings",
+        "taux",
+        "rotation-sectorielle"
+      ],
+      "conditions": {
+        "flags": [
+          "PRICE_MOVE",
+          "EXTREME_MOVE",
+          "ATH_PROXIMITY",
+          "EARNINGS_SURPRISE",
+          "NEWS_LINKED"
+        ],
+        "actors": [
+          "lagarde"
+        ],
+        "regimes": [
+          "risk-on",
+          "risk-off",
+          "incertain"
+        ],
+        "vix_above": null,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": true,
+      "always_if_theme": false,
+      "priority": "high",
+      "related_chunks": [
+        "asset-sp500-profile",
+        "asset-eurusd-profile"
+      ],
+      "wordCount": 111,
+      "file": "asset-cac40-profile.md"
+    },
+    {
+      "id": "asset-chf-refuge",
+      "title": "Franc suisse — Refuge, BNS et funding currency",
+      "source": "asset-profiles.md",
+      "symbols": [
+        "EURUSD=X",
+        "DX-Y.NYB",
+        "USDJPY=X"
+      ],
+      "themes": [
+        "refuge",
+        "carry-trade",
+        "taux",
+        "volatilite"
+      ],
+      "conditions": {
+        "flags": [
+          "PRICE_MOVE",
+          "EXTREME_MOVE",
+          "VOLUME_SPIKE"
+        ],
+        "actors": [],
+        "regimes": [
+          "risk-off",
+          "choc-exogene"
+        ],
+        "vix_above": 25,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": true,
+      "always_if_theme": false,
+      "priority": "high",
+      "related_chunks": [
+        "inter-carry-trade",
+        "asset-jpy-refuge"
+      ],
+      "wordCount": 206,
+      "file": "asset-chf-refuge.md"
+    },
+    {
+      "id": "asset-copper-gas",
+      "title": "Cuivre et Gaz naturel — Barometre economique et saisonnalite",
+      "source": "asset-profiles.md",
+      "symbols": [
+        "HG=F",
+        "NG=F",
+        "CL=F"
+      ],
+      "themes": [
+        "recession",
+        "croissance",
+        "saisonnalite",
+        "volatilite"
+      ],
+      "conditions": {
+        "flags": [
+          "PRICE_MOVE",
+          "EXTREME_MOVE",
+          "MACRO_SURPRISE"
+        ],
+        "actors": [],
+        "regimes": [
+          "risk-on",
+          "risk-off",
+          "incertain"
+        ],
+        "vix_above": null,
+        "any_symbol_move": true,
+        "seasonality_months": [
+          1,
+          2,
+          3,
+          4,
+          7,
+          8,
+          11,
+          12
+        ]
+      },
+      "always_if_symbol": true,
+      "always_if_theme": false,
+      "priority": "high",
+      "related_chunks": [
+        "asset-oil-wti-brent",
+        "asset-aud-nzd-commodity"
+      ],
+      "wordCount": 156,
+      "file": "asset-copper-gas.md"
+    },
+    {
+      "id": "asset-dollar-index",
+      "title": "Dollar Index — Drivers, composition et reserves de change",
+      "source": "asset-profiles.md",
+      "symbols": [
+        "DX-Y.NYB",
+        "EURUSD=X",
+        "USDJPY=X",
+        "GC=F",
+        "BTC-USD",
+        "^GSPC"
+      ],
+      "themes": [
+        "fed",
+        "taux",
+        "refuge",
+        "geopolitique",
+        "banque-centrale"
+      ],
+      "conditions": {
+        "flags": [
+          "PRICE_MOVE",
+          "EXTREME_MOVE",
+          "MACRO_SURPRISE",
+          "POLITICAL_TRIGGER"
+        ],
+        "actors": [
+          "powell",
+          "trump"
+        ],
+        "regimes": [
+          "risk-on",
+          "risk-off",
+          "incertain",
+          "choc-exogene"
+        ],
+        "vix_above": null,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": true,
+      "always_if_theme": false,
+      "priority": "critical",
+      "related_chunks": [
+        "asset-gold-drivers",
+        "asset-eurusd-profile",
+        "asset-jpy-refuge"
+      ],
+      "wordCount": 296,
+      "file": "asset-dollar-index.md"
+    },
+    {
+      "id": "asset-eurusd-profile",
+      "title": "EUR/USD — Differentiel de taux et tendances longues",
+      "source": "asset-profiles.md",
+      "symbols": [
+        "EURUSD=X",
+        "DX-Y.NYB",
+        "^FCHI"
+      ],
+      "themes": [
+        "bce",
+        "fed",
+        "taux",
+        "geopolitique"
+      ],
+      "conditions": {
+        "flags": [
+          "PRICE_MOVE",
+          "EXTREME_MOVE",
+          "MACRO_SURPRISE"
+        ],
+        "actors": [
+          "lagarde",
+          "powell"
+        ],
+        "regimes": [
+          "risk-on",
+          "risk-off",
+          "incertain"
+        ],
+        "vix_above": null,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": true,
+      "always_if_theme": false,
+      "priority": "high",
+      "related_chunks": [
+        "asset-dollar-index",
+        "asset-cac40-profile"
+      ],
+      "wordCount": 125,
+      "file": "asset-eurusd-profile.md"
+    },
+    {
+      "id": "asset-gold-central-banks",
+      "title": "Or — Achats banques centrales et dedollarisation",
+      "source": "asset-profiles.md",
+      "symbols": [
+        "GC=F",
+        "DX-Y.NYB"
+      ],
+      "themes": [
+        "banque-centrale",
+        "refuge",
+        "geopolitique"
+      ],
+      "conditions": {
+        "flags": [
+          "PRICE_MOVE",
+          "ATH_PROXIMITY",
+          "NEWS_LINKED"
+        ],
+        "actors": [
+          "xi-jinping",
+          "poutine"
+        ],
+        "regimes": [
+          "risk-off",
+          "incertain"
+        ],
+        "vix_above": null,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": true,
+      "always_if_theme": false,
+      "priority": "high",
+      "related_chunks": [
+        "asset-gold-drivers",
+        "asset-dollar-index"
+      ],
+      "wordCount": 277,
+      "file": "asset-gold-central-banks.md"
+    },
+    {
+      "id": "asset-gold-drivers",
+      "title": "Or — Trois piliers de valorisation et drivers",
+      "source": "asset-profiles.md",
+      "symbols": [
+        "GC=F",
+        "DX-Y.NYB",
+        "SI=F",
+        "^VIX",
+        "TLT"
+      ],
+      "themes": [
+        "refuge",
+        "taux",
+        "banque-centrale",
+        "fed",
+        "inflation",
+        "geopolitique"
+      ],
+      "conditions": {
+        "flags": [
+          "PRICE_MOVE",
+          "ATH_PROXIMITY",
+          "EXTREME_MOVE",
+          "ZONE_EVENT"
+        ],
+        "actors": [
+          "powell",
+          "lagarde"
+        ],
+        "regimes": [
+          "risk-off",
+          "incertain"
+        ],
+        "vix_above": null,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": true,
+      "always_if_theme": false,
+      "priority": "critical",
+      "related_chunks": [
+        "asset-dollar-index",
+        "asset-silver-profile",
+        "asset-yields-bonds",
+        "inter-carry-trade"
+      ],
+      "wordCount": 251,
+      "file": "asset-gold-drivers.md"
+    },
+    {
+      "id": "asset-jpy-refuge",
+      "title": "Yen japonais — Refuge, carry trade et normalisation BoJ",
+      "source": "asset-profiles.md",
+      "symbols": [
+        "USDJPY=X",
+        "GC=F",
+        "^N225",
+        "^GSPC"
+      ],
+      "themes": [
+        "refuge",
+        "carry-trade",
+        "boj",
+        "taux",
+        "volatilite"
+      ],
+      "conditions": {
+        "flags": [
+          "PRICE_MOVE",
+          "EXTREME_MOVE",
+          "MACRO_SURPRISE"
+        ],
+        "actors": [
+          "ueda"
+        ],
+        "regimes": [
+          "risk-off",
+          "choc-exogene",
+          "incertain"
+        ],
+        "vix_above": 25,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": true,
+      "always_if_theme": false,
+      "priority": "critical",
+      "related_chunks": [
+        "inter-carry-trade",
+        "asset-chf-refuge",
+        "asset-dollar-index"
+      ],
+      "wordCount": 231,
+      "file": "asset-jpy-refuge.md"
+    },
+    {
+      "id": "asset-narration-rules",
+      "title": "Regles de narration des profils d'assets",
+      "source": "asset-profiles.md",
+      "symbols": [],
+      "themes": [
+        "narration",
+        "analyse-technique",
+        "confluence"
+      ],
+      "conditions": {
+        "flags": [],
+        "actors": [],
+        "regimes": [],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "narr-quality-criteria",
+        "narr-causal-chains"
+      ],
+      "wordCount": 172,
+      "file": "asset-narration-rules.md"
+    },
+    {
+      "id": "asset-oil-wti-brent",
+      "title": "Petrole WTI/Brent — OPEP+ et geopolitique",
+      "source": "asset-profiles.md",
+      "symbols": [
+        "CL=F",
+        "BZ=F",
+        "XLE",
+        "GC=F"
+      ],
+      "themes": [
+        "geopolitique",
+        "moyen-orient",
+        "inflation",
+        "recession"
+      ],
+      "conditions": {
+        "flags": [
+          "PRICE_MOVE",
+          "EXTREME_MOVE",
+          "NEWS_LINKED",
+          "POLITICAL_TRIGGER"
+        ],
+        "actors": [
+          "poutine",
+          "trump",
+          "xi-jinping"
+        ],
+        "regimes": [
+          "risk-off",
+          "choc-exogene",
+          "risk-on"
+        ],
+        "vix_above": null,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": true,
+      "always_if_theme": false,
+      "priority": "critical",
+      "related_chunks": [
+        "asset-copper-gas",
+        "asset-dollar-index"
+      ],
+      "wordCount": 119,
+      "file": "asset-oil-wti-brent.md"
+    },
+    {
+      "id": "asset-silver-profile",
+      "title": "Argent — Double nature industrielle et refuge",
+      "source": "asset-profiles.md",
+      "symbols": [
+        "SI=F",
+        "GC=F",
+        "HG=F",
+        "BTC-USD"
+      ],
+      "themes": [
+        "refuge",
+        "momentum",
+        "volatilite",
+        "croissance"
+      ],
+      "conditions": {
+        "flags": [
+          "PRICE_MOVE",
+          "EXTREME_MOVE",
+          "ATH_PROXIMITY",
+          "VOLUME_SPIKE"
+        ],
+        "actors": [],
+        "regimes": [
+          "risk-off",
+          "incertain",
+          "risk-on"
+        ],
+        "vix_above": null,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": true,
+      "always_if_theme": false,
+      "priority": "critical",
+      "related_chunks": [
+        "asset-gold-drivers",
+        "asset-copper-gas"
+      ],
+      "wordCount": 292,
+      "file": "asset-silver-profile.md"
+    },
+    {
+      "id": "asset-sp500-drawdowns",
+      "title": "S&P 500 — Drawdowns historiques et saisonnalite",
+      "source": "asset-profiles.md",
+      "symbols": [
+        "^GSPC",
+        "^IXIC",
+        "^DJI",
+        "^VIX"
+      ],
+      "themes": [
+        "recession",
+        "saisonnalite",
+        "volatilite",
+        "risk-off"
+      ],
+      "conditions": {
+        "flags": [
+          "PRICE_MOVE",
+          "EXTREME_MOVE",
+          "ATH_PROXIMITY"
+        ],
+        "actors": [],
+        "regimes": [
+          "risk-off",
+          "incertain",
+          "choc-exogene"
+        ],
+        "vix_above": 25,
+        "any_symbol_move": true,
+        "seasonality_months": [
+          9,
+          10
+        ]
+      },
+      "always_if_symbol": true,
+      "always_if_theme": false,
+      "priority": "high",
+      "related_chunks": [
+        "asset-sp500-profile",
+        "asset-vix-profile"
+      ],
+      "wordCount": 240,
+      "file": "asset-sp500-drawdowns.md"
+    },
+    {
+      "id": "asset-sp500-profile",
+      "title": "S&P 500 — Drivers, MAG7 et rendement historique",
+      "source": "asset-profiles.md",
+      "symbols": [
+        "^GSPC",
+        "^IXIC",
+        "^DJI",
+        "^VIX",
+        "XLK",
+        "XLF"
+      ],
+      "themes": [
+        "earnings",
+        "fed",
+        "taux",
+        "risk-on",
+        "recession"
+      ],
+      "conditions": {
+        "flags": [
+          "PRICE_MOVE",
+          "EXTREME_MOVE",
+          "ATH_PROXIMITY",
+          "EARNINGS_SURPRISE",
+          "MACRO_SURPRISE"
+        ],
+        "actors": [
+          "powell",
+          "trump"
+        ],
+        "regimes": [
+          "risk-on",
+          "risk-off",
+          "incertain"
+        ],
+        "vix_above": null,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": true,
+      "always_if_theme": false,
+      "priority": "critical",
+      "related_chunks": [
+        "asset-sp500-drawdowns",
+        "asset-vix-profile",
+        "asset-cac40-profile"
+      ],
+      "wordCount": 223,
+      "file": "asset-sp500-profile.md"
+    },
+    {
+      "id": "asset-vix-profile",
+      "title": "VIX — Volatilite implicite et zones de stress",
+      "source": "asset-profiles.md",
+      "symbols": [
+        "^VIX",
+        "^GSPC",
+        "^IXIC"
+      ],
+      "themes": [
+        "volatilite",
+        "risk-off",
+        "risk-on"
+      ],
+      "conditions": {
+        "flags": [
+          "PRICE_MOVE",
+          "EXTREME_MOVE",
+          "RSI_EXTREME"
+        ],
+        "actors": [],
+        "regimes": [
+          "risk-off",
+          "choc-exogene",
+          "risk-on"
+        ],
+        "vix_above": 20,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": true,
+      "always_if_theme": false,
+      "priority": "critical",
+      "related_chunks": [
+        "asset-sp500-profile",
+        "asset-sp500-drawdowns"
+      ],
+      "wordCount": 141,
+      "file": "asset-vix-profile.md"
+    },
+    {
+      "id": "asset-yields-bonds",
+      "title": "Yields US et obligations — Courbe des taux et refuges",
+      "source": "asset-profiles.md",
+      "symbols": [
+        "TLT",
+        "IDTL",
+        "GC=F",
+        "^GSPC",
+        "DX-Y.NYB"
+      ],
+      "themes": [
+        "taux",
+        "fed",
+        "recession",
+        "refuge"
+      ],
+      "conditions": {
+        "flags": [
+          "PRICE_MOVE",
+          "MACRO_SURPRISE"
+        ],
+        "actors": [
+          "powell"
+        ],
+        "regimes": [
+          "risk-off",
+          "incertain",
+          "risk-on"
+        ],
+        "vix_above": null,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": true,
+      "always_if_theme": false,
+      "priority": "critical",
+      "related_chunks": [
+        "asset-gold-drivers",
+        "asset-dollar-index",
+        "asset-sp500-profile"
+      ],
+      "wordCount": 187,
+      "file": "asset-yields-bonds.md"
+    },
+    {
+      "id": "cb-bce-fragmentation",
+      "title": "BCE — Spreads peripheriques et risque de fragmentation",
+      "source": "central-banks.md",
+      "symbols": [
+        "EURUSD=X",
+        "^FCHI",
+        "^GDAXI",
+        "IDTL"
+      ],
+      "themes": [
+        "banque-centrale",
+        "bce",
+        "taux",
+        "dette",
+        "risk-off"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE",
+          "POLITICAL_TRIGGER"
+        ],
+        "actors": [
+          "lagarde",
+          "bce"
+        ],
+        "regimes": [
+          "risk-off",
+          "choc-exogene"
+        ],
+        "vix_above": 25,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "cb-bce-mandat-transmission",
+        "cb-divergences-mecanismes"
+      ],
+      "wordCount": 199,
+      "file": "cb-bce-fragmentation.md"
+    },
+    {
+      "id": "cb-bce-mandat-transmission",
+      "title": "BCE — Mandat, indicateurs et transmission",
+      "source": "central-banks.md",
+      "symbols": [
+        "EURUSD=X",
+        "^FCHI",
+        "^GDAXI",
+        "TLT",
+        "IDTL"
+      ],
+      "themes": [
+        "banque-centrale",
+        "bce",
+        "taux",
+        "inflation"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE"
+        ],
+        "actors": [
+          "lagarde",
+          "bce"
+        ],
+        "regimes": [
+          "risk-off",
+          "risk-on"
+        ],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "cb-bce-fragmentation",
+        "cb-patterns-hawkish-cuts",
+        "cb-divergences-mecanismes"
+      ],
+      "wordCount": 210,
+      "file": "cb-bce-mandat-transmission.md"
+    },
+    {
+      "id": "cb-boe-mandat-fiscal",
+      "title": "BoE — Mandat inflation et interaction fiscale UK",
+      "source": "central-banks.md",
+      "symbols": [
+        "GBPUSD=X",
+        "^FTSE"
+      ],
+      "themes": [
+        "boe",
+        "banque-centrale",
+        "taux",
+        "inflation"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE",
+          "POLITICAL_TRIGGER"
+        ],
+        "actors": [],
+        "regimes": [
+          "incertain"
+        ],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "medium",
+      "related_chunks": [
+        "cb-divergences-mecanismes",
+        "cb-divergences-historiques"
+      ],
+      "wordCount": 251,
+      "file": "cb-boe-mandat-fiscal.md"
+    },
+    {
+      "id": "cb-boj-carry-trade",
+      "title": "BoJ — Carry trade et risque systemique",
+      "source": "central-banks.md",
+      "symbols": [
+        "USDJPY=X",
+        "^N225",
+        "AUDUSD=X",
+        "NZDUSD=X"
+      ],
+      "themes": [
+        "boj",
+        "carry-trade",
+        "banque-centrale",
+        "risk-off",
+        "volatilite"
+      ],
+      "conditions": {
+        "flags": [
+          "CAUSAL_CHAIN",
+          "EXTREME_MOVE"
+        ],
+        "actors": [
+          "ueda",
+          "boj"
+        ],
+        "regimes": [
+          "risk-off",
+          "choc-exogene"
+        ],
+        "vix_above": 25,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "cb-boj-mandat-specificites",
+        "inter-carry-trade",
+        "cb-boj-divergence-fed"
+      ],
+      "wordCount": 238,
+      "file": "cb-boj-carry-trade.md"
+    },
+    {
+      "id": "cb-boj-divergence-fed",
+      "title": "BoJ — Divergence 2022 et enseignements",
+      "source": "central-banks.md",
+      "symbols": [
+        "USDJPY=X",
+        "^N225",
+        "DX-Y.NYB"
+      ],
+      "themes": [
+        "boj",
+        "fed",
+        "banque-centrale",
+        "taux",
+        "carry-trade",
+        "inflation"
+      ],
+      "conditions": {
+        "flags": [
+          "CAUSAL_CHAIN",
+          "PRICE_MOVE"
+        ],
+        "actors": [
+          "ueda",
+          "boj",
+          "powell",
+          "fed"
+        ],
+        "regimes": [
+          "incertain",
+          "rotation"
+        ],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "medium",
+      "related_chunks": [
+        "cb-boj-carry-trade",
+        "cb-boj-mandat-specificites",
+        "cb-divergences-mecanismes"
+      ],
+      "wordCount": 206,
+      "file": "cb-boj-divergence-fed.md"
+    },
+    {
+      "id": "cb-boj-mandat-specificites",
+      "title": "BoJ — Mandat, YCC et interventions forex",
+      "source": "central-banks.md",
+      "symbols": [
+        "USDJPY=X",
+        "^N225"
+      ],
+      "themes": [
+        "boj",
+        "banque-centrale",
+        "taux"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE"
+        ],
+        "actors": [
+          "ueda",
+          "boj"
+        ],
+        "regimes": [
+          "risk-off",
+          "incertain"
+        ],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "cb-boj-carry-trade",
+        "cb-boj-divergence-fed"
+      ],
+      "wordCount": 221,
+      "file": "cb-boj-mandat-specificites.md"
+    },
+    {
+      "id": "cb-discours-analyse",
+      "title": "Analyse des discours de banquiers centraux",
+      "source": "central-banks.md",
+      "symbols": [
+        "DX-Y.NYB",
+        "EURUSD=X",
+        "USDJPY=X",
+        "^GSPC"
+      ],
+      "themes": [
+        "banque-centrale",
+        "fed",
+        "bce",
+        "boj",
+        "taux",
+        "pivot",
+        "ton"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE",
+          "POLITICAL_TRIGGER"
+        ],
+        "actors": [
+          "powell",
+          "lagarde",
+          "ueda",
+          "fed",
+          "bce",
+          "boj"
+        ],
+        "regimes": [
+          "incertain"
+        ],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "cb-fed-pivot-signals",
+        "cb-boj-mandat-specificites",
+        "cb-patterns-fed-put"
+      ],
+      "wordCount": 234,
+      "file": "cb-discours-analyse.md"
+    },
+    {
+      "id": "cb-divergences-historiques",
+      "title": "Divergences inter-BC — Cas historiques majeurs",
+      "source": "central-banks.md",
+      "symbols": [
+        "EURUSD=X",
+        "USDJPY=X",
+        "DX-Y.NYB"
+      ],
+      "themes": [
+        "banque-centrale",
+        "fed",
+        "bce",
+        "boj",
+        "taux",
+        "qe-qt"
+      ],
+      "conditions": {
+        "flags": [
+          "CAUSAL_CHAIN"
+        ],
+        "actors": [
+          "powell",
+          "lagarde",
+          "fed",
+          "bce",
+          "boj"
+        ],
+        "regimes": [
+          "risk-on",
+          "risk-off",
+          "incertain"
+        ],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "medium",
+      "related_chunks": [
+        "cb-divergences-mecanismes",
+        "inter-taux-moteur-forex",
+        "cb-fed-qe-qt-bilan"
+      ],
+      "wordCount": 279,
+      "file": "cb-divergences-historiques.md"
+    },
+    {
+      "id": "cb-divergences-mecanismes",
+      "title": "Divergences inter-banques centrales — Mecanismes",
+      "source": "central-banks.md",
+      "symbols": [
+        "EURUSD=X",
+        "USDJPY=X",
+        "GBPUSD=X",
+        "DX-Y.NYB"
+      ],
+      "themes": [
+        "banque-centrale",
+        "fed",
+        "bce",
+        "boj",
+        "boe",
+        "taux",
+        "inflation"
+      ],
+      "conditions": {
+        "flags": [
+          "CAUSAL_CHAIN",
+          "PRICE_MOVE"
+        ],
+        "actors": [
+          "powell",
+          "lagarde",
+          "ueda",
+          "fed",
+          "bce",
+          "boj"
+        ],
+        "regimes": [
+          "risk-on",
+          "risk-off",
+          "incertain",
+          "rotation"
+        ],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "cb-divergences-historiques",
+        "inter-taux-moteur-forex",
+        "cb-boj-divergence-fed"
+      ],
+      "wordCount": 233,
+      "file": "cb-divergences-mecanismes.md"
+    },
+    {
+      "id": "cb-fed-dot-plot",
+      "title": "Fed — Projections FOMC et dot plot",
+      "source": "central-banks.md",
+      "symbols": [
+        "DX-Y.NYB",
+        "^GSPC",
+        "TLT",
+        "^VIX"
+      ],
+      "themes": [
+        "banque-centrale",
+        "fed",
+        "taux",
+        "inflation",
+        "croissance",
+        "emploi"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE"
+        ],
+        "actors": [
+          "powell",
+          "fed"
+        ],
+        "regimes": [
+          "risk-off",
+          "risk-on",
+          "incertain"
+        ],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": [
+          3,
+          6,
+          9,
+          12
+        ]
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "cb-fed-dual-mandate",
+        "cb-fed-fedwatch",
+        "cb-fed-pivot-signals"
+      ],
+      "wordCount": 205,
+      "file": "cb-fed-dot-plot.md"
+    },
+    {
+      "id": "cb-fed-dual-mandate",
+      "title": "Fed — Mandat dual et indicateurs cles",
+      "source": "central-banks.md",
+      "symbols": [
+        "DX-Y.NYB",
+        "GC=F",
+        "^GSPC",
+        "^VIX"
+      ],
+      "themes": [
+        "banque-centrale",
+        "fed",
+        "taux",
+        "inflation",
+        "emploi"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE"
+        ],
+        "actors": [
+          "powell",
+          "fed"
+        ],
+        "regimes": [
+          "risk-off",
+          "risk-on"
+        ],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "cb-fed-transmission",
+        "cb-fed-pivot-signals",
+        "cb-fed-fedwatch"
+      ],
+      "wordCount": 184,
+      "file": "cb-fed-dual-mandate.md"
+    },
+    {
+      "id": "cb-fed-fedwatch",
+      "title": "Fed — FedWatch Tool utilisation avancee",
+      "source": "central-banks.md",
+      "symbols": [
+        "DX-Y.NYB",
+        "^GSPC",
+        "TLT"
+      ],
+      "themes": [
+        "banque-centrale",
+        "fed",
+        "taux"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE"
+        ],
+        "actors": [
+          "powell",
+          "fed"
+        ],
+        "regimes": [
+          "risk-off",
+          "risk-on",
+          "incertain"
+        ],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": false,
+      "priority": "high",
+      "related_chunks": [
+        "cb-fed-dot-plot",
+        "cb-fed-dual-mandate",
+        "cb-fed-pivot-signals"
+      ],
+      "wordCount": 230,
+      "file": "cb-fed-fedwatch.md"
+    },
+    {
+      "id": "cb-fed-money-supply",
+      "title": "Fed — Masses monetaires M1, M2, M3",
+      "source": "central-banks.md",
+      "symbols": [
+        "^GSPC",
+        "DX-Y.NYB",
+        "GC=F",
+        "BTC-USD"
+      ],
+      "themes": [
+        "banque-centrale",
+        "fed",
+        "m2",
+        "liquidite",
+        "inflation"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE"
+        ],
+        "actors": [
+          "fed"
+        ],
+        "regimes": [
+          "risk-on",
+          "risk-off"
+        ],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "medium",
+      "related_chunks": [
+        "cb-fed-qe-qt-bilan",
+        "cb-fed-transmission"
+      ],
+      "wordCount": 191,
+      "file": "cb-fed-money-supply.md"
+    },
+    {
+      "id": "cb-fed-pivot-signals",
+      "title": "Fed — Signaux de pivot et frontloading",
+      "source": "central-banks.md",
+      "symbols": [
+        "DX-Y.NYB",
+        "GC=F",
+        "^GSPC",
+        "^IXIC",
+        "TLT"
+      ],
+      "themes": [
+        "banque-centrale",
+        "fed",
+        "pivot",
+        "taux",
+        "ton"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE",
+          "POLITICAL_TRIGGER"
+        ],
+        "actors": [
+          "powell",
+          "fed"
+        ],
+        "regimes": [
+          "risk-off",
+          "risk-on",
+          "incertain"
+        ],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "cb-fed-dual-mandate",
+        "cb-fed-fedwatch",
+        "cb-patterns-fed-put"
+      ],
+      "wordCount": 220,
+      "file": "cb-fed-pivot-signals.md"
+    },
+    {
+      "id": "cb-fed-qe-qt-bilan",
+      "title": "Fed — QE, QT et bilan de la Fed",
+      "source": "central-banks.md",
+      "symbols": [
+        "DX-Y.NYB",
+        "^GSPC",
+        "^IXIC",
+        "^VIX",
+        "TLT",
+        "EURUSD=X"
+      ],
+      "themes": [
+        "banque-centrale",
+        "fed",
+        "qe-qt",
+        "liquidite",
+        "taux"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE",
+          "POLITICAL_TRIGGER"
+        ],
+        "actors": [
+          "fed",
+          "powell"
+        ],
+        "regimes": [
+          "risk-off",
+          "risk-on"
+        ],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "cb-fed-transmission",
+        "cb-fed-money-supply",
+        "cb-divergences-mecanismes"
+      ],
+      "wordCount": 239,
+      "file": "cb-fed-qe-qt-bilan.md"
+    },
+    {
+      "id": "cb-fed-rate-cut-stats",
+      "title": "Fed — Statistiques historiques des baisses de taux",
+      "source": "central-banks.md",
+      "symbols": [
+        "^GSPC",
+        "DX-Y.NYB",
+        "TLT"
+      ],
+      "themes": [
+        "banque-centrale",
+        "fed",
+        "taux",
+        "recession"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE"
+        ],
+        "actors": [
+          "powell",
+          "fed"
+        ],
+        "regimes": [
+          "risk-off",
+          "incertain"
+        ],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": false,
+      "priority": "high",
+      "related_chunks": [
+        "cb-fed-pivot-signals",
+        "cb-fed-transmission"
+      ],
+      "wordCount": 215,
+      "file": "cb-fed-rate-cut-stats.md"
+    },
+    {
+      "id": "cb-fed-transmission",
+      "title": "Fed — Mecanisme de transmission aux marches",
+      "source": "central-banks.md",
+      "symbols": [
+        "DX-Y.NYB",
+        "GC=F",
+        "^GSPC",
+        "^IXIC",
+        "TLT",
+        "^VIX"
+      ],
+      "themes": [
+        "banque-centrale",
+        "fed",
+        "taux",
+        "refuge",
+        "volatilite"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE",
+          "POLITICAL_TRIGGER"
+        ],
+        "actors": [
+          "powell",
+          "fed"
+        ],
+        "regimes": [
+          "risk-off",
+          "risk-on"
+        ],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "cb-fed-dual-mandate",
+        "cb-fed-qe-qt-bilan"
+      ],
+      "wordCount": 181,
+      "file": "cb-fed-transmission.md"
+    },
+    {
+      "id": "cb-narration-rules",
+      "title": "Regles de narration banques centrales",
+      "source": "central-banks.md",
+      "symbols": [],
+      "themes": [
+        "banque-centrale",
+        "narration",
+        "ton",
+        "structure-episode"
+      ],
+      "conditions": {
+        "flags": [],
+        "actors": [
+          "powell",
+          "lagarde",
+          "ueda",
+          "fed",
+          "bce",
+          "boj"
+        ],
+        "regimes": [],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "medium",
+      "related_chunks": [
+        "cb-discours-analyse",
+        "cb-patterns-fed-put",
+        "narr-causal-chains"
+      ],
+      "wordCount": 253,
+      "file": "cb-narration-rules.md"
+    },
+    {
+      "id": "cb-patterns-fed-put",
+      "title": "Patterns marche — Fed put, pivot et anticipations excessives",
+      "source": "central-banks.md",
+      "symbols": [
+        "^GSPC",
+        "^IXIC",
+        "^VIX",
+        "DX-Y.NYB"
+      ],
+      "themes": [
+        "fed",
+        "banque-centrale",
+        "taux",
+        "pivot",
+        "volatilite"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE",
+          "SENTIMENT_EXTREME",
+          "PRICE_MOVE"
+        ],
+        "actors": [
+          "powell",
+          "fed"
+        ],
+        "regimes": [
+          "risk-off",
+          "incertain"
+        ],
+        "vix_above": 20,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "cb-fed-pivot-signals",
+        "cb-fed-rate-cut-stats",
+        "cb-patterns-hawkish-cuts"
+      ],
+      "wordCount": 276,
+      "file": "cb-patterns-fed-put.md"
+    },
+    {
+      "id": "cb-patterns-hawkish-cuts",
+      "title": "Patterns marche — Baisses hawkish et data-dependance",
+      "source": "central-banks.md",
+      "symbols": [
+        "EURUSD=X",
+        "^GSPC",
+        "DX-Y.NYB",
+        "^FCHI"
+      ],
+      "themes": [
+        "banque-centrale",
+        "fed",
+        "bce",
+        "taux",
+        "pivot",
+        "inflation"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE",
+          "CAUSAL_CHAIN"
+        ],
+        "actors": [
+          "powell",
+          "lagarde",
+          "fed",
+          "bce"
+        ],
+        "regimes": [
+          "incertain",
+          "rotation"
+        ],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "cb-patterns-fed-put",
+        "cb-bce-mandat-transmission",
+        "cb-discours-analyse"
+      ],
+      "wordCount": 270,
+      "file": "cb-patterns-hawkish-cuts.md"
+    },
+    {
+      "id": "cot-categories-traders",
+      "title": "COT — Categories de traders et rapports",
+      "source": "cot-positioning.md",
+      "symbols": [
+        "EURUSD=X",
+        "GC=F",
+        "CL=F",
+        "^GSPC",
+        "BTC-USD"
+      ],
+      "themes": [
+        "cot-positioning"
+      ],
+      "conditions": {
+        "flags": [
+          "COT_DIVERGENCE",
+          "SENTIMENT_EXTREME"
+        ],
+        "actors": [],
+        "regimes": [],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "cot-signaux-cles",
+        "cot-narration-rules",
+        "cot-exemples"
+      ],
+      "wordCount": 222,
+      "file": "cot-categories-traders.md"
+    },
+    {
+      "id": "cot-exemples",
+      "title": "COT — Exemples de narration",
+      "source": "cot-positioning.md",
+      "symbols": [
+        "EURUSD=X",
+        "GC=F",
+        "^GSPC",
+        "BTC-USD"
+      ],
+      "themes": [
+        "cot-positioning",
+        "narration"
+      ],
+      "conditions": {
+        "flags": [
+          "COT_DIVERGENCE",
+          "SENTIMENT_EXTREME"
+        ],
+        "actors": [],
+        "regimes": [],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "medium",
+      "related_chunks": [
+        "cot-signaux-cles",
+        "cot-narration-rules",
+        "cot-categories-traders"
+      ],
+      "wordCount": 284,
+      "file": "cot-exemples.md"
+    },
+    {
+      "id": "cot-narration-rules",
+      "title": "COT — Regles de narration et vocabulaire",
+      "source": "cot-positioning.md",
+      "symbols": [],
+      "themes": [
+        "cot-positioning",
+        "narration",
+        "ton"
+      ],
+      "conditions": {
+        "flags": [
+          "COT_DIVERGENCE"
+        ],
+        "actors": [],
+        "regimes": [],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "medium",
+      "related_chunks": [
+        "cot-signaux-cles",
+        "cot-categories-traders",
+        "cot-exemples"
+      ],
+      "wordCount": 255,
+      "file": "cot-narration-rules.md"
+    },
+    {
+      "id": "cot-signaux-cles",
+      "title": "COT — Signaux cles a detecter",
+      "source": "cot-positioning.md",
+      "symbols": [
+        "EURUSD=X",
+        "GC=F",
+        "CL=F",
+        "^GSPC",
+        "BTC-USD",
+        "USDJPY=X"
+      ],
+      "themes": [
+        "cot-positioning",
+        "volatilite",
+        "mean-reversion"
+      ],
+      "conditions": {
+        "flags": [
+          "COT_DIVERGENCE",
+          "SENTIMENT_EXTREME"
+        ],
+        "actors": [],
+        "regimes": [],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "cot-categories-traders",
+        "cot-narration-rules",
+        "cot-exemples"
+      ],
+      "wordCount": 248,
+      "file": "cot-signaux-cles.md"
+    },
+    {
+      "id": "geo-3-phases-conflit",
+      "title": "Les 3 phases d'un conflit sur les marchés",
+      "source": "geopolitics.md",
+      "symbols": [
+        "GC=F",
+        "EURUSD=X",
+        "USDJPY=X",
+        "^VIX",
+        "BTC-USD"
+      ],
+      "themes": [
+        "geopolitique",
+        "risk-off",
+        "refuge",
+        "volatilite"
+      ],
+      "conditions": {
+        "flags": [
+          "POLITICAL_TRIGGER",
+          "NEWS_CLUSTER",
+          "EXTREME_MOVE"
+        ],
+        "actors": [],
+        "regimes": [
+          "choc-exogene"
+        ],
+        "vix_above": 20,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "geo-regle-fondamentale",
+        "geo-reaction-vs-anticipation"
+      ],
+      "wordCount": 218,
+      "file": "geo-3-phases-conflit.md"
+    },
+    {
+      "id": "geo-asymetries-regionales",
+      "title": "Asymétries régionales face aux chocs énergétiques",
+      "source": "geopolitics.md",
+      "symbols": [
+        "CL=F",
+        "BZ=F",
+        "NG=F",
+        "^GSPC",
+        "^GDAXI",
+        "^FCHI",
+        "^N225",
+        "^HSI",
+        "XLE",
+        "USDJPY=X"
+      ],
+      "themes": [
+        "geopolitique",
+        "moyen-orient",
+        "inflation",
+        "rotation-sectorielle"
+      ],
+      "conditions": {
+        "flags": [
+          "POLITICAL_TRIGGER",
+          "CAUSAL_CHAIN",
+          "PRICE_MOVE"
+        ],
+        "actors": [],
+        "regimes": [
+          "choc-exogene"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "geo-moyen-orient-chaine",
+        "geo-russie-ukraine-chaine"
+      ],
+      "wordCount": 266,
+      "file": "geo-asymetries-regionales.md"
+    },
+    {
+      "id": "geo-chine-taiwan",
+      "title": "Chine-Taïwan — Risque semi-conducteurs",
+      "source": "geopolitics.md",
+      "symbols": [
+        "^IXIC",
+        "^N225",
+        "^HSI",
+        "^VIX",
+        "DX-Y.NYB",
+        "XLK"
+      ],
+      "themes": [
+        "geopolitique",
+        "chine-taiwan",
+        "volatilite",
+        "risk-off"
+      ],
+      "conditions": {
+        "flags": [
+          "POLITICAL_TRIGGER",
+          "NEWS_CLUSTER",
+          "CAUSAL_CHAIN"
+        ],
+        "actors": [
+          "xi-jinping"
+        ],
+        "regimes": [
+          "choc-exogene"
+        ],
+        "vix_above": 20,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "geo-tarifs-chaine",
+        "geo-asymetries-regionales"
+      ],
+      "wordCount": 160,
+      "file": "geo-chine-taiwan.md"
+    },
+    {
+      "id": "geo-coupe-circuits",
+      "title": "Coupe-circuits et flash crash crypto",
+      "source": "geopolitics.md",
+      "symbols": [
+        "^GSPC",
+        "^DJI",
+        "BTC-USD",
+        "ETH-USD",
+        "SOL-USD"
+      ],
+      "themes": [
+        "volatilite",
+        "liquidite",
+        "risk-off"
+      ],
+      "conditions": {
+        "flags": [
+          "EXTREME_MOVE",
+          "VOLUME_SPIKE"
+        ],
+        "actors": [],
+        "regimes": [
+          "choc-exogene"
+        ],
+        "vix_above": 30,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": false,
+      "priority": "medium",
+      "related_chunks": [
+        "geo-flash-crash"
+      ],
+      "wordCount": 175,
+      "file": "geo-coupe-circuits.md"
+    },
+    {
+      "id": "geo-crise-bancaire",
+      "title": "Crises bancaires — Mécanique et chaîne causale",
+      "source": "geopolitics.md",
+      "symbols": [
+        "XLF",
+        "GC=F",
+        "BTC-USD",
+        "TLT",
+        "^VIX"
+      ],
+      "themes": [
+        "risk-off",
+        "refuge",
+        "taux",
+        "liquidite"
+      ],
+      "conditions": {
+        "flags": [
+          "EXTREME_MOVE",
+          "NEWS_CLUSTER",
+          "CAUSAL_CHAIN"
+        ],
+        "actors": [
+          "fed",
+          "bce"
+        ],
+        "regimes": [
+          "choc-exogene",
+          "risk-off"
+        ],
+        "vix_above": 25,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": false,
+      "priority": "high",
+      "related_chunks": [
+        "geo-crise-bancaire-cas",
+        "geo-krachs-patterns"
+      ],
+      "wordCount": 221,
+      "file": "geo-crise-bancaire.md"
+    },
+    {
+      "id": "geo-crise-bancaire-cas",
+      "title": "Crises bancaires — Cas historiques (SVB, CS, Lehman)",
+      "source": "geopolitics.md",
+      "symbols": [
+        "XLF",
+        "GC=F",
+        "BTC-USD",
+        "^GSPC"
+      ],
+      "themes": [
+        "risk-off",
+        "taux",
+        "liquidite"
+      ],
+      "conditions": {
+        "flags": [
+          "NEWS_CLUSTER",
+          "EXTREME_MOVE"
+        ],
+        "actors": [
+          "fed"
+        ],
+        "regimes": [
+          "choc-exogene",
+          "risk-off"
+        ],
+        "vix_above": 25,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": false,
+      "priority": "medium",
+      "related_chunks": [
+        "geo-crise-bancaire",
+        "geo-krachs-patterns"
+      ],
+      "wordCount": 186,
+      "file": "geo-crise-bancaire-cas.md"
+    },
+    {
+      "id": "geo-flash-crash",
+      "title": "Flash crashes — Types et réaction",
+      "source": "geopolitics.md",
+      "symbols": [
+        "BTC-USD",
+        "ETH-USD",
+        "^GSPC",
+        "^IXIC",
+        "EURUSD=X",
+        "USDJPY=X"
+      ],
+      "themes": [
+        "volatilite",
+        "liquidite",
+        "risk-off"
+      ],
+      "conditions": {
+        "flags": [
+          "EXTREME_MOVE",
+          "VOLUME_SPIKE"
+        ],
+        "actors": [],
+        "regimes": [
+          "choc-exogene"
+        ],
+        "vix_above": 25,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": false,
+      "priority": "high",
+      "related_chunks": [
+        "inter-bitcoin-hybride",
+        "geo-coupe-circuits"
+      ],
+      "wordCount": 179,
+      "file": "geo-flash-crash.md"
+    },
+    {
+      "id": "geo-flux-capitaux-crash",
+      "title": "Où va l'argent pendant un crash",
+      "source": "geopolitics.md",
+      "symbols": [
+        "GC=F",
+        "BTC-USD",
+        "TLT",
+        "DX-Y.NYB",
+        "USDJPY=X",
+        "^VIX"
+      ],
+      "themes": [
+        "risk-off",
+        "refuge",
+        "liquidite"
+      ],
+      "conditions": {
+        "flags": [
+          "EXTREME_MOVE",
+          "SENTIMENT_EXTREME"
+        ],
+        "actors": [],
+        "regimes": [
+          "risk-off",
+          "choc-exogene"
+        ],
+        "vix_above": 25,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "geo-krachs-patterns",
+        "geo-piege-or-buy-dip"
+      ],
+      "wordCount": 174,
+      "file": "geo-flux-capitaux-crash.md"
+    },
+    {
+      "id": "geo-iran-israel",
+      "title": "Spécificité Iran-Israël",
+      "source": "geopolitics.md",
+      "symbols": [
+        "CL=F",
+        "BZ=F",
+        "GC=F"
+      ],
+      "themes": [
+        "geopolitique",
+        "moyen-orient"
+      ],
+      "conditions": {
+        "flags": [
+          "POLITICAL_TRIGGER",
+          "NEWS_CLUSTER"
+        ],
+        "actors": [
+          "trump"
+        ],
+        "regimes": [
+          "choc-exogene"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "medium",
+      "related_chunks": [
+        "geo-moyen-orient-chaine",
+        "geo-moyen-orient-gravite"
+      ],
+      "wordCount": 153,
+      "file": "geo-iran-israel.md"
+    },
+    {
+      "id": "geo-krachs-fed-reaction",
+      "title": "Comment la Fed réagit aux crises",
+      "source": "geopolitics.md",
+      "symbols": [
+        "^GSPC",
+        "TLT",
+        "^VIX"
+      ],
+      "themes": [
+        "fed",
+        "taux",
+        "qe-qt",
+        "liquidite"
+      ],
+      "conditions": {
+        "flags": [
+          "EXTREME_MOVE",
+          "MACRO_SURPRISE"
+        ],
+        "actors": [
+          "fed",
+          "powell"
+        ],
+        "regimes": [
+          "risk-off",
+          "choc-exogene"
+        ],
+        "vix_above": 25,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": false,
+      "priority": "medium",
+      "related_chunks": [
+        "geo-krachs-patterns",
+        "geo-crise-bancaire"
+      ],
+      "wordCount": 173,
+      "file": "geo-krachs-fed-reaction.md"
+    },
+    {
+      "id": "geo-krachs-patterns",
+      "title": "Krachs boursiers — Patterns historiques et signaux",
+      "source": "geopolitics.md",
+      "symbols": [
+        "^GSPC",
+        "^DJI",
+        "^IXIC",
+        "^VIX"
+      ],
+      "themes": [
+        "risk-off",
+        "volatilite",
+        "liquidite",
+        "momentum"
+      ],
+      "conditions": {
+        "flags": [
+          "EXTREME_MOVE",
+          "SENTIMENT_EXTREME"
+        ],
+        "actors": [
+          "fed"
+        ],
+        "regimes": [
+          "risk-off",
+          "choc-exogene"
+        ],
+        "vix_above": 30,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": false,
+      "priority": "high",
+      "related_chunks": [
+        "geo-krachs-fed-reaction",
+        "geo-flux-capitaux-crash",
+        "geo-crise-bancaire"
+      ],
+      "wordCount": 219,
+      "file": "geo-krachs-patterns.md"
+    },
+    {
+      "id": "geo-moyen-orient-ancrage",
+      "title": "Moyen-Orient — Points d'ancrage narratifs",
+      "source": "geopolitics.md",
+      "symbols": [
+        "CL=F",
+        "BZ=F"
+      ],
+      "themes": [
+        "geopolitique",
+        "moyen-orient",
+        "narration"
+      ],
+      "conditions": {
+        "flags": [
+          "POLITICAL_TRIGGER",
+          "NEWS_CLUSTER"
+        ],
+        "actors": [],
+        "regimes": [
+          "choc-exogene"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "medium",
+      "related_chunks": [
+        "geo-moyen-orient-chaine",
+        "geo-moyen-orient-gravite"
+      ],
+      "wordCount": 154,
+      "file": "geo-moyen-orient-ancrage.md"
+    },
+    {
+      "id": "geo-moyen-orient-chaine",
+      "title": "Moyen-Orient — Chaîne causale pétrole",
+      "source": "geopolitics.md",
+      "symbols": [
+        "CL=F",
+        "BZ=F",
+        "GC=F",
+        "XLE",
+        "EURUSD=X",
+        "AUDUSD=X",
+        "NZDUSD=X",
+        "DX-Y.NYB"
+      ],
+      "themes": [
+        "geopolitique",
+        "moyen-orient",
+        "refuge",
+        "inflation"
+      ],
+      "conditions": {
+        "flags": [
+          "POLITICAL_TRIGGER",
+          "NEWS_CLUSTER",
+          "CAUSAL_CHAIN"
+        ],
+        "actors": [],
+        "regimes": [
+          "choc-exogene"
+        ],
+        "vix_above": 20,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "geo-moyen-orient-gravite",
+        "geo-iran-israel",
+        "geo-moyen-orient-ancrage",
+        "geo-asymetries-regionales"
+      ],
+      "wordCount": 135,
+      "file": "geo-moyen-orient-chaine.md"
+    },
+    {
+      "id": "geo-moyen-orient-gravite",
+      "title": "Moyen-Orient — Niveaux de gravité et impact pétrole",
+      "source": "geopolitics.md",
+      "symbols": [
+        "CL=F",
+        "BZ=F"
+      ],
+      "themes": [
+        "geopolitique",
+        "moyen-orient"
+      ],
+      "conditions": {
+        "flags": [
+          "POLITICAL_TRIGGER",
+          "NEWS_CLUSTER"
+        ],
+        "actors": [],
+        "regimes": [
+          "choc-exogene"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "geo-moyen-orient-chaine",
+        "geo-iran-israel",
+        "geo-moyen-orient-ancrage"
+      ],
+      "wordCount": 173,
+      "file": "geo-moyen-orient-gravite.md"
+    },
+    {
+      "id": "geo-piege-or-buy-dip",
+      "title": "Piège de l'or en crash et prudence buy-the-dip",
+      "source": "geopolitics.md",
+      "symbols": [
+        "GC=F",
+        "^GSPC",
+        "^IXIC"
+      ],
+      "themes": [
+        "refuge",
+        "risk-off",
+        "mean-reversion",
+        "volatilite"
+      ],
+      "conditions": {
+        "flags": [
+          "EXTREME_MOVE",
+          "PRICE_MOVE"
+        ],
+        "actors": [],
+        "regimes": [
+          "risk-off"
+        ],
+        "vix_above": 25,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": true,
+      "always_if_theme": false,
+      "priority": "medium",
+      "related_chunks": [
+        "geo-flux-capitaux-crash",
+        "geo-krachs-patterns"
+      ],
+      "wordCount": 187,
+      "file": "geo-piege-or-buy-dip.md"
+    },
+    {
+      "id": "geo-priorite-geopolitique",
+      "title": "Règle de priorité géopolitique vs technique",
+      "source": "geopolitics.md",
+      "symbols": [],
+      "themes": [
+        "geopolitique",
+        "analyse-technique",
+        "narration"
+      ],
+      "conditions": {
+        "flags": [
+          "POLITICAL_TRIGGER",
+          "NEWS_CLUSTER"
+        ],
+        "actors": [],
+        "regimes": [
+          "choc-exogene"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "geo-regle-fondamentale",
+        "geo-sur-narrativisation"
+      ],
+      "wordCount": 173,
+      "file": "geo-priorite-geopolitique.md"
+    },
+    {
+      "id": "geo-reaction-vs-anticipation",
+      "title": "Trading de réaction vs anticipation + outils de suivi",
+      "source": "geopolitics.md",
+      "symbols": [
+        "BTC-USD",
+        "CL=F",
+        "^VIX"
+      ],
+      "themes": [
+        "geopolitique",
+        "narration",
+        "volatilite"
+      ],
+      "conditions": {
+        "flags": [
+          "POLITICAL_TRIGGER",
+          "EXTREME_MOVE"
+        ],
+        "actors": [],
+        "regimes": [
+          "choc-exogene",
+          "incertain"
+        ],
+        "vix_above": 20,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "medium",
+      "related_chunks": [
+        "geo-3-phases-conflit",
+        "geo-regle-fondamentale"
+      ],
+      "wordCount": 200,
+      "file": "geo-reaction-vs-anticipation.md"
+    },
+    {
+      "id": "geo-regle-fondamentale",
+      "title": "Règle fondamentale — Géopolitique = catalyseur, pas sujet",
+      "source": "geopolitics.md",
+      "symbols": [],
+      "themes": [
+        "geopolitique"
+      ],
+      "conditions": {
+        "flags": [
+          "POLITICAL_TRIGGER",
+          "NEWS_CLUSTER",
+          "NEWS_LINKED"
+        ],
+        "actors": [],
+        "regimes": [
+          "choc-exogene"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "geo-priorite-geopolitique",
+        "geo-sur-narrativisation"
+      ],
+      "wordCount": 157,
+      "file": "geo-regle-fondamentale.md"
+    },
+    {
+      "id": "geo-russie-ukraine-ble",
+      "title": "Russie-Ukraine — Dynamique du blé",
+      "source": "geopolitics.md",
+      "symbols": [
+        "ZW=F"
+      ],
+      "themes": [
+        "geopolitique",
+        "russie-ukraine",
+        "inflation"
+      ],
+      "conditions": {
+        "flags": [
+          "POLITICAL_TRIGGER",
+          "NEWS_CLUSTER",
+          "PRICE_MOVE"
+        ],
+        "actors": [
+          "poutine"
+        ],
+        "regimes": [
+          "choc-exogene"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": true,
+      "always_if_theme": false,
+      "priority": "medium",
+      "related_chunks": [
+        "geo-russie-ukraine-chaine"
+      ],
+      "wordCount": 146,
+      "file": "geo-russie-ukraine-ble.md"
+    },
+    {
+      "id": "geo-russie-ukraine-chaine",
+      "title": "Russie-Ukraine — Chaîne causale gaz/blé/défense",
+      "source": "geopolitics.md",
+      "symbols": [
+        "NG=F",
+        "ZW=F",
+        "^GDAXI",
+        "^FCHI",
+        "GC=F",
+        "EURUSD=X"
+      ],
+      "themes": [
+        "geopolitique",
+        "russie-ukraine",
+        "inflation",
+        "refuge"
+      ],
+      "conditions": {
+        "flags": [
+          "POLITICAL_TRIGGER",
+          "NEWS_CLUSTER",
+          "CAUSAL_CHAIN"
+        ],
+        "actors": [
+          "poutine"
+        ],
+        "regimes": [
+          "choc-exogene"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "geo-russie-ukraine-ble",
+        "geo-russie-ukraine-phases",
+        "geo-asymetries-regionales"
+      ],
+      "wordCount": 149,
+      "file": "geo-russie-ukraine-chaine.md"
+    },
+    {
+      "id": "geo-russie-ukraine-phases",
+      "title": "Russie-Ukraine — Narration selon les phases",
+      "source": "geopolitics.md",
+      "symbols": [
+        "NG=F",
+        "^GDAXI",
+        "GC=F",
+        "EURUSD=X"
+      ],
+      "themes": [
+        "geopolitique",
+        "russie-ukraine",
+        "narration"
+      ],
+      "conditions": {
+        "flags": [
+          "POLITICAL_TRIGGER",
+          "NEWS_CLUSTER"
+        ],
+        "actors": [
+          "poutine"
+        ],
+        "regimes": [
+          "choc-exogene"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "medium",
+      "related_chunks": [
+        "geo-russie-ukraine-chaine",
+        "geo-russie-ukraine-ble"
+      ],
+      "wordCount": 164,
+      "file": "geo-russie-ukraine-phases.md"
+    },
+    {
+      "id": "geo-sur-narrativisation",
+      "title": "Pièges — Sur-narrativisation et extrapolation",
+      "source": "geopolitics.md",
+      "symbols": [
+        "DX-Y.NYB",
+        "^GSPC"
+      ],
+      "themes": [
+        "geopolitique",
+        "narration"
+      ],
+      "conditions": {
+        "flags": [
+          "POLITICAL_TRIGGER",
+          "NEWS_CLUSTER"
+        ],
+        "actors": [],
+        "regimes": [],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "geo-regle-fondamentale",
+        "geo-priorite-geopolitique"
+      ],
+      "wordCount": 186,
+      "file": "geo-sur-narrativisation.md"
+    },
+    {
+      "id": "geo-tarifs-acteurs",
+      "title": "Tarifs — Impact par acteur",
+      "source": "geopolitics.md",
+      "symbols": [
+        "^GSPC",
+        "^IXIC",
+        "^GDAXI",
+        "^FCHI",
+        "^VIX",
+        "DX-Y.NYB"
+      ],
+      "themes": [
+        "tarifs",
+        "geopolitique"
+      ],
+      "conditions": {
+        "flags": [
+          "POLITICAL_TRIGGER",
+          "NEWS_CLUSTER"
+        ],
+        "actors": [
+          "trump",
+          "xi-jinping"
+        ],
+        "regimes": [
+          "choc-exogene",
+          "incertain"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "medium",
+      "related_chunks": [
+        "geo-tarifs-chaine",
+        "geo-tarifs-obligataire"
+      ],
+      "wordCount": 180,
+      "file": "geo-tarifs-acteurs.md"
+    },
+    {
+      "id": "geo-tarifs-chaine",
+      "title": "Tarifs douaniers — Chaîne causale et pattern d'escalade",
+      "source": "geopolitics.md",
+      "symbols": [
+        "^GSPC",
+        "^IXIC",
+        "^GDAXI",
+        "^FCHI",
+        "DX-Y.NYB",
+        "^VIX",
+        "EURUSD=X",
+        "TLT"
+      ],
+      "themes": [
+        "tarifs",
+        "geopolitique",
+        "inflation",
+        "volatilite"
+      ],
+      "conditions": {
+        "flags": [
+          "POLITICAL_TRIGGER",
+          "NEWS_CLUSTER",
+          "CAUSAL_CHAIN"
+        ],
+        "actors": [
+          "trump",
+          "xi-jinping"
+        ],
+        "regimes": [
+          "choc-exogene",
+          "incertain"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "geo-tarifs-obligataire",
+        "geo-tarifs-acteurs",
+        "geo-tarifs-devises"
+      ],
+      "wordCount": 201,
+      "file": "geo-tarifs-chaine.md"
+    },
+    {
+      "id": "geo-tarifs-devises",
+      "title": "Devises en période d'incertitude commerciale",
+      "source": "geopolitics.md",
+      "symbols": [
+        "EURUSD=X",
+        "GBPUSD=X",
+        "AUDUSD=X",
+        "NZDUSD=X",
+        "DX-Y.NYB"
+      ],
+      "themes": [
+        "tarifs",
+        "geopolitique",
+        "refuge"
+      ],
+      "conditions": {
+        "flags": [
+          "POLITICAL_TRIGGER",
+          "PRICE_MOVE"
+        ],
+        "actors": [
+          "trump"
+        ],
+        "regimes": [
+          "choc-exogene",
+          "incertain"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": true,
+      "always_if_theme": false,
+      "priority": "medium",
+      "related_chunks": [
+        "geo-tarifs-chaine",
+        "geo-tarifs-obligataire"
+      ],
+      "wordCount": 178,
+      "file": "geo-tarifs-devises.md"
+    },
+    {
+      "id": "geo-tarifs-obligataire",
+      "title": "Tarifs — Subtilité obligataire et prime de risque",
+      "source": "geopolitics.md",
+      "symbols": [
+        "TLT",
+        "IDTL",
+        "DX-Y.NYB",
+        "GBPUSD=X"
+      ],
+      "themes": [
+        "tarifs",
+        "taux",
+        "dette",
+        "geopolitique"
+      ],
+      "conditions": {
+        "flags": [
+          "POLITICAL_TRIGGER",
+          "PRICE_MOVE"
+        ],
+        "actors": [
+          "trump"
+        ],
+        "regimes": [
+          "choc-exogene",
+          "incertain"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "geo-tarifs-chaine",
+        "geo-tarifs-devises"
+      ],
+      "wordCount": 227,
+      "file": "geo-tarifs-obligataire.md"
+    },
+    {
+      "id": "inter-bitcoin-hybride",
+      "title": "Bitcoin — Actif hybride risk-on et or numerique",
+      "source": "intermarket.md",
+      "symbols": [
+        "BTC-USD",
+        "^IXIC",
+        "DX-Y.NYB",
+        "ETH-USD",
+        "SOL-USD"
+      ],
+      "themes": [
+        "risk-on",
+        "risk-off",
+        "momentum",
+        "liquidite",
+        "refuge"
+      ],
+      "conditions": {
+        "flags": [
+          "PRICE_MOVE",
+          "EXTREME_MOVE",
+          "CAUSAL_CHAIN"
+        ],
+        "actors": [],
+        "regimes": [
+          "risk-on",
+          "risk-off"
+        ],
+        "vix_above": null,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": true,
+      "always_if_theme": false,
+      "priority": "high",
+      "related_chunks": [
+        "inter-dollar-cascade",
+        "inter-m2-liquidite"
+      ],
+      "wordCount": 179,
+      "file": "inter-bitcoin-hybride.md"
+    },
+    {
+      "id": "inter-carry-trade",
+      "title": "Carry Trade — Mecanique, paires et impact cross-market",
+      "source": "asset-profiles.md",
+      "symbols": [
+        "USDJPY=X",
+        "AUDUSD=X",
+        "NZDUSD=X",
+        "GBPUSD=X",
+        "^GSPC",
+        "^VIX"
+      ],
+      "themes": [
+        "carry-trade",
+        "taux",
+        "volatilite",
+        "risk-on",
+        "risk-off",
+        "boj",
+        "boe"
+      ],
+      "conditions": {
+        "flags": [
+          "PRICE_MOVE",
+          "EXTREME_MOVE"
+        ],
+        "actors": [
+          "ueda",
+          "powell"
+        ],
+        "regimes": [
+          "risk-on",
+          "risk-off",
+          "choc-exogene"
+        ],
+        "vix_above": null,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "asset-jpy-refuge",
+        "asset-chf-refuge",
+        "asset-aud-nzd-commodity"
+      ],
+      "wordCount": 260,
+      "file": "inter-carry-trade.md"
+    },
+    {
+      "id": "inter-chaines-transmission",
+      "title": "Chaînes de transmission cross-market",
+      "source": "intermarket.md",
+      "symbols": [
+        "^GSPC",
+        "^IXIC",
+        "DX-Y.NYB",
+        "EURUSD=X",
+        "GC=F",
+        "CL=F",
+        "TLT"
+      ],
+      "themes": [
+        "taux",
+        "inflation",
+        "fed",
+        "banque-centrale",
+        "risk-on",
+        "risk-off",
+        "croissance"
+      ],
+      "conditions": {
+        "flags": [
+          "CAUSAL_CHAIN",
+          "MACRO_SURPRISE",
+          "NEWS_LINKED"
+        ],
+        "actors": [
+          "powell",
+          "lagarde"
+        ],
+        "regimes": [
+          "risk-on",
+          "risk-off",
+          "choc-exogene"
+        ],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "inter-dollar-cascade",
+        "inter-taux-moteur-forex",
+        "inter-petrole-inflation"
+      ],
+      "wordCount": 271,
+      "file": "inter-chaines-transmission.md"
+    },
+    {
+      "id": "inter-correlations-cassees",
+      "title": "Quand les corrélations cassent -- signaux de divergence",
+      "source": "intermarket.md",
+      "symbols": [
+        "GC=F",
+        "DX-Y.NYB",
+        "BTC-USD",
+        "^IXIC",
+        "^VIX",
+        "^GSPC",
+        "CL=F",
+        "TLT"
+      ],
+      "themes": [
+        "risk-off",
+        "refuge",
+        "volatilite",
+        "momentum",
+        "geopolitique",
+        "inflation",
+        "risk-on"
+      ],
+      "conditions": {
+        "flags": [
+          "CAUSAL_CHAIN",
+          "SENTIMENT_EXTREME",
+          "EXTREME_MOVE"
+        ],
+        "actors": [],
+        "regimes": [
+          "risk-off",
+          "incertain",
+          "choc-exogene"
+        ],
+        "vix_above": 20,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "inter-or-refuge",
+        "inter-bitcoin-hybride",
+        "inter-vix-peur",
+        "inter-dollar-cascade"
+      ],
+      "wordCount": 259,
+      "file": "inter-correlations-cassees.md"
+    },
+    {
+      "id": "inter-dedollarisation",
+      "title": "Réserves mondiales et dédollarisation",
+      "source": "intermarket.md",
+      "symbols": [
+        "DX-Y.NYB",
+        "GC=F",
+        "EURUSD=X",
+        "USDJPY=X"
+      ],
+      "themes": [
+        "geopolitique",
+        "refuge",
+        "liquidite",
+        "banque-centrale",
+        "sanctions"
+      ],
+      "conditions": {
+        "flags": [
+          "POLITICAL_TRIGGER",
+          "NEWS_LINKED"
+        ],
+        "actors": [
+          "xi-jinping",
+          "poutine"
+        ],
+        "regimes": [
+          "incertain"
+        ],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "medium",
+      "related_chunks": [
+        "inter-dollar-cascade",
+        "inter-or-refuge"
+      ],
+      "wordCount": 235,
+      "file": "inter-dedollarisation.md"
+    },
+    {
+      "id": "inter-dollar-cascade",
+      "title": "Dollar — Cascade DXY sur tous les marches",
+      "source": "intermarket.md",
+      "symbols": [
+        "DX-Y.NYB",
+        "GC=F",
+        "EURUSD=X",
+        "CL=F",
+        "BTC-USD",
+        "SI=F",
+        "HG=F"
+      ],
+      "themes": [
+        "risk-off",
+        "refuge",
+        "carry-trade",
+        "taux",
+        "risk-on"
+      ],
+      "conditions": {
+        "flags": [
+          "PRICE_MOVE",
+          "CAUSAL_CHAIN"
+        ],
+        "actors": [],
+        "regimes": [
+          "risk-off",
+          "risk-on"
+        ],
+        "vix_above": null,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": true,
+      "always_if_theme": false,
+      "priority": "critical",
+      "related_chunks": [
+        "inter-yield-spread",
+        "inter-taux-moteur-forex",
+        "inter-chaines-transmission"
+      ],
+      "wordCount": 287,
+      "file": "inter-dollar-cascade.md"
+    },
+    {
+      "id": "inter-fondamental-vs-technique",
+      "title": "Fondamental vs Technique -- rôles distincts dans la narration",
+      "source": "intermarket.md",
+      "symbols": [
+        "EURUSD=X",
+        "^GSPC",
+        "^IXIC",
+        "GC=F"
+      ],
+      "themes": [
+        "analyse-technique",
+        "confluence",
+        "narration",
+        "ton"
+      ],
+      "conditions": {
+        "flags": [
+          "ZONE_EVENT",
+          "EMA_BREAK",
+          "SMA200_CROSS"
+        ],
+        "actors": [],
+        "regimes": [
+          "risk-on",
+          "risk-off",
+          "incertain",
+          "rotation",
+          "choc-exogene"
+        ],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "inter-taux-moteur-forex",
+        "inter-chaines-transmission"
+      ],
+      "wordCount": 255,
+      "file": "inter-fondamental-vs-technique.md"
+    },
+    {
+      "id": "inter-forex-hierarchie",
+      "title": "Forex — Hierarchie des devises et paires derivees",
+      "source": "intermarket.md",
+      "symbols": [
+        "DX-Y.NYB",
+        "EURUSD=X",
+        "USDJPY=X",
+        "GBPUSD=X",
+        "AUDUSD=X",
+        "NZDUSD=X"
+      ],
+      "themes": [
+        "carry-trade",
+        "taux"
+      ],
+      "conditions": {
+        "flags": [
+          "PRICE_MOVE",
+          "EMA_BREAK"
+        ],
+        "actors": [],
+        "regimes": [
+          "risk-on",
+          "risk-off"
+        ],
+        "vix_above": null,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": true,
+      "always_if_theme": false,
+      "priority": "high",
+      "related_chunks": [
+        "inter-dollar-cascade",
+        "inter-taux-moteur-forex"
+      ],
+      "wordCount": 179,
+      "file": "inter-forex-hierarchie.md"
+    },
+    {
+      "id": "inter-m2-liquidite",
+      "title": "M2 masse monetaire — Indicateur avance de liquidite",
+      "source": "intermarket.md",
+      "symbols": [
+        "^GSPC",
+        "^IXIC",
+        "BTC-USD"
+      ],
+      "themes": [
+        "liquidite",
+        "m2",
+        "qe-qt"
+      ],
+      "conditions": {
+        "flags": [
+          "CAUSAL_CHAIN"
+        ],
+        "actors": [
+          "fed"
+        ],
+        "regimes": [
+          "risk-on",
+          "risk-off"
+        ],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "inter-bitcoin-hybride",
+        "inter-taux-moteur-forex"
+      ],
+      "wordCount": 213,
+      "file": "inter-m2-liquidite.md"
+    },
+    {
+      "id": "inter-macro-impact-forex",
+      "title": "Données macro clés et leur impact forex",
+      "source": "intermarket.md",
+      "symbols": [
+        "DX-Y.NYB",
+        "EURUSD=X",
+        "USDJPY=X",
+        "GBPUSD=X",
+        "^GSPC",
+        "TLT"
+      ],
+      "themes": [
+        "emploi",
+        "inflation",
+        "croissance",
+        "pib",
+        "fed",
+        "bce",
+        "boj",
+        "boe",
+        "banque-centrale",
+        "taux"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE",
+          "NEWS_LINKED",
+          "CAUSAL_CHAIN"
+        ],
+        "actors": [
+          "powell",
+          "lagarde",
+          "ueda"
+        ],
+        "regimes": [
+          "risk-on",
+          "risk-off",
+          "incertain"
+        ],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "inter-taux-moteur-forex",
+        "inter-chaines-transmission",
+        "inter-dollar-cascade"
+      ],
+      "wordCount": 282,
+      "file": "inter-macro-impact-forex.md"
+    },
+    {
+      "id": "inter-or-refuge",
+      "title": "Or — Refuge complexe et non lineaire",
+      "source": "intermarket.md",
+      "symbols": [
+        "GC=F",
+        "SI=F",
+        "DX-Y.NYB",
+        "^VIX",
+        "TLT"
+      ],
+      "themes": [
+        "refuge",
+        "risk-off",
+        "geopolitique",
+        "inflation"
+      ],
+      "conditions": {
+        "flags": [
+          "PRICE_MOVE",
+          "EXTREME_MOVE",
+          "CAUSAL_CHAIN"
+        ],
+        "actors": [],
+        "regimes": [
+          "risk-off",
+          "choc-exogene",
+          "incertain"
+        ],
+        "vix_above": null,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": true,
+      "always_if_theme": false,
+      "priority": "high",
+      "related_chunks": [
+        "inter-dollar-cascade",
+        "inter-vix-peur",
+        "inter-correlations-cassees"
+      ],
+      "wordCount": 215,
+      "file": "inter-or-refuge.md"
+    },
+    {
+      "id": "inter-patterns-comportement",
+      "title": "Patterns intermarchés et comportement de marché",
+      "source": "intermarket.md",
+      "symbols": [
+        "^GSPC",
+        "^IXIC",
+        "^DJI",
+        "^VIX",
+        "GC=F",
+        "TLT",
+        "XLK",
+        "XLE",
+        "XLF",
+        "HG=F"
+      ],
+      "themes": [
+        "momentum",
+        "mean-reversion",
+        "rotation-sectorielle",
+        "earnings",
+        "volatilite",
+        "refuge",
+        "liquidite",
+        "narration"
+      ],
+      "conditions": {
+        "flags": [
+          "SENTIMENT_EXTREME",
+          "ATH_PROXIMITY",
+          "VOLUME_SPIKE",
+          "EARNINGS_SURPRISE",
+          "EARNINGS_TODAY",
+          "RSI_EXTREME"
+        ],
+        "actors": [],
+        "regimes": [
+          "risk-on",
+          "risk-off",
+          "rotation",
+          "incertain"
+        ],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "inter-vix-peur",
+        "inter-regimes-marche",
+        "inter-chaines-transmission"
+      ],
+      "wordCount": 334,
+      "file": "inter-patterns-comportement.md"
+    },
+    {
+      "id": "inter-petrole-inflation",
+      "title": "Petrole — Thermometre de l'inflation et geopolitique",
+      "source": "intermarket.md",
+      "symbols": [
+        "CL=F",
+        "BZ=F",
+        "XLE",
+        "^GSPC"
+      ],
+      "themes": [
+        "inflation",
+        "geopolitique",
+        "moyen-orient",
+        "fed",
+        "risk-off"
+      ],
+      "conditions": {
+        "flags": [
+          "PRICE_MOVE",
+          "CAUSAL_CHAIN",
+          "NEWS_LINKED",
+          "POLITICAL_TRIGGER"
+        ],
+        "actors": [],
+        "regimes": [
+          "risk-off",
+          "choc-exogene"
+        ],
+        "vix_above": null,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": true,
+      "always_if_theme": false,
+      "priority": "high",
+      "related_chunks": [
+        "inter-chaines-transmission",
+        "inter-dollar-cascade"
+      ],
+      "wordCount": 249,
+      "file": "inter-petrole-inflation.md"
+    },
+    {
+      "id": "inter-regimes-marche",
+      "title": "Régimes de marché -- 5 états et caractéristiques",
+      "source": "intermarket.md",
+      "symbols": [
+        "^GSPC",
+        "^VIX",
+        "GC=F",
+        "DX-Y.NYB",
+        "BTC-USD",
+        "^IXIC"
+      ],
+      "themes": [
+        "risk-on",
+        "risk-off",
+        "volatilite",
+        "rotation-sectorielle"
+      ],
+      "conditions": {
+        "flags": [
+          "CAUSAL_CHAIN",
+          "SENTIMENT_EXTREME"
+        ],
+        "actors": [],
+        "regimes": [
+          "risk-on",
+          "risk-off",
+          "incertain",
+          "rotation",
+          "choc-exogene"
+        ],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "inter-vix-peur",
+        "inter-dollar-cascade"
+      ],
+      "wordCount": 237,
+      "file": "inter-regimes-marche.md"
+    },
+    {
+      "id": "inter-taux-moteur-forex",
+      "title": "Taux d'interet — Le moteur numero un du forex",
+      "source": "intermarket.md",
+      "symbols": [
+        "DX-Y.NYB",
+        "EURUSD=X",
+        "USDJPY=X",
+        "TLT",
+        "IDTL"
+      ],
+      "themes": [
+        "taux",
+        "fed",
+        "bce",
+        "pivot",
+        "boj"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE",
+          "CAUSAL_CHAIN",
+          "POLITICAL_TRIGGER"
+        ],
+        "actors": [
+          "powell",
+          "lagarde"
+        ],
+        "regimes": [
+          "risk-on",
+          "risk-off"
+        ],
+        "vix_above": null,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "inter-yield-spread",
+        "inter-dollar-cascade",
+        "inter-macro-impact-forex"
+      ],
+      "wordCount": 254,
+      "file": "inter-taux-moteur-forex.md"
+    },
+    {
+      "id": "inter-vix-peur",
+      "title": "VIX — Indice de la peur et mean-reversion",
+      "source": "intermarket.md",
+      "symbols": [
+        "^VIX",
+        "^GSPC",
+        "GC=F"
+      ],
+      "themes": [
+        "volatilite",
+        "risk-off",
+        "refuge",
+        "mean-reversion"
+      ],
+      "conditions": {
+        "flags": [
+          "RSI_EXTREME",
+          "EXTREME_MOVE"
+        ],
+        "actors": [],
+        "regimes": [
+          "risk-off",
+          "choc-exogene"
+        ],
+        "vix_above": 20,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": true,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "inter-regimes-marche",
+        "inter-correlations-cassees"
+      ],
+      "wordCount": 215,
+      "file": "inter-vix-peur.md"
+    },
+    {
+      "id": "inter-yield-spread",
+      "title": "Yield spread — Ecart de rendement obligataire",
+      "source": "intermarket.md",
+      "symbols": [
+        "EURUSD=X",
+        "TLT",
+        "IDTL",
+        "DX-Y.NYB"
+      ],
+      "themes": [
+        "taux",
+        "fed",
+        "bce"
+      ],
+      "conditions": {
+        "flags": [
+          "CAUSAL_CHAIN",
+          "MACRO_SURPRISE"
+        ],
+        "actors": [
+          "powell",
+          "lagarde"
+        ],
+        "regimes": [
+          "risk-on",
+          "risk-off"
+        ],
+        "vix_above": null,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "inter-taux-moteur-forex",
+        "macro-treasury-yields",
+        "ta-leading-indicators"
+      ],
+      "wordCount": 186,
+      "file": "inter-yield-spread.md"
+    },
+    {
+      "id": "macro-anticipation-vs-realisation",
+      "title": "Anticipation vs realisation et tendances auto-alimentees",
+      "source": "macro-indicators.md",
+      "symbols": [
+        "^GSPC",
+        "^IXIC",
+        "^VIX"
+      ],
+      "themes": [
+        "momentum",
+        "risk-on",
+        "risk-off",
+        "narration",
+        "liquidite"
+      ],
+      "conditions": {
+        "flags": [
+          "EXTREME_MOVE",
+          "SENTIMENT_EXTREME"
+        ],
+        "actors": [],
+        "regimes": [
+          "risk-on",
+          "risk-off"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": false,
+      "priority": "high",
+      "related_chunks": [
+        "macro-vix-zones",
+        "macro-cycles-economiques",
+        "macro-bourse-vs-economie"
+      ],
+      "wordCount": 199,
+      "file": "macro-anticipation-vs-realisation.md"
+    },
+    {
+      "id": "macro-bourse-vs-economie",
+      "title": "Bourse vs Economie — Le paradoxe apparent",
+      "source": "macro-indicators.md",
+      "symbols": [
+        "^GSPC",
+        "^IXIC",
+        "XLK"
+      ],
+      "themes": [
+        "croissance",
+        "liquidite",
+        "qe-qt",
+        "narration"
+      ],
+      "conditions": {
+        "flags": [],
+        "actors": [
+          "fed"
+        ],
+        "regimes": [
+          "risk-on",
+          "incertain"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": false,
+      "priority": "medium",
+      "related_chunks": [
+        "macro-cycles-economiques",
+        "macro-anticipation-vs-realisation"
+      ],
+      "wordCount": 181,
+      "file": "macro-bourse-vs-economie.md"
+    },
+    {
+      "id": "macro-carry-trade-tarifs",
+      "title": "Carry trade, douanes et transmission inflationniste",
+      "source": "macro-indicators.md",
+      "symbols": [
+        "USDJPY=X",
+        "AUDUSD=X",
+        "^GSPC",
+        "^N225",
+        "BTC-USD"
+      ],
+      "themes": [
+        "carry-trade",
+        "tarifs",
+        "inflation",
+        "volatilite",
+        "geopolitique"
+      ],
+      "conditions": {
+        "flags": [
+          "POLITICAL_TRIGGER",
+          "EXTREME_MOVE",
+          "NEWS_LINKED"
+        ],
+        "actors": [
+          "trump",
+          "biden",
+          "ueda",
+          "boj"
+        ],
+        "regimes": [
+          "choc-exogene",
+          "risk-off"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "macro-fed-decisions",
+        "macro-inflation-cpi"
+      ],
+      "wordCount": 206,
+      "file": "macro-carry-trade-tarifs.md"
+    },
+    {
+      "id": "macro-cycles-economiques",
+      "title": "Cycles economiques — Cadre de reference long/moyen/court terme",
+      "source": "macro-indicators.md",
+      "symbols": [
+        "^GSPC",
+        "^IXIC",
+        "^DJI",
+        "^FCHI",
+        "^GDAXI"
+      ],
+      "themes": [
+        "croissance",
+        "recession",
+        "pib",
+        "rotation-sectorielle",
+        "emploi"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE"
+        ],
+        "actors": [],
+        "regimes": [
+          "risk-on",
+          "risk-off",
+          "rotation",
+          "incertain"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "macro-recession-signals",
+        "macro-bourse-vs-economie"
+      ],
+      "wordCount": 235,
+      "file": "macro-cycles-economiques.md"
+    },
+    {
+      "id": "macro-debt-ceiling",
+      "title": "Plafond de la dette americaine — Mecanisme et impact",
+      "source": "macro-indicators.md",
+      "symbols": [
+        "TLT",
+        "DX-Y.NYB",
+        "^GSPC",
+        "^VIX"
+      ],
+      "themes": [
+        "dette",
+        "geopolitique",
+        "volatilite"
+      ],
+      "conditions": {
+        "flags": [
+          "POLITICAL_TRIGGER",
+          "NEWS_LINKED"
+        ],
+        "actors": [
+          "biden",
+          "trump"
+        ],
+        "regimes": [
+          "incertain",
+          "choc-exogene"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "medium",
+      "related_chunks": [
+        "macro-treasury-yields",
+        "macro-notation-souveraine"
+      ],
+      "wordCount": 204,
+      "file": "macro-debt-ceiling.md"
+    },
+    {
+      "id": "macro-donnees-pieges",
+      "title": "Pieges des donnees mensuel vs trimestriel vs annuel",
+      "source": "macro-indicators.md",
+      "symbols": [
+        "^GSPC"
+      ],
+      "themes": [
+        "inflation",
+        "pib",
+        "croissance",
+        "narration"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE"
+        ],
+        "actors": [],
+        "regimes": [
+          "incertain"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": false,
+      "priority": "medium",
+      "related_chunks": [
+        "macro-inflation-cpi",
+        "macro-pmi-gdp-retail"
+      ],
+      "wordCount": 161,
+      "file": "macro-donnees-pieges.md"
+    },
+    {
+      "id": "macro-fear-greed-crypto",
+      "title": "Fear and Greed Index — Sentiment crypto",
+      "source": "macro-indicators.md",
+      "symbols": [
+        "BTC-USD",
+        "ETH-USD",
+        "SOL-USD"
+      ],
+      "themes": [
+        "volatilite",
+        "risk-on",
+        "risk-off",
+        "momentum"
+      ],
+      "conditions": {
+        "flags": [
+          "SENTIMENT_EXTREME",
+          "EXTREME_MOVE"
+        ],
+        "actors": [],
+        "regimes": [
+          "risk-on",
+          "risk-off"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": true,
+      "always_if_theme": false,
+      "priority": "high",
+      "related_chunks": [
+        "macro-vix-zones",
+        "macro-anticipation-vs-realisation"
+      ],
+      "wordCount": 199,
+      "file": "macro-fear-greed-crypto.md"
+    },
+    {
+      "id": "macro-fed-decisions",
+      "title": "FOMC, ECB et decisions de taux — Lecture et impact",
+      "source": "macro-indicators.md",
+      "symbols": [
+        "^GSPC",
+        "^IXIC",
+        "DX-Y.NYB",
+        "EURUSD=X",
+        "TLT",
+        "GC=F"
+      ],
+      "themes": [
+        "fed",
+        "bce",
+        "taux",
+        "banque-centrale",
+        "pivot"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE",
+          "POLITICAL_TRIGGER"
+        ],
+        "actors": [
+          "powell",
+          "fed",
+          "lagarde",
+          "bce"
+        ],
+        "regimes": [
+          "risk-on",
+          "risk-off",
+          "incertain"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "macro-inflation-cpi",
+        "macro-treasury-yields",
+        "cb-fed-fedwatch"
+      ],
+      "wordCount": 200,
+      "file": "macro-fed-decisions.md"
+    },
+    {
+      "id": "macro-inflation-cpi",
+      "title": "Inflation / CPI / PCE — Interpretation et composantes",
+      "source": "macro-indicators.md",
+      "symbols": [
+        "^GSPC",
+        "TLT",
+        "DX-Y.NYB",
+        "GC=F"
+      ],
+      "themes": [
+        "inflation",
+        "taux",
+        "fed",
+        "banque-centrale"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE"
+        ],
+        "actors": [
+          "powell",
+          "fed"
+        ],
+        "regimes": [
+          "risk-off",
+          "incertain"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "macro-treasury-yields",
+        "macro-fed-decisions",
+        "macro-donnees-pieges"
+      ],
+      "wordCount": 249,
+      "file": "macro-inflation-cpi.md"
+    },
+    {
+      "id": "macro-nfp-emploi",
+      "title": "NFP, chomage et emploi — Indicateurs et paradoxes",
+      "source": "macro-indicators.md",
+      "symbols": [
+        "^GSPC",
+        "DX-Y.NYB",
+        "TLT",
+        "GC=F"
+      ],
+      "themes": [
+        "emploi",
+        "fed",
+        "taux",
+        "recession"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE"
+        ],
+        "actors": [
+          "powell",
+          "fed"
+        ],
+        "regimes": [
+          "risk-on",
+          "risk-off",
+          "incertain"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "macro-recession-signals",
+        "macro-fed-decisions",
+        "macro-anticipation-vs-realisation"
+      ],
+      "wordCount": 220,
+      "file": "macro-nfp-emploi.md"
+    },
+    {
+      "id": "macro-notation-souveraine",
+      "title": "Notation souveraine, basis trade et endettement public",
+      "source": "macro-indicators.md",
+      "symbols": [
+        "TLT",
+        "IDTL",
+        "DX-Y.NYB",
+        "^GSPC"
+      ],
+      "themes": [
+        "dette",
+        "taux",
+        "risk-off",
+        "liquidite",
+        "banque-centrale"
+      ],
+      "conditions": {
+        "flags": [
+          "NEWS_LINKED",
+          "POLITICAL_TRIGGER"
+        ],
+        "actors": [],
+        "regimes": [
+          "risk-off",
+          "choc-exogene"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "macro-treasury-yields",
+        "macro-debt-ceiling"
+      ],
+      "wordCount": 189,
+      "file": "macro-notation-souveraine.md"
+    },
+    {
+      "id": "macro-pmi-gdp-retail",
+      "title": "PMI, PIB, ventes au detail et balance commerciale",
+      "source": "macro-indicators.md",
+      "symbols": [
+        "^GSPC",
+        "^FCHI",
+        "^GDAXI",
+        "EURUSD=X",
+        "AUDUSD=X",
+        "NZDUSD=X"
+      ],
+      "themes": [
+        "croissance",
+        "pib",
+        "recession",
+        "emploi"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE"
+        ],
+        "actors": [],
+        "regimes": [
+          "risk-on",
+          "risk-off",
+          "incertain"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "macro-recession-signals",
+        "macro-donnees-pieges"
+      ],
+      "wordCount": 190,
+      "file": "macro-pmi-gdp-retail.md"
+    },
+    {
+      "id": "macro-recession-signals",
+      "title": "Signaux de recession — Checklist indicateurs avances et coincidents",
+      "source": "macro-indicators.md",
+      "symbols": [
+        "^GSPC",
+        "^IXIC",
+        "TLT",
+        "^VIX"
+      ],
+      "themes": [
+        "recession",
+        "emploi",
+        "croissance",
+        "pib"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE",
+          "SENTIMENT_EXTREME"
+        ],
+        "actors": [
+          "fed",
+          "powell"
+        ],
+        "regimes": [
+          "risk-off",
+          "choc-exogene"
+        ],
+        "vix_above": 25,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "macro-yield-curve",
+        "macro-cycles-economiques",
+        "macro-nfp-emploi"
+      ],
+      "wordCount": 202,
+      "file": "macro-recession-signals.md"
+    },
+    {
+      "id": "macro-treasury-yields",
+      "title": "Treasury Yields — Mecanisme et interpretation",
+      "source": "macro-indicators.md",
+      "symbols": [
+        "TLT",
+        "IDTL",
+        "DX-Y.NYB",
+        "^GSPC"
+      ],
+      "themes": [
+        "taux",
+        "inflation",
+        "recession",
+        "refuge"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE",
+          "EXTREME_MOVE"
+        ],
+        "actors": [
+          "powell",
+          "fed"
+        ],
+        "regimes": [
+          "risk-off",
+          "incertain"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": true,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "macro-yield-curve",
+        "macro-inflation-cpi",
+        "macro-fed-decisions"
+      ],
+      "wordCount": 230,
+      "file": "macro-treasury-yields.md"
+    },
+    {
+      "id": "macro-triple-witching",
+      "title": "Triple witching et expiration d'options",
+      "source": "macro-indicators.md",
+      "symbols": [
+        "^GSPC",
+        "^IXIC",
+        "XLK"
+      ],
+      "themes": [
+        "volatilite",
+        "saisonnalite",
+        "momentum",
+        "analyse-technique"
+      ],
+      "conditions": {
+        "flags": [
+          "VOLUME_SPIKE"
+        ],
+        "actors": [],
+        "regimes": [
+          "risk-on",
+          "risk-off"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": [
+          3,
+          6,
+          9,
+          12
+        ]
+      },
+      "always_if_symbol": false,
+      "always_if_theme": false,
+      "priority": "medium",
+      "related_chunks": [
+        "macro-vix-zones",
+        "season-indices-actions"
+      ],
+      "wordCount": 187,
+      "file": "macro-triple-witching.md"
+    },
+    {
+      "id": "macro-vix-zones",
+      "title": "VIX — Zones de volatilite et signaux",
+      "source": "macro-indicators.md",
+      "symbols": [
+        "^VIX",
+        "^GSPC",
+        "^IXIC"
+      ],
+      "themes": [
+        "volatilite",
+        "risk-off",
+        "risk-on",
+        "analyse-technique"
+      ],
+      "conditions": {
+        "flags": [
+          "SENTIMENT_EXTREME",
+          "EXTREME_MOVE"
+        ],
+        "actors": [],
+        "regimes": [
+          "risk-off",
+          "choc-exogene"
+        ],
+        "vix_above": 20,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": true,
+      "always_if_theme": false,
+      "priority": "high",
+      "related_chunks": [
+        "macro-recession-signals",
+        "macro-anticipation-vs-realisation"
+      ],
+      "wordCount": 236,
+      "file": "macro-vix-zones.md"
+    },
+    {
+      "id": "macro-yield-curve",
+      "title": "Yield Curve — Spread 10Y-2Y et signal de recession",
+      "source": "macro-indicators.md",
+      "symbols": [
+        "TLT",
+        "IDTL",
+        "^GSPC"
+      ],
+      "themes": [
+        "taux",
+        "recession",
+        "croissance",
+        "analyse-technique",
+        "banque-centrale"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE"
+        ],
+        "actors": [
+          "fed",
+          "powell"
+        ],
+        "regimes": [
+          "risk-off",
+          "incertain"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "macro-treasury-yields",
+        "macro-recession-signals"
+      ],
+      "wordCount": 246,
+      "file": "macro-yield-curve.md"
+    },
+    {
+      "id": "narr-buy-rumor-misprice",
+      "title": "Patterns F et G — Buy the rumor et misprice",
+      "source": "narrative-patterns.md",
+      "symbols": [],
+      "themes": [
+        "narration",
+        "structure-episode",
+        "mean-reversion"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE",
+          "EXTREME_MOVE",
+          "NEWS_LINKED"
+        ],
+        "actors": [],
+        "regimes": [],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "narr-counter-intuitive",
+        "narr-discounting-mechanism"
+      ],
+      "wordCount": 313,
+      "file": "narr-buy-rumor-misprice.md"
+    },
+    {
+      "id": "narr-causal-chains",
+      "title": "Chaines causales — Coeur de la narration",
+      "source": "narrative-patterns.md",
+      "symbols": [],
+      "themes": [
+        "narration",
+        "confluence",
+        "analyse-technique"
+      ],
+      "conditions": {
+        "flags": [
+          "CAUSAL_CHAIN"
+        ],
+        "actors": [],
+        "regimes": [],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "narr-transitions",
+        "narr-fil-rouge",
+        "narr-domino-contraste"
+      ],
+      "wordCount": 297,
+      "file": "narr-causal-chains.md"
+    },
+    {
+      "id": "narr-cold-open",
+      "title": "Cold open — Regles du hook et du closing",
+      "source": "narrative-patterns.md",
+      "symbols": [],
+      "themes": [
+        "narration",
+        "structure-episode"
+      ],
+      "conditions": {
+        "flags": [],
+        "actors": [],
+        "regimes": [],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "narr-episode-structure",
+        "narr-transitions"
+      ],
+      "wordCount": 170,
+      "file": "narr-cold-open.md"
+    },
+    {
+      "id": "narr-counter-intuitive",
+      "title": "Narration contre-intuitive — Bad news is good news",
+      "source": "narrative-patterns.md",
+      "symbols": [],
+      "themes": [
+        "narration",
+        "ton",
+        "fed",
+        "bce"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE",
+          "NEWS_LINKED"
+        ],
+        "actors": [
+          "powell",
+          "lagarde"
+        ],
+        "regimes": [],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "narr-discounting-mechanism",
+        "narr-buy-rumor-misprice"
+      ],
+      "wordCount": 196,
+      "file": "narr-counter-intuitive.md"
+    },
+    {
+      "id": "narr-data-hierarchy",
+      "title": "Hierarchie des donnees et pieges du calendrier",
+      "source": "narrative-patterns.md",
+      "symbols": [],
+      "themes": [
+        "narration",
+        "inflation",
+        "emploi",
+        "croissance"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE"
+        ],
+        "actors": [],
+        "regimes": [],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "narr-discounting-mechanism",
+        "narr-causal-chains"
+      ],
+      "wordCount": 345,
+      "file": "narr-data-hierarchy.md"
+    },
+    {
+      "id": "narr-discounting-mechanism",
+      "title": "Discounting mechanism — Les marches anticipent",
+      "source": "narrative-patterns.md",
+      "symbols": [],
+      "themes": [
+        "narration",
+        "ton"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE",
+          "NEWS_LINKED",
+          "POLITICAL_TRIGGER"
+        ],
+        "actors": [],
+        "regimes": [],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "narr-counter-intuitive",
+        "narr-buy-rumor-misprice",
+        "narr-data-hierarchy"
+      ],
+      "wordCount": 241,
+      "file": "narr-discounting-mechanism.md"
+    },
+    {
+      "id": "narr-domino-contraste",
+      "title": "Patterns B et C — Effet domino et contraste",
+      "source": "narrative-patterns.md",
+      "symbols": [],
+      "themes": [
+        "narration",
+        "structure-episode",
+        "confluence"
+      ],
+      "conditions": {
+        "flags": [
+          "CAUSAL_CHAIN",
+          "MACRO_SURPRISE"
+        ],
+        "actors": [],
+        "regimes": [],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "narr-fil-rouge",
+        "narr-causal-chains"
+      ],
+      "wordCount": 171,
+      "file": "narr-domino-contraste.md"
+    },
+    {
+      "id": "narr-episode-structure",
+      "title": "Structure temporelle d'un episode et segments",
+      "source": "narrative-patterns.md",
+      "symbols": [],
+      "themes": [
+        "narration",
+        "structure-episode"
+      ],
+      "conditions": {
+        "flags": [],
+        "actors": [],
+        "regimes": [],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "narr-cold-open",
+        "narr-transitions",
+        "narr-quality-criteria"
+      ],
+      "wordCount": 286,
+      "file": "narr-episode-structure.md"
+    },
+    {
+      "id": "narr-fil-rouge",
+      "title": "Pattern A — Le fil rouge (~70% des episodes)",
+      "source": "narrative-patterns.md",
+      "symbols": [],
+      "themes": [
+        "narration",
+        "structure-episode"
+      ],
+      "conditions": {
+        "flags": [],
+        "actors": [],
+        "regimes": [],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "narr-episode-structure",
+        "narr-cold-open",
+        "narr-transitions"
+      ],
+      "wordCount": 168,
+      "file": "narr-fil-rouge.md"
+    },
+    {
+      "id": "narr-institutional-cycle",
+      "title": "Narration institutionnelle, cycle economique et archetypes",
+      "source": "narrative-patterns.md",
+      "symbols": [],
+      "themes": [
+        "narration",
+        "ton",
+        "recession",
+        "croissance",
+        "inflation"
+      ],
+      "conditions": {
+        "flags": [],
+        "actors": [],
+        "regimes": [
+          "risk-on",
+          "risk-off",
+          "incertain",
+          "rotation"
+        ],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "medium",
+      "related_chunks": [
+        "narr-causal-chains",
+        "narr-quality-criteria"
+      ],
+      "wordCount": 341,
+      "file": "narr-institutional-cycle.md"
+    },
+    {
+      "id": "narr-quality-criteria",
+      "title": "Criteres de qualite et regles obligatoires",
+      "source": "narrative-patterns.md",
+      "symbols": [],
+      "themes": [
+        "narration",
+        "ton",
+        "structure-episode"
+      ],
+      "conditions": {
+        "flags": [],
+        "actors": [],
+        "regimes": [],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "narr-episode-structure",
+        "narr-causal-chains",
+        "narr-transitions"
+      ],
+      "wordCount": 299,
+      "file": "narr-quality-criteria.md"
+    },
+    {
+      "id": "narr-surprise-patience",
+      "title": "Patterns D et E — La surprise et la patience",
+      "source": "narrative-patterns.md",
+      "symbols": [],
+      "themes": [
+        "narration",
+        "structure-episode"
+      ],
+      "conditions": {
+        "flags": [
+          "EXTREME_MOVE"
+        ],
+        "actors": [],
+        "regimes": [
+          "incertain"
+        ],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "narr-fil-rouge",
+        "narr-episode-structure"
+      ],
+      "wordCount": 177,
+      "file": "narr-surprise-patience.md"
+    },
+    {
+      "id": "narr-transitions",
+      "title": "Transitions entre segments — Liens causaux",
+      "source": "narrative-patterns.md",
+      "symbols": [],
+      "themes": [
+        "narration",
+        "structure-episode",
+        "confluence"
+      ],
+      "conditions": {
+        "flags": [],
+        "actors": [],
+        "regimes": [],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "narr-episode-structure",
+        "narr-causal-chains"
+      ],
+      "wordCount": 171,
+      "file": "narr-transitions.md"
+    },
+    {
+      "id": "season-crypto",
+      "title": "Saisonnalite — Cryptomonnaies (Bitcoin, Ethereum, Solana)",
+      "source": "seasonality.md",
+      "symbols": [
+        "BTC-USD",
+        "ETH-USD",
+        "SOL-USD"
+      ],
+      "themes": [
+        "saisonnalite",
+        "momentum",
+        "risk-on",
+        "volatilite"
+      ],
+      "conditions": {
+        "flags": [],
+        "actors": [],
+        "regimes": [
+          "risk-on",
+          "risk-off"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": [
+          1,
+          4,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      "always_if_symbol": true,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "macro-fear-greed-crypto",
+        "season-indices-actions"
+      ],
+      "wordCount": 216,
+      "file": "season-crypto.md"
+    },
+    {
+      "id": "season-cuivre-ble",
+      "title": "Saisonnalite — Metaux industriels et agricoles (cuivre, ble)",
+      "source": "seasonality.md",
+      "symbols": [
+        "HG=F",
+        "ZW=F"
+      ],
+      "themes": [
+        "saisonnalite",
+        "croissance",
+        "geopolitique",
+        "inflation"
+      ],
+      "conditions": {
+        "flags": [],
+        "actors": [],
+        "regimes": [
+          "risk-on",
+          "risk-off"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ]
+      },
+      "always_if_symbol": true,
+      "always_if_theme": true,
+      "priority": "medium",
+      "related_chunks": [
+        "season-energie",
+        "macro-pmi-gdp-retail"
+      ],
+      "wordCount": 213,
+      "file": "season-cuivre-ble.md"
+    },
+    {
+      "id": "season-devises",
+      "title": "Saisonnalite — Devises (DXY, EUR/USD, USD/JPY, GBP/USD)",
+      "source": "seasonality.md",
+      "symbols": [
+        "DX-Y.NYB",
+        "EURUSD=X",
+        "USDJPY=X",
+        "GBPUSD=X"
+      ],
+      "themes": [
+        "saisonnalite",
+        "carry-trade",
+        "taux"
+      ],
+      "conditions": {
+        "flags": [],
+        "actors": [],
+        "regimes": [
+          "risk-on",
+          "risk-off"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      "always_if_symbol": true,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "macro-carry-trade-tarifs",
+        "macro-fed-decisions",
+        "season-indices-actions"
+      ],
+      "wordCount": 211,
+      "file": "season-devises.md"
+    },
+    {
+      "id": "season-energie",
+      "title": "Saisonnalite — Energie (petrole WTI, Brent, gaz naturel)",
+      "source": "seasonality.md",
+      "symbols": [
+        "CL=F",
+        "BZ=F",
+        "NG=F",
+        "XLE"
+      ],
+      "themes": [
+        "saisonnalite",
+        "geopolitique",
+        "moyen-orient",
+        "inflation"
+      ],
+      "conditions": {
+        "flags": [],
+        "actors": [],
+        "regimes": [
+          "risk-on",
+          "risk-off"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      "always_if_symbol": true,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "macro-inflation-cpi",
+        "macro-carry-trade-tarifs",
+        "season-etfs-sectoriels"
+      ],
+      "wordCount": 233,
+      "file": "season-energie.md"
+    },
+    {
+      "id": "season-etfs-sectoriels",
+      "title": "Saisonnalite — ETFs sectoriels (XLK, XLF, XLE)",
+      "source": "seasonality.md",
+      "symbols": [
+        "XLK",
+        "XLF",
+        "XLE"
+      ],
+      "themes": [
+        "saisonnalite",
+        "rotation-sectorielle",
+        "earnings"
+      ],
+      "conditions": {
+        "flags": [],
+        "actors": [],
+        "regimes": [
+          "risk-on",
+          "rotation"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": [
+          1,
+          4,
+          5,
+          6,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      "always_if_symbol": true,
+      "always_if_theme": true,
+      "priority": "medium",
+      "related_chunks": [
+        "season-indices-actions",
+        "season-energie",
+        "macro-triple-witching"
+      ],
+      "wordCount": 225,
+      "file": "season-etfs-sectoriels.md"
+    },
+    {
+      "id": "season-indices-actions",
+      "title": "Saisonnalite — Indices boursiers (S&P, Nasdaq, CAC, DAX, FTSE, Nikkei, HSI, STOXX)",
+      "source": "seasonality.md",
+      "symbols": [
+        "^GSPC",
+        "^IXIC",
+        "^FCHI",
+        "^GDAXI",
+        "^FTSE",
+        "^N225",
+        "^HSI"
+      ],
+      "themes": [
+        "saisonnalite",
+        "rotation-sectorielle",
+        "momentum",
+        "earnings"
+      ],
+      "conditions": {
+        "flags": [],
+        "actors": [],
+        "regimes": [
+          "risk-on",
+          "risk-off"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      "always_if_symbol": true,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "season-etfs-sectoriels",
+        "macro-triple-witching"
+      ],
+      "wordCount": 331,
+      "file": "season-indices-actions.md"
+    },
+    {
+      "id": "season-or-argent-platine",
+      "title": "Saisonnalite — Metaux precieux (or, argent, platine)",
+      "source": "seasonality.md",
+      "symbols": [
+        "GC=F",
+        "SI=F",
+        "PL=F"
+      ],
+      "themes": [
+        "saisonnalite",
+        "refuge",
+        "risk-off",
+        "inflation",
+        "geopolitique"
+      ],
+      "conditions": {
+        "flags": [],
+        "actors": [],
+        "regimes": [
+          "risk-off",
+          "incertain"
+        ],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      "always_if_symbol": true,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "macro-vix-zones",
+        "macro-inflation-cpi",
+        "season-energie"
+      ],
+      "wordCount": 195,
+      "file": "season-or-argent-platine.md"
+    },
+    {
+      "id": "ta-confluences",
+      "title": "Confluences techniques et methodologie point bas",
+      "source": "technical-analysis.md",
+      "symbols": [],
+      "themes": [
+        "analyse-technique",
+        "confluence",
+        "volatilite",
+        "risk-off"
+      ],
+      "conditions": {
+        "flags": [
+          "RSI_EXTREME",
+          "VOLUME_SPIKE",
+          "SMA200_CROSS",
+          "ATH_PROXIMITY",
+          "EMA_BREAK",
+          "EXTREME_MOVE"
+        ],
+        "actors": [],
+        "regimes": [
+          "risk-off",
+          "choc-exogene"
+        ],
+        "vix_above": 30,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "ta-rsi-zones",
+        "ta-ema-sma",
+        "ta-volume-signals",
+        "ta-support-resistance",
+        "ta-fibonacci",
+        "ta-hierarchy"
+      ],
+      "wordCount": 409,
+      "file": "ta-confluences.md"
+    },
+    {
+      "id": "ta-ema-sma",
+      "title": "EMA 9/21 et SMA 200 — Tendances court et long terme",
+      "source": "technical-analysis.md",
+      "symbols": [],
+      "themes": [
+        "analyse-technique",
+        "momentum",
+        "confluence"
+      ],
+      "conditions": {
+        "flags": [
+          "EMA_BREAK",
+          "SMA200_CROSS"
+        ],
+        "actors": [],
+        "regimes": [],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "ta-hierarchy",
+        "ta-rsi-zones",
+        "ta-confluences",
+        "ta-support-resistance"
+      ],
+      "wordCount": 373,
+      "file": "ta-ema-sma.md"
+    },
+    {
+      "id": "ta-fibonacci",
+      "title": "Fibonacci — Retracements, zone OTE et flux institutionnels",
+      "source": "technical-analysis.md",
+      "symbols": [],
+      "themes": [
+        "analyse-technique",
+        "confluence"
+      ],
+      "conditions": {
+        "flags": [
+          "ZONE_EVENT",
+          "PRICE_MOVE"
+        ],
+        "actors": [],
+        "regimes": [],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "medium",
+      "related_chunks": [
+        "ta-support-resistance",
+        "ta-confluences",
+        "ta-hierarchy"
+      ],
+      "wordCount": 251,
+      "file": "ta-fibonacci.md"
+    },
+    {
+      "id": "ta-hierarchy",
+      "title": "Hierarchie des analyses — Fondamental = direction, technique = timing",
+      "source": "technical-analysis.md",
+      "symbols": [],
+      "themes": [
+        "analyse-technique",
+        "confluence"
+      ],
+      "conditions": {
+        "flags": [],
+        "actors": [],
+        "regimes": [],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "ta-confluences",
+        "ta-ema-sma",
+        "ta-rsi-zones",
+        "ta-support-resistance"
+      ],
+      "wordCount": 269,
+      "file": "ta-hierarchy.md"
+    },
+    {
+      "id": "ta-leading-indicators",
+      "title": "Indicateurs avances — Yield spread et M2 comme signaux precurseurs",
+      "source": "technical-analysis.md",
+      "symbols": [
+        "TLT",
+        "DX-Y.NYB",
+        "EURUSD=X",
+        "^GSPC",
+        "BTC-USD"
+      ],
+      "themes": [
+        "analyse-technique",
+        "taux",
+        "liquidite",
+        "m2"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE",
+          "CAUSAL_CHAIN"
+        ],
+        "actors": [
+          "powell",
+          "lagarde"
+        ],
+        "regimes": [],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "medium",
+      "related_chunks": [
+        "ta-hierarchy",
+        "ta-confluences",
+        "asset-yields-bonds",
+        "asset-dollar-index"
+      ],
+      "wordCount": 237,
+      "file": "ta-leading-indicators.md"
+    },
+    {
+      "id": "ta-rsi-zones",
+      "title": "RSI 14 — Zones, divergences et failure swings",
+      "source": "technical-analysis.md",
+      "symbols": [],
+      "themes": [
+        "analyse-technique",
+        "confluence",
+        "momentum"
+      ],
+      "conditions": {
+        "flags": [
+          "RSI_EXTREME"
+        ],
+        "actors": [],
+        "regimes": [],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "ta-confluences",
+        "ta-hierarchy",
+        "ta-ema-sma"
+      ],
+      "wordCount": 290,
+      "file": "ta-rsi-zones.md"
+    },
+    {
+      "id": "ta-support-resistance",
+      "title": "Support / Resistance — Types de niveaux et ATH/ATL",
+      "source": "technical-analysis.md",
+      "symbols": [],
+      "themes": [
+        "analyse-technique",
+        "confluence"
+      ],
+      "conditions": {
+        "flags": [
+          "ZONE_EVENT",
+          "ATH_PROXIMITY"
+        ],
+        "actors": [],
+        "regimes": [],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "ta-fibonacci",
+        "ta-ema-sma",
+        "ta-confluences"
+      ],
+      "wordCount": 243,
+      "file": "ta-support-resistance.md"
+    },
+    {
+      "id": "ta-volume-signals",
+      "title": "Volume — Ratios, conviction et distribution institutionnelle",
+      "source": "technical-analysis.md",
+      "symbols": [],
+      "themes": [
+        "analyse-technique",
+        "confluence",
+        "liquidite"
+      ],
+      "conditions": {
+        "flags": [
+          "VOLUME_SPIKE"
+        ],
+        "actors": [],
+        "regimes": [],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "medium",
+      "related_chunks": [
+        "ta-confluences",
+        "ta-ema-sma",
+        "ta-hierarchy"
+      ],
+      "wordCount": 258,
+      "file": "ta-volume-signals.md"
+    },
+    {
+      "id": "tone-analyse-technique",
+      "title": "Ton — Analyse technique narrative et transitions",
+      "source": "tone-references.md",
+      "symbols": [],
+      "themes": [
+        "ton",
+        "narration",
+        "analyse-technique",
+        "structure-episode",
+        "confluence"
+      ],
+      "conditions": {
+        "flags": [],
+        "actors": [],
+        "regimes": [],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "tone-chaine-causale",
+        "narr-transitions"
+      ],
+      "wordCount": 209,
+      "file": "tone-analyse-technique.md"
+    },
+    {
+      "id": "tone-chaine-causale",
+      "title": "Ton — Chaîne causale fluide et lecture business",
+      "source": "tone-references.md",
+      "symbols": [],
+      "themes": [
+        "ton",
+        "narration",
+        "structure-episode",
+        "confluence"
+      ],
+      "conditions": {
+        "flags": [],
+        "actors": [],
+        "regimes": [],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "tone-cold-open",
+        "tone-analyse-technique",
+        "narr-transitions"
+      ],
+      "wordCount": 191,
+      "file": "tone-chaine-causale.md"
+    },
+    {
+      "id": "tone-closing",
+      "title": "Ton — Closing/CTA et registre calme vs fort",
+      "source": "tone-references.md",
+      "symbols": [],
+      "themes": [
+        "ton",
+        "narration",
+        "structure-episode"
+      ],
+      "conditions": {
+        "flags": [],
+        "actors": [],
+        "regimes": [],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "high",
+      "related_chunks": [
+        "tone-cold-open",
+        "tone-chaine-causale"
+      ],
+      "wordCount": 221,
+      "file": "tone-closing.md"
+    },
+    {
+      "id": "tone-cold-open",
+      "title": "Ton — Entrée en matière percutante (cold open)",
+      "source": "tone-references.md",
+      "symbols": [],
+      "themes": [
+        "ton",
+        "structure-episode",
+        "narration"
+      ],
+      "conditions": {
+        "flags": [],
+        "actors": [],
+        "regimes": [],
+        "vix_above": 0,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "tone-chaine-causale",
+        "tone-closing"
+      ],
+      "wordCount": 192,
+      "file": "tone-cold-open.md"
+    }
+  ]
+}
