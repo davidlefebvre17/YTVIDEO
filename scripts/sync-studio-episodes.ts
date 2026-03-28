@@ -77,7 +77,7 @@ function main() {
       // Rewrite image paths to per-episode public dir
       if (entry.hasImages) {
         for (const beat of beats) {
-          if (beat.imagePath && beat.imagePath.includes("editorial/")) {
+          if (beat.imagePath && (beat.imagePath.includes("editorial/") || beat.imagePath.includes("editorial\\"))) {
             beat.imagePath = `editorial/ep-${entry.date}/${path.basename(beat.imagePath)}`;
           }
         }

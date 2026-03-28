@@ -130,8 +130,8 @@ export function syncImagesToPublic(
     try {
       copyFileSync(sourcePath, episodeImagePath);
       copyFileSync(sourcePath, publicImagePath);
-      // Return path relative to public/ for Remotion (e.g., "editorial/beat-001.png")
-      updatedMap.set(key, join("editorial", filename));
+      // Return path relative to public/ for Remotion — always forward slashes (web URLs)
+      updatedMap.set(key, `editorial/${filename}`);
     } catch (err) {
       console.warn(
         `Failed to sync image ${filename}: ${(err as Error).message}`
