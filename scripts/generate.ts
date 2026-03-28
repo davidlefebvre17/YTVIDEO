@@ -424,7 +424,7 @@ async function main() {
     console.log("  Syncing audio durations...");
     try {
       const { parseFile } = await import("music-metadata");
-      const remotionAudioDir = path.resolve(__dirname, "..", "packages", "remotion-app", "public", "audio", "beats");
+      const remotionAudioDir = path.join(epDir, "audio");
       let synced = 0;
       for (const beat of beats) {
         if (!beat.audioPath) continue;
