@@ -31,6 +31,7 @@ import { InkSubtitle, type SubtitleLine } from "../scenes/shared/InkSubtitle";
 import { GrainOverlay } from "../scenes/shared/GrainOverlay";
 import { DisclaimerBar } from "../scenes/shared/DisclaimerBar";
 import { BeatAudioTrack } from "../audio/BeatAudioTrack";
+import { getSfxPath, SFX_VOLUME } from "../audio/sfx-library";
 import { DisclaimerScene } from "../scenes/shared/DisclaimerScene";
 import { TypewriterTitle } from "../scenes/shared/TypewriterTitle";
 import {
@@ -496,6 +497,27 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
         />
       </Sequence>
 
+      {/* ── SFX: Newspaper unfold at episode start ── */}
+      <Sequence from={0} durationInFrames={Math.round(2 * fps)}>
+        <Audio src={getSfxPath("unfold", 0)} volume={SFX_VOLUME.unfold} />
+      </Sequence>
+
+      {/* ── SFX: Typing during newspaper headline typewriter ── */}
+      <Sequence
+        from={OWL_INTRO_FRAMES + OWL_DIVE_FRAMES - OWL_CLIP_OVERLAP}
+        durationInFrames={Math.min(timings.newspaperIntroFrames, Math.round(3 * fps))}
+      >
+        <Audio src={getSfxPath("typing", 0)} volume={SFX_VOLUME.typing} />
+      </Sequence>
+
+      {/* ── SFX: Ticker ambient during newspaper intro (voice over newspaper) ── */}
+      <Sequence
+        from={OWL_INTRO_FRAMES + OWL_DIVE_FRAMES - OWL_CLIP_OVERLAP + Math.round(3 * fps)}
+        durationInFrames={Math.max(30, timings.newspaperIntroFrames - Math.round(3 * fps))}
+      >
+        <Audio src={getSfxPath("ticker", 0)} volume={0.06} loop />
+      </Sequence>
+
       {/* ── 3. Segment zoom loops ── */}
       {timings.segTimings.map((st, i) => {
         const segBeats = beatGroups.get(st.segId) ?? [];
@@ -555,6 +577,11 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
               </ZoomTransition>
             </Sequence>
 
+            {/* SFX: Paper rustle on zoom in */}
+            <Sequence from={st.zoomInStart} durationInFrames={ZOOM_FRAMES}>
+              <Audio src={getSfxPath("paperSlide", i)} volume={SFX_VOLUME.paperSlide} />
+            </Sequence>
+
             {/* Beats play full-screen (first beat overlaps zoom-in end for smooth crossfade) */}
             {segBeats.map((beat, j) => {
               const globalIdx = beats.indexOf(beat);
@@ -564,6 +591,8 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
               const effectiveFade = j === 0
                 ? Math.max(bt.fadeFrames, CROSSFADE_FRAMES)
                 : bt.fadeFrames;
+              const hasOverlay = beat.overlay && (beat.overlay.type as string) !== 'none';
+              const overlayType = beat.overlay?.type as string | undefined;
               return (
                 <Sequence
                   key={beat.id}
@@ -577,16 +606,38 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
                     durationInFrames={bt.duration}
                     fadeFrames={effectiveFade}
                   />
-                  {/* Segment title overlay on first beat */}
+                  {/* Segment title overlay on first beat + letterpress stamp SFX */}
                   {j === 0 && section && (
-                    <TypewriterTitle
-                      text={section.title}
-                      durationInFrames={Math.min(
-                        60,
-                        Math.round(1.5 * fps),
-                      )}
-                      accentColor={accentColor}
-                    />
+                    <>
+                      <TypewriterTitle
+                        text={section.title}
+                        durationInFrames={Math.min(60, Math.round(1.5 * fps))}
+                        accentColor={accentColor}
+                      />
+                      <Audio src={getSfxPath("stamp", i)} volume={SFX_VOLUME.stamp * 0.7} />
+                    </>
+                  )}
+                  {/* SFX: subtle pen on image crossfade (not first beat) */}
+                  {j > 0 && effectiveFade > 0 && (
+                    <Audio src={getSfxPath("pen", globalIdx)} volume={0.10} />
+                  )}
+                  {/* SFX: typewriter key when data overlay appears */}
+                  {hasOverlay && (overlayType === 'stat' || overlayType === 'gauge_rsi' || overlayType === 'gauge_fear_greed' || overlayType === 'multi_badge') && (
+                    <Sequence from={Math.round((beat.overlay?.enterDelayMs ?? 300) / 1000 * fps)} durationInFrames={Math.round(0.5 * fps)}>
+                      <Audio src={getSfxPath("sting", globalIdx)} volume={SFX_VOLUME.sting * 0.7} />
+                    </Sequence>
+                  )}
+                  {/* SFX: ticker ambient when causal chain displays */}
+                  {hasOverlay && overlayType === 'causal_chain' && (
+                    <Sequence from={Math.round((beat.overlay?.enterDelayMs ?? 300) / 1000 * fps)} durationInFrames={Math.round(2 * fps)}>
+                      <Audio src={getSfxPath("ticker", globalIdx)} volume={0.08} />
+                    </Sequence>
+                  )}
+                  {/* SFX: bell on scenario fork */}
+                  {hasOverlay && overlayType === 'scenario_fork' && (
+                    <Sequence from={Math.round((beat.overlay?.enterDelayMs ?? 300) / 1000 * fps)} durationInFrames={Math.round(1 * fps)}>
+                      <Audio src={getSfxPath("stingBell", globalIdx)} volume={SFX_VOLUME.stingBell * 0.7} />
+                    </Sequence>
                   )}
                 </Sequence>
               );
@@ -612,18 +663,32 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
               </ZoomTransition>
             </Sequence>
 
+            {/* SFX: Page flip on zoom out */}
+            <Sequence from={st.zoomOutStart} durationInFrames={ZOOM_FRAMES}>
+              <Audio src={getSfxPath("pageFlip", i)} volume={SFX_VOLUME.pageFlip} />
+            </Sequence>
+
             {/* Brief pause on newspaper between segments */}
             {i < segmentIds.length - 1 && BETWEEN_FRAMES > 0 && (
-              <Sequence
-                from={st.zoomOutStart + ZOOM_FRAMES}
-                durationInFrames={BETWEEN_FRAMES}
-              >
-                <NewspaperPage
-                  {...npProps}
-                  activeSegmentIdx={i + 1}
-                  showTypewriter={false}
-                />
-              </Sequence>
+              <>
+                <Sequence
+                  from={st.zoomOutStart + ZOOM_FRAMES}
+                  durationInFrames={BETWEEN_FRAMES}
+                >
+                  <NewspaperPage
+                    {...npProps}
+                    activeSegmentIdx={i + 1}
+                    showTypewriter={false}
+                  />
+                </Sequence>
+                {/* SFX: subtle clock tick during pause */}
+                <Sequence
+                  from={st.zoomOutStart + ZOOM_FRAMES}
+                  durationInFrames={BETWEEN_FRAMES}
+                >
+                  <Audio src={getSfxPath("clock", i)} volume={SFX_VOLUME.clock * 0.4} />
+                </Sequence>
+              </>
             )}
           </React.Fragment>
         );
@@ -639,6 +704,14 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
           activeSegmentIdx={-1}
           showTypewriter={false}
         />
+      </Sequence>
+
+      {/* ── SFX: Portfolio close at episode end ── */}
+      <Sequence
+        from={timings.closingStart + timings.closingDur - Math.round(2 * fps)}
+        durationInFrames={Math.round(2 * fps)}
+      >
+        <Audio src={getSfxPath("close", 0)} volume={SFX_VOLUME.close} />
       </Sequence>
 
       {/* ── Owl audio: intro over video clips ── */}
@@ -676,7 +749,6 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
         beats={beats}
         beatTimings={timings.allBeatTimings}
         fps={fps}
-        direction={script.direction}
       />
 
       {/* ── Scrolling ticker — only during segment beats ── */}
@@ -716,12 +788,30 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
         const stampStart = firstT.start;
         const stampDur = lastT.start + lastT.duration - stampStart;
         return (
-          <Sequence from={stampStart} durationInFrames={stampDur}>
-            <StampOverlay
-              assets={assets}
-              durationInFrames={stampDur}
-            />
-          </Sequence>
+          <>
+            <Sequence from={stampStart} durationInFrames={stampDur}>
+              <StampOverlay
+                assets={assets}
+                durationInFrames={stampDur}
+              />
+            </Sequence>
+            {/* SFX: 1 stamp sound per asset, synced with StampOverlay appearance */}
+            {(() => {
+              // Mirror StampOverlay's appearance timing: 85% of duration, evenly spaced
+              const appearWindow = Math.round(stampDur * 0.85);
+              const count = assets.length;
+              const interval = count > 1 ? appearWindow / (count - 1) : 0;
+              return assets.map((_, j) => (
+                <Sequence
+                  key={`stamp-sfx-${j}`}
+                  from={stampStart + Math.round(j * interval)}
+                  durationInFrames={Math.round(0.8 * fps)}
+                >
+                  <Audio src={getSfxPath("stamp", j)} volume={SFX_VOLUME.stamp * 0.6} />
+                </Sequence>
+              ));
+            })()}
+          </>
         );
       })()}
 
