@@ -84,6 +84,13 @@ export async function annotateBeats(
       // Handle both array and { annotations: [...] } format
       const rawAnns = Array.isArray(response) ? response : (response as any).annotations ?? [];
       const validated = validateAnnotations(rawAnns, segBeats, snapshot);
+      // PANORAMA beats: force overlayType='none' — visuals handled by StampOverlay
+      if (segId === 'seg_panorama') {
+        for (const ann of validated) {
+          ann.overlayType = 'none';
+          ann.overlaySpec = null;
+        }
+      }
       allAnnotations.push(...validated);
     }
 

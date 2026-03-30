@@ -219,8 +219,14 @@ export function computeNewspaperDuration(
   let segTotal = 0;
   for (let i = 0; i < segIds.length; i++) {
     const dur = groupDurationFrames(groups.get(segIds[i]) ?? [], fps);
-    // CROSSFADE_FRAMES overlap means beats start earlier, reducing total
-    segTotal += ZOOM_FRAMES + dur + ZOOM_FRAMES - CROSSFADE_FRAMES;
+    const isPanorama = segIds[i] === 'seg_panorama';
+    if (isPanorama) {
+      // PANORAMA: no zoom in/out, just raw beat duration on newspaper page
+      segTotal += dur;
+    } else {
+      // CROSSFADE_FRAMES overlap means beats start earlier, reducing total
+      segTotal += ZOOM_FRAMES + dur + ZOOM_FRAMES - CROSSFADE_FRAMES;
+    }
     if (i < segIds.length - 1) segTotal += BETWEEN_FRAMES;
   }
 
@@ -356,11 +362,29 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
         beatGroups.get(segId) ?? [],
         fps,
       );
+      const isPanorama = segId === 'seg_panorama';
+      const isLast = i === segmentIds.length - 1;
+
+      if (isPanorama) {
+        // PANORAMA: no zoom in/out — stays on newspaper page with StampOverlay + audio
+        const beatsStart = segCum;
+        const end = beatsStart + dur + (isLast ? 0 : BETWEEN_FRAMES);
+        sectionStarts.set(segId, beatsStart);
+        segCum = end;
+        return {
+          segIdx: i,
+          segId,
+          zoomInStart: beatsStart, // no zoom, but field required
+          beatsStart,
+          zoomOutStart: beatsStart + dur, // no zoom, but field required
+          end,
+        };
+      }
+
       const zoomInStart = segCum;
       // Beats start CROSSFADE_FRAMES before zoom ends (overlap for smooth transition)
       const beatsStart = zoomInStart + ZOOM_FRAMES - CROSSFADE_FRAMES;
       const zoomOutStart = beatsStart + dur;
-      const isLast = i === segmentIds.length - 1;
       const end =
         zoomOutStart + ZOOM_FRAMES + (isLast ? 0 : BETWEEN_FRAMES);
       sectionStarts.set(segId, beatsStart);
@@ -478,6 +502,38 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
         const section = script.sections.find((s) => s.id === st.segId);
         const rect = segmentRects[i];
         if (!rect || segBeats.length === 0) return null;
+
+        const isPanorama = st.segId === 'seg_panorama';
+
+        // PANORAMA: stay on newspaper page — no zoom, no BeatSequence images
+        // Audio plays via BeatAudioTrack, stamps via StampOverlay (rendered separately)
+        if (isPanorama) {
+          const panoDur = st.zoomOutStart - st.beatsStart;
+          return (
+            <React.Fragment key={st.segId}>
+              <Sequence from={st.beatsStart} durationInFrames={panoDur}>
+                <NewspaperPage
+                  {...npProps}
+                  activeSegmentIdx={i}
+                  showTypewriter={false}
+                />
+              </Sequence>
+              {/* Brief pause on newspaper between segments */}
+              {i < segmentIds.length - 1 && BETWEEN_FRAMES > 0 && (
+                <Sequence
+                  from={st.zoomOutStart}
+                  durationInFrames={BETWEEN_FRAMES}
+                >
+                  <NewspaperPage
+                    {...npProps}
+                    activeSegmentIdx={i < segmentIds.length - 1 ? i + 1 : -1}
+                    showTypewriter={false}
+                  />
+                </Sequence>
+              )}
+            </React.Fragment>
+          );
+        }
 
         return (
           <React.Fragment key={st.segId}>

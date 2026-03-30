@@ -90,19 +90,26 @@ export async function runC7Direction(
 ): Promise<C7DirectionResult> {
   const beatIds = new Set(rawBeats.map(b => b.id));
 
+  // Filter out PANORAMA beats — they use StampOverlay on newspaper page, not generated images
+  const panoramaBeats = rawBeats.filter(b => b.segmentId === 'seg_panorama');
+  const beatsForC7 = rawBeats.filter(b => b.segmentId !== 'seg_panorama');
+  if (panoramaBeats.length > 0) {
+    console.log(`  C7: skipping ${panoramaBeats.length} PANORAMA beats (StampOverlay, no images)`);
+  }
+
   try {
-    console.log(`  C7 Direction Artistique: ${rawBeats.length} beats → Sonnet...`);
+    console.log(`  C7 Direction Artistique: ${beatsForC7.length} beats → Sonnet...`);
 
     let result: C7DirectionResult;
 
     const ev = options.editorialVisuals;
 
-    if (rawBeats.length <= CHUNK_SIZE) {
-      result = await callC7Chunk(rawBeats, direction, assets, '1/1', ev);
+    if (beatsForC7.length <= CHUNK_SIZE) {
+      result = await callC7Chunk(beatsForC7, direction, assets, '1/1', ev);
     } else {
       const chunks: RawBeat[][] = [];
-      for (let i = 0; i < rawBeats.length; i += CHUNK_SIZE) {
-        chunks.push(rawBeats.slice(i, i + CHUNK_SIZE));
+      for (let i = 0; i < beatsForC7.length; i += CHUNK_SIZE) {
+        chunks.push(beatsForC7.slice(i, i + CHUNK_SIZE));
       }
 
       const firstResult = await callC7Chunk(chunks[0], direction, assets, `1/${chunks.length}`, ev);
@@ -130,7 +137,22 @@ export async function runC7Direction(
       .filter(d => beatIds.has(d.beatId))
       .map(d => validateDirection(d, beatIds));
 
-    const missingBeats = rawBeats.filter(b => !validatedDirections.find(d => d.beatId === b.id));
+    // Add PANORAMA beats with empty imageDirection (no image generation needed)
+    for (const pb of panoramaBeats) {
+      validatedDirections.push({
+        beatId: pb.id,
+        imageDirection: '',
+        imageReuse: 'skip_panorama',
+        overlay: 'none',
+        imageEffect: 'static',
+        transitionOut: pb.isSegmentEnd ? 'cross_dissolve' : 'fade',
+        emotion: 'contexte',
+      });
+    }
+
+    const missingBeats = rawBeats.filter(b =>
+      b.segmentId !== 'seg_panorama' && !validatedDirections.find(d => d.beatId === b.id),
+    );
     for (const missing of missingBeats) {
       validatedDirections.push({
         beatId: missing.id,

@@ -101,7 +101,7 @@ export async function generateBeats(
     }
 
     const segmentAssets = section.assets ?? [];
-    const segmentDepth = (section.depth ?? 'focus') as 'flash' | 'focus' | 'deep';
+    const segmentDepth = (section.depth ?? 'focus') as 'flash' | 'focus' | 'deep' | 'panorama';
 
     for (let i = 0; i < chunks.length; i++) {
       const chunk = chunks[i];
@@ -130,7 +130,7 @@ export async function generateBeats(
   if (analysis) {
     console.log(`  P7a.5: Annotating ${beats.length} beats via Haiku...`);
     const annotations = await annotateBeats(beats, snapshot, analysis);
-    mergeAnnotations(beats, annotations);
+    mergeAnnotations(beats, annotations, analysis);
 
     const overlayCount = beats.filter(b => b.overlayHint !== 'none').length;
     console.log(`  P7a.5: ${overlayCount} overlays (${Math.round(overlayCount / beats.length * 100)}%), ${annotations.filter(a => a.isKeyMoment).length} key moments`);
@@ -144,8 +144,15 @@ export async function generateBeats(
 
 // ── Merge annotations into beats ────────────────────────────
 
-function mergeAnnotations(beats: RawBeat[], annotations: BeatAnnotation[]): void {
+function mergeAnnotations(beats: RawBeat[], annotations: BeatAnnotation[], analysis?: AnalysisBundle): void {
   const annMap = new Map(annotations.map(a => [a.beatId, a]));
+  // Index C2 scenarios by segmentId for fallback enrichment
+  const segScenarios = new Map<string, { bullish: { target: string; condition: string }; bearish: { target: string; condition: string } }>();
+  if (analysis) {
+    for (const seg of analysis.segments) {
+      if (seg.scenarios) segScenarios.set(seg.segmentId, seg.scenarios);
+    }
+  }
 
   for (const beat of beats) {
     const ann = annMap.get(beat.id);
@@ -153,6 +160,20 @@ function mergeAnnotations(beats: RawBeat[], annotations: BeatAnnotation[]): void
 
     beat.overlayHint = ann.overlayType;
     beat.overlayData = normalizeOverlayData(ann.overlayType, ann.overlaySpec, ann.primaryAsset);
+
+    // Enrich scenario_fork with C2 data when Haiku left fields empty
+    if (ann.overlayType === 'scenario_fork' && beat.overlayData) {
+      const d = beat.overlayData;
+      const c2 = segScenarios.get(beat.segmentId);
+      if (c2 && !d.bullTarget && !d.bullCondition) {
+        d.bullTarget = c2.bullish.target;
+        d.bullCondition = c2.bullish.condition;
+        d.bearTarget = c2.bearish.target;
+        d.bearCondition = c2.bearish.condition;
+        d.bull = `${c2.bullish.target} — ${c2.bullish.condition}`;
+        d.bear = `${c2.bearish.target} — ${c2.bearish.condition}`;
+      }
+    }
 
     // Store annotation fields in beat for downstream use (C7, Remotion)
     (beat as any).emotion = ann.emotion;
@@ -217,14 +238,24 @@ function normalizeOverlayData(
     }
 
     case 'scenario_fork': {
-      // Haiku: { bullish: { target, condition }, bearish: { target, condition } }
-      // Remotion expects: { trunk, bull, bear }
-      const bull = spec.bullish as any;
-      const bear = spec.bearish as any;
+      // Haiku sends FLAT: { trunk, asset, bullTarget, bullCondition, bearTarget, bearCondition }
+      // OR nested: { bullish: { target, condition }, bearish: { target, condition } }
+      // Remotion expects: { trunk, bullTarget, bullCondition, bearTarget, bearCondition }
+      const nested = spec.bullish as any;
+      const bullTarget = (spec.bullTarget as string) ?? nested?.target ?? '';
+      const bullCondition = (spec.bullCondition as string) ?? nested?.condition ?? '';
+      const bearNested = spec.bearish as any;
+      const bearTarget = (spec.bearTarget as string) ?? bearNested?.target ?? '';
+      const bearCondition = (spec.bearCondition as string) ?? bearNested?.condition ?? '';
       return {
         trunk: spec.trunk ?? primaryAsset ?? '',
-        bull: bull ? `${bull.target ?? ''} — ${bull.condition ?? ''}`.trim() : (spec.bull as string) ?? '',
-        bear: bear ? `${bear.target ?? ''} — ${bear.condition ?? ''}`.trim() : (spec.bear as string) ?? '',
+        bullTarget,
+        bullCondition,
+        bearTarget,
+        bearCondition,
+        // Legacy fallback fields for old DataOverlay code
+        bull: bullTarget && bullCondition ? `${bullTarget} — ${bullCondition}` : (spec.bull as string) ?? '',
+        bear: bearTarget && bearCondition ? `${bearTarget} — ${bearCondition}` : (spec.bear as string) ?? '',
       };
     }
 
