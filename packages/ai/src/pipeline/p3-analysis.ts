@@ -4,7 +4,7 @@ import { generateStructuredJSON } from "../llm-client";
 import { loadMemory } from "@yt-maker/data";
 import type {
   SnapshotFlagged, EditorialPlan, AnalysisBundle, CausalBrief,
-  FlaggedAsset,
+  FlaggedAsset, EpisodeSummary,
 } from "./types";
 import type { DailySnapshot, Language } from "@yt-maker/core";
 import type { BriefingPack } from "./helpers/briefing-pack";
@@ -202,7 +202,8 @@ Le COT reflète les positions AVANT le move du jour, jamais pendant. Trois règl
    a. Signal prospectif de risque : "les spéculateurs étaient extreme_long avant le spike → risque de capitulation si le move se retourne"
    b. Divergence structurelle : "COT bearish sur DXY malgré la hausse → divergence spéculateurs/prix, à surveiller"
    c. Signal de fond neutre : "pas de capitulation structurelle visible dans le COT" (sans relier au move du jour)
-Si le COT est cité dans un segment, le sourcesUsed DOIT noter "market_memory" avec le daysOld exact.`;
+Si le COT est cité dans un segment, le sourcesUsed DOIT noter "market_memory" avec le daysOld exact.
+- **Anti-répétition** : si un mécanisme est listé dans "MÉCANISMES DÉJÀ ENSEIGNÉS", ne le réexpliquez pas dans fondamentalContext ou causalChain. Trouvez un angle plus profond via le KNOWLEDGE : positionnement COT, saisonnalité, yield spreads, divergences de corrélation, impact sectoriel, etc.`;
 }
 
 function buildC2UserPrompt(
@@ -212,6 +213,7 @@ function buildC2UserPrompt(
   researchContext: string,
   knowledge: string,
   briefingPack?: BriefingPack,
+  episodeSummaries?: EpisodeSummary[],
 ): string {
   let prompt = '';
 
@@ -228,6 +230,18 @@ function buildC2UserPrompt(
     if (seg.continuityFromJ1) prompt += `  Continuité J-1: ${seg.continuityFromJ1}\n`;
   }
   prompt += '\n';
+
+  // Mechanisms already explained to audience
+  const recentMechanisms = (episodeSummaries || [])
+    .filter(s => ['J-1', 'J-2', 'J-3'].includes(s.label))
+    .flatMap(s => s.mechanismsExplained || []);
+
+  if (recentMechanisms.length > 0) {
+    prompt += `## MÉCANISMES DÉJÀ ENSEIGNÉS (J-1 à J-3)\n`;
+    prompt += `Le spectateur comprend déjà ces mécanismes. Ne les réexpliquez pas — référencez-les brièvement et allez PLUS PROFOND.\n`;
+    prompt += recentMechanisms.map(m => `- ${m}`).join('\n');
+    prompt += `\n\nPour chaque segment, votre analyse DOIT explorer un angle ou mécanisme DIFFÉRENT de ceux ci-dessus. Utilisez le KNOWLEDGE pour trouver des angles fondamentaux plus profonds (saisonnalité, COT, yield spreads, carry trade, etc.).\n\n`;
+  }
 
   // Briefing Pack (raw editorial context for trigger/news citation)
   if (briefingPack) {
@@ -326,6 +340,7 @@ export async function runC2Analysis(input: {
   snapshot: DailySnapshot;
   briefingPack?: BriefingPack;
   knowledgeBriefing?: string;
+  episodeSummaries?: EpisodeSummary[];
   lang: Language;
 }): Promise<AnalysisBundle> {
   // Load only Tier 2/3 knowledge for selected assets (NOT full 119K)
@@ -342,6 +357,7 @@ export async function runC2Analysis(input: {
     input.researchContext,
     knowledge,
     input.briefingPack,
+    input.episodeSummaries,
   );
 
   console.log('  P3 C2 Sonnet — analyse approfondie...');

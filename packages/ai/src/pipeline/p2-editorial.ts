@@ -46,6 +46,7 @@ function formatEpisodeSummariesCompact(summaries: EpisodeSummary[]): string {
       line += `\n  Prédictions: ${preds}`;
     }
     if (s.angles.length) line += `\n  Angles: ${s.angles.filter(Boolean).join(', ')}`;
+    if (s.mechanismsExplained?.length) line += `\n  Mécanismes enseignés: ${s.mechanismsExplained.join(' | ')}`;
     if (s.forwardLooking?.length) line += `\n  À venir: ${s.forwardLooking.join(' | ')}`;
     return line;
   }).join('\n\n');
@@ -86,6 +87,19 @@ CONTRAINTES STRUCTURELLES (STRICTES) :
 - Ne pas re-couvrir un sujet traité les 2 derniers jours avec le MÊME angle
 - Identifier au moins 1 continuité J-1 si une prédiction passée est résolue ou invalidée
 - Le fil conducteur (threadSummary) doit relier au moins 3 segments entre eux
+
+### MÉCANISMES DÉJÀ ENSEIGNÉS (anti-répétition)
+
+Les épisodes récents listent les MÉCANISMES FONDAMENTAUX déjà expliqués au spectateur. Ces mécanismes sont ACQUIS — le spectateur les comprend.
+
+Règles :
+1. **Ne JAMAIS ré-expliquer un mécanisme déjà enseigné.** Si J-1 a expliqué "Iran → pétrole → inflation → Fed contrainte", le spectateur le sait. Aujourd'hui, référencez-le en une phrase ("on a vu hier pourquoi le pétrole monte quand Trump parle") et ALLEZ PLUS LOIN.
+2. **Aller plus profond** : si le même asset revient, l'angle DOIT explorer un mécanisme DIFFÉRENT. Exemples :
+   - J-1 a expliqué la chaîne pétrole→inflation → aujourd'hui explore le spread Brent-WTI, ou le positionnement COT, ou l'impact sur les compagnies aériennes
+   - J-1 a expliqué la correction Nasdaq → aujourd'hui explore le ratio put/call, ou la rotation Growth→Value, ou les rachats d'actions
+   - J-1 a expliqué le paradoxe or/refuge → aujourd'hui explore les achats banques centrales, ou la saisonnalité T1 de l'or
+3. Dans le champ "angle" : préciser QUEL nouveau mécanisme sera exploré (pas juste le topic)
+4. **Exception** : si l'événement est un retournement COMPLET (hier -6%, aujourd'hui +8%), le retournement lui-même EST le nouveau mécanisme
 - DÉCLENCHEURS POLITIQUES : si un mouvement >3% est lié à une déclaration politique identifiable, le champ trigger est OBLIGATOIRE (actor + action + source)
 - COHÉRENCE THÉMATIQUE INVERSE : si le thème du jour est géopolitique, cherche les actifs en direction OPPOSÉE (défense si désescalade, refuges si escalade) — ces actifs ont valeur de "revers de médaille" même avec un drama score modéré
 - STOCKS PROMUS [PROMU] : ces actions hors-watchlist ont été promues par le scoring (earnings, buzz, mouvement extrême). Elles peuvent être FOCUS ou FLASH (jamais DEEP — données allégées). Intègre-les si leur histoire est narrativement forte.
@@ -164,7 +178,20 @@ function buildC1UserPrompt(
     prompt += '\n';
   }
 
-  prompt += `## ÉPISODES RÉCENTS (${episodeSummaries.length} jours)\n${formatEpisodeSummariesCompact(episodeSummaries)}\n\n`;
+  prompt += `## ÉPISODES RÉCENTS (${episodeSummaries.length} jours)\n`;
+
+  // Extract all mechanisms from last 3 days for emphasis
+  const recentMechanisms = episodeSummaries
+    .filter(s => ['J-1', 'J-2', 'J-3'].includes(s.label))
+    .flatMap(s => s.mechanismsExplained || []);
+
+  if (recentMechanisms.length > 0) {
+    prompt += `\n⚠️ MÉCANISMES ACQUIS PAR LE SPECTATEUR (J-1 à J-3) — NE PAS ré-expliquer :\n`;
+    prompt += recentMechanisms.map(m => `  - ${m}`).join('\n');
+    prompt += `\n\nPour chaque segment sur un asset déjà couvert, l'ANGLE doit explorer un mécanisme DIFFÉRENT de ceux ci-dessus.\n\n`;
+  }
+
+  prompt += `${formatEpisodeSummariesCompact(episodeSummaries)}\n\n`;
 
   if (researchContext) {
     prompt += `## CONTEXTE HISTORIQUE (NewsMemory — articles ANTÉRIEURS au ${flagged.date})\n`;

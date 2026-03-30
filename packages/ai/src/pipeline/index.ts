@@ -154,6 +154,7 @@ export function toEpisodeScript(
     threadSummary: script.metadata.threadSummary,
     segmentCount: script.metadata.segmentCount,
     coverageTopics: script.metadata.coverageTopics,
+    mechanismsExplained: script.metadata.mechanismsExplained ?? [],
     direction: {
       arc: directed.arc,
       transitions: directed.transitions,
@@ -343,6 +344,7 @@ export async function runPipeline(
       snapshot,
       briefingPack,
       knowledgeBriefing,
+      episodeSummaries,
       lang,
     });
     stats.llmCalls++;

@@ -106,6 +106,9 @@ EDITORIAL VISUAL (OBLIGATOIRE pour chaque segment — le directeur artistique en
 
 VISUAL CUES : pour chaque segment, 1-3 visualCues parmi : highlight_asset, show_chart, show_level, direction_arrow, flash, transition, sector_heatmap, macro_stat, comparison
 
+## MÉCANISMES ENSEIGNÉS
+Dans metadata.mechanismsExplained, liste les 3-8 MÉCANISMES FONDAMENTAUX que tu as enseignés dans cet épisode. Un mécanisme = une chaîne causale ou un concept que le spectateur comprend maintenant. Exemples : "corrélation inverse or/dollar via taux réels", "carry trade JPY : différentiel de taux → flux spéculatifs → yen faible", "VIX > 30 = zone peur, historiquement zone d'achat à 3 mois". Ce champ sera utilisé pour éviter de ré-expliquer les mêmes mécanismes dans les prochains épisodes.
+
 SORTIE : JSON strict avec EXACTEMENT cette structure :
 {
   "date": "YYYY-MM-DD",
@@ -130,7 +133,9 @@ SORTIE : JSON strict avec EXACTEMENT cette structure :
   "metadata": {
     "totalWordCount": N, "totalDurationSec": N, "toneProfile": "...",
     "dominantTheme": "...", "threadSummary": "...", "moodMarche": "...",
-    "coverageTopics": ["topic1"], "segmentCount": N
+    "coverageTopics": ["topic1"],
+    "mechanismsExplained": ["chaîne causale explicite ou mécanisme fondamental enseigné — ex: 'Iran → pétrole → inflation → Fed contrainte', 'or chute en crise aiguë (liquidations forcées, margin calls)', 'spread Brent-WTI > 5$ = stress offre internationale'"],
+    "segmentCount": N
   }
 }
 IMPORTANT : le champ "segments" est un ARRAY d'objets avec segmentId, narration, depth, etc. Ne PAS utiliser "sections" ou un autre nom.`;

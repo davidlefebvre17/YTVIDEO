@@ -93,6 +93,7 @@ export interface EpisodeScript {
   threadSummary: string;
   segmentCount: number;
   coverageTopics: string[];
+  mechanismsExplained?: string[];
   direction?: EpisodeDirection;
   /** Owl intro speech (welcome + date + disclaimer) */
   owlIntro?: string;

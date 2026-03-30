@@ -42,16 +42,16 @@ export interface FishTTSResult {
   bytes: number;
 }
 
-/** Presets par type de segment — base speed 1.10 (calibré sur "Bon a savoir") */
+/** Presets par type de segment — base speed 0.95 (posé, naturel, ~150 mots/min) */
 export const FISH_PRESETS = {
   /** Analyse posée, ton professoral */
-  DEEP: { speed: 1.05, temperature: 0.7, topP: 0.8, repetitionPenalty: 1.2 },
+  DEEP: { speed: 0.90, temperature: 0.7, topP: 0.8, repetitionPenalty: 1.2 },
   /** Focus, ton engagé */
-  FOCUS: { speed: 1.10, temperature: 0.75, topP: 0.8, repetitionPenalty: 1.2 },
+  FOCUS: { speed: 0.95, temperature: 0.75, topP: 0.8, repetitionPenalty: 1.2 },
   /** Flash, ton dynamique */
-  FLASH: { speed: 1.15, temperature: 0.8, topP: 0.85, repetitionPenalty: 1.1 },
+  FLASH: { speed: 1.0, temperature: 0.8, topP: 0.85, repetitionPenalty: 1.1 },
   /** Cold open, ton accrocheur */
-  COLD_OPEN: { speed: 1.08, temperature: 0.8, topP: 0.85, repetitionPenalty: 1.2 },
+  COLD_OPEN: { speed: 0.93, temperature: 0.8, topP: 0.85, repetitionPenalty: 1.2 },
 } as const;
 
 function getFishConfig() {

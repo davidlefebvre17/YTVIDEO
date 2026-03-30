@@ -235,6 +235,7 @@ export interface DraftScript {
     threadSummary: string;
     moodMarche: string;
     coverageTopics: string[];
+    mechanismsExplained?: string[];
     segmentCount: number;
   };
 }
@@ -353,6 +354,7 @@ export interface EpisodeSummary {
   /** Events/earnings announced as upcoming in this episode — to be followed up in future episodes */
   forwardLooking: string[];
   angles: string[];
+  mechanismsExplained: string[];
   dominantTheme: string;
   moodMarche: string;
 }

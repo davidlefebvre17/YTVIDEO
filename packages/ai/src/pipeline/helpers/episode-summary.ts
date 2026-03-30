@@ -85,6 +85,7 @@ export function buildEpisodeSummaries(
       angles: script?.sections
         ?.filter(s => s.type === 'segment')
         .map(s => (s.data?.topic as string) ?? s.topic ?? '') ?? [],
+      mechanismsExplained: script?.mechanismsExplained ?? [],
       dominantTheme: script?.threadSummary ?? '',
       moodMarche: ((script as unknown as Record<string, unknown>)?.moodMarche as string) ?? '',
     };
