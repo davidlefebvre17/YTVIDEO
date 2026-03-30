@@ -69,7 +69,7 @@ export interface SnapshotFlagged {
 
 // ── P2 C1 Editorial ─────────────────────────────────────
 
-export type SegmentDepth = 'DEEP' | 'FOCUS' | 'FLASH';
+export type SegmentDepth = 'DEEP' | 'FOCUS' | 'FLASH' | 'PANORAMA';
 
 export interface PlannedSegment {
   id: string;
@@ -440,7 +440,7 @@ export interface RawBeat {
   narrationChunk: string;
   overlayHint: OverlayType | 'none';
   overlayData?: Record<string, unknown>;
-  segmentDepth: 'flash' | 'focus' | 'deep';
+  segmentDepth: 'flash' | 'focus' | 'deep' | 'panorama';
   segmentTopic?: string;
   assets: string[];
   isSegmentStart: boolean;

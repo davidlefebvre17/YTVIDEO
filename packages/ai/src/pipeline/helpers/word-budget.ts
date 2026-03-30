@@ -1,11 +1,12 @@
 import type { EditorialPlan, WordBudget, SegmentDepth } from "../types";
 
-const WORDS_PER_SEC = 150 / 60; // 2.5 words/sec
+const WORDS_PER_SEC = 170 / 60; // ~2.83 words/sec (calibrated on Fish Audio 0.90-0.95 speed)
 
 const DEPTH_WORDS: Record<SegmentDepth, { min: number; target: number; max: number }> = {
-  DEEP:  { min: 225, target: 300, max: 380 },
-  FOCUS: { min: 120, target: 155, max: 200 },
-  FLASH: { min: 50,  target: 62,  max: 75 },
+  DEEP:  { min: 280, target: 370, max: 460 },
+  FOCUS: { min: 150, target: 195, max: 250 },
+  FLASH: { min: 65,  target: 80,  max: 100 },
+  PANORAMA: { min: 200, target: 250, max: 320 },
 };
 
 export function computeWordBudget(plan: EditorialPlan): WordBudget {

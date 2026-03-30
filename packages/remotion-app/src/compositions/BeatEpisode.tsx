@@ -41,6 +41,7 @@ import {
 import { ZoomTransition } from "../scenes/shared/ZoomTransition";
 import { ScrollingTicker } from "../scenes/shared/ScrollingTicker";
 import { NewsRollBanner } from "../scenes/shared/NewsRollBanner";
+import { StampOverlay } from "../scenes/shared/StampOverlay";
 
 // ── Props ────────────────────────────────────────────────────
 export interface BeatEpisodeProps {
@@ -644,6 +645,29 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
           </Sequence>
         );
       })}
+
+      {/* ── Stamp overlay during PANORAMA segment ── */}
+      {(() => {
+        const panoramaSeg = timings.segTimings.find(st => st.segId === "seg_panorama");
+        if (!panoramaSeg) return null;
+        const segBeats = beatGroups.get("seg_panorama") ?? [];
+        if (segBeats.length === 0) return null;
+        const firstIdx = beats.indexOf(segBeats[0]);
+        const lastIdx = beats.indexOf(segBeats[segBeats.length - 1]);
+        const firstT = timings.allBeatTimings[firstIdx];
+        const lastT = timings.allBeatTimings[lastIdx];
+        if (!firstT || !lastT) return null;
+        const stampStart = firstT.start;
+        const stampDur = lastT.start + lastT.duration - stampStart;
+        return (
+          <Sequence from={stampStart} durationInFrames={stampDur}>
+            <StampOverlay
+              assets={assets}
+              durationInFrames={stampDur}
+            />
+          </Sequence>
+        );
+      })()}
 
       {/* ── Viewport-locked overlays ── */}
       <InkSubtitle lines={subtitleLines} />

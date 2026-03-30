@@ -38,7 +38,7 @@ export interface ScriptSection {
   durationSec: number;
   visualCues: VisualCue[];
   data?: Record<string, unknown>;
-  depth?: "flash" | "focus" | "deep";
+  depth?: "flash" | "focus" | "deep" | "panorama";
   topic?: string;
   assets?: string[];
   /** Concept visuel éditorial (Opus C3) — scène narrative pour le directeur artistique C7 */

@@ -83,7 +83,7 @@ function loadKnowledgeForC2(snapshot: DailySnapshot, selectedSymbols: string[]):
  * Format asset data for C2 prompt.
  * DEEP/FOCUS get full data, FLASH gets minimal.
  */
-function formatAssetForC2(asset: FlaggedAsset, depth: 'DEEP' | 'FOCUS' | 'FLASH', snapshotDate?: string): string {
+function formatAssetForC2(asset: FlaggedAsset, depth: 'DEEP' | 'FOCUS' | 'FLASH' | 'PANORAMA', snapshotDate?: string): string {
   const fmt = (n: number) => n.toFixed(asset.price > 100 ? 2 : 4);
   const hi = asset.snapshot.high24h;
   const lo = asset.snapshot.low24h;
@@ -92,7 +92,7 @@ function formatAssetForC2(asset: FlaggedAsset, depth: 'DEEP' | 'FOCUS' | 'FLASH'
   if (hi && lo) text += ` | Séance: low ${fmt(lo)} → high ${fmt(hi)}`;
   text += '\n';
 
-  if (depth === 'FLASH') return text + '\n';
+  if (depth === 'FLASH' || depth === 'PANORAMA') return text + '\n';
 
   // Full data for DEEP/FOCUS
   const t = asset.snapshot.technicals;
@@ -203,7 +203,8 @@ Le COT reflète les positions AVANT le move du jour, jamais pendant. Trois règl
    b. Divergence structurelle : "COT bearish sur DXY malgré la hausse → divergence spéculateurs/prix, à surveiller"
    c. Signal de fond neutre : "pas de capitulation structurelle visible dans le COT" (sans relier au move du jour)
 Si le COT est cité dans un segment, le sourcesUsed DOIT noter "market_memory" avec le daysOld exact.
-- **Anti-répétition** : si un mécanisme est listé dans "MÉCANISMES DÉJÀ ENSEIGNÉS", ne le réexpliquez pas dans fondamentalContext ou causalChain. Trouvez un angle plus profond via le KNOWLEDGE : positionnement COT, saisonnalité, yield spreads, divergences de corrélation, impact sectoriel, etc.`;
+- **Anti-répétition** : si un mécanisme est listé dans "MÉCANISMES DÉJÀ ENSEIGNÉS", ne le réexpliquez pas dans fondamentalContext ou causalChain. Trouvez un angle plus profond via le KNOWLEDGE : positionnement COT, saisonnalité, yield spreads, divergences de corrélation, impact sectoriel, etc.
+- Pour les segments PANORAMA : analyse MINIMALE. Un keyFact par asset (mouvement + raison probable). Pas de causalChain, pas de scenarios, pas de chartInstructions.`;
 }
 
 function buildC2UserPrompt(
@@ -255,7 +256,7 @@ function buildC2UserPrompt(
     for (const symbol of seg.assets) {
       const asset = flagged.assets.find(a => a.symbol === symbol);
       if (asset) {
-        prompt += formatAssetForC2(asset, seg.depth, editorial.date);
+        prompt += formatAssetForC2(asset, seg.depth as 'DEEP' | 'FOCUS' | 'FLASH' | 'PANORAMA', editorial.date);
       }
     }
   }
@@ -345,7 +346,7 @@ export async function runC2Analysis(input: {
 }): Promise<AnalysisBundle> {
   // Load only Tier 2/3 knowledge for selected assets (NOT full 119K)
   const deepFocusSymbols = input.editorial.segments
-    .filter(s => s.depth !== 'FLASH')
+    .filter(s => s.depth !== 'FLASH' && s.depth !== 'PANORAMA')
     .flatMap(s => s.assets);
   const knowledge = input.knowledgeBriefing || loadKnowledgeForC2(input.snapshot, deepFocusSymbols);
 

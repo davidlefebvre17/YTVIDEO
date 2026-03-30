@@ -122,7 +122,7 @@ export function toEpisodeScript(
     narration: seg.narration,
     durationSec: seg.durationSec,
     visualCues: seg.visualCues ?? [],
-    depth: seg.depth.toLowerCase() as "flash" | "focus" | "deep",
+    depth: seg.depth.toLowerCase() as "flash" | "focus" | "deep" | "panorama",
     topic: seg.topic,
     assets: seg.assets,
     editorialVisual: seg.editorialVisual,
@@ -312,6 +312,48 @@ export async function runPipeline(
     if (!loaded) throw new Error(`startFrom=${options.startFrom}: editorial.json not found`);
     editorial = loaded;
     console.log(`  ${editorial.totalSegments} segments (loaded)`);
+  }
+
+  // ── Auto-generate PANORAMA segment from skipped/uncovered assets ──
+  {
+    // Collect top skipped assets + screen movers not already in editorial segments
+    const coveredSymbols = new Set<string>();
+    for (const seg of editorial.segments) {
+      for (const sym of seg.assets) coveredSymbols.add(sym);
+    }
+
+    // Candidates: skipped assets with high materiality + top screen movers
+    const panoramaAssets: string[] = [];
+
+    // 1. Flagged assets not covered (already scored, sorted by materialityScore)
+    for (const asset of flagged.assets) {
+      if (coveredSymbols.has(asset.symbol)) continue;
+      if (panoramaAssets.length >= 10) break;
+      panoramaAssets.push(asset.symbol);
+    }
+
+    // 2. Screen movers (outside watchlist) not covered
+    if (briefingPack?.topScreenMovers) {
+      for (const mover of briefingPack.topScreenMovers) {
+        if (coveredSymbols.has(mover.symbol)) continue;
+        if (panoramaAssets.includes(mover.symbol)) continue;
+        if (panoramaAssets.length >= 15) break;
+        panoramaAssets.push(mover.symbol);
+      }
+    }
+
+    if (panoramaAssets.length >= 5) {
+      editorial.segments.push({
+        id: 'seg_panorama',
+        topic: 'Tour du monde — les autres mouvements du jour',
+        depth: 'PANORAMA' as any,
+        assets: panoramaAssets,
+        angle: 'Balayage rapide des mouvements non couverts — une phrase par asset, enchaîner naturellement',
+        justification: `${panoramaAssets.length} assets non couverts méritent une mention`,
+      });
+      editorial.totalSegments = editorial.segments.length;
+      console.log(`  Panorama: ${panoramaAssets.length} assets (${panoramaAssets.slice(0, 5).join(', ')}...)`);
+    }
   }
 
   // ── Knowledge RAG briefing (depends on editorial) ──

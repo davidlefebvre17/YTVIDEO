@@ -73,7 +73,7 @@ RIGUEUR FACTUELLE :
 
 BUDGET MOTS (STRICT) :
 - 150 mots par 60 secondes. Le budget est une LIMITE, pas une cible.
-- DEEP : max 380 mots. FOCUS : max 200 mots. FLASH : max 75 mots.
+- DEEP : max 380 mots. FOCUS : max 200 mots. FLASH : max 75 mots. PANORAMA : max 320 mots.
 - Tolérance : warning au-delà de +15%, rejet au-delà de +30%.
 - Les mots servent à EXPLIQUER, pas à ajouter des faits.
 
@@ -105,6 +105,8 @@ EDITORIAL VISUAL (OBLIGATOIRE pour chaque segment — le directeur artistique en
 - La scène doit être CONCRÈTE et FILMABLE — pas de concepts abstraits
 
 VISUAL CUES : pour chaque segment, 1-3 visualCues parmi : highlight_asset, show_chart, show_level, direction_arrow, flash, transition, sector_heatmap, macro_stat, comparison
+
+FORMAT PANORAMA (~250 mots, ~90s) — Tour du monde en bref. 10-15 assets en une phrase chacun. Enchaîne naturellement avec des connecteurs ("Côté devises...", "En Asie...", "Sur les matières premières..."). Regroupe par thème/géographie. PAS de liste, PAS de tirets — c'est de la prose orale. Chaque mention = asset + mouvement + une raison en 5 mots max. Exemple : "Le yen touche 160, plombé par le différentiel de taux. Le cuivre gagne 3% — la Chine restocke. STMicro lâche presque 5%, emportée par la vague de défiance sur les semi-conducteurs européens."
 
 ## MÉCANISMES ENSEIGNÉS
 Dans metadata.mechanismsExplained, liste les 3-8 MÉCANISMES FONDAMENTAUX que tu as enseignés dans cet épisode. Un mécanisme = une chaîne causale ou un concept que le spectateur comprend maintenant. Exemples : "corrélation inverse or/dollar via taux réels", "carry trade JPY : différentiel de taux → flux spéculatifs → yen faible", "VIX > 30 = zone peur, historiquement zone d'achat à 3 mois". Ce champ sera utilisé pour éviter de ré-expliquer les mêmes mécanismes dans les prochains épisodes.
