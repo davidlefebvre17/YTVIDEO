@@ -502,13 +502,33 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
         <Audio src={getSfxPath("unfold", 0)} volume={SFX_VOLUME.unfold} />
       </Sequence>
 
-      {/* ── SFX: Typing during newspaper headline typewriter ── */}
-      <Sequence
-        from={OWL_INTRO_FRAMES + OWL_DIVE_FRAMES - OWL_CLIP_OVERLAP}
-        durationInFrames={Math.min(timings.newspaperIntroFrames, Math.round(3 * fps))}
-      >
-        <Audio src={getSfxPath("typing", 0)} volume={SFX_VOLUME.typing} />
-      </Sequence>
+      {/* ── SFX: Individual key strikes during headline typewriter ── */}
+      {(() => {
+        const typeStart = OWL_INTRO_FRAMES + OWL_DIVE_FRAMES - OWL_CLIP_OVERLAP;
+        const titleLen = script.title?.length ?? 40;
+        const charsPerFrame = 1.2;
+        // One strike every ~4 chars (not every char — too dense)
+        const strikeInterval = Math.round(4 / charsPerFrame); // ~3 frames
+        const strikeCount = Math.min(Math.ceil(titleLen / 4), 25); // cap at 25 strikes
+        // Key files to rotate: typewriter-key + sting (both are short key sounds)
+        const keyFiles = ["sting", "sting", "sting"] as const;
+        return Array.from({ length: strikeCount }, (_, k) => {
+          // Slight volume variation per key (0.12 - 0.22)
+          const vol = 0.12 + (((k * 7 + 3) % 11) / 11) * 0.10;
+          return (
+            <Sequence
+              key={`typekey-${k}`}
+              from={typeStart + k * strikeInterval}
+              durationInFrames={Math.round(0.3 * fps)}
+            >
+              <Audio
+                src={getSfxPath(keyFiles[k % keyFiles.length], k)}
+                volume={vol}
+              />
+            </Sequence>
+          );
+        });
+      })()}
 
       {/* ── SFX: Ticker ambient during newspaper intro (voice over newspaper) ── */}
       <Sequence
