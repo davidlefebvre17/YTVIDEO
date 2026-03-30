@@ -592,9 +592,12 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
       )}
 
       {/* ── Owl audio: transitions between segments (over cream background) ── */}
+      {/* owlTransition text introduces the NEXT segment, so we play seg[i-1]'s audio before seg[i] */}
       {timings.segTimings.map((st, i) => {
-        const audioPath = owlTransitionAudios[st.segId];
-        if (!audioPath || i === 0) return null; // first segment: newspaper intro is the transition
+        if (i === 0) return null; // first segment: newspaper intro is the transition
+        const prevSegId = timings.segTimings[i - 1].segId;
+        const audioPath = owlTransitionAudios[prevSegId];
+        if (!audioPath) return null;
         return (
           <Sequence key={`owl-tr-${st.segId}`}
             from={st.zoomInStart - BETWEEN_FRAMES}
