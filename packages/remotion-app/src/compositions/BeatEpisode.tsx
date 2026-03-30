@@ -604,8 +604,8 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
         );
       })}
 
-      {/* ── Owl audio: closing ── */}
-      {owlClosingAudio && (
+      {/* ── Owl audio: closing — only if no closing beats have TTS audio ── */}
+      {owlClosingAudio && !(beatGroups.get("closing") ?? []).some(b => b.audioPath) && (
         <Sequence from={timings.closingStart} durationInFrames={timings.closingDur}>
           <Audio src={staticFile(owlClosingAudio)} volume={1} />
         </Sequence>
