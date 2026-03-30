@@ -17,6 +17,7 @@ import { SAMPLE_BEATS } from "./fixtures/sample-beats";
 import REAL_PROPS from "./fixtures/real-beats.json";
 import EPISODE_INDEX from "./fixtures/episode-index.json";
 import { BeatEpisode, computeNewspaperDuration } from "./compositions/BeatEpisode";
+import { StampOverlay } from "./scenes/shared/StampOverlay";
 import type { EpisodeScript, ScriptSection, AssetSnapshot, Beat } from "@yt-maker/core";
 import { BRAND } from "@yt-maker/core";
 
@@ -127,7 +128,7 @@ const EmptyNewspaperPage: React.FC = () => (
   />
 );
 
-import { NewspaperPage } from "./scenes/shared/NewspaperPage";
+import { NewspaperPage, type SegmentCard } from "./scenes/shared/NewspaperPage";
 
 // Fallback sections for legacy Scenes folder when script uses pipeline format
 const FALLBACK_SECTION = (type: string): ScriptSection => ({
@@ -361,6 +362,52 @@ export const RemotionRoot: React.FC = () => {
           );
         })}
       </Folder>
+
+      {/* ── Stamp Demo: real assets on newspaper background, ~90s ── */}
+      {(() => {
+        const ep27 = (EPISODE_INDEX.props as Record<string, any>)["2026-03-27"];
+        if (!ep27?.assets || !ep27?.script) return null;
+        const demoAssets = ep27.assets as AssetSnapshot[];
+        const demoScript = ep27.script as EpisodeScript;
+        const dur = 2700; // 90s at 30fps
+        const demoBeats = (ep27.beats ?? []) as Beat[];
+        const demoSegments: SegmentCard[] = (demoScript.sections ?? [])
+          .filter((s: any) => s.type === "segment")
+          .map((sec: any, i: number) => {
+            const segBeats = demoBeats.filter((b: any) => b.segmentId === sec.id);
+            const firstWithImage = segBeats.find((b: any) => b.imagePath && !b.imagePath.includes("placeholder"));
+            return {
+              id: sec.id ?? `seg_${i}`,
+              title: sec.title ?? "Segment",
+              depth: sec.depth,
+              imageSrc: firstWithImage?.imagePath,
+              narration: sec.narration?.slice(0, 400),
+            };
+          });
+        const StampDemoComp: React.FC = () => (
+          <AbsoluteFill>
+            <NewspaperPage
+              title={demoScript.title}
+              date={demoScript.date}
+              segments={demoSegments}
+              threadSummary={demoScript.threadSummary ?? demoScript.description ?? ""}
+              activeSegmentIdx={-1}
+              showTypewriter={false}
+            />
+            <StampOverlay assets={demoAssets} durationInFrames={dur} />
+          </AbsoluteFill>
+        );
+        return (
+          <Composition
+            id="StampDemo"
+            component={StampDemoComp}
+            durationInFrames={dur}
+            fps={30}
+            width={1920}
+            height={1080}
+          />
+        );
+      })()}
 
       <Folder name="Newspaper">
         {/* Full newspaper episode with camera movement — 1920×1080 viewport */}
