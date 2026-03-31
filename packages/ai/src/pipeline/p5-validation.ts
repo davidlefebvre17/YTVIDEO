@@ -101,6 +101,23 @@ function buildKnownNumbers(flagged?: SnapshotFlagged): Set<number> {
       known.add(Math.round(Math.abs(s.changePct) * 10) / 10);
       known.add(Math.round(Math.abs(s.changePct) * 100) / 100);
     }
+    // Earnings detail (EPS values)
+    const ed = s.earningsDetail;
+    if (ed) {
+      for (const q of ed.lastFourQuarters ?? []) {
+        if (q.epsActual != null) known.add(Math.round(q.epsActual * 100) / 100);
+        if (q.epsEstimate != null) known.add(Math.round(q.epsEstimate * 100) / 100);
+        if (q.surprisePct != null) known.add(Math.round(Math.abs(q.surprisePct) * 10) / 10);
+      }
+    }
+  }
+  // Economic events (actual/forecast parsed as numbers)
+  for (const e of flagged.events ?? []) {
+    for (const val of [e.actual, e.forecast, e.previous]) {
+      if (!val) continue;
+      const n = parseFloat(String(val).replace(/[^0-9.\-]/g, ''));
+      if (!isNaN(n) && n > 0) known.add(Math.round(n * 100) / 100);
+    }
   }
   return known;
 }
@@ -130,13 +147,13 @@ export function validateMechanical(
   const issues: ValidationIssue[] = [];
   const fullText = getAllNarration(draft);
 
-  // 1. Duration range (390-520s = 6.5-8.7 min)
+  // 1. Duration range (300-420s = 5-7 min)
   const duration = draft.metadata?.totalDurationSec ?? 0;
-  if (duration < 390 || duration > 520) {
+  if (duration < 300 || duration > 420) {
     issues.push({
       type: 'length',
-      description: `Durée estimée ${duration}s hors range 390-520s`,
-      severity: duration < 300 || duration > 600 ? 'blocker' : 'warning',
+      description: `Durée estimée ${duration}s hors range 300-420s (5-7 min)`,
+      severity: duration < 240 || duration > 500 ? 'blocker' : 'warning',
       source: 'code',
     });
   }
@@ -290,7 +307,48 @@ export function validateMechanical(
     }
   }
 
-  // 12. Day-of-week consistency: verify day names match actual dates
+  // 12. Number density per segment — too many numbers = indigestible
+  const NUMBER_LIMITS: Record<string, number> = {
+    deep: 6,
+    focus: 4,
+    flash: 2,
+    panorama: 8,
+  };
+  for (const seg of draft.segments) {
+    const nums = extractSignificantNumbers(seg.narration);
+    // Also count written-out percentages ("trois virgule seize pour cent")
+    const pctMatches = seg.narration.match(/\b\w+\s+virgule\s+\w+\s+pour\s+cent/gi) ?? [];
+    const totalNumbers = nums.length + pctMatches.length;
+    const limit = NUMBER_LIMITS[(seg.depth ?? 'FOCUS').toLowerCase()] ?? 4;
+    if (totalNumbers > limit) {
+      issues.push({
+        type: 'structure',
+        segmentId: seg.segmentId,
+        description: `${totalNumbers} chiffres dans ${seg.segmentId} [${seg.depth}] (max ${limit}) — trop dense, le spectateur décroche`,
+        severity: totalNumbers > limit * 1.5 ? 'blocker' : 'warning',
+        suggestedFix: `Garder les ${limit} chiffres les plus importants, reformuler le reste en mots ("en forte hausse" au lieu du % exact)`,
+        source: 'code',
+      });
+    }
+  }
+
+  // 13. [BEAT] markers — breathing room check
+  for (const seg of draft.segments) {
+    const beatCount = (seg.narration.match(/\[BEAT\]/gi) ?? []).length;
+    const minBeats = (seg.depth === 'DEEP') ? 2 : (seg.depth === 'FOCUS') ? 1 : 0;
+    if (beatCount < minBeats) {
+      issues.push({
+        type: 'structure',
+        segmentId: seg.segmentId,
+        description: `${beatCount} [BEAT] dans ${seg.segmentId} [${seg.depth}] (min ${minBeats}) — pas assez de respiration`,
+        severity: 'warning',
+        suggestedFix: `Ajouter ${minBeats - beatCount} marqueur(s) [BEAT] entre les actes du segment`,
+        source: 'code',
+      });
+    }
+  }
+
+  // 14. Day-of-week consistency: verify day names match actual dates
   if (flagged) {
     const anchors = buildTemporalAnchors(flagged.date);
     const JOURS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];

@@ -30,7 +30,23 @@ function formatAssetsCompact(flagged: SnapshotFlagged): string {
 function formatEventsCompact(flagged: SnapshotFlagged, snapDayName?: string): string {
   if (!flagged.events.length) return `Aucun événement économique ce ${snapDayName ?? 'jour'}.`;
   return flagged.events
-    .map(e => `${e.time} ${e.name} (${e.currency}, ${e.impact})${e.forecast ? ` consensus:${e.forecast}` : ''}${e.actual ? ` résultat:${e.actual}` : ''}`)
+    .map(e => {
+      let line = `${e.time} ${e.name} (${e.currency}, ${e.impact})`;
+      if (e.forecast) line += ` consensus:${e.forecast}`;
+      if (e.previous) line += ` précédent:${e.previous}`;
+      if (e.actual) {
+        line += ` résultat:${e.actual}`;
+        // Compute surprise % when both actual and forecast are numeric
+        const act = parseFloat(String(e.actual).replace(/[^0-9.-]/g, ''));
+        const fct = parseFloat(String(e.forecast ?? '').replace(/[^0-9.-]/g, ''));
+        if (!isNaN(act) && !isNaN(fct) && fct !== 0) {
+          const surprise = ((act - fct) / Math.abs(fct)) * 100;
+          const mag = Math.abs(surprise) > 30 ? 'CHOC' : Math.abs(surprise) > 15 ? 'MAJOR' : Math.abs(surprise) > 5 ? 'NOTABLE' : '';
+          if (mag) line += ` → surprise ${surprise > 0 ? '+' : ''}${surprise.toFixed(1)}% [${mag}]`;
+        }
+      }
+      return line;
+    })
     .join('\n');
 }
 
@@ -79,14 +95,16 @@ MÉTHODE ÉDITORIALE (dans cet ordre) :
 4. LIENS NARRATIFS : un bon épisode raconte UNE histoire avec plusieurs facettes, pas une liste de sujets indépendants. Cherche le fil conducteur qui relie au moins 3 segments.
 
 CONTRAINTES STRUCTURELLES (STRICTES) :
-- Sélectionner 4 à 7 segments
-- Maximum 2 DEEP (analyse approfondie 70-90s)
-- Minimum 2 FLASH (brève 20-30s)
+- Sélectionner 4 à 5 segments (PAS PLUS DE 5 — on raconte moins d'histoires mais on les raconte BIEN)
+- Maximum 1 DEEP (analyse approfondie 60-80s) — un seul sujet star, les autres en FOCUS/FLASH
+- Minimum 2 FLASH (brève 15-25s)
+- Le PANORAMA couvre 5-6 assets MAX, pas 12 — choisir les plus marquants
 - Le premier segment = le sujet le plus important / impactant
 - Le dernier segment = TOUJOURS un FLASH (sortie légère)
 - Ne pas re-couvrir un sujet traité les 2 derniers jours avec le MÊME angle
 - Identifier au moins 1 continuité J-1 si une prédiction passée est résolue ou invalidée
 - Le fil conducteur (threadSummary) doit relier au moins 3 segments entre eux
+- RYTHME NARRATIF : alterner tension et respiration. Jamais 2 segments denses consécutifs (DEEP puis FOCUS lourd). Après un segment dense, placer un FLASH qui fait respirer.
 
 ### MÉCANISMES DÉJÀ ENSEIGNÉS (anti-répétition)
 
@@ -103,16 +121,16 @@ Règles :
 - DÉCLENCHEURS POLITIQUES : si un mouvement >3% est lié à une déclaration politique identifiable, le champ trigger est OBLIGATOIRE (actor + action + source)
 - COHÉRENCE THÉMATIQUE INVERSE : si le thème du jour est géopolitique, cherche les actifs en direction OPPOSÉE (défense si désescalade, refuges si escalade) — ces actifs ont valeur de "revers de médaille" même avec un drama score modéré
 - STOCKS PROMUS [PROMU] : ces actions hors-watchlist ont été promues par le scoring (earnings, buzz, mouvement extrême). Elles peuvent être FOCUS ou FLASH (jamais DEEP — données allégées). Intègre-les si leur histoire est narrativement forte.
-- RÔLE NARRATIF : le dernier FLASH doit idéalement BOUCLER l'histoire du jour (narrativeRole = "closer")
+- RÔLE NARRATIF : le dernier FLASH doit BOUCLER l'histoire du jour (narrativeRole = "closer") ET ouvrir sur demain. Intègre 1-2 éléments forward-looking si disponibles dans EARNINGS À VENIR ou ÉVÉNEMENTS À VENIR : un nom d'entreprise qui publie, une décision de banque centrale, un chiffre macro attendu. Ne liste pas — une phrase suffit ("demain, Netflix publie ses résultats et la BCE se réunit"). Ne répète pas un teaser déjà donné dans un épisode récent.
 - ACTIFS PONT : si un actif relie deux segments thématiquement, il peut être mentionné dans les deux segments ou avoir un rôle "bridge"
 - DÉDUPLICATION ASSETS : chaque symbole ne peut apparaître qu'en PROPRIÉTAIRE dans un seul segment. S'il est asset principal dans un DEEP, il ne peut pas être asset principal dans un autre segment — référencer seulement via le contexte narratif, pas dans la liste assets[]
 - COT (CFTC) : les données de positionnement sont toujours décalées de 7-11 jours. Tu peux t'en servir comme contexte de fond ("les spéculateurs étaient déjà positionés long avant le move") mais JAMAIS comme cause directe du move du jour. Ne pas écrire "la COT flip explique/confirme le +X% d'aujourd'hui".
 - DÉCISIONS À VENIR (banque centrale, politique, résultats) : tu CONSTATES qu'une décision approche et que le marché réagit, tu ne SPÉCULES PAS sur le résultat. "La Fed se réunit demain" = fait. "Le marché anticipe une baisse de taux" = spéculation INTERDITE sauf si des données chiffrées (futures, OIS, swaps) quantifient cette anticipation. Les angles et le threadSummary doivent rester factuels — l'interprétation éditoriale appartient aux étapes suivantes.
 
 PROFONDEURS :
-- DEEP : chaîne causale complète, 2 scénarios, technique + fondamental (70-90s, 175-225 mots)
-- FOCUS : move + catalyst + conséquences + 1 niveau + 1 scénario (40-60s, 100-150 mots)
-- FLASH : fait + cause + conséquence, 3 phrases max (20-30s, 50-75 mots)
+- DEEP : UNE histoire bien racontée, 1 mécanisme expliqué, 1 scénario, max 4 chiffres (60-80s, 200-260 mots)
+- FOCUS : move + catalyst + conséquence, max 3 chiffres (35-50s, 100-140 mots)
+- FLASH : fait + cause + conséquence, 2-3 phrases, max 1 chiffre (15-25s, 45-65 mots)
 
 SORTIE : JSON strict, schéma EditorialPlan.`;
 }
@@ -248,14 +266,14 @@ export function validateEditorialPlan(plan: EditorialPlan): string[] {
   if (!plan.segments || !Array.isArray(plan.segments))
     return ['segments manquants ou invalides'];
 
-  if (plan.segments.length < 4 || plan.segments.length > 7)
-    errors.push(`${plan.segments.length} segments (attendu 4-7)`);
+  if (plan.segments.length < 3 || plan.segments.length > 5)
+    errors.push(`${plan.segments.length} segments (attendu 3-5)`);
 
   const deepCount = plan.segments.filter(s => s.depth === 'DEEP').length;
   const flashCount = plan.segments.filter(s => s.depth === 'FLASH').length;
 
-  if (deepCount > 2)
-    errors.push(`${deepCount} DEEP (max 2)`);
+  if (deepCount > 1)
+    errors.push(`${deepCount} DEEP (max 1)`);
   if (flashCount < 2)
     errors.push(`${flashCount} FLASH (min 2)`);
 
@@ -290,9 +308,9 @@ export function validateEditorialPlan(plan: EditorialPlan): string[] {
  * Fallback: mechanical selection when C1 fails twice.
  */
 function fallbackEditorialPlan(flagged: SnapshotFlagged): EditorialPlan {
-  const top = flagged.assets.filter(a => a.materialityScore > 0).slice(0, 5);
+  const top = flagged.assets.filter(a => a.materialityScore > 0).slice(0, 4);
   // If not enough flagged, take top by changePct
-  while (top.length < 4) {
+  while (top.length < 3) {
     const next = flagged.assets.find(a => !top.includes(a));
     if (!next) break;
     top.push(next);
@@ -301,7 +319,7 @@ function fallbackEditorialPlan(flagged: SnapshotFlagged): EditorialPlan {
   const segments: PlannedSegment[] = top.map((a, i) => ({
     id: `seg_${i + 1}`,
     topic: a.symbol.toLowerCase().replace(/[^a-z0-9]/g, '-'),
-    depth: i === 0 ? 'DEEP' as const : i < 3 ? 'FOCUS' as const : 'FLASH' as const,
+    depth: i === 0 ? 'DEEP' as const : i < 2 ? 'FOCUS' as const : 'FLASH' as const,
     assets: [a.symbol],
     angle: `Variation ${a.changePct.toFixed(1)}%`,
     justification: `Score matérialité ${a.materialityScore}, flags: ${a.flags.join(', ')}`,
