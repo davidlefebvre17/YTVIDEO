@@ -138,7 +138,7 @@ Pour CHAQUE beat:
    - chart: { asset, levels: [support, resistance], type: "price_line"|"zone_highlight"|... }
    - stat: { asset, value, unit, format: "%" ou "€" }
    - causal_chain: { steps: ["step1", "step2", ...] } — les maillons du raisonnement que le narrateur explique DANS CE BEAT. Chaque step = un maillon logique. Illustre la parole en cours.
-   - scenario_fork: { trunk: "question posée par le narrateur", asset: "SYMBOL", bullTarget: "prix cible", bullCondition: "condition en langage simple", bearTarget: "prix cible", bearCondition: "condition en langage simple" }
+   - scenario_fork: { trunk: "question courte max 60 chars", asset: "SYMBOL", bullTarget: "prix COURT max 15 chars (ex: 'Or 4800$', 'WTI < 90$')", bullCondition: "condition max 50 chars", bearTarget: "prix COURT max 15 chars", bearCondition: "condition max 50 chars" }
    - gauge: { type: "rsi"|"fear_greed", value, asset }
    - comparison: { assets: [symbol1, symbol2], values: [val1, val2] }
    - headline: { text, actor?, source? }

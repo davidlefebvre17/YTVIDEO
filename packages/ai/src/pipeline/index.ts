@@ -13,7 +13,7 @@ import { runC5Direction } from "./p6-direction";
 import { computeWordBudget } from "./helpers/word-budget";
 import { buildEpisodeSummaries, formatRecentScriptsForC3 } from "./helpers/episode-summary";
 import { buildCausalBrief } from "./helpers/causal-brief";
-import { buildBriefingPack } from "./helpers/briefing-pack";
+import { buildBriefingPack, enrichBriefingPackCBSpeeches } from "./helpers/briefing-pack";
 import { runNewsDigest } from "./p1b-news-digest";
 import { saveIntermediate as saveToEpisodeIntermediate, loadIntermediate } from "../episode-folder";
 import type {
@@ -49,11 +49,11 @@ export { runC8ImagePrompts, buildStyleSuffix } from "./p7c-image-prompts";
 export { runImageGeneration } from "./p7d-image-generation";
 export { adaptForTTS } from "./p7-c6-tts-adaptation";
 export type { TTSBeat } from "./p7-c6-tts-adaptation";
-export { buildBriefingPack, formatBriefingPack } from "./helpers/briefing-pack";
+export { buildBriefingPack, enrichBriefingPackCBSpeeches, formatBriefingPack } from "./helpers/briefing-pack";
 export { runNewsDigest, formatNewsDigest } from "./p1b-news-digest";
 export type { NewsDigest, NewsDigestEvent } from "./p1b-news-digest";
 export type { BriefingPack, PoliticalTrigger, ScreenMover, EarningsBucket, COTHighlight, COTDivergence, SentimentTrend } from "./helpers/briefing-pack";
-export { episodeDir, createEpisodeDir, saveToEpisode, saveIntermediate as saveToEpisodeIntermediate, syncImagesToPublic, syncAudioToPublic, saveRemotionProps, saveEpisodeData } from "../episode-folder";
+export { episodeDir, createEpisodeDir, saveToEpisode, saveIntermediate as saveToEpisodeIntermediate, syncImagesToPublic, syncAudioToPublic, saveRemotionProps, saveEpisodeData, cleanPublicForNewEpisode } from "../episode-folder";
 
 /**
  * Format weekly brief as string for C1 prompt.
@@ -231,7 +231,12 @@ export async function runPipeline(
 
   const weeklyBrief = formatWeeklyBrief();
   const causalBrief = buildCausalBrief(flagged);
-  const briefingPack = buildBriefingPack(flagged, snapshot);
+  let briefingPack = buildBriefingPack(flagged, snapshot);
+  // Enrich CB speeches with BIS content (async, conditional — only fetches if speeches detected)
+  briefingPack = await enrichBriefingPackCBSpeeches(briefingPack, snapshot);
+  if (briefingPack.cbSpeechesYesterday.length) {
+    console.log(`  CB speeches: ${briefingPack.cbSpeechesYesterday.length} enriched`);
+  }
   if (briefingPack.politicalTriggers.length) {
     console.log(`  Triggers: ${briefingPack.politicalTriggers.map(t => `${t.actor}(${t.action})`).join(', ')}`);
   }
@@ -460,6 +465,7 @@ export async function runPipeline(
     researchContext,
     lang,
     assetContext,
+    flagged,
   });
   stats.llmCalls++;
   saveIntermediate(snapshot.date, "episode_draft", draft);
@@ -491,6 +497,7 @@ export async function runPipeline(
       researchContext,
       lang,
       feedback: blockers,
+      flagged,
     });
     stats.llmCalls++;
     stats.retries++;

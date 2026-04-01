@@ -110,11 +110,14 @@ export const ScenarioFork: React.FC<ScenarioForkProps> = ({
       {/* Trunk question / asset label */}
       <div style={{
         opacity: interpolate(rel, [0, 8], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
-        fontFamily: BRAND.fonts.display, fontSize: 28, fontWeight: 700,
+        fontFamily: BRAND.fonts.display,
+        fontSize: trunk.length > 80 ? 22 : trunk.length > 60 ? 25 : 28,
+        fontWeight: 700,
         fontStyle: "italic", color: BRAND.colors.ink, textAlign: "center",
         borderBottom: `2px solid ${BRAND.colors.ink}`, padding: "10px 24px",
         width: "100%", marginBottom: 10,
         letterSpacing: "0.02em",
+        overflow: "hidden", textOverflow: "ellipsis",
       }}>
         {trunk}
       </div>
@@ -210,28 +213,38 @@ export const ScenarioFork: React.FC<ScenarioForkProps> = ({
         )}
 
         {/* Bull target (end of green line) */}
-        {bullTarget && targetScale > 0 && (
-          <g transform={`translate(${RIGHT_END}, ${CHART_MID - 95}) scale(${targetScale})`}>
-            <rect x={-70} y={-20} width={140} height={40} rx={4}
-              fill={BRAND.colors.cream} stroke={BRAND.colors.accentBull} strokeWidth={2} />
-            <text x={0} y={7} textAnchor="middle"
-              fontFamily={BRAND.fonts.condensed} fontSize={24} fontWeight={700} fill={BRAND.colors.accentBull}>
-              ▲ {bullTarget}
-            </text>
-          </g>
-        )}
+        {bullTarget && targetScale > 0 && (() => {
+          const label = `▲ ${bullTarget}`;
+          const fs = label.length > 18 ? 16 : label.length > 12 ? 20 : 24;
+          const bw = Math.max(140, label.length * (fs * 0.65) + 24);
+          return (
+            <g transform={`translate(${RIGHT_END}, ${CHART_MID - 95}) scale(${targetScale})`}>
+              <rect x={-bw / 2} y={-20} width={bw} height={40} rx={4}
+                fill={BRAND.colors.cream} stroke={BRAND.colors.accentBull} strokeWidth={2} />
+              <text x={0} y={7} textAnchor="middle"
+                fontFamily={BRAND.fonts.condensed} fontSize={fs} fontWeight={700} fill={BRAND.colors.accentBull}>
+                {label}
+              </text>
+            </g>
+          );
+        })()}
 
         {/* Bear target (end of red line) */}
-        {bearTarget && targetScale > 0 && (
-          <g transform={`translate(${RIGHT_END}, ${CHART_MID + 95}) scale(${targetScale})`}>
-            <rect x={-70} y={-20} width={140} height={40} rx={4}
-              fill={BRAND.colors.cream} stroke={BRAND.colors.accentBear} strokeWidth={2} />
-            <text x={0} y={7} textAnchor="middle"
-              fontFamily={BRAND.fonts.condensed} fontSize={24} fontWeight={700} fill={BRAND.colors.accentBear}>
-              ▼ {bearTarget}
-            </text>
-          </g>
-        )}
+        {bearTarget && targetScale > 0 && (() => {
+          const label = `▼ ${bearTarget}`;
+          const fs = label.length > 18 ? 16 : label.length > 12 ? 20 : 24;
+          const bw = Math.max(140, label.length * (fs * 0.65) + 24);
+          return (
+            <g transform={`translate(${RIGHT_END}, ${CHART_MID + 95}) scale(${targetScale})`}>
+              <rect x={-bw / 2} y={-20} width={bw} height={40} rx={4}
+                fill={BRAND.colors.cream} stroke={BRAND.colors.accentBear} strokeWidth={2} />
+              <text x={0} y={7} textAnchor="middle"
+                fontFamily={BRAND.fonts.condensed} fontSize={fs} fontWeight={700} fill={BRAND.colors.accentBear}>
+                {label}
+              </text>
+            </g>
+          );
+        })()}
 
         {/* HAUSSIER / BAISSIER labels */}
         <text x={CX + BRANCH_LEN * 0.5} y={CHART_TOP - 8}
@@ -253,18 +266,22 @@ export const ScenarioFork: React.FC<ScenarioForkProps> = ({
         display: "flex", width: "100%", gap: 40, opacity: condOp, marginTop: 10,
       }}>
         <div style={{
-          flex: 1, fontFamily: BRAND.fonts.body, fontSize: 18, fontStyle: "italic",
-          color: BRAND.colors.inkMid, lineHeight: 1.5, textAlign: "center",
+          flex: 1, fontFamily: BRAND.fonts.body,
+          fontSize: bullish.condition.length > 80 ? 14 : bullish.condition.length > 50 ? 16 : 18,
+          fontStyle: "italic",
+          color: BRAND.colors.inkMid, lineHeight: 1.4, textAlign: "center",
           borderTop: `2px solid ${BRAND.colors.accentBull}`,
-          paddingTop: 10,
+          paddingTop: 10, overflow: "hidden", maxHeight: 70,
         }}>
           {bullish.condition}
         </div>
         <div style={{
-          flex: 1, fontFamily: BRAND.fonts.body, fontSize: 18, fontStyle: "italic",
-          color: BRAND.colors.inkMid, lineHeight: 1.5, textAlign: "center",
+          flex: 1, fontFamily: BRAND.fonts.body,
+          fontSize: bearish.condition.length > 80 ? 14 : bearish.condition.length > 50 ? 16 : 18,
+          fontStyle: "italic",
+          color: BRAND.colors.inkMid, lineHeight: 1.4, textAlign: "center",
           borderTop: `2px solid ${BRAND.colors.accentBear}`,
-          paddingTop: 10,
+          paddingTop: 10, overflow: "hidden", maxHeight: 70,
         }}>
           {bearish.condition}
         </div>

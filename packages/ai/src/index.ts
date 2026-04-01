@@ -44,7 +44,7 @@ export { adaptForTTS } from "./pipeline";
 export type { TTSBeat } from "./pipeline";
 
 // Episode folder management
-export { episodeDir, createEpisodeDir, saveToEpisode, saveToEpisodeIntermediate, syncImagesToPublic, syncAudioToPublic, saveRemotionProps, saveEpisodeData } from "./pipeline";
+export { episodeDir, createEpisodeDir, saveToEpisode, saveToEpisodeIntermediate, syncImagesToPublic, syncAudioToPublic, saveRemotionProps, saveEpisodeData, cleanPublicForNewEpisode } from "./pipeline";
 
 // News Memory (D2)
 export {

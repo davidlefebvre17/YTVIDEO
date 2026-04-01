@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, writeFileSync, readFileSync, copyFileSync } from "fs";
+import { existsSync, mkdirSync, writeFileSync, readFileSync, copyFileSync, readdirSync, unlinkSync } from "fs";
 import { join, basename } from "path";
 
 const ROOT = join(__dirname, "..", "..", "..");
@@ -92,6 +92,43 @@ export function loadIntermediate<T = unknown>(date: string, name: string): T | n
     return JSON.parse(readFileSync(filePath, "utf-8")) as T;
   } catch {
     return null;
+  }
+}
+
+/**
+ * Remove all files matching a pattern from a directory (non-recursive).
+ * Used to clean stale beat audio/images before syncing a new episode.
+ */
+function cleanDir(dir: string, ext?: string): number {
+  if (!existsSync(dir)) return 0;
+  let removed = 0;
+  try {
+    for (const file of readdirSync(dir)) {
+      if (ext && !file.endsWith(ext)) continue;
+      try {
+        unlinkSync(join(dir, file));
+        removed++;
+      } catch {}
+    }
+  } catch {}
+  return removed;
+}
+
+/**
+ * Clean all Remotion public directories to avoid stale files from previous episodes.
+ * Call ONCE at the start of a new generate run.
+ */
+export function cleanPublicForNewEpisode(): void {
+  const beatsAudioDir = join(REMOTION_PUBLIC, "audio", "beats");
+  const owlAudioDir = join(REMOTION_PUBLIC, "audio", "owl");
+  const editorialDir = join(REMOTION_PUBLIC, "editorial");
+
+  const a = cleanDir(beatsAudioDir, ".mp3");
+  const b = cleanDir(owlAudioDir, ".mp3");
+  const c = cleanDir(editorialDir, ".png");
+
+  if (a + b + c > 0) {
+    console.log(`  Cleaned public/: ${a} beat audio, ${b} owl audio, ${c} images`);
   }
 }
 

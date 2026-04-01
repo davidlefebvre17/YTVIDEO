@@ -23,7 +23,7 @@ import {
   runPipeline, toEpisodeScript,
   generateBeats, runC7Direction, runC8ImagePrompts, runImageGeneration,
   adaptForTTS,
-  createEpisodeDir, saveToEpisode, syncImagesToPublic, syncAudioToPublic, saveRemotionProps,
+  createEpisodeDir, saveToEpisode, syncImagesToPublic, syncAudioToPublic, saveRemotionProps, cleanPublicForNewEpisode,
 } from "@yt-maker/ai";
 import type { PrevContext, RawBeat, AnalysisBundle } from "@yt-maker/ai";
 import type { EpisodeType, Language, EpisodeManifestEntry, DailySnapshot, Beat } from "@yt-maker/core";
@@ -89,8 +89,9 @@ async function main() {
   console.log("=== Trading YouTube Maker ===");
   console.log(`Date: ${date} | Lang: ${lang} | Script: ${skipScript ? "SKIP" : "ON"} | Images: ${skipImages ? "SKIP" : "ON"} | TTS: ${skipTts ? "SKIP" : "ON"} | Render: ${skipRender ? "SKIP" : "ON"}`);
 
-  // Create episode folder
+  // Create episode folder + clean stale public files
   const epDir = createEpisodeDir(date);
+  cleanPublicForNewEpisode();
   console.log(`Episode folder: ${epDir}`);
 
   let snapshot: DailySnapshot;
@@ -414,7 +415,7 @@ async function main() {
     const audioDir = path.join(epDir, "audio");
     const { manifest: audioManifest } = await generateBeatAudio(
       beats as any, lang, audioDir, "audio/beats",
-      { skipExisting: true },
+      { skipExisting: false },
     );
 
     // Sync audio to Remotion public/
@@ -541,10 +542,36 @@ async function main() {
   const propsPath = saveRemotionProps(date, remotionProps);
   console.log(`  Props saved: ${propsPath}`);
 
-  // Also save to Remotion fixture for studio preview
+  // Also save to Remotion fixture for studio preview (stripped — no heavy candle data)
   try {
     const fixturePath = path.resolve(__dirname, "..", "packages", "remotion-app", "src", "fixtures", "real-beats.json");
-    fs.writeFileSync(fixturePath, JSON.stringify(remotionProps, null, 2));
+    const stripAssets = (assets: any[]) => assets?.map((a: any) => ({
+      symbol: a.symbol, name: a.name, price: a.price,
+      change: a.change, changePct: a.changePct,
+      high24h: a.high24h, low24h: a.low24h,
+      technicals: a.technicals ? { rsi14: a.technicals.rsi14, sma200: a.technicals.sma200 } : undefined,
+      candles: a.candles?.slice(-5),          // Last 5 intraday candles (for mini charts)
+      dailyCandles: a.dailyCandles?.slice(-30), // Last 30 daily candles (for overlays)
+    }));
+    const studioProps = {
+      ...remotionProps,
+      assets: stripAssets(remotionProps.assets as any[]),
+    };
+    fs.writeFileSync(fixturePath, JSON.stringify(studioProps, null, 2));
+
+    // Add to episode-index.json for studio episode list
+    const indexPath = path.resolve(__dirname, "..", "packages", "remotion-app", "src", "fixtures", "episode-index.json");
+    const idx = JSON.parse(fs.readFileSync(indexPath, "utf-8"));
+    if (!idx.entries.find((e: any) => e.date === date)) {
+      idx.entries.push({
+        date,
+        title: script.title,
+        episodeNumber: script.episodeNumber,
+      });
+    }
+    idx.props[date] = studioProps;
+    fs.writeFileSync(indexPath, JSON.stringify(idx, null, 2));
+    console.log(`  Episode added to studio index`);
   } catch {}
 
   // Update manifest (only if script was freshly generated)
