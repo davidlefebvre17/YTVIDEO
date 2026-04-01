@@ -91,7 +91,7 @@ Transformer la narration écrite en texte vivant pour l'oreille. Tu places des t
 7. **isSegmentStart=true** → commencer par [pause].
 8. **isKeyMoment=true** → utiliser [loud] ou [slowly] selon le contexte.
 9. **CHIFFRES → LETTRES** : TOUS les nombres en toutes lettres. C'est OBLIGATOIRE.
-10. **MOTS ANGLAIS** : laisser tels quels. Le TTS les prononce. Pas de phonétisation.
+10. **MOTS ANGLAIS** : laisser tels quels. La phonétisation est gérée par le code après toi.
 11. **SIGLES** : lettres séparées par des points. "ETF" → "É.T.F.". "S&P" → "S. et P.".
 
 ## Exemples
@@ -176,10 +176,11 @@ export async function adaptForTTS(
         const depth = beat.segmentDepth.toUpperCase();
         const pacing = ann?.beatPacing ?? 'posé';
 
+        const rawAdapted = adapted?.adapted ?? fallbackAdapt(beat.narrationChunk, ann);
         allResults.push({
           beatId: beat.id,
           original: beat.narrationChunk,
-          adapted: adapted?.adapted ?? fallbackAdapt(beat.narrationChunk, ann),
+          adapted: applyPronunciationFixes(rawAdapted),
           fishPreset: depth === 'DEEP' ? 'DEEP'
             : depth === 'FLASH' ? 'FLASH'
             : PACING_TO_PRESET[pacing] ?? 'FOCUS',
@@ -192,7 +193,7 @@ export async function adaptForTTS(
         allResults.push({
           beatId: beat.id,
           original: beat.narrationChunk,
-          adapted: fallbackAdapt(beat.narrationChunk, ann),
+          adapted: applyPronunciationFixes(fallbackAdapt(beat.narrationChunk, ann)),
           fishPreset: 'FOCUS',
         });
       }
@@ -229,17 +230,30 @@ function convertNumbersToFrench(text: string): string {
       if (rest === 0) return hPart + (h > 1 ? 's' : '');
       return hPart + ' ' + numberToFrench(String(rest));
     }
-    if (num < 10000) {
+    if (num < 1000000) {
       const th = Math.floor(num / 1000);
       const rest = num % 1000;
       const thPart = th === 1 ? 'mille' : numberToFrench(String(th)) + ' mille';
       if (rest === 0) return thPart;
       return thPart + ' ' + numberToFrench(String(rest));
     }
+    if (num < 1000000000) {
+      const mil = Math.floor(num / 1000000);
+      const rest = num % 1000000;
+      const milPart = mil === 1 ? 'un million' : numberToFrench(String(mil)) + ' millions';
+      if (rest === 0) return milPart;
+      return milPart + ' ' + numberToFrench(String(rest));
+    }
     return n;
   };
 
   let result = text;
+  // First: merge space-separated thousands (3 450 → 3450, 1 000 000 → 1000000)
+  let prev = '';
+  while (prev !== result) {
+    prev = result;
+    result = result.replace(/(\d)\s(\d{3})(?!\d)/g, '$1$2');
+  }
   // Percentages with decimals
   result = result.replace(/(\d+)[.,](\d+)\s*%/g, (_, a, b) => `${numberToFrench(a)} virgule ${numberToFrench(b)} pour cent`);
   // Percentages without decimals
@@ -248,8 +262,47 @@ function convertNumbersToFrench(text: string): string {
   result = result.replace(/(\d+)[.,](\d+)\s*\$/g, (_, a, b) => `${numberToFrench(a)} dollars ${numberToFrench(b)}`);
   // Prices without decimals
   result = result.replace(/(\d+)\s*\$/g, (_, n) => `${numberToFrench(n)} dollars`);
-  // Plain numbers
-  result = result.replace(/\b(\d{1,4})\b/g, (_, n) => numberToFrench(n));
+  // Plain numbers (up to 999 999 999)
+  result = result.replace(/\b(\d{1,9})\b/g, (_, n) => numberToFrench(n));
+  return result;
+}
+
+// ─── Pronunciation fixes (Fish Audio quirks) ────────────────────
+
+/**
+ * Words Fish Audio mispronounces or reads in wrong language.
+ * Key = word as written, Value = phonetic hint for Fish Audio.
+ */
+const PRONUNCIATION_FIXES: [RegExp, string][] = [
+  // Fish Audio stutters on "grimpe" → force clean pronunciation
+  [/\bgrimpe\b/gi, 'grimp'],
+  [/\bgrimpé\b/gi, 'grimpé'],
+  [/\bgrimper\b/gi, 'grimper'],
+  // English finance terms Fish Audio reads as French
+  [/\bpricer\b/gi, 'praille-cé'],
+  [/\bpricing\b/gi, 'praille-cingue'],
+  [/\bspread\b/gi, 'sprèdd'],
+  [/\bshort squeeze\b/gi, 'shorte skouize'],
+  [/\bsqueeze\b/gi, 'skouize'],
+  [/\bdead cat bounce\b/gi, 'dèdd catt baounnce'],
+  [/\bdeath cross\b/gi, 'dèss crosse'],
+  [/\bbull run\b/gi, 'boull reune'],
+  [/\bbullish\b/gi, 'boulliche'],
+  [/\bbearish\b/gi, 'bèriche'],
+  [/\brisk-off\b/gi, 'risque-off'],
+  [/\brisk-on\b/gi, 'risque-on'],
+  [/\bhedge\b/gi, 'hèdje'],
+  [/\bhedging\b/gi, 'hèdjingue'],
+  [/\btrading\b/gi, 'trèdingue'],
+  [/\btrader\b/gi, 'trèdeur'],
+  [/\btraders\b/gi, 'trèdeurse'],
+];
+
+function applyPronunciationFixes(text: string): string {
+  let result = text;
+  for (const [pattern, replacement] of PRONUNCIATION_FIXES) {
+    result = result.replace(pattern, replacement);
+  }
   return result;
 }
 
