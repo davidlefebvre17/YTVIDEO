@@ -320,6 +320,7 @@ export const RemotionRoot: React.FC = () => {
             owlClosingAudio: (REAL_PROPS as any).owlClosingAudio,
             owlTransitionAudios: (REAL_PROPS as any).owlTransitionAudios,
             owlAudioDurations: (REAL_PROPS as any).owlAudioDurations,
+            segmentAudioDurations: (REAL_PROPS as any).segmentAudioDurations,
           }}
           calculateMetadata={({ props }: { props: Record<string, unknown> }) => {
             const beats = (props.beats ?? []) as Beat[];
@@ -354,6 +355,7 @@ export const RemotionRoot: React.FC = () => {
                 owlClosingAudio: props.owlClosingAudio as any,
                 owlTransitionAudios: (props.owlTransitionAudios ?? {}) as any,
                 owlAudioDurations: props.owlAudioDurations as any,
+                segmentAudioDurations: props.segmentAudioDurations as any,
               }}
               calculateMetadata={({ props: p }: { props: Record<string, unknown> }) => {
                 const b = (p.beats ?? []) as Beat[];

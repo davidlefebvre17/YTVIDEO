@@ -373,6 +373,7 @@ async function main() {
   // ════════════════════════════════════════════════════════════
   // STEP 5: TTS AUDIO GENERATION
   // ════════════════════════════════════════════════════════════
+  let segmentDurations: Record<string, number> | undefined;
   if (!skipTts) {
     console.log("\n═══ Step 5: TTS Audio Generation ═══");
 
@@ -413,43 +414,61 @@ async function main() {
     // Generate audio
     console.log("  Generating audio...");
     const audioDir = path.join(epDir, "audio");
-    const { manifest: audioManifest } = await generateBeatAudio(
+    const { manifest: audioManifest, segmentDurations: segDur } = await generateBeatAudio(
       beats as any, lang, audioDir, "audio/beats",
       { skipExisting: false },
     );
+    segmentDurations = segDur;
 
     // Sync audio to Remotion public/
-    syncAudioToPublic(date, beats.map(b => ({ id: b.id, audioPath: b.audioPath })));
+    const isSegmentMode = beats.some((b: any) => b.audioSegmentPath);
 
-    // Read real MP3 durations
-    console.log("  Syncing audio durations...");
-    try {
-      const { parseFile } = await import("music-metadata");
-      const remotionAudioDir = path.join(epDir, "audio");
-      let synced = 0;
-      for (const beat of beats) {
-        if (!beat.audioPath) continue;
-        const mp3Path = path.join(remotionAudioDir, path.basename(beat.audioPath));
-        if (!fs.existsSync(mp3Path)) continue;
-        try {
-          const metadata = await parseFile(mp3Path);
-          const realDuration = metadata.format.duration;
-          if (realDuration && realDuration > 0) {
-            beat.timing = { ...beat.timing, audioDurationSec: realDuration };
-            beat.durationSec = realDuration;
-            synced++;
-          }
-        } catch {}
+    if (isSegmentMode) {
+      // Segment mode: copy segment MP3s to public
+      const segSrcDir = path.join(audioDir, "segments");
+      const segPubDir = path.resolve(__dirname, "..", "packages", "remotion-app", "public", "audio", "beats", "segments");
+      if (!fs.existsSync(segPubDir)) fs.mkdirSync(segPubDir, { recursive: true });
+      if (fs.existsSync(segSrcDir)) {
+        for (const f of fs.readdirSync(segSrcDir).filter(f => f.endsWith('.mp3'))) {
+          fs.copyFileSync(path.join(segSrcDir, f), path.join(segPubDir, f));
+        }
+        console.log(`  Segment audio synced to public/`);
       }
-      // Recalculate startSec
-      let cumSec = 0;
-      for (const beat of beats) {
-        (beat as any).startSec = cumSec;
-        cumSec += beat.durationSec;
+      // Durations already set by alignment — no need to re-read MP3s
+    } else {
+      // Legacy mode: copy per-beat MP3s
+      syncAudioToPublic(date, beats.map(b => ({ id: b.id, audioPath: b.audioPath })));
+
+      // Read real MP3 durations
+      console.log("  Syncing audio durations...");
+      try {
+        const { parseFile } = await import("music-metadata");
+        const remotionAudioDir = path.join(epDir, "audio");
+        let synced = 0;
+        for (const beat of beats) {
+          if (!beat.audioPath) continue;
+          const mp3Path = path.join(remotionAudioDir, path.basename(beat.audioPath));
+          if (!fs.existsSync(mp3Path)) continue;
+          try {
+            const metadata = await parseFile(mp3Path);
+            const realDuration = metadata.format.duration;
+            if (realDuration && realDuration > 0) {
+              beat.timing = { ...beat.timing, audioDurationSec: realDuration };
+              beat.durationSec = realDuration;
+              synced++;
+            }
+          } catch {}
+        }
+        // Recalculate startSec
+        let cumSec = 0;
+        for (const beat of beats) {
+          (beat as any).startSec = cumSec;
+          cumSec += beat.durationSec;
+        }
+        console.log(`  ${synced}/${beats.length} beats synced with real MP3 durations`);
+      } catch (err) {
+        console.warn(`  Duration sync failed: ${(err as Error).message.slice(0, 80)}`);
       }
-      console.log(`  ${synced}/${beats.length} beats synced with real MP3 durations`);
-    } catch (err) {
-      console.warn(`  Duration sync failed: ${(err as Error).message.slice(0, 80)}`);
     }
 
     saveToEpisode(date, "audio-manifest.json", audioManifest);
@@ -553,6 +572,7 @@ async function main() {
     owlClosingAudio: owlAudioPaths["owl_closing"] || undefined,
     owlTransitionAudios,
     owlAudioDurations,
+    segmentAudioDurations: segmentDurations ?? undefined,
   };
   const propsPath = saveRemotionProps(date, remotionProps);
   console.log(`  Props saved: ${propsPath}`);

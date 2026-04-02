@@ -51,13 +51,13 @@ interface C6Output {
 // ─── Emotion → Fish Audio tag mapping ───────────────────────────
 
 const EMOTION_TAG_MAP: Record<BeatEmotion, string> = {
-  tension: '[grave]',
-  impact: '[emphase]',
-  revelation: '[emphase]',
-  analyse: '[calme]',
+  tension: '[breathy]',
+  impact: '[emphasis]',
+  revelation: '[emphasis]',
+  analyse: '[soft]',
   contexte: '',
-  respiration: '[calme]',
-  conclusion: '[calme]',
+  respiration: '[soft]',
+  conclusion: '[soft]',
 };
 
 const PACING_TO_PRESET: Record<string, TTSBeat['fishPreset']> = {
@@ -73,24 +73,27 @@ const C6_SYSTEM_PROMPT = `Tu es un adaptateur de texte pour synthèse vocale (TT
 ## Ton rôle
 Transformer la narration écrite en texte vivant pour l'oreille. Tu places des tags d'intonation DEVANT les mots clés pour guider la voix.
 
-## Tags Fish Audio S2 (placés DEVANT le mot concerné)
-- [accent] — met l'emphase sur le mot/nombre qui suit. C'est le tag principal. Utilise-le sur les chiffres importants, les mots de surprise, les contrastes.
+## Tags Fish Audio S2 (placés DEVANT le mot ou passage concerné)
+- [emphasis] — insistance sur le mot/phrase qui suit. C'est le tag principal. Utilise-le sur les chiffres importants, les mots de surprise, les contrastes.
 - [pause] — silence court. Avant un chiffre clé, entre deux idées, après une révélation.
+- [long pause] — silence plus long. Entre deux sous-parties d'un segment, ou avant un retournement.
 - [soft] — ton doux, posé. Pour les explications calmes, les analogies.
-- [loud] — plus fort, insistant. Pour les faits chocs, les contradictions.
-- [slowly] — ralentit le débit. Pour les moments graves, les conclusions.
+- [excited] — plus fort, insistant, enthousiaste. Pour les faits chocs, les contradictions.
+- [whispering] — chuchotement, confidence. Pour un aparté ou un détail surprenant.
+- [breathy] — ton essoufflé, tendu. Pour les moments de suspense.
+- [sighing] — soupir. Avant une mauvaise nouvelle ou un constat d'impuissance.
 
 ## Règles
 
-1. **[accent] DEVANT le mot** : "un aller-retour de [accent]quinze dollars" PAS "[accent] un aller-retour de quinze dollars". Le tag accentue le MOT qui le suit immédiatement.
-2. **2-4 [accent] par beat** — pas plus. Trop de tags tue l'effet. Choisis les mots qui COMPTENT : le chiffre choc, le verbe d'action, le contraste.
+1. **[emphasis] DEVANT le mot** : "un aller-retour de [emphasis]quinze dollars" PAS "[emphasis] un aller-retour de quinze dollars". Le tag accentue le MOT qui le suit immédiatement.
+2. **2-4 [emphasis] par beat** — pas plus. Trop de tags tue l'effet. Choisis les mots qui COMPTENT : le chiffre choc, le verbe d'action, le contraste.
 3. **[pause] entre les idées** — pas à chaque phrase. Avant un chiffre clé, après une révélation, entre deux sujets.
 4. **Phrases > 20 mots** : couper en 2 phrases distinctes.
 5. **Supprimer** les références visuelles : "comme tu peux le voir", "sur ce graphique".
 6. **Ne PAS changer le sens** — reformuler pour l'oral, pas réécrire.
 7. **isSegmentStart=true** → commencer par [pause].
-8. **isSegmentEnd=true** → terminer par [slowly] sur les 3-4 derniers mots pour marquer la conclusion. Le ton doit baisser naturellement en fin de segment.
-9. **isKeyMoment=true** → utiliser [loud] ou [slowly] selon le contexte.
+8. **isSegmentEnd=true** → terminer par [soft] ou [breathy] sur les 3-4 derniers mots pour marquer la conclusion. Le ton doit baisser naturellement en fin de segment.
+9. **isKeyMoment=true** → utiliser [excited] ou [emphasis] selon le contexte.
 10. **CHIFFRES → LETTRES** : TOUS les nombres en toutes lettres. C'est OBLIGATOIRE.
 11. **MOTS ANGLAIS** : laisser tels quels. La phonétisation est gérée par le code après toi.
 12. **SIGLES** : lettres séparées par des points. "ETF" → "É.T.F.". "S&P" → "S. et P.".
@@ -98,21 +101,21 @@ Transformer la narration écrite en texte vivant pour l'oreille. Tu places des t
 ## Exemples
 
 Input: "Le Brent a touché 105$ hier — un aller-retour de 15$ en moins de 48 heures sur deux tweets contradictoires."
-Output: "Le Brent a touché [accent]cent cinq dollars hier. [pause] Un aller-retour de [accent]quinze dollars en moins de quarante-huit heures sur deux tweets contradictoires."
+Output: "Le Brent a touché [emphasis]cent cinq dollars hier. [pause] Un aller-retour de [emphasis]quinze dollars en moins de quarante-huit heures sur deux tweets contradictoires."
 
 Input: "L'or enregistre sa pire semaine en 40 ans avec une baisse de -9%."
-Output: "L'or enregistre sa [accent]pire semaine en quarante ans. [pause] [slowly] Moins neuf pour cent."
+Output: "L'or enregistre sa [emphasis]pire semaine en quarante ans. [pause] [breathy] Moins neuf pour cent."
 
 Input: "Trump évoque un cessez-le-feu. L'Iran dit non. Et les marchés montent quand même."
-Output: "Trump évoque un cessez-le-feu. L'Iran dit [accent]non. [pause] Et les marchés [accent]montent quand même."
+Output: "Trump évoque un cessez-le-feu. L'Iran dit [emphasis]non. [pause] Et les marchés [emphasis]montent quand même."
 
 ## Output JSON
 
 \`\`\`json
 {
   "beats": [
-    { "beatId": "beat_001", "adapted": "[grave] Texte adapté..." },
-    { "beatId": "beat_002", "adapted": "[calme] Suite..." }
+    { "beatId": "beat_001", "adapted": "[soft] Texte adapté..." },
+    { "beatId": "beat_002", "adapted": "[soft] Suite..." }
   ]
 }
 \`\`\``;

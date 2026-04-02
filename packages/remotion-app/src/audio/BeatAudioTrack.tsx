@@ -16,6 +16,8 @@ interface BeatAudioTrackProps {
   fps: number;
   /** Volume global voix (0-1), défaut 1 */
   voiceVolume?: number;
+  /** Segment mode: map of segmentId → total duration in seconds */
+  segmentAudioDurations?: Record<string, number>;
 }
 
 export const BeatAudioTrack: React.FC<BeatAudioTrackProps> = ({
@@ -23,6 +25,7 @@ export const BeatAudioTrack: React.FC<BeatAudioTrackProps> = ({
   beatTimings,
   fps,
   voiceVolume = 1,
+  segmentAudioDurations = {},
 }) => {
   const elements: React.ReactNode[] = [];
 
@@ -31,9 +34,48 @@ export const BeatAudioTrack: React.FC<BeatAudioTrackProps> = ({
     const timing = beatTimings[i];
     if (!timing) continue;
 
-    // ── Voix TTS ──
-    // audioPath est un chemin relatif depuis public/ (ex: "audio/beats/beat_001.mp3")
-    if (beat.audioPath) {
+    // ── Detect mode: segment or legacy ──
+    const beatAny = beat as any;
+    const isSegmentMode =
+      beatAny.audioSegmentPath &&
+      typeof beatAny.audioSegmentPath === 'string' &&
+      beatAny.audioSegmentPath.trim().length > 0;
+
+    if (isSegmentMode) {
+      // ── Segment mode: trim portion of shared segment MP3 ──
+      const segmentPath = beatAny.audioSegmentPath;
+      const offsetSec = beatAny.audioOffsetSec ?? 0;
+      const endSec = beatAny.audioEndSec ?? 0;
+
+      // Get total duration of segment from map; fallback to endSec if not provided
+      const segmentId = segmentPath.replace(/[^a-zA-Z0-9_-]/g, '_');
+      const totalDuration = segmentAudioDurations[segmentId] ?? endSec;
+
+      if (totalDuration <= 0) continue;
+
+      const trimBeforeFrames = Math.round(offsetSec * fps);
+      const trimAfterFrames = Math.round((totalDuration - endSec) * fps);
+
+      const audioSrc = segmentPath.startsWith('http') || segmentPath.startsWith('/')
+        ? segmentPath
+        : staticFile(segmentPath);
+
+      elements.push(
+        <Sequence
+          key={`voice-segment-${beat.id}`}
+          from={timing.start}
+          durationInFrames={timing.duration + 15}
+        >
+          <Audio
+            src={audioSrc}
+            volume={voiceVolume}
+            trimBefore={trimBeforeFrames}
+            trimAfter={trimAfterFrames}
+          />
+        </Sequence>
+      );
+    } else if (beat.audioPath) {
+      // ── Legacy mode: individual MP3 per beat ──
       const audioSrc = beat.audioPath.startsWith('http') || beat.audioPath.startsWith('/')
         ? beat.audioPath
         : staticFile(beat.audioPath);

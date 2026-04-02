@@ -1,20 +1,23 @@
 /**
- * Génère l'audio TTS pour chaque beat individuellement.
+ * Génère l'audio TTS — deux modes :
+ *
+ * 1. SEGMENT MODE (default with Fish): 1 MP3 par segment, puis alignment Echogarden
+ *    pour trouver les frontières de beats. Prosodie naturelle.
+ * 2. LEGACY MODE (edge-tts ou fallback): 1 MP3 par beat individuel.
  *
  * Providers : edge-tts (gratuit) | fish (Fish Audio S2-Pro, ~$0.15/épisode)
  * Switch via TTS_PROVIDER env var (default: edge).
  *
- * Chaque beat reçoit son propre fichier MP3.
- * Après génération, beat.audioPath et beat.timing.audioDurationSec sont remplis.
- *
- * Usage:
- *   const beats = await generateBeatAudio(beats, 'fr', 'packages/remotion-app/public/audio/beats');
+ * Après génération, chaque beat reçoit :
+ *   - Segment mode: audioSegmentPath, audioOffsetSec, audioEndSec, durationSec
+ *   - Legacy mode: audioPath, timing.audioDurationSec
  */
 
 import { existsSync, mkdirSync, writeFileSync, statSync } from 'fs';
 import { join } from 'path';
 import type { Beat, Language } from '@yt-maker/core';
 import { fishTTS, FISH_PRESETS } from './fish-tts';
+import { alignSegmentAudio } from './align-segment-audio';
 
 // ─── TTS Provider ───────────────────────────────────────────────
 
@@ -182,6 +185,131 @@ async function generateBeatWithFish(
   });
 }
 
+// ─── Segment-level TTS generation ───────────────────────────────
+
+/** Group beats by segmentId, preserving order */
+function groupBeatsBySegment(beats: Beat[]): Map<string, Beat[]> {
+  const map = new Map<string, Beat[]>();
+  for (const b of beats) {
+    if (!map.has(b.segmentId)) map.set(b.segmentId, []);
+    map.get(b.segmentId)!.push(b);
+  }
+  return map;
+}
+
+/**
+ * Generate 1 MP3 per segment via Fish Audio, then align with Echogarden.
+ * Sets audioSegmentPath, audioOffsetSec, audioEndSec on each beat.
+ */
+async function generateSegmentAudio(
+  beats: Beat[],
+  outputDir: string,
+  publicRelativePrefix: string,
+  speed?: number,
+): Promise<{ successSegments: number; segmentDurations: Record<string, number> }> {
+  const segmentsDir = join(outputDir, 'segments');
+  if (!existsSync(segmentsDir)) mkdirSync(segmentsDir, { recursive: true });
+
+  const groups = groupBeatsBySegment(beats);
+  let successSegments = 0;
+  const segmentDurations: Record<string, number> = {};
+
+  for (const [segId, segBeats] of groups) {
+    // Skip segments with no narration (title_card)
+    const narrativeBeats = segBeats.filter(b => b.narrationChunk && b.narrationChunk.trim().length >= 3);
+    if (narrativeBeats.length === 0) {
+      for (const b of segBeats) { (b as any).audioSegmentPath = ''; }
+      continue;
+    }
+
+    const segMp3 = join(segmentsDir, `${segId}.mp3`);
+    const segRelative = `${publicRelativePrefix}/segments/${segId}.mp3`;
+
+    console.log(`    Segment ${segId}: ${narrativeBeats.length} beats, generating...`);
+
+    // 1. Concatenate all narrationTTS for this segment
+    const fullTTS = narrativeBeats
+      .map(b => (b as any).narrationTTS || b.narrationChunk)
+      .join(' ');
+    const sanitized = sanitizeForTTS(fullTTS);
+
+    // 2. Generate 1 MP3 for the whole segment
+    try {
+      await fishTTS({
+        text: sanitized,
+        outputPath: segMp3,
+        format: 'mp3',
+        speed: speed ?? FISH_PRESETS.FOCUS.speed,
+        temperature: FISH_PRESETS.FOCUS.temperature,
+        topP: FISH_PRESETS.FOCUS.topP,
+        repetitionPenalty: FISH_PRESETS.FOCUS.repetitionPenalty,
+      });
+    } catch (err) {
+      console.warn(`    Fish Audio failed for segment ${segId}: ${(err as Error).message.slice(0, 100)}`);
+      // Mark all beats as no audio
+      for (const b of segBeats) { (b as any).audioSegmentPath = ''; }
+      continue;
+    }
+
+    // Get real MP3 duration
+    let segDuration = estimateDuration(sanitized);
+    try {
+      const { parseFile } = await import('music-metadata');
+      const meta = await parseFile(segMp3);
+      if (meta.format.duration) segDuration = meta.format.duration;
+    } catch {}
+
+    segmentDurations[segId] = segDuration;
+    console.log(`    Segment ${segId}: ${segDuration.toFixed(1)}s`);
+
+    // 3. Alignment — find beat boundaries within the segment audio
+    try {
+      const timings = await alignSegmentAudio(segMp3, narrativeBeats.map(b => ({
+        id: b.id,
+        narrationTTS: (b as any).narrationTTS,
+        narrationChunk: b.narrationChunk,
+      })));
+
+      // 4. Set timing on each beat
+      for (const bt of timings) {
+        const beat = segBeats.find(b => b.id === bt.beatId);
+        if (!beat) continue;
+        (beat as any).audioSegmentPath = segRelative;
+        (beat as any).audioOffsetSec = bt.startSec;
+        (beat as any).audioEndSec = bt.endSec;
+        beat.durationSec = bt.durationSec;
+        beat.timing = { ...beat.timing, audioDurationSec: bt.durationSec };
+      }
+
+      // Mark non-narrative beats (title_card, etc.)
+      for (const b of segBeats) {
+        if (!(b as any).audioSegmentPath) (b as any).audioSegmentPath = '';
+      }
+
+      successSegments++;
+    } catch (err) {
+      console.warn(`    Alignment failed for ${segId}, using proportional: ${(err as Error).message.slice(0, 100)}`);
+      // Fallback: proportional timing
+      const wordsPerBeat = narrativeBeats.map(b => ((b as any).narrationTTS || b.narrationChunk).split(/\s+/).length);
+      const totalWords = wordsPerBeat.reduce((a, b) => a + b, 0);
+      let cumSec = 0;
+      for (let i = 0; i < narrativeBeats.length; i++) {
+        const beatDur = (wordsPerBeat[i] / totalWords) * segDuration;
+        const beat = narrativeBeats[i];
+        (beat as any).audioSegmentPath = segRelative;
+        (beat as any).audioOffsetSec = cumSec;
+        (beat as any).audioEndSec = cumSec + beatDur;
+        beat.durationSec = beatDur;
+        beat.timing = { ...beat.timing, audioDurationSec: beatDur };
+        cumSec += beatDur;
+      }
+      successSegments++;
+    }
+  }
+
+  return { successSegments, segmentDurations };
+}
+
 // ─── Main entry point ───────────────────────────────────────────
 
 /**
@@ -204,11 +332,53 @@ export async function generateBeatAudio(
     skipExisting?: boolean;
     /** Speed multiplier (Fish Audio only, default 1.0) */
     speed?: number;
+    /** Force legacy per-beat mode even with Fish */
+    legacyMode?: boolean;
   }
-): Promise<{ beats: Beat[]; manifest: BeatAudioManifest }> {
+): Promise<{ beats: Beat[]; manifest: BeatAudioManifest; segmentDurations?: Record<string, number> }> {
   const provider = getTTSProvider();
 
   if (!existsSync(outputDir)) mkdirSync(outputDir, { recursive: true });
+
+  // ── Segment mode: Fish Audio + Echogarden alignment ──
+  if (provider === 'fish' && !options?.legacyMode) {
+    console.log(`\n  Generating TTS per SEGMENT (${provider}, segment mode)...`);
+    const { successSegments, segmentDurations } = await generateSegmentAudio(
+      beats, outputDir, publicRelativePrefix, options?.speed,
+    );
+
+    // Recalculate cumulative startSec
+    let cumSec = 0;
+    for (const beat of beats) {
+      (beat as any).startSec = cumSec;
+      cumSec += beat.durationSec;
+    }
+
+    // Build manifest
+    const manifest: BeatAudioManifest = {
+      date: new Date().toISOString().slice(0, 10),
+      provider,
+      totalDurationSec: cumSec,
+      beats: beats.filter(b => b.narrationChunk?.trim().length >= 3).map(b => ({
+        beatId: b.id,
+        mp3Path: (b as any).audioSegmentPath || '',
+        relativePath: (b as any).audioSegmentPath || '',
+        startSec: (b as any).startSec ?? 0,
+        durationSec: b.durationSec,
+        voice: process.env.FISH_VOICE_ID ?? 'fish-s2-pro',
+      })),
+    };
+    const manifestPath = join(outputDir, 'beat-audio-manifest.json');
+    writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+
+    console.log(`  ${successSegments} segments generated (${cumSec.toFixed(1)}s total) [${provider} segment mode]`);
+    console.log(`  Manifest: ${manifestPath}`);
+
+    return { beats, manifest, segmentDurations };
+  }
+
+  // ── Legacy mode: 1 MP3 per beat ──
+  console.log(`\n  Generating TTS per BEAT (${provider}, legacy mode)...`);
 
   // Init provider
   let edgeTts: any = null;

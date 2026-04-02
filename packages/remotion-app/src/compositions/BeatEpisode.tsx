@@ -58,6 +58,8 @@ export interface BeatEpisodeProps {
   owlTransitionAudios?: Record<string, string>;
   /** Real durations (seconds) of owl audio clips keyed by owl_intro, owl_tr_seg_1, etc. */
   owlAudioDurations?: Record<string, number>;
+  /** Segment audio durations for segment-level TTS mode (segmentId → total seconds) */
+  segmentAudioDurations?: Record<string, number>;
   [key: string]: unknown;
 }
 
@@ -294,6 +296,7 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
   owlClosingAudio,
   owlTransitionAudios = {},
   owlAudioDurations,
+  segmentAudioDurations,
 }) => {
   const { fps } = useVideoConfig();
   const mood = script.direction?.moodMusic ?? "neutre_analytique";
@@ -786,6 +789,7 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
         beats={beats}
         beatTimings={timings.allBeatTimings}
         fps={fps}
+        segmentAudioDurations={segmentAudioDurations}
       />
 
       {/* ── Scrolling ticker — only during segment beats ── */}
