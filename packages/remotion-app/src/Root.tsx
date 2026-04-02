@@ -315,13 +315,17 @@ export const RemotionRoot: React.FC = () => {
             script: REAL_PROPS.script as any,
             beats: REAL_PROPS.beats as any,
             assets: REAL_PROPS.assets as any,
-            news: REAL_PROPS.news as any,
+            news: (REAL_PROPS as any).news as any,
+            owlIntroAudio: (REAL_PROPS as any).owlIntroAudio,
+            owlClosingAudio: (REAL_PROPS as any).owlClosingAudio,
+            owlTransitionAudios: (REAL_PROPS as any).owlTransitionAudios,
+            owlAudioDurations: (REAL_PROPS as any).owlAudioDurations,
           }}
           calculateMetadata={({ props }: { props: Record<string, unknown> }) => {
             const beats = (props.beats ?? []) as Beat[];
             const script = props.script as EpisodeScript;
             return {
-              durationInFrames: Math.max(30, computeNewspaperDuration(beats, script, 30)),
+              durationInFrames: Math.max(30, computeNewspaperDuration(beats, script, 30, (props as any).owlAudioDurations)),
               fps: 30, width: 1920, height: 1080,
             };
           }}
@@ -349,12 +353,13 @@ export const RemotionRoot: React.FC = () => {
                 owlIntroAudio: props.owlIntroAudio as any,
                 owlClosingAudio: props.owlClosingAudio as any,
                 owlTransitionAudios: (props.owlTransitionAudios ?? {}) as any,
+                owlAudioDurations: props.owlAudioDurations as any,
               }}
               calculateMetadata={({ props: p }: { props: Record<string, unknown> }) => {
                 const b = (p.beats ?? []) as Beat[];
                 const s = p.script as EpisodeScript;
                 return {
-                  durationInFrames: Math.max(30, b.length > 0 ? computeNewspaperDuration(b, s, 30) : (s.totalDurationSec ?? 300) * 30),
+                  durationInFrames: Math.max(30, b.length > 0 ? computeNewspaperDuration(b, s, 30, (p as any).owlAudioDurations) : (s.totalDurationSec ?? 300) * 30),
                   fps: 30, width: 1920, height: 1080,
                 };
               }}

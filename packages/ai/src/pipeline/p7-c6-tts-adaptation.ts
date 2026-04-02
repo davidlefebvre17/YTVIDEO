@@ -89,10 +89,11 @@ Transformer la narration écrite en texte vivant pour l'oreille. Tu places des t
 5. **Supprimer** les références visuelles : "comme tu peux le voir", "sur ce graphique".
 6. **Ne PAS changer le sens** — reformuler pour l'oral, pas réécrire.
 7. **isSegmentStart=true** → commencer par [pause].
-8. **isKeyMoment=true** → utiliser [loud] ou [slowly] selon le contexte.
-9. **CHIFFRES → LETTRES** : TOUS les nombres en toutes lettres. C'est OBLIGATOIRE.
-10. **MOTS ANGLAIS** : laisser tels quels. La phonétisation est gérée par le code après toi.
-11. **SIGLES** : lettres séparées par des points. "ETF" → "É.T.F.". "S&P" → "S. et P.".
+8. **isSegmentEnd=true** → terminer par [slowly] sur les 3-4 derniers mots pour marquer la conclusion. Le ton doit baisser naturellement en fin de segment.
+9. **isKeyMoment=true** → utiliser [loud] ou [slowly] selon le contexte.
+10. **CHIFFRES → LETTRES** : TOUS les nombres en toutes lettres. C'est OBLIGATOIRE.
+11. **MOTS ANGLAIS** : laisser tels quels. La phonétisation est gérée par le code après toi.
+12. **SIGLES** : lettres séparées par des points. "ETF" → "É.T.F.". "S&P" → "S. et P.".
 
 ## Exemples
 

@@ -253,7 +253,8 @@ export async function generateBeatAudio(
     }
 
     try {
-      const sanitized = sanitizeForTTS(beat.narrationChunk);
+      const ttsText = (beat as any).narrationTTS || beat.narrationChunk;
+      const sanitized = sanitizeForTTS(ttsText);
 
       if (provider === 'fish') {
         await generateBeatWithFish(sanitized, mp3Path, undefined, options?.speed);

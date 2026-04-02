@@ -56,6 +56,8 @@ export interface BeatEpisodeProps {
   owlClosingAudio?: string;
   /** Owl transition audio paths per segment */
   owlTransitionAudios?: Record<string, string>;
+  /** Real durations (seconds) of owl audio clips keyed by owl_intro, owl_tr_seg_1, etc. */
+  owlAudioDurations?: Record<string, number>;
   [key: string]: unknown;
 }
 
@@ -103,7 +105,7 @@ const OwlDiveWithCrossfade: React.FC<{
     <AbsoluteFill>
       <AbsoluteFill style={{ opacity: pageOp }}>{children}</AbsoluteFill>
       <AbsoluteFill style={{ opacity: combinedVideoOp }}>
-        <Video src={OWL_DIVE_SRC} style={{ width: "100%", height: "100%" }} volume={0} muted />
+        <Video src={OWL_DIVE_SRC} style={{ width: "100%", height: "100%" }} volume={0} muted onError={() => {}} />
       </AbsoluteFill>
     </AbsoluteFill>
   );
@@ -112,12 +114,21 @@ const OwlDiveWithCrossfade: React.FC<{
 // ── Constants ────────────────────────────────────────────────
 const DISCLAIMER_FRAMES = 90; // 3s
 const ZOOM_FRAMES = 45; // 1.5s
-const BETWEEN_FRAMES = 90; // 3s pause for owl transition voice between segments
+const BETWEEN_FRAMES_DEFAULT = 90; // 3s fallback for owl transition voice between segments
 const CROSSFADE_FRAMES = 25; // overlap between zoom end and first beat
 const MIN_NEWSPAPER_FRAMES = 600; // 20s minimum newspaper intro
 const MIN_CLOSING_FRAMES = 150; // 5s minimum closing
 
 const PRE_SEGMENT_IDS = ["hook", "title_card", "thread"];
+
+/** Get transition duration in frames for a given segment, using real owl audio duration if available. */
+function getBetweenFrames(segId: string, fps: number, owlAudioDurations?: Record<string, number>): number {
+  if (!owlAudioDurations) return BETWEEN_FRAMES_DEFAULT;
+  const key = `owl_tr_${segId}`;
+  const dur = owlAudioDurations[key];
+  if (dur && dur > 0) return Math.round(dur * fps) + 15; // audio duration + 0.5s padding
+  return BETWEEN_FRAMES_DEFAULT;
+}
 
 // ── Beat helpers ─────────────────────────────────────────────
 
@@ -205,6 +216,7 @@ export function computeNewspaperDuration(
   beats: Beat[],
   script: EpisodeScript,
   fps: number,
+  owlAudioDurations?: Record<string, number>,
 ): number {
   const groups = groupBeatsBySegment(beats);
 
@@ -228,7 +240,7 @@ export function computeNewspaperDuration(
       // CROSSFADE_FRAMES overlap means beats start earlier, reducing total
       segTotal += ZOOM_FRAMES + dur + ZOOM_FRAMES - CROSSFADE_FRAMES;
     }
-    if (i < segIds.length - 1) segTotal += BETWEEN_FRAMES;
+    if (i < segIds.length - 1) segTotal += getBetweenFrames(segIds[i], fps, owlAudioDurations);
   }
 
   const closingDur = groups.has("closing")
@@ -281,6 +293,7 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
   owlIntroAudio,
   owlClosingAudio,
   owlTransitionAudios = {},
+  owlAudioDurations,
 }) => {
   const { fps } = useVideoConfig();
   const mood = script.direction?.moodMusic ?? "neutre_analytique";
@@ -352,6 +365,7 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
     interface SegTiming {
       segIdx: number;
       segId: string;
+      betweenFrames: number;
       zoomInStart: number;
       beatsStart: number;
       zoomOutStart: number;
@@ -369,12 +383,14 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
       if (isPanorama) {
         // PANORAMA: no zoom in/out — stays on newspaper page with StampOverlay + audio
         const beatsStart = segCum;
-        const end = beatsStart + dur + (isLast ? 0 : BETWEEN_FRAMES);
+        const betweenF = getBetweenFrames(segId, fps, owlAudioDurations as any);
+        const end = beatsStart + dur + (isLast ? 0 : betweenF);
         sectionStarts.set(segId, beatsStart);
         segCum = end;
         return {
           segIdx: i,
           segId,
+          betweenFrames: betweenF,
           zoomInStart: beatsStart, // no zoom, but field required
           beatsStart,
           zoomOutStart: beatsStart + dur, // no zoom, but field required
@@ -382,17 +398,19 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
         };
       }
 
+      const betweenF = getBetweenFrames(segId, fps, owlAudioDurations as any);
       const zoomInStart = segCum;
       // Beats start CROSSFADE_FRAMES before zoom ends (overlap for smooth transition)
       const beatsStart = zoomInStart + ZOOM_FRAMES - CROSSFADE_FRAMES;
       const zoomOutStart = beatsStart + dur;
       const end =
-        zoomOutStart + ZOOM_FRAMES + (isLast ? 0 : BETWEEN_FRAMES);
+        zoomOutStart + ZOOM_FRAMES + (isLast ? 0 : betweenF);
       sectionStarts.set(segId, beatsStart);
       segCum = end;
       return {
         segIdx: i,
         segId,
+        betweenFrames: betweenF,
         zoomInStart,
         beatsStart,
         zoomOutStart,
@@ -470,7 +488,7 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
       {/* ── 1. Owl Intro clip (8s) — fades out at end ── */}
       <Sequence from={0} durationInFrames={OWL_INTRO_FRAMES}>
         <OwlClipFade durationInFrames={OWL_INTRO_FRAMES} fadeOutFrames={OWL_CLIP_OVERLAP}>
-          <Video src={OWL_INTRO_SRC} style={{ width: "100%", height: "100%" }} volume={0} muted />
+          <Video src={OWL_INTRO_SRC} style={{ width: "100%", height: "100%" }} volume={0} muted onError={() => {}} />
         </OwlClipFade>
       </Sequence>
 
@@ -561,10 +579,10 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
                 />
               </Sequence>
               {/* Brief pause on newspaper between segments */}
-              {i < segmentIds.length - 1 && BETWEEN_FRAMES > 0 && (
+              {i < segmentIds.length - 1 && st.betweenFrames > 0 && (
                 <Sequence
                   from={st.zoomOutStart}
-                  durationInFrames={BETWEEN_FRAMES}
+                  durationInFrames={st.betweenFrames}
                 >
                   <NewspaperPage
                     {...npProps}
@@ -637,10 +655,7 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
                       <Audio src={getSfxPath("stamp", i)} volume={SFX_VOLUME.stamp * 0.7} />
                     </>
                   )}
-                  {/* SFX: subtle pen on image crossfade (not first beat) */}
-                  {j > 0 && effectiveFade > 0 && (
-                    <Audio src={getSfxPath("pen", globalIdx)} volume={0.10} />
-                  )}
+                  {/* SFX: pen removed — too frequent on 80+ beats, sounds like wind */}
                   {/* SFX: typewriter key when data overlay appears */}
                   {hasOverlay && (overlayType === 'stat' || overlayType === 'gauge_rsi' || overlayType === 'gauge_fear_greed' || overlayType === 'multi_badge') && (
                     <Sequence from={Math.round((beat.overlay?.enterDelayMs ?? 300) / 1000 * fps)} durationInFrames={Math.round(0.5 * fps)}>
@@ -689,11 +704,11 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
             </Sequence>
 
             {/* Brief pause on newspaper between segments */}
-            {i < segmentIds.length - 1 && BETWEEN_FRAMES > 0 && (
+            {i < segmentIds.length - 1 && st.betweenFrames > 0 && (
               <>
                 <Sequence
                   from={st.zoomOutStart + ZOOM_FRAMES}
-                  durationInFrames={BETWEEN_FRAMES}
+                  durationInFrames={st.betweenFrames}
                 >
                   <NewspaperPage
                     {...npProps}
@@ -704,7 +719,7 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
                 {/* SFX: subtle clock tick during pause */}
                 <Sequence
                   from={st.zoomOutStart + ZOOM_FRAMES}
-                  durationInFrames={BETWEEN_FRAMES}
+                  durationInFrames={st.betweenFrames}
                 >
                   <Audio src={getSfxPath("clock", i)} volume={SFX_VOLUME.clock * 0.4} />
                 </Sequence>
@@ -745,13 +760,15 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
       {/* owlTransition text introduces the NEXT segment, so we play seg[i-1]'s audio before seg[i] */}
       {timings.segTimings.map((st, i) => {
         if (i === 0) return null; // first segment: newspaper intro is the transition
-        const prevSegId = timings.segTimings[i - 1].segId;
-        const audioPath = owlTransitionAudios[prevSegId];
+        const prevSeg = timings.segTimings[i - 1];
+        const audioPath = owlTransitionAudios[prevSeg.segId];
         if (!audioPath) return null;
+        // The gap before current segment was sized by PREVIOUS segment's betweenFrames
+        const gapFrames = prevSeg.betweenFrames;
         return (
           <Sequence key={`owl-tr-${st.segId}`}
-            from={st.zoomInStart - BETWEEN_FRAMES}
-            durationInFrames={BETWEEN_FRAMES + ZOOM_FRAMES}>
+            from={st.zoomInStart - gapFrames}
+            durationInFrames={gapFrames + ZOOM_FRAMES}>
             <Audio src={staticFile(audioPath)} volume={1} />
           </Sequence>
         );

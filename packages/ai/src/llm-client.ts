@@ -139,7 +139,7 @@ async function callAnthropic(
   maxTokens: number = ANTHROPIC_MAX_TOKENS_DEFAULT,
 ): Promise<string> {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 300_000); // 5 min timeout
+  const timeoutId = setTimeout(() => controller.abort(), 600_000); // 10 min timeout
   const response = await fetch(ANTHROPIC_BASE, {
     method: "POST",
     headers: {
@@ -176,7 +176,7 @@ async function callGemini(
   maxTokens: number = GEMINI_MAX_TOKENS_DEFAULT,
 ): Promise<string> {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 300_000); // 5 min timeout
+  const timeoutId = setTimeout(() => controller.abort(), 600_000); // 10 min timeout
   const url = `${GEMINI_BASE}/${model}:generateContent?key=${apiKey}`;
   const response = await fetch(url, {
     method: "POST",

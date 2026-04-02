@@ -91,7 +91,7 @@ async function main() {
 
   // Create episode folder + clean stale public files
   const epDir = createEpisodeDir(date);
-  cleanPublicForNewEpisode();
+  cleanPublicForNewEpisode({ skipImages });
   console.log(`Episode folder: ${epDir}`);
 
   let snapshot: DailySnapshot;
@@ -530,6 +530,20 @@ async function main() {
     const key = `owl_tr_${sec.id}`;
     if (owlAudioPaths[key]) owlTransitionAudios[sec.id] = owlAudioPaths[key];
   }
+  // Compute real durations for owl audio (transitions, intro, closing)
+  const owlAudioDurations: Record<string, number> = {};
+  try {
+    const { parseFile } = await import("music-metadata");
+    const owlDir = path.join(epDir, "audio", "owl");
+    for (const [key, relPath] of Object.entries(owlAudioPaths)) {
+      const mp3 = path.join(owlDir, path.basename(relPath));
+      if (fs.existsSync(mp3)) {
+        const meta = await parseFile(mp3);
+        if (meta.format.duration) owlAudioDurations[key] = meta.format.duration;
+      }
+    }
+  } catch {}
+
   const remotionProps = {
     script,
     beats,
@@ -538,6 +552,7 @@ async function main() {
     owlIntroAudio: owlAudioPaths["owl_intro"] || undefined,
     owlClosingAudio: owlAudioPaths["owl_closing"] || undefined,
     owlTransitionAudios,
+    owlAudioDurations,
   };
   const propsPath = saveRemotionProps(date, remotionProps);
   console.log(`  Props saved: ${propsPath}`);
@@ -550,8 +565,8 @@ async function main() {
       change: a.change, changePct: a.changePct,
       high24h: a.high24h, low24h: a.low24h,
       technicals: a.technicals ? { rsi14: a.technicals.rsi14, sma200: a.technicals.sma200 } : undefined,
-      candles: a.candles?.slice(-5),          // Last 5 intraday candles (for mini charts)
-      dailyCandles: a.dailyCandles?.slice(-30), // Last 30 daily candles (for overlays)
+      candles: a.candles?.slice(-5),           // Last 5 intraday candles (for mini charts)
+      dailyCandles: a.dailyCandles?.slice(-450), // 450 daily candles (SMA 200 lookback + 250 display)
     }));
     const studioProps = {
       ...remotionProps,

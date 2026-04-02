@@ -200,8 +200,8 @@ function buildC3UserPrompt(
     prompt += `Technique: ${seg.technicalReading}\n`;
     prompt += `Fondamental: ${seg.fundamentalContext}\n`;
     if (seg.causalChain) prompt += `Chaîne causale: ${seg.causalChain}\n`;
-    prompt += `Scénario haussier: ${seg.scenarios.bullish.target} (${seg.scenarios.bullish.condition})\n`;
-    prompt += `Scénario baissier: ${seg.scenarios.bearish.target} (${seg.scenarios.bearish.condition})\n`;
+    if (seg.scenarios?.bullish) prompt += `Scénario haussier: ${seg.scenarios.bullish.target} (${seg.scenarios.bullish.condition})\n`;
+    if (seg.scenarios?.bearish) prompt += `Scénario baissier: ${seg.scenarios.bearish.target} (${seg.scenarios.bearish.condition})\n`;
     prompt += `Accroche: "${seg.narrativeHook}"\n`;
     prompt += `Risque: ${seg.risk}\n`;
     prompt += `Confiance: ${seg.confidenceLevel}\n`;

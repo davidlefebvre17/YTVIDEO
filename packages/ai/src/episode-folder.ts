@@ -118,14 +118,14 @@ function cleanDir(dir: string, ext?: string): number {
  * Clean all Remotion public directories to avoid stale files from previous episodes.
  * Call ONCE at the start of a new generate run.
  */
-export function cleanPublicForNewEpisode(): void {
+export function cleanPublicForNewEpisode(opts?: { skipImages?: boolean }): void {
   const beatsAudioDir = join(REMOTION_PUBLIC, "audio", "beats");
   const owlAudioDir = join(REMOTION_PUBLIC, "audio", "owl");
   const editorialDir = join(REMOTION_PUBLIC, "editorial");
 
   const a = cleanDir(beatsAudioDir, ".mp3");
   const b = cleanDir(owlAudioDir, ".mp3");
-  const c = cleanDir(editorialDir, ".png");
+  const c = opts?.skipImages ? 0 : cleanDir(editorialDir, ".png");
 
   if (a + b + c > 0) {
     console.log(`  Cleaned public/: ${a} beat audio, ${b} owl audio, ${c} images`);
@@ -199,18 +199,28 @@ export function syncAudioToPublic(
   }
 
   for (const beat of beats) {
-    if (!beat.audioPath || !existsSync(beat.audioPath)) {
-      continue;
+    if (!beat.audioPath) continue;
+
+    // Resolve: audioPath can be absolute or relative (e.g. "audio/beats/beat_001.mp3")
+    let sourcePath = beat.audioPath;
+    if (!existsSync(sourcePath)) {
+      // Try resolving from episode audio dir
+      const fromEpisode = join(audioDir, basename(sourcePath));
+      if (existsSync(fromEpisode)) {
+        sourcePath = fromEpisode;
+      } else {
+        continue;
+      }
     }
 
-    const filename = basename(beat.audioPath);
+    const filename = basename(sourcePath);
 
     try {
       const episodeAudioPath = join(audioDir, filename);
       const publicAudioPath = join(beatsPublicDir, filename);
 
-      copyFileSync(beat.audioPath, episodeAudioPath);
-      copyFileSync(beat.audioPath, publicAudioPath);
+      if (sourcePath !== episodeAudioPath) copyFileSync(sourcePath, episodeAudioPath);
+      copyFileSync(sourcePath, publicAudioPath);
     } catch (err) {
       console.warn(
         `Failed to sync audio ${beat.id}: ${(err as Error).message}`
