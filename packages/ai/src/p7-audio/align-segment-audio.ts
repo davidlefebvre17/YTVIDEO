@@ -76,9 +76,9 @@ async function alignWithEchogarden(
     const result = await Echogarden.align(audioPath, fullText, {
       engine: 'dtw',
       language: 'fr',
-      crop: true,
+      crop: false,
       dtw: { granularity: 'high' },
-    });
+    } as any);
 
     if (!result.wordTimeline || result.wordTimeline.length === 0) {
       console.warn('[align] Echogarden returned empty wordTimeline');
@@ -234,6 +234,20 @@ export async function alignSegmentAudio(
       };
     })
     .filter((r): r is BeatTimingResult => r !== null);
+
+  // Extend last beat to cover the full audio duration (silences at end)
+  if (totalDurationSec !== null && results.length > 0) {
+    const last = results[results.length - 1];
+    if (last.endSec < totalDurationSec) {
+      last.endSec = totalDurationSec;
+      last.durationSec = last.endSec - last.startSec;
+    }
+    // Also ensure first beat starts at 0 (silence at start)
+    if (results[0].startSec > 0.5) {
+      results[0].startSec = 0;
+      results[0].durationSec = results[0].endSec - results[0].startSec;
+    }
+  }
 
   // Validation
   if (totalDurationSec !== null) {
