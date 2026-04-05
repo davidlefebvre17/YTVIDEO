@@ -60,12 +60,14 @@ CE QU'ON NE VEUT PAS :
 - Des métaphores littéraires recherchées
 - Un ton uniformément neutre et distant — le narrateur est une PERSONNE, pas un robot
 
-TECHNIQUE :
+TECHNIQUE (CRUCIAL — chaque mot sera lu par une voix de synthèse) :
+- TOUS les nombres en TOUTES LETTRES. Pas "4 590$" mais "quatre mille cinq cent quatre-vingt-dix dollars". Pas "12%" mais "douze pour cent". Pas "3,5" mais "trois virgule cinq". C'est NON NÉGOCIABLE — la voix de synthèse ne sait pas lire les chiffres.
 - Les termes techniques en toutes lettres pour la prononciation
-- Les acronymes courants restent : la Fed, la BCE, le VIX, le S&P, le Nasdaq
-- Les prix en chiffres. Les pourcentages en lettres.
+- Les acronymes courants épelés naturellement : la Fed, la BCE, le VIX, le S&P, le Nasdaq
+- Les sigles rares en lettres séparées : "le W.T.I.", "le D.X.Y.", "le R.S.I.", "un É.T.F."
 - Pas de parenthèses, pas de crochets, pas de sigles imprononçables
-- Chiffres ronds quand l'exact n'apporte rien au récit. "Il grimpe de 4%" suffit, pas besoin de "quatre virgule deux pour cent". "Autour des 100 dollars" plutôt que "99 dollars 64". Garder la précision uniquement pour les seuils symboliques et les niveaux techniques.
+- Les anglicismes financiers : écrire normalement en anglais ("spread", "short squeeze", "bull run", "pricing"). La phonétisation est gérée automatiquement après — ne PAS écrire phonétiquement.
+- Chiffres ronds quand l'exact n'apporte rien. "Autour des cent dollars" plutôt que "quatre-vingt-dix-neuf dollars soixante-quatre". Garder la précision uniquement pour les seuils symboliques.
 
 ## GARDE-FOUS
 

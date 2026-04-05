@@ -95,7 +95,7 @@ Transformer la narration écrite en texte vivant pour l'oreille. Tu places des t
 8. **isSegmentEnd=true** → terminer par [soft] ou [breathy] sur les 3-4 derniers mots pour marquer la conclusion. Le ton doit baisser naturellement en fin de segment.
 9. **isKeyMoment=true** → utiliser [excited] ou [emphasis] selon le contexte.
 10. **CHIFFRES → LETTRES** : TOUS les nombres en toutes lettres. C'est OBLIGATOIRE.
-11. **MOTS ANGLAIS** : laisser tels quels. La phonétisation est gérée par le code après toi.
+11. **MOTS ANGLAIS** : phonétiser pour qu'un francophone lise la prononciation anglaise correcte. Exemples : "spread" → "sprèdd", "squeeze" → "skouize", "pricing" → "praïcingue", "bull run" → "boull reune", "dead cat bounce" → "dèdd catt baounce", "hedge" → "hèdje", "trader" → "trèdeur", "short" → "shorte". Applique ce principe à TOUT mot anglais rencontré, même ceux pas listés ici.
 12. **SIGLES** : lettres séparées par des points. "ETF" → "É.T.F.". "S&P" → "S. et P.".
 
 ## Exemples
