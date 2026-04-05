@@ -162,6 +162,7 @@ function buildC3UserPrompt(
   researchContext?: string,
   feedback?: ValidationIssue[],
   assetContext?: Record<string, string>,
+  previousDraft?: DraftScript,
 ): string {
   let prompt = '';
 
@@ -245,9 +246,25 @@ function buildC3UserPrompt(
     prompt += researchContext + '\n\n';
   }
 
-  // Feedback from previous validation (retry)
+  // Feedback from previous validation (retry) + previous draft for targeted correction
   if (feedback?.length) {
-    prompt += `## RETOURS DE VALIDATION (corrigez ces problèmes)\n`;
+    // Inject previous draft narrations so Opus corrects instead of rewriting from scratch
+    if (previousDraft) {
+      const blockerSegIds = new Set(feedback.map(f => f.segmentId).filter(Boolean));
+      prompt += `## BROUILLON PRÉCÉDENT (CORRIGE uniquement les problèmes listés ci-dessous — garde le reste tel quel)\n`;
+      prompt += `owlIntro: "${previousDraft.owlIntro ?? ''}"\n`;
+      prompt += `coldOpen: "${previousDraft.coldOpen?.narration ?? ''}"\n`;
+      prompt += `thread: "${previousDraft.thread?.narration ?? ''}"\n`;
+      for (const seg of previousDraft.segments ?? []) {
+        const hasBlocker = blockerSegIds.has(seg.segmentId) || blockerSegIds.size === 0;
+        prompt += `${seg.segmentId}${hasBlocker ? ' [⚠ CORRECTION REQUISE]' : ''}: "${seg.narration}"\n`;
+        prompt += `  owlTransition: "${seg.owlTransition ?? ''}"\n`;
+      }
+      prompt += `owlClosing: "${previousDraft.owlClosing ?? ''}"\n`;
+      prompt += `closing: "${previousDraft.closing?.narration ?? ''}"\n\n`;
+    }
+
+    prompt += `## RETOURS DE VALIDATION (corrigez UNIQUEMENT ces problèmes)\n`;
     for (const issue of feedback) {
       prompt += `- [${issue.severity}] ${issue.description}`;
       if (issue.suggestedFix) prompt += ` → ${issue.suggestedFix}`;
@@ -270,6 +287,9 @@ export async function runC3Writing(input: {
   feedback?: ValidationIssue[];
   /** Asset symbol → description for C3 to present unfamiliar names */
   assetContext?: Record<string, string>;
+  /** Previous draft for targeted correction on retry */
+  previousDraft?: DraftScript;
+  [key: string]: unknown;
 }): Promise<DraftScript> {
   const systemPrompt = buildC3SystemPrompt(input.lang, input.knowledgeBriefing);
   const userPrompt = buildC3UserPrompt(
@@ -280,6 +300,7 @@ export async function runC3Writing(input: {
     input.researchContext,
     input.feedback,
     input.assetContext,
+    input.previousDraft,
   );
 
   console.log('  P4 C3 Opus — rédaction narrative...');

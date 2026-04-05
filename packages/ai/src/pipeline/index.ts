@@ -487,7 +487,7 @@ export async function runPipeline(
     const blockers = validation.issues.filter((i) => i.severity === "blocker");
     console.log(`  ⚠ ${blockers.length} blockers — retry C3...`);
 
-    // Retry C3 with feedback
+    // Retry C3 with feedback + previous draft for targeted correction
     draft = await runC3Writing({
       editorial,
       analysis,
@@ -497,7 +497,9 @@ export async function runPipeline(
       researchContext,
       lang,
       feedback: blockers,
+      assetContext,
       flagged,
+      previousDraft: draft,
     });
     stats.llmCalls++;
     stats.retries++;
