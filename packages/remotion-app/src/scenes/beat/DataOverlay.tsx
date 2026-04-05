@@ -317,18 +317,32 @@ const ChartWithZoom: React.FC<{
 
 const OverlayContent: React.FC<OverlayContentProps> = ({ type, data, assets, accentColor, durationInFrames }) => {
   switch (type) {
-    case 'stat':
+    case 'stat': {
+      const rawValue = data.value;
+      const numValue = typeof rawValue === 'number' ? rawValue : parseFloat(String(rawValue));
+      // If value is not a valid number, show just the label as a text card
+      if (isNaN(numValue)) {
+        return (
+          <TextCard
+            text={humanize((data.label as string) ?? '', assets)}
+            accentColor={accentColor}
+          />
+        );
+      }
+      const rawSuffix = (data.suffix as string) ?? '%';
+      const suffix = rawSuffix === 'text' || rawSuffix === 'string' ? '' : rawSuffix;
       return (
         <AnimatedStat
-          value={(data.value as number) ?? 0}
+          value={numValue}
           label={humanize((data.label as string) ?? '', assets)}
           prefix={(data.prefix as string) ?? ''}
-          suffix={(data.suffix as string) ?? '%'}
-          decimals={Math.abs((data.value as number) ?? 0) < 10 ? 1 : 0}
+          suffix={suffix}
+          decimals={Math.abs(numValue) < 10 ? 1 : 0}
           accentColor={accentColor}
           size="md"
         />
       );
+    }
 
     case 'causal_chain': {
       const steps: CausalStep[] = ((data.steps as string[]) ?? []).map(s => ({ label: humanize(s, assets) }));

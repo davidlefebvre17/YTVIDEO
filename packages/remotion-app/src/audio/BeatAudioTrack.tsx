@@ -29,32 +29,41 @@ export const BeatAudioTrack: React.FC<BeatAudioTrackProps> = ({
 }) => {
   const elements: React.ReactNode[] = [];
 
-  for (let i = 0; i < beats.length; i++) {
-    const beat = beats[i];
-    const timing = beatTimings[i];
-    if (!timing) continue;
+  // ── Detect mode from first beat with audio ──
+  const firstAudioBeat = beats.find((b: any) => (b as any).audioSegmentPath?.trim());
+  const isSegmentMode = !!firstAudioBeat;
 
-    // ── Detect mode: segment or legacy ──
-    const beatAny = beat as any;
-    const isSegmentMode =
-      beatAny.audioSegmentPath &&
-      typeof beatAny.audioSegmentPath === 'string' &&
-      beatAny.audioSegmentPath.trim().length > 0;
+  if (isSegmentMode) {
+    // ── Segment mode: ONE <Audio> per segment (not per beat) ──
+    // Group beats by segmentId, find first/last beat timing for each segment
+    const segmentInfo = new Map<string, { startFrame: number; endFrame: number; segmentPath: string }>();
 
-    if (isSegmentMode) {
-      // ── Segment mode: trim portion of shared segment MP3 ──
-      const segmentPath = beatAny.audioSegmentPath;
-      const offsetSec = beatAny.audioOffsetSec ?? 0;
-      const endSec = beatAny.audioEndSec ?? 0;
+    for (let i = 0; i < beats.length; i++) {
+      const beat = beats[i];
+      const timing = beatTimings[i];
+      const beatAny = beat as any;
+      if (!timing || !beatAny.audioSegmentPath?.trim()) continue;
 
-      // Get total duration of segment from map; fallback to endSec if not provided
-      const segmentId = segmentPath.replace(/[^a-zA-Z0-9_-]/g, '_');
-      const totalDuration = segmentAudioDurations[segmentId] ?? endSec;
+      const segId = beat.segmentId;
+      const beatEnd = timing.start + timing.duration;
+      if (!segmentInfo.has(segId)) {
+        segmentInfo.set(segId, {
+          startFrame: timing.start,
+          endFrame: beatEnd,
+          segmentPath: beatAny.audioSegmentPath,
+        });
+      } else {
+        const info = segmentInfo.get(segId)!;
+        if (beatEnd > info.endFrame) info.endFrame = beatEnd;
+      }
+    }
 
-      if (totalDuration <= 0) continue;
-
-      const trimBeforeFrames = Math.round(offsetSec * fps);
-      const trimAfterFrames = Math.round((totalDuration - endSec) * fps);
+    // Render one <Audio> per segment — use real audio duration to avoid cutting short
+    for (const [segId, { startFrame, segmentPath }] of segmentInfo) {
+      const audioDurSec = segmentAudioDurations[segId];
+      const durationFrames = audioDurSec
+        ? Math.round(audioDurSec * fps) + 15
+        : 9000; // fallback
 
       const audioSrc = segmentPath.startsWith('http') || segmentPath.startsWith('/')
         ? segmentPath
@@ -62,20 +71,21 @@ export const BeatAudioTrack: React.FC<BeatAudioTrackProps> = ({
 
       elements.push(
         <Sequence
-          key={`voice-segment-${beat.id}`}
-          from={timing.start}
-          durationInFrames={timing.duration + 15}
+          key={`voice-seg-${segId}`}
+          from={startFrame}
+          durationInFrames={durationFrames}
         >
-          <Audio
-            src={audioSrc}
-            volume={voiceVolume}
-            trimBefore={trimBeforeFrames}
-            trimAfter={trimAfterFrames}
-          />
+          <Audio src={audioSrc} volume={voiceVolume} />
         </Sequence>
       );
-    } else if (beat.audioPath) {
-      // ── Legacy mode: individual MP3 per beat ──
+    }
+  } else {
+    // ── Legacy mode: individual MP3 per beat ──
+    for (let i = 0; i < beats.length; i++) {
+      const beat = beats[i];
+      const timing = beatTimings[i];
+      if (!timing || !beat.audioPath) continue;
+
       const audioSrc = beat.audioPath.startsWith('http') || beat.audioPath.startsWith('/')
         ? beat.audioPath
         : staticFile(beat.audioPath);
@@ -85,10 +95,7 @@ export const BeatAudioTrack: React.FC<BeatAudioTrackProps> = ({
           from={timing.start}
           durationInFrames={timing.duration + 15}
         >
-          <Audio
-            src={audioSrc}
-            volume={voiceVolume}
-          />
+          <Audio src={audioSrc} volume={voiceVolume} />
         </Sequence>
       );
     }

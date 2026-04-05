@@ -326,7 +326,7 @@ export const RemotionRoot: React.FC = () => {
             const beats = (props.beats ?? []) as Beat[];
             const script = props.script as EpisodeScript;
             return {
-              durationInFrames: Math.max(30, computeNewspaperDuration(beats, script, 30, (props as any).owlAudioDurations)),
+              durationInFrames: Math.max(30, computeNewspaperDuration(beats, script, 30, (props as any).owlAudioDurations, (props as any).segmentAudioDurations)),
               fps: 30, width: 1920, height: 1080,
             };
           }}
@@ -361,7 +361,7 @@ export const RemotionRoot: React.FC = () => {
                 const b = (p.beats ?? []) as Beat[];
                 const s = p.script as EpisodeScript;
                 return {
-                  durationInFrames: Math.max(30, b.length > 0 ? computeNewspaperDuration(b, s, 30, (p as any).owlAudioDurations) : (s.totalDurationSec ?? 300) * 30),
+                  durationInFrames: Math.max(30, b.length > 0 ? computeNewspaperDuration(b, s, 30, (p as any).owlAudioDurations, (p as any).segmentAudioDurations) : (s.totalDurationSec ?? 300) * 30),
                   fps: 30, width: 1920, height: 1080,
                 };
               }}

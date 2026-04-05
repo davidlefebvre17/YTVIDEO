@@ -235,17 +235,27 @@ export async function alignSegmentAudio(
     })
     .filter((r): r is BeatTimingResult => r !== null);
 
-  // Extend last beat to cover the full audio duration (silences at end)
-  if (totalDurationSec !== null && results.length > 0) {
-    const last = results[results.length - 1];
-    if (last.endSec < totalDurationSec) {
-      last.endSec = totalDurationSec;
-      last.durationSec = last.endSec - last.startSec;
+  // Close gaps between beats: each beat extends to the start of the next beat.
+  // This ensures beat durations sum exactly to the total audio duration.
+  if (results.length > 0) {
+    // First beat always starts at 0
+    results[0].startSec = 0;
+
+    // Each beat's endSec = next beat's startSec (close the gap)
+    for (let i = 0; i < results.length - 1; i++) {
+      const midpoint = results[i].endSec + (results[i + 1].startSec - results[i].endSec) / 2;
+      results[i].endSec = midpoint;
+      results[i + 1].startSec = midpoint;
     }
-    // Also ensure first beat starts at 0 (silence at start)
-    if (results[0].startSec > 0.5) {
-      results[0].startSec = 0;
-      results[0].durationSec = results[0].endSec - results[0].startSec;
+
+    // Last beat extends to total audio duration
+    if (totalDurationSec !== null) {
+      results[results.length - 1].endSec = totalDurationSec;
+    }
+
+    // Recalculate all durations
+    for (const r of results) {
+      r.durationSec = r.endSec - r.startSec;
     }
   }
 

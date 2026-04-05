@@ -368,6 +368,15 @@ async function main() {
       if (sourcePath) beat.imagePath = sourcePath;
     }
   }
+  // Fallback: beats with a prompt but no image (generation failed) inherit previous beat's image
+  let lastImage = "";
+  for (const beat of beats) {
+    if (beat.imagePath) {
+      lastImage = beat.imagePath;
+    } else if ((beat as any).imagePrompt && lastImage) {
+      beat.imagePath = lastImage;
+    }
+  }
   console.log(`  ${publicImagePaths.size} images synced`);
 
   // ════════════════════════════════════════════════════════════
@@ -505,13 +514,14 @@ async function main() {
       }));
       const { manifest: owlManifest } = await generateBeatAudio(
         owlBeats as any, lang, owlAudioDir, "audio/owl",
-        { skipExisting: false },
+        { skipExisting: false, legacyMode: true },
       );
       // Copy to public + track paths
       for (const ob of owlBeats) {
         if (!ob.audioPath) continue;
         const filename = path.basename(ob.audioPath);
-        const src = path.join(owlAudioDir, filename);
+        // audioPath may be relative — resolve from owlAudioDir
+        const src = fs.existsSync(ob.audioPath) ? ob.audioPath : path.join(owlAudioDir, filename);
         const dst = path.join(owlPublicDir, filename);
         if (fs.existsSync(src)) fs.copyFileSync(src, dst);
         generatedOwlPaths[ob.id] = `audio/owl/${filename}`;

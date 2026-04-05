@@ -123,7 +123,8 @@ export function cleanPublicForNewEpisode(opts?: { skipImages?: boolean }): void 
   const owlAudioDir = join(REMOTION_PUBLIC, "audio", "owl");
   const editorialDir = join(REMOTION_PUBLIC, "editorial");
 
-  const a = cleanDir(beatsAudioDir, ".mp3");
+  const segmentsAudioDir = join(beatsAudioDir, "segments");
+  const a = cleanDir(beatsAudioDir, ".mp3") + cleanDir(segmentsAudioDir, ".mp3");
   const b = cleanDir(owlAudioDir, ".mp3");
   const c = opts?.skipImages ? 0 : cleanDir(editorialDir, ".png");
 

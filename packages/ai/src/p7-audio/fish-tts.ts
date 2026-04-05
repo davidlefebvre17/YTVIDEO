@@ -92,7 +92,7 @@ export async function fishTTS(opts: FishTTSOptions): Promise<FishTTSResult> {
   body.prosody = { speed, volume: 0 };
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 60_000); // 60s timeout
+  const timeoutId = setTimeout(() => controller.abort(), 180_000); // 3 min timeout (segment mode can be long)
 
   const response = await fetch(FISH_BASE, {
     method: 'POST',

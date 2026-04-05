@@ -219,6 +219,7 @@ export function computeNewspaperDuration(
   script: EpisodeScript,
   fps: number,
   owlAudioDurations?: Record<string, number>,
+  segmentAudioDurations?: Record<string, number>,
 ): number {
   const groups = groupBeatsBySegment(beats);
 
@@ -233,10 +234,11 @@ export function computeNewspaperDuration(
     .map((s) => s.id);
   let segTotal = 0;
   for (let i = 0; i < segIds.length; i++) {
-    const dur = groupDurationFrames(groups.get(segIds[i]) ?? [], fps);
+    const crossfadeDur = groupDurationFrames(groups.get(segIds[i]) ?? [], fps);
+    const segAudioDur = segmentAudioDurations?.[segIds[i]];
+    const dur = segAudioDur ? Math.round(segAudioDur * fps) : crossfadeDur;
     const isPanorama = segIds[i] === 'seg_panorama';
     if (isPanorama) {
-      // PANORAMA: no zoom in/out, just raw beat duration on newspaper page
       segTotal += dur;
     } else {
       // CROSSFADE_FRAMES overlap means beats start earlier, reducing total
@@ -376,10 +378,13 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
     }
     let segCum = owlTotalFrames + newspaperIntroFrames;
     const segs: SegTiming[] = segmentIds.map((segId, i) => {
-      const dur = groupDurationFrames(
+      const crossfadeDur = groupDurationFrames(
         beatGroups.get(segId) ?? [],
         fps,
       );
+      // In segment audio mode, use real audio duration (no crossfade reduction)
+      const segAudioDur = segmentAudioDurations?.[segId];
+      const dur = segAudioDur ? Math.round(segAudioDur * fps) : crossfadeDur;
       const isPanorama = segId === 'seg_panorama';
       const isLast = i === segmentIds.length - 1;
 
@@ -752,7 +757,7 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
         <Audio src={getSfxPath("close", 0)} volume={SFX_VOLUME.close} />
       </Sequence>
 
-      {/* ── Owl audio: intro over video clips ── */}
+      {/* ── Owl audio: intro over video clips (plays before beats — no overlap) ── */}
       {owlIntroAudio && (
         <Sequence from={0} durationInFrames={OWL_INTRO_FRAMES + OWL_DIVE_FRAMES}>
           <Audio src={staticFile(owlIntroAudio)} volume={1} />
@@ -777,8 +782,8 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
         );
       })}
 
-      {/* ── Owl audio: closing — only if no closing beats have TTS audio ── */}
-      {owlClosingAudio && !(beatGroups.get("closing") ?? []).some(b => b.audioPath) && (
+      {/* ── Owl audio: closing — skip if closing beats have segment audio (would double-play) ── */}
+      {owlClosingAudio && !(beatGroups.get("closing") ?? []).some((b: any) => b.audioPath || (b as any).audioSegmentPath) && (
         <Sequence from={timings.closingStart} durationInFrames={timings.closingDur}>
           <Audio src={staticFile(owlClosingAudio)} volume={1} />
         </Sequence>
