@@ -96,6 +96,8 @@ Transformer la narration écrite en texte vivant pour l'oreille. Tu places des t
 9. **isKeyMoment=true** → utiliser [excited] ou [emphasis] selon le contexte.
 10. **CHIFFRES → LETTRES** : TOUS les nombres en toutes lettres. C'est OBLIGATOIRE.
 11. **MOTS ANGLAIS** : phonétiser pour qu'un francophone lise la prononciation anglaise correcte. Exemples : "spread" → "sprèdd", "squeeze" → "skouize", "pricing" → "praïcingue", "bull run" → "boull reune", "dead cat bounce" → "dèdd catt baounce", "hedge" → "hèdje", "trader" → "trèdeur", "short" → "shorte". Applique ce principe à TOUT mot anglais rencontré, même ceux pas listés ici.
+13. **NOMS DE SOCIÉTÉS** : phonétiser les noms de sociétés étrangères pour qu'un francophone les prononce correctement. Exemples : "Nvidia" → "Ènvidia", "Sysco" → "Saïsko", "Ciena" → "Siéna", "Teradyne" → "Téradaïne", "Micron" → "Maïkronne", "Western Digital" → "Ouèsterne Digitol", "Coinbase" → "Coïnbèïse", "BlackRock" → "Blakroke", "JPMorgan" → "Djéï-Pi Morganne". Les noms français (TotalEnergies, Société Générale, Pernod Ricard) restent tels quels. En cas de doute sur la prononciation, phonétiser plutôt que laisser tel quel.
+14. **INDICES BOURSIERS** : phonétiser avec la prononciation usuelle des salles de marché francophones. "S&P 500" → "èss-enne-pi cinq cents", "CAC 40" → "caque quarante", "DAX" → "daxe", "FTSE" → "fouttsi", "KOSPI" → "kospi", "Nasdaq" → "nazdak", "Dow Jones" → "daou djonnze", "Nikkei" → "nikèï", "MSCI" → "èmm-èss-ci-aï", "VIX" → "vixe", "Russell 2000" → "reussèl deux mille". Applique ce principe à tous les indices rencontrés.
 12. **SIGLES** : lettres séparées par des points. "ETF" → "É.T.F.". "S&P" → "S. et P.".
 
 ## Exemples
@@ -300,6 +302,20 @@ const PRONUNCIATION_FIXES: [RegExp, string][] = [
   [/\btrading\b/gi, 'trèdingue'],
   [/\btrader\b/gi, 'trèdeur'],
   [/\btraders\b/gi, 'trèdeurse'],
+  // Indices boursiers
+  [/\bS&P 500\b/gi, 'èss-enne-pi cinq cents'],
+  [/\bS&P\b/gi, 'èss-enne-pi'],
+  [/\bCAC 40\b/gi, 'caque quarante'],
+  [/\bCAC\b/gi, 'caque'],
+  [/\bDAX\b/gi, 'daxe'],
+  [/\bFTSE\b/gi, 'fouttsi'],
+  [/\bKOSPI\b/gi, 'kospi'],
+  [/\bNasdaq\b/gi, 'nazdak'],
+  [/\bDow Jones\b/gi, 'daou djonnze'],
+  [/\bNikkei\b/gi, 'nikèï'],
+  [/\bVIX\b/gi, 'vixe'],
+  [/\bRussell 2000\b/gi, 'reussèl deux mille'],
+  [/\bMSCI\b/gi, 'èmm-èss-ci-aï'],
 ];
 
 function applyPronunciationFixes(text: string): string {

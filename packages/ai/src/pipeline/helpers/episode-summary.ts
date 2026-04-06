@@ -59,6 +59,26 @@ export function buildEpisodeSummaries(
       ? Math.round((refDate.getTime() - new Date(entryDate + "T12:00:00Z").getTime()) / (24 * 60 * 60 * 1000))
       : 0;
 
+    // Extract covered asset symbols from script segments
+    const coveredSymbols = new Set(
+      script?.sections
+        ?.filter(s => s.type === 'segment')
+        .flatMap(s => s.assets ?? []) ?? []
+    );
+
+    // Build assetMoves from snapshot — top movers + covered assets
+    const snapshot = entry.snapshot;
+    const assetMoves = (snapshot?.assets ?? [])
+      .filter(a => a.symbol && (Math.abs(a.changePct ?? 0) > 1.5 || coveredSymbols.has(a.symbol)))
+      .slice(0, 20)
+      .map(a => ({
+        symbol: a.symbol,
+        name: a.name ?? a.symbol,
+        price: a.price ?? 0,
+        changePct: a.changePct ?? 0,
+        covered: coveredSymbols.has(a.symbol),
+      }));
+
     return {
       date: entryDate ?? `?`,
       label: `J-${daysAgo}`,
@@ -88,6 +108,7 @@ export function buildEpisodeSummaries(
       mechanismsExplained: script?.mechanismsExplained ?? [],
       dominantTheme: script?.threadSummary ?? '',
       moodMarche: ((script as unknown as Record<string, unknown>)?.moodMarche as string) ?? '',
+      assetMoves,
     };
   });
 }

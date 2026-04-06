@@ -357,6 +357,15 @@ export interface EpisodeSummary {
   mechanismsExplained: string[];
   dominantTheme: string;
   moodMarche: string;
+  /** Key asset moves on this episode's date — for narrative continuity and reversal detection */
+  assetMoves?: Array<{
+    symbol: string;
+    name: string;
+    price: number;
+    changePct: number;
+    /** Was this asset covered in a segment? */
+    covered: boolean;
+  }>;
 }
 
 export interface WordBudget {

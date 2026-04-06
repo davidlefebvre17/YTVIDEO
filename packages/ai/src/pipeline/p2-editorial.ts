@@ -48,6 +48,13 @@ function formatEpisodeSummariesCompact(summaries: EpisodeSummary[]): string {
     if (s.angles.length) line += `\n  Angles: ${s.angles.filter(Boolean).join(', ')}`;
     if (s.mechanismsExplained?.length) line += `\n  Mécanismes enseignés: ${s.mechanismsExplained.join(' | ')}`;
     if (s.forwardLooking?.length) line += `\n  À venir: ${s.forwardLooking.join(' | ')}`;
+    if (s.assetMoves?.length) {
+      const moves = s.assetMoves
+        .filter(m => m.covered || Math.abs(m.changePct) > 3)
+        .map(m => `${m.symbol} ${m.changePct > 0 ? '+' : ''}${m.changePct.toFixed(1)}% @${m.price.toFixed(0)}${m.covered ? '★' : ''}`)
+        .join(', ');
+      if (moves) line += `\n  Moves: ${moves}`;
+    }
     return line;
   }).join('\n\n');
 }
@@ -76,7 +83,13 @@ MÉTHODE ÉDITORIALE (dans cet ordre) :
 1. ÉVÉNEMENTS STRUCTURELS D'ABORD : avant de regarder les scores et les prix, parcours les ÉVÉNEMENTS STRUCTURELS pré-filtrés et le calendrier éco. Ces événements méritent un segment même si l'asset n'a pas bougé. Si un événement game_changer ou significant est lié à un asset, l'ANGLE du segment DOIT adresser cet événement — le prix est la conséquence, l'événement est la cause. Ne réduis jamais un game_changer à une ligne dans un segment sur le prix.
 2. MOUVEMENTS DE PRIX ENSUITE : parmi les assets à fort materialityScore, identifie ceux dont le mouvement a un CATALYSEUR clair. Un +3% sans explication est moins intéressant qu'un +1% causé par un événement identifiable.
 3. SUIVI DES FILS : parcours les épisodes récents. Si un sujet couvert J-1 ou J-2 (asset, thème, stock promu) réapparaît dans les données d'aujourd'hui — retournement, continuation, résolution — c'est un angle narratif fort. Le spectateur veut savoir "et alors, qu'est-ce qui s'est passé depuis ?". Un retournement (hier +7%, aujourd'hui -6%) vaut souvent un segment à lui seul.
-4. LIENS NARRATIFS : un bon épisode raconte UNE histoire avec plusieurs facettes, pas une liste de sujets indépendants. Cherche le fil conducteur qui relie au moins 3 segments.
+4. CONTEXTE PRIX (section "Moves" des épisodes récents) : utilise les prix et variations des épisodes précédents pour contextualiser les moves d'aujourd'hui. RÈGLES :
+   - Si un asset était à X$ J-1 et à Y$ aujourd'hui → CALCULE le move cumulé et nomme-le (retournement, continuation, accélération)
+   - JAMAIS dire "s'effondre de -5%" si hier c'était déjà -10% → dire "continue de reculer" ou "la chute ralentit"
+   - JAMAIS dire "explose de +12%" si hier c'était déjà +8% → dire "la hausse s'accélère" ou "le rally continue"
+   - Un RETOURNEMENT (direction opposée à J-1) mérite un angle dédié : "hier -14%, aujourd'hui +12%" est UNE HISTOIRE
+   - Le symbole ★ dans les Moves indique que l'asset était couvert dans un segment — le spectateur s'en souvient, il faut y faire référence
+5. LIENS NARRATIFS : un bon épisode raconte UNE histoire avec plusieurs facettes, pas une liste de sujets indépendants. Cherche le fil conducteur qui relie au moins 3 segments.
 
 CONTRAINTES STRUCTURELLES (STRICTES) :
 - Sélectionner 4 à 7 segments
