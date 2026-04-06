@@ -51,13 +51,13 @@ interface C6Output {
 // ─── Emotion → Fish Audio tag mapping ───────────────────────────
 
 const EMOTION_TAG_MAP: Record<BeatEmotion, string> = {
-  tension: '[breathy]',
+  tension: '',
   impact: '[emphasis]',
   revelation: '[emphasis]',
-  analyse: '[soft]',
+  analyse: '',
   contexte: '',
-  respiration: '[soft]',
-  conclusion: '[soft]',
+  respiration: '',
+  conclusion: '',
 };
 
 const PACING_TO_PRESET: Record<string, TTSBeat['fishPreset']> = {
@@ -73,51 +73,48 @@ const C6_SYSTEM_PROMPT = `Tu es un adaptateur de texte pour synthèse vocale (TT
 ## Ton rôle
 Transformer la narration écrite en texte vivant pour l'oreille. Tu places des tags d'intonation DEVANT les mots clés pour guider la voix.
 
-## Tags Fish Audio S2 (placés DEVANT le mot ou passage concerné)
-- [emphasis] — insistance sur le mot/phrase qui suit. C'est le tag principal. Utilise-le sur les chiffres importants, les mots de surprise, les contrastes.
-- [pause] — silence court. Avant un chiffre clé, entre deux idées, après une révélation.
+## Tags Fish Audio S2 — UNIQUEMENT ces 3 tags
+- [emphasis] — insistance sur le mot qui suit. 2-4 par beat max. Sur les chiffres importants, les mots de surprise, les contrastes.
+- [pause] — silence court. Entre deux idées, avant un chiffre clé, après une révélation.
 - [long pause] — silence plus long. Entre deux sous-parties d'un segment, ou avant un retournement.
-- [soft] — ton doux, posé. Pour les explications calmes, les analogies.
-- [excited] — plus fort, insistant, enthousiaste. Pour les faits chocs, les contradictions.
-- [whispering] — chuchotement, confidence. Pour un aparté ou un détail surprenant.
-- [breathy] — ton essoufflé, tendu. Pour les moments de suspense.
-- [sighing] — soupir. Avant une mauvaise nouvelle ou un constat d'impuissance.
+
+PAS D'AUTRES TAGS. Pas de [soft], [breathy], [whispering], [excited], [sighing]. Ils déforment la voix.
 
 ## Règles
 
-1. **[emphasis] DEVANT le mot** : "un aller-retour de [emphasis]quinze dollars" PAS "[emphasis] un aller-retour de quinze dollars". Le tag accentue le MOT qui le suit immédiatement.
-2. **2-4 [emphasis] par beat** — pas plus. Trop de tags tue l'effet. Choisis les mots qui COMPTENT : le chiffre choc, le verbe d'action, le contraste.
-3. **[pause] entre les idées** — pas à chaque phrase. Avant un chiffre clé, après une révélation, entre deux sujets.
+1. **[emphasis] DEVANT le mot** : "un aller-retour de [emphasis]quinze dollars". Le tag accentue le MOT qui le suit immédiatement.
+2. **2-4 [emphasis] par beat** — pas plus. Choisis les mots qui COMPTENT.
+3. **[pause] entre les idées** — pas à chaque phrase. Avant un chiffre clé, après une révélation.
 4. **Phrases > 20 mots** : couper en 2 phrases distinctes.
 5. **Supprimer** les références visuelles : "comme tu peux le voir", "sur ce graphique".
 6. **Ne PAS changer le sens** — reformuler pour l'oral, pas réécrire.
 7. **isSegmentStart=true** → commencer par [pause].
-8. **isSegmentEnd=true** → terminer par [soft] ou [breathy] sur les 3-4 derniers mots pour marquer la conclusion. Le ton doit baisser naturellement en fin de segment.
-9. **isKeyMoment=true** → utiliser [excited] ou [emphasis] selon le contexte.
+8. **isSegmentEnd=true** → ajouter [long pause] avant les 2-3 derniers mots ET terminer par un point final bien marqué. La dernière phrase doit être COURTE et CONCLUSIVE.
+9. **isKeyMoment=true** → utiliser [emphasis] sur le mot clé.
 10. **CHIFFRES → LETTRES** : TOUS les nombres en toutes lettres. C'est OBLIGATOIRE.
-11. **MOTS ANGLAIS** : phonétiser pour qu'un francophone lise la prononciation anglaise correcte. Exemples : "spread" → "sprèdd", "squeeze" → "skouize", "pricing" → "praïcingue", "bull run" → "boull reune", "dead cat bounce" → "dèdd catt baounce", "hedge" → "hèdje", "trader" → "trèdeur", "short" → "shorte". Applique ce principe à TOUT mot anglais rencontré, même ceux pas listés ici.
-13. **NOMS DE SOCIÉTÉS** : phonétiser les noms de sociétés étrangères pour qu'un francophone les prononce correctement. Exemples : "Nvidia" → "Ènvidia", "Sysco" → "Saïsko", "Ciena" → "Siéna", "Teradyne" → "Téradaïne", "Micron" → "Maïkronne", "Western Digital" → "Ouèsterne Digitol", "Coinbase" → "Coïnbèïse", "BlackRock" → "Blakroke", "JPMorgan" → "Djéï-Pi Morganne". Les noms français (TotalEnergies, Société Générale, Pernod Ricard) restent tels quels. En cas de doute sur la prononciation, phonétiser plutôt que laisser tel quel.
-14. **INDICES BOURSIERS** : phonétiser avec la prononciation usuelle des salles de marché francophones. "S&P 500" → "èss-enne-pi cinq cents", "CAC 40" → "caque quarante", "DAX" → "daxe", "FTSE" → "fouttsi", "KOSPI" → "kospi", "Nasdaq" → "nazdak", "Dow Jones" → "daou djonnze", "Nikkei" → "nikèï", "MSCI" → "èmm-èss-ci-aï", "VIX" → "vixe", "Russell 2000" → "reussèl deux mille". Applique ce principe à tous les indices rencontrés.
-12. **SIGLES** : lettres séparées par des points. "ETF" → "É.T.F.". "S&P" → "S. et P.".
+11. **MOTS ANGLAIS** : phonétiser pour qu'un francophone lise la prononciation anglaise correcte. Exemples : "spread" → "sprèdd", "squeeze" → "skouize", "pricing" → "praïcingue", "pricé" → "praïcé", "price" → "praïce", "bull run" → "boull reune", "dead cat bounce" → "dèdd catt baounce", "hedge" → "hèdje", "hedging" → "hèdjingue", "trader" → "trèdeur", "short" → "shorte", "spike" → "spikke", "spot" → "spotte", "move" → "mouve". Applique ce principe à TOUT mot anglais, même conjugué en français ("pric��", "pricait", "shortait").
+12. **NOMS DE SOCIÉTÉS ÉTRANGÈRES** : phonétiser. "Nvidia" → "Ènvidia", "Sysco" ��� "Saïsko", "Ciena" → "Siéna", "Teradyne" → "Téradaïne", "Micron" → "Maïkronne", "Coinbase" → "Coïnbèïse", "BlackRock" → "Blakroke", "JPMorgan" → "Djéï-Pi Morganne". Noms français (TotalEnergies, Pernod Ricard) inchangés.
+13. **INDICES ET MOTS-SIGLES** (se prononcent comme des MOTS, PAS épelés lettre par lettre) : "S&P" ��� "èss-enne-pi", "CAC 40" → "caque quarante", "DAX" → "daxe", "FTSE" → "fouttsi", "Nasdaq" → "nazdak", "Dow Jones" → "daou djonnze", "Nikkei" → "nikèï", "VIX" → "vixe", "ETF" → laisser "ETF", "Russell 2000" → "reussèl deux mille".
+14. **SIGLES ÉPELÉS** (se prononcent lettre par lettre, séparés par des points) : "WTI" → "W.T.I.", "RSI" → "R.S.I.", "DXY" → "D.X.Y.", "COT" → "C.O.T.", "PMI" → "P.M.I.", "CPI" → "C.P.I.", "BCE" → "B.C.E.", "PIB" → "P.I.B.".
 
 ## Exemples
 
-Input: "Le Brent a touché 105$ hier — un aller-retour de 15$ en moins de 48 heures sur deux tweets contradictoires."
-Output: "Le Brent a touché [emphasis]cent cinq dollars hier. [pause] Un aller-retour de [emphasis]quinze dollars en moins de quarante-huit heures sur deux tweets contradictoires."
+Input: "Le Brent a touché 105$ hier — un aller-retour de 15$ en moins de 48 heures."
+Output: "Le Brent a touché [emphasis]cent cinq dollars hier. [pause] Un aller-retour de [emphasis]quinze dollars en moins de quarante-huit heures."
 
 Input: "L'or enregistre sa pire semaine en 40 ans avec une baisse de -9%."
-Output: "L'or enregistre sa [emphasis]pire semaine en quarante ans. [pause] [breathy] Moins neuf pour cent."
+Output: "L'or enregistre sa [emphasis]pire semaine en quarante ans. [pause] Moins neuf pour cent."
 
-Input: "Trump évoque un cessez-le-feu. L'Iran dit non. Et les marchés montent quand même."
-Output: "Trump évoque un cessez-le-feu. L'Iran dit [emphasis]non. [pause] Et les marchés [emphasis]montent quand même."
+Input: "Le marché avait pricé la reconquête. Le VIX est à 23."
+Output: "Le marché avait [emphasis]praïcé la reconquête. Le vixe est à vingt-trois."
 
 ## Output JSON
 
 \`\`\`json
 {
   "beats": [
-    { "beatId": "beat_001", "adapted": "[soft] Texte adapté..." },
-    { "beatId": "beat_002", "adapted": "[soft] Suite..." }
+    { "beatId": "beat_001", "adapted": "[pause] Texte adapté..." },
+    { "beatId": "beat_002", "adapted": "Suite du texte..." }
   ]
 }
 \`\`\``;
@@ -287,6 +284,10 @@ const PRONUNCIATION_FIXES: [RegExp, string][] = [
   // English finance terms Fish Audio reads as French
   [/\bpricer\b/gi, 'praille-cé'],
   [/\bpricing\b/gi, 'praille-cingue'],
+  [/\bpricé\b/gi, 'praïcé'],
+  [/\bprice\b/gi, 'praïce'],
+  [/\bpricait\b/gi, 'praïcait'],
+  [/\bpricent\b/gi, 'praïcent'],
   [/\bspread\b/gi, 'sprèdd'],
   [/\bshort squeeze\b/gi, 'shorte skouize'],
   [/\bsqueeze\b/gi, 'skouize'],
@@ -302,20 +303,29 @@ const PRONUNCIATION_FIXES: [RegExp, string][] = [
   [/\btrading\b/gi, 'trèdingue'],
   [/\btrader\b/gi, 'trèdeur'],
   [/\btraders\b/gi, 'trèdeurse'],
-  // Indices boursiers
+  // Indices boursiers (both raw and post-sanitize forms)
   [/\bS&P 500\b/gi, 'èss-enne-pi cinq cents'],
+  [/\bS\. and P\./g, 'èss-enne-pi'],
   [/\bS&P\b/gi, 'èss-enne-pi'],
   [/\bCAC 40\b/gi, 'caque quarante'],
-  [/\bCAC\b/gi, 'caque'],
+  [/\bC\.A\.C\./g, 'caque'],
+  [/\bCAC\b/g, 'caque'],
   [/\bDAX\b/gi, 'daxe'],
+  [/\bD\.A\.X\./g, 'daxe'],
   [/\bFTSE\b/gi, 'fouttsi'],
+  [/\bF\.T\.S\.E\./g, 'fouttsi'],
   [/\bKOSPI\b/gi, 'kospi'],
   [/\bNasdaq\b/gi, 'nazdak'],
   [/\bDow Jones\b/gi, 'daou djonnze'],
   [/\bNikkei\b/gi, 'nikèï'],
   [/\bVIX\b/gi, 'vixe'],
+  [/\bV\.I\.X\./g, 'vixe'],
   [/\bRussell 2000\b/gi, 'reussèl deux mille'],
   [/\bMSCI\b/gi, 'èmm-èss-ci-aï'],
+  [/\bM\.S\.C\.I\./g, 'èmm-èss-ci-aï'],
+  // Mots prononcés tels quels (pas épelés) — rattrapage post-sanitize
+  [/\bE\.T\.F\./g, 'ETF'],
+  [/\bÉ\.T\.F\./g, 'ETF'],
 ];
 
 function applyPronunciationFixes(text: string): string {

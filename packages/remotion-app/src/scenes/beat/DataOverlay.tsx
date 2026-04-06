@@ -423,14 +423,13 @@ const OverlayContent: React.FC<OverlayContentProps> = ({ type, data, assets, acc
       const allCandles = asset?.dailyCandles ?? asset?.candles ?? [];
 
       if (allCandles.length < 5) {
-        return (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-            <span style={{ fontFamily: BRAND.fonts.mono, fontSize: 14, color: BRAND.colors.inkLight }}>{asset?.name ?? sym}</span>
-            <span style={{ fontFamily: BRAND.fonts.condensed, fontSize: 28, color: BRAND.colors.ink }}>
-              {(data.price as number)?.toLocaleString() ?? ''}
-            </span>
-          </div>
-        );
+        // No candle data — show as stat or text instead of broken chart
+        const label = humanize((data.name as string) ?? (asset?.name as string) ?? sym, assets);
+        const price = (data.price as number);
+        if (price) {
+          return <AnimatedStat value={price} label={label} suffix="" accentColor={accentColor} size="md" />;
+        }
+        return <TextCard text={label} accentColor={accentColor} />;
       }
 
       const levels: InkLevel[] = ((data.levels as any[]) ?? []).map(l => ({

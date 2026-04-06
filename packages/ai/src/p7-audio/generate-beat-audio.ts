@@ -140,7 +140,7 @@ function sanitizeForTTS(text: string): string {
     .replace(/\bFed\b/g, 'Fède')
     .replace(/\bBCE\b/g, 'B.C.E.')
     .replace(/\bS&P\b/g, 'S. and P.')
-    .replace(/\bETF\b/g, 'E.T.F.')
+    // ETF reste tel quel — se prononce comme un mot, pas épelé
     .replace(/\bUSDC\b/g, 'U.S.D.C.')
     .replace(/\bUSDT\b/g, 'U.S.D.T.')
     .replace(/\bAUD\b/g, 'A.U.D.')

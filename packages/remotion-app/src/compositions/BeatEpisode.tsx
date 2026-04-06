@@ -121,7 +121,7 @@ const CROSSFADE_FRAMES = 25; // overlap between zoom end and first beat
 const MIN_NEWSPAPER_FRAMES = 600; // 20s minimum newspaper intro
 const MIN_CLOSING_FRAMES = 150; // 5s minimum closing
 
-const PRE_SEGMENT_IDS = ["hook", "title_card", "thread"];
+const PRE_SEGMENT_IDS = ["hook", "thread"];
 
 /** Get transition duration in frames for a given segment, using real owl audio duration if available. */
 function getBetweenFrames(segId: string, fps: number, owlAudioDurations?: Record<string, number>): number {

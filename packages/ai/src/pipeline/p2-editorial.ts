@@ -59,6 +59,49 @@ function formatEpisodeSummariesCompact(summaries: EpisodeSummary[]): string {
   }).join('\n\n');
 }
 
+/**
+ * Build multi-day trajectory summary for key assets across recent episodes.
+ * Shows cumulative direction so C1 can detect trends, reversals, and continuations.
+ */
+function buildAssetTrajectories(summaries: EpisodeSummary[]): string {
+  if (summaries.length < 2) return '';
+
+  // Collect all asset moves across episodes
+  const assetHistory = new Map<string, Array<{ date: string; label: string; changePct: number; price: number; covered: boolean }>>();
+
+  for (const s of summaries) {
+    for (const m of s.assetMoves ?? []) {
+      if (!assetHistory.has(m.symbol)) assetHistory.set(m.symbol, []);
+      assetHistory.get(m.symbol)!.push({
+        date: s.date, label: s.label,
+        changePct: m.changePct, price: m.price, covered: m.covered,
+      });
+    }
+  }
+
+  // Only show assets that appear 2+ times or were covered
+  const lines: string[] = [];
+  for (const [symbol, history] of assetHistory) {
+    if (history.length < 2 && !history.some(h => h.covered)) continue;
+
+    const sorted = history.sort((a, b) => a.date.localeCompare(b.date));
+    const cumulative = sorted.reduce((sum, h) => sum + h.changePct, 0);
+    const direction = sorted.every(h => h.changePct > 0) ? '↑ hausse continue'
+      : sorted.every(h => h.changePct < 0) ? '↓ baisse continue'
+      : (sorted[sorted.length - 1].changePct > 0) !== (sorted[sorted.length - 2]?.changePct > 0) ? '↕ retournement'
+      : '~ volatile';
+
+    const trajectory = sorted.map(h =>
+      `${h.label}:${h.changePct > 0 ? '+' : ''}${h.changePct.toFixed(1)}%@${h.price.toFixed(0)}${h.covered ? '★' : ''}`
+    ).join(' → ');
+
+    lines.push(`${symbol} [${direction}, cumul ${cumulative > 0 ? '+' : ''}${cumulative.toFixed(1)}%] ${trajectory}`);
+  }
+
+  if (lines.length === 0) return '';
+  return `\n## TRAJECTOIRES MULTI-JOURS (contexte narratif)\nChaque ligne = historique récent d'un asset. ★ = couvert dans un segment. Utilise pour contextualiser : "ça continue", "retournement", "accélération".\n${lines.join('\n')}\n`;
+}
+
 function formatThemesCompact(flagged: SnapshotFlagged): string {
   if (!flagged.themesDuJour) return 'Pas de thèmes pré-digérés.';
   const tdj = flagged.themesDuJour;
