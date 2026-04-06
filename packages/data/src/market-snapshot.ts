@@ -3,7 +3,7 @@ import { fetchAllAssets, fetchDailyCandles, fetchWeeklyCandles, fetchDaily3yCand
 import { fetchNews } from "./news";
 import { fetchEconomicCalendar } from "./calendar";
 import { computeTechnicals, computeMultiTFAnalysis } from "./technicals";
-import { fetchBondYields } from "./fred";
+import { fetchBondYields, fetchYieldsHistory } from "./fred";
 import { fetchMarketSentiment } from "./sentiment";
 import { fetchEarningsCalendar, fetchFinnhubNews, fetchFinnhubCompanyNews, fetchStockEarningsHistory } from "./finnhub";
 import { fetchMarketauxNews } from "./marketaux";
@@ -55,13 +55,14 @@ export async function fetchMarketSnapshot(
   // NOTE: fetchFinnhubNews() returns only LIVE articles (Finnhub /news ignores from/to params).
   // In historical mode we skip it entirely to avoid today's news contaminating yesterday's snapshot.
   // fetchNews() receives targetDate to anchor its 24h window to snapshotDate in historical mode.
-  const [assets, rssNews, calendar, yields, sentiment, earnings] = await Promise.all([
+  const [assets, rssNews, calendar, yields, sentiment, earnings, yieldsHistory] = await Promise.all([
     fetchAllAssets(DEFAULT_ASSETS, snapshotDate),
     fetchNews(snapshotDate),
     fetchEconomicCalendar(snapshotDate),
     fetchBondYields(snapshotDate),
     fetchMarketSentiment(snapshotDate),
     fetchEarningsCalendar(snapshotDate),
+    fetchYieldsHistory(snapshotDate),
   ]);
 
   // Fetch upcoming earnings (J+1 to J+21) for editorial context
@@ -248,6 +249,7 @@ export async function fetchMarketSnapshot(
     yesterdayEvents: dedupedYesterday,
     upcomingEvents: calendar.upcoming,
     yields,
+    yieldsHistory,
     sentiment,
     earnings,
     earningsUpcoming: filteredUpcoming.length > 0 ? filteredUpcoming : undefined,

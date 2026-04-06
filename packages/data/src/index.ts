@@ -1,11 +1,12 @@
 export { fetchAllAssets, fetchAssetSnapshot, fetchDailyCandles, fetchWeeklyCandles, fetchDaily3yCandles, fetchDailyMaxCandles, fetchSparkChanges, DEFAULT_ASSETS } from "./yahoo";
 export { fetchNews } from "./news";
 export { enrichNewsSummaries } from "./article-extractor";
+export { fetchCBSpeechContent, enrichCBSpeeches } from "./cb-speeches";
 export { fetchEconomicCalendar } from "./calendar";
 export { fetchSupabaseCalendar } from "./supabase-calendar";
 export { fetchMarketSnapshot } from "./market-snapshot";
 export { computeTechnicals, computeMultiTFAnalysis } from "./technicals";
-export { fetchBondYields } from "./fred";
+export { fetchBondYields, fetchYieldsHistory } from "./fred";
 export { fetchEconomicCalendar as fetchFinnhubCalendar, fetchEarningsCalendar, fetchFinnhubNews, fetchStockEarningsHistory, fetchFinnhubCompanyNews } from "./finnhub";
 export { fetchMarketSentiment } from "./sentiment";
 export { screenStocks } from "./screening";

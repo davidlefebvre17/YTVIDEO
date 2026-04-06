@@ -129,6 +129,7 @@ Pour CHAQUE beat:
    - 'scenario_fork': Quand la narration présente des SCÉNARIOS haussier/baissier avec cibles
    - 'gauge': RSI extrême (<30 ou >70), Fear&Greed, VIX → jauge circulaire
    - 'comparison': Quand la narration COMPARE explicitement 2+ actifs côte à côte
+   - 'spread_chart': Quand la narration parle d'un SPREAD ou ÉCART entre deux actifs (ex: "spread WTI-Brent", "écart 10 ans - 2 ans", "courbe des taux"). Affiche les deux courbes superposées.
    - 'headline': Quand la narration cite une ACTUALITÉ spécifique ou déclaration politique
    - 'none': Transitions, contexte général, respiration — pas de données à afficher
 
@@ -141,6 +142,7 @@ Pour CHAQUE beat:
    - scenario_fork: { trunk: "question courte max 60 chars", asset: "SYMBOL", bullTarget: "prix COURT max 15 chars (ex: 'Or 4800$', 'WTI < 90$')", bullCondition: "condition max 50 chars", bearTarget: "prix COURT max 15 chars", bearCondition: "condition max 50 chars" }
    - gauge: { type: "rsi"|"fear_greed", value, asset }
    - comparison: { assets: [symbol1, symbol2], values: [val1, val2] }
+   - spread_chart: { asset1: "CL=F", asset2: "BZ=F", label: "Spread WTI-Brent" } pour des actifs du snapshot, OU { asset1: "DGS10", asset2: "DGS2", label: "Courbe des taux 10Y-2Y" } pour les yields FRED. NE PAS inventer de symboles — utiliser les symboles Yahoo existants ou DGS10/DGS2/T10Y2Y pour les yields.
    - headline: { text, actor?, source? }
    - none: null
 
@@ -330,7 +332,7 @@ function normalizeEmotion(raw: string): BeatEmotion {
 }
 
 function isValidOverlayType(type: string): boolean {
-  const valid = ['chart', 'stat', 'causal_chain', 'scenario_fork', 'gauge', 'comparison', 'headline', 'none'];
+  const valid = ['chart', 'stat', 'causal_chain', 'scenario_fork', 'gauge', 'comparison', 'spread_chart', 'headline', 'none'];
   return valid.includes(type);
 }
 

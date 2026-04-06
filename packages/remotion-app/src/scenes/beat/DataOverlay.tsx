@@ -12,12 +12,14 @@ import { GaugeOverlay } from "../shared/GaugeOverlay";
 import { HeatmapGrid } from "../shared/HeatmapGrid";
 import { type InkLevel } from "../shared/InkChart";
 import { CandlestickChart } from "../shared/CandlestickChart";
+import { SpreadChart } from "../shared/SpreadChart";
 
 interface DataOverlayProps {
   overlay: BeatOverlay;
   assets: AssetSnapshot[];
   accentColor: string;
   durationInFrames: number;
+  yieldsHistory?: { us10y: any[]; us2y: any[]; spread10y2y: any[] };
 }
 
 const POSITION_STYLES: Record<string, React.CSSProperties> = {
@@ -112,6 +114,7 @@ export const DataOverlay: React.FC<DataOverlayProps> = ({
   assets,
   accentColor,
   durationInFrames,
+  yieldsHistory,
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -162,7 +165,7 @@ export const DataOverlay: React.FC<DataOverlayProps> = ({
   return (
     <div style={{ ...posStyle, zIndex: 100 }}>
       <div style={{ ...containerStyle, ...combinedAnimStyle }}>
-        <OverlayContent type={overlay.type} data={data} assets={assets} accentColor={accentColor} durationInFrames={durationInFrames} />
+        <OverlayContent type={overlay.type} data={data} assets={assets} accentColor={accentColor} durationInFrames={durationInFrames} yieldsHistory={yieldsHistory} />
       </div>
     </div>
   );
@@ -174,6 +177,7 @@ interface OverlayContentProps {
   assets: AssetSnapshot[];
   accentColor: string;
   durationInFrames: number;
+  yieldsHistory?: { us10y: any[]; us2y: any[]; spread10y2y: any[] };
 }
 
 /** Replace Yahoo symbols with human names.
@@ -315,7 +319,7 @@ const ChartWithZoom: React.FC<{
   );
 };
 
-const OverlayContent: React.FC<OverlayContentProps> = ({ type, data, assets, accentColor, durationInFrames }) => {
+const OverlayContent: React.FC<OverlayContentProps> = ({ type, data, assets, accentColor, durationInFrames, yieldsHistory }) => {
   switch (type) {
     case 'stat': {
       const rawValue = data.value;
@@ -459,6 +463,54 @@ const OverlayContent: React.FC<OverlayContentProps> = ({ type, data, assets, acc
         changePct={asset?.changePct ?? 0}
         durationInFrames={durationInFrames}
       />;
+    }
+
+    case 'spread_chart': {
+      const sym1 = (data.asset1 as string) ?? '';
+      const sym2 = (data.asset2 as string) ?? '';
+      const label = (data.label as string) ?? `${sym1} vs ${sym2}`;
+
+      // For yield symbols (DGS10, DGS2, T10Y2Y), use yieldsHistory
+      const yieldMap: Record<string, string> = { 'DGS10': 'us10y', 'DGS2': 'us2y', 'T10Y2Y': 'spread10y2y' };
+
+      let candles1: any[] = [];
+      let candles2: any[] = [];
+      let label1 = sym1;
+      let label2 = sym2;
+
+      if (yieldMap[sym1] && yieldsHistory) {
+        candles1 = (yieldsHistory as any)[yieldMap[sym1]] ?? [];
+        label1 = sym1 === 'DGS10' ? '10Y' : sym1 === 'DGS2' ? '2Y' : sym1;
+      } else {
+        const a1 = assets.find(a => a.symbol === sym1);
+        candles1 = a1?.dailyCandles ?? a1?.candles ?? [];
+        label1 = a1?.name ?? sym1;
+      }
+
+      if (yieldMap[sym2] && yieldsHistory) {
+        candles2 = (yieldsHistory as any)[yieldMap[sym2]] ?? [];
+        label2 = sym2 === 'DGS10' ? '10Y' : sym2 === 'DGS2' ? '2Y' : sym2;
+      } else {
+        const a2 = assets.find(a => a.symbol === sym2);
+        candles2 = a2?.dailyCandles ?? a2?.candles ?? [];
+        label2 = a2?.name ?? sym2;
+      }
+
+      if (candles1.length < 5 || candles2.length < 5) {
+        return <TextCard text={humanize(label, assets)} accentColor={accentColor} />;
+      }
+
+      return (
+        <SpreadChart
+          line1={{ candles: candles1, label: label1 }}
+          line2={{ candles: candles2, label: label2 }}
+          title={humanize(label, assets)}
+          showSpread
+          width={1400}
+          height={650}
+          drawDuration={30}
+        />
+      );
     }
 
     default:

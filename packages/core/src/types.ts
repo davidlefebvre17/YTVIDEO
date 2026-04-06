@@ -353,6 +353,12 @@ export interface DailySnapshot {
   yesterdayEvents?: EconomicEvent[];
   upcomingEvents?: EconomicEvent[];
   yields?: BondYields;
+  /** Historical yield timeseries for SpreadChart rendering (from FRED) */
+  yieldsHistory?: {
+    us10y: Candle[];
+    us2y: Candle[];
+    spread10y2y: Candle[];
+  };
   sentiment?: MarketSentiment;
   earnings?: EarningsEvent[];
   earningsUpcoming?: EarningsEvent[];  // J+1 to J+21
