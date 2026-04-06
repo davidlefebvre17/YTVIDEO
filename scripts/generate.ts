@@ -583,6 +583,7 @@ async function main() {
     owlTransitionAudios,
     owlAudioDurations,
     segmentAudioDurations: segmentDurations ?? undefined,
+    yieldsHistory: snapshot.yieldsHistory ?? undefined,
   };
   const propsPath = saveRemotionProps(date, remotionProps);
   console.log(`  Props saved: ${propsPath}`);

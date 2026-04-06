@@ -9,6 +9,7 @@ interface BeatSequenceProps {
   beat: Beat;
   assets: AssetSnapshot[];
   accentColor: string;
+  yieldsHistory?: { us10y: any[]; us2y: any[]; spread10y2y: any[] };
 }
 
 const isPlaceholder = (src?: string) =>
@@ -18,13 +19,16 @@ export const BeatSequence: React.FC<BeatSequenceProps> = ({
   beat,
   assets,
   accentColor,
+  yieldsHistory,
 }) => {
   const { fps } = useVideoConfig();
   const durationInFrames = Math.round(beat.durationSec * fps);
-  // Charts: no delay, extra duration (+80%), persist longer
-  const isChart = beat.overlay?.type === 'chart' || beat.overlay?.type === 'chart_zone';
+  const overlayType = beat.overlay?.type as string | undefined;
+  const isChart = overlayType === 'chart' || overlayType === 'chart_zone';
+  const isCausal = overlayType === 'causal_chain' || overlayType === 'scenario_fork';
   const rawDelay = beat.overlay ? Math.round((beat.overlay.enterDelayMs ?? 0) / 1000 * fps) : 0;
-  const delayFrames = isChart ? 0 : rawDelay;
+  // Charts + causal: no delay, appear immediately. Causal chains need time to read.
+  const delayFrames = (isChart || isCausal) ? 0 : rawDelay;
   const showPrompt = isPlaceholder(beat.imagePath) && beat.imagePrompt;
 
   return (
@@ -93,12 +97,21 @@ export const BeatSequence: React.FC<BeatSequenceProps> = ({
         </div>
       )}
       {beat.overlay && (
-        <Sequence from={delayFrames}>
+        <Sequence from={delayFrames} durationInFrames={
+          isCausal
+            ? Math.round((durationInFrames - delayFrames) * 1.8) // causal chains persist 80% longer
+            : (durationInFrames - delayFrames)
+        }>
           <DataOverlay
             overlay={beat.overlay}
             assets={assets}
             accentColor={accentColor}
-            durationInFrames={durationInFrames - delayFrames}
+            yieldsHistory={yieldsHistory}
+            durationInFrames={
+              isCausal
+                ? Math.round((durationInFrames - delayFrames) * 1.8)
+                : (durationInFrames - delayFrames)
+            }
           />
         </Sequence>
       )}

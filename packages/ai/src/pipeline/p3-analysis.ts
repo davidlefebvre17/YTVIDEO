@@ -127,9 +127,8 @@ function formatAssetForC2(asset: FlaggedAsset, depth: 'DEEP' | 'FOCUS' | 'FLASH'
       }
       if (memory.indicators_daily) {
         const ind = memory.indicators_daily;
-        // Vol_ratio from MarketMemory is historical (last weekly update) — NOT today's volume.
-        // Only BB/slope/ATR are structurally useful. Vol_ratio omitted to prevent hallucination.
-        text += `Indicateurs structurels (historique, PAS données du jour): BB_width_rank=${ind.bb_width_pct_rank.toFixed(0)} | SMA20_slope=${ind.mm20_slope_deg.toFixed(1)}° | ATR_ratio=${ind.atr_ratio.toFixed(2)}\n`;
+        // Only ATR for volatility context. No BB, no slope — not used in narration.
+        text += `Volatilité historique: ATR_ratio=${ind.atr_ratio.toFixed(2)}\n`;
       }
     }
   } catch {
@@ -204,6 +203,7 @@ Le COT reflète les positions AVANT le move du jour, jamais pendant. Trois règl
    c. Signal de fond neutre : "pas de capitulation structurelle visible dans le COT" (sans relier au move du jour)
 Si le COT est cité dans un segment, le sourcesUsed DOIT noter "market_memory" avec le daysOld exact.
 - **Anti-répétition** : si un mécanisme est listé dans "MÉCANISMES DÉJÀ ENSEIGNÉS", ne le réexpliquez pas dans fondamentalContext ou causalChain. Trouvez un angle plus profond via le KNOWLEDGE : positionnement COT, saisonnalité, yield spreads, divergences de corrélation, impact sectoriel, etc.
+- **Lien data→banque centrale** : si une donnée macro (NFP, CPI, PCE, PMI) est sortie hier ET qu'une réunion CB est dans les 7 prochains jours (visible dans upcomingHighImpact), analyse explicitement : cette data confirme-t-elle ou remet-elle en cause le pricing de la prochaine décision ? Le marché bouge en AMONT des réunions grâce aux données — la donnée d'hier est peut-être plus importante que la décision à venir. Mentionner dans coreMechanism si pertinent.
 - Pour les segments PANORAMA : analyse MINIMALE. Un keyFact par asset (mouvement + raison probable). Pas de causalChain, pas de scenarios, pas de chartInstructions.`;
 }
 

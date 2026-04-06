@@ -66,7 +66,7 @@ function priceToY(
 function alignData(
   candles1: Candle[],
   candles2: Candle[],
-  maxPoints: number = 250,
+  maxPoints: number = 120,
 ): { aligned1: Candle[]; aligned2: Candle[]; count: number } {
   // Both arrays should be aligned by date index already
   // Take min length, then last maxPoints
@@ -240,7 +240,7 @@ export const SpreadChart: React.FC<SpreadChartProps> = ({
       <svg
         width={width}
         height={height}
-        style={{ display: 'block' }}
+        style={{ display: 'block', overflow: 'visible' }}
         viewBox={`0 0 ${width} ${height}`}
       >
         {/* Background */}

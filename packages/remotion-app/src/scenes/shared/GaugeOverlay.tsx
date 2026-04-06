@@ -37,7 +37,7 @@ export const GaugeOverlay: React.FC<GaugeOverlayProps> = ({
 
   const range = safeMax - safeMin || 1;
   const normalizedValue = Math.max(0, Math.min(1, (safeValue - safeMin) / range));
-  const currentAngle = normalizedValue * progress * 180;
+  const currentAngle = Math.min(179, normalizedValue * progress * 180);
   const currentValue = interpolate(rel, [0, durationFrames], [0, safeValue], {
     extrapolateRight: "clamp", extrapolateLeft: "clamp",
   });
@@ -51,23 +51,32 @@ export const GaugeOverlay: React.FC<GaugeOverlayProps> = ({
   });
 
   const r = 70;
-  const cx = 90;
-  const cy = 85;
+  const cx = 110;
+  const cy = 105;
   const strokeW = 10;
 
-  // Arc paths
-  const endX = cx + r * Math.cos(Math.PI - (currentAngle * Math.PI) / 180);
-  const endY = cy - r * Math.sin(Math.PI - (currentAngle * Math.PI) / 180);
-  const largeArc = currentAngle > 90 ? 1 : 0;
-  const bgPath = `M ${cx - r} ${cy} A ${r} ${r} 0 1 1 ${cx + r} ${cy}`;
-  const valuePath = currentAngle > 0
-    ? `M ${cx - r} ${cy} A ${r} ${r} 0 ${largeArc} 1 ${endX} ${endY}`
-    : "";
+  // Arc paths — built as polyline to avoid SVG arc ambiguity
+  function arcPoints(radius: number, startDeg: number, endDeg: number, steps: number) {
+    const pts: string[] = [];
+    for (let i = 0; i <= steps; i++) {
+      const deg = startDeg + (endDeg - startDeg) * (i / steps);
+      const rad = (deg * Math.PI) / 180;
+      const x = cx + radius * Math.cos(rad);
+      const y = cy - radius * Math.sin(rad);
+      pts.push(`${x.toFixed(1)},${y.toFixed(1)}`);
+    }
+    return pts;
+  }
+  const bgPts = arcPoints(r, 180, 0, 60);
+  const bgPath = `M ${bgPts.join(' L ')}`;
+  const valPts = arcPoints(r, 180, 180 - currentAngle, Math.max(2, Math.round(currentAngle / 3)));
+  const valuePath = currentAngle > 0 ? `M ${valPts.join(' L ')}` : "";
 
   // Needle
   const needleR = r - 18;
-  const needleX = cx + needleR * Math.cos(Math.PI - (currentAngle * Math.PI) / 180);
-  const needleY = cy - needleR * Math.sin(Math.PI - (currentAngle * Math.PI) / 180);
+  const needleAngleRad = ((180 - currentAngle) * Math.PI) / 180;
+  const needleX = cx + needleR * Math.cos(needleAngleRad);
+  const needleY = cy - needleR * Math.sin(needleAngleRad);
 
   const opacity = interpolate(rel, [0, 8], [0, 1], {
     extrapolateRight: "clamp", extrapolateLeft: "clamp",
@@ -100,10 +109,10 @@ export const GaugeOverlay: React.FC<GaugeOverlayProps> = ({
       opacity, display: "flex", flexDirection: "column",
       alignItems: "center", gap: 6,
     }}>
-      <svg width={180} height={115} viewBox="0 0 180 115">
-        {/* Background arc */}
+      <svg width={220} height={130} viewBox="0 0 220 130" style={{ overflow: 'visible' }}>
+        {/* Background arc (slightly wider as rail) */}
         <path d={bgPath} fill="none"
-          stroke={BRAND.colors.inkFaint} strokeWidth={strokeW} strokeLinecap="round" />
+          stroke={BRAND.colors.inkFaint} strokeWidth={strokeW + 4} strokeLinecap="round" />
 
         {/* Tick marks */}
         {ticks.map((t, i) => (

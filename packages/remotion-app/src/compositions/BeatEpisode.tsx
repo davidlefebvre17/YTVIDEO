@@ -263,7 +263,8 @@ const CrossfadeBeat: React.FC<{
   accentColor: string;
   durationInFrames: number;
   fadeFrames: number;
-}> = ({ beat, assets, accentColor, durationInFrames, fadeFrames }) => {
+  yieldsHistory?: any;
+}> = ({ beat, assets, accentColor, durationInFrames, fadeFrames, yieldsHistory }) => {
   const frame = useCurrentFrame();
   const ff = Math.max(1, fadeFrames);
   const fadeIn = interpolate(frame, [0, ff], [0, 1], {
@@ -282,6 +283,7 @@ const CrossfadeBeat: React.FC<{
         beat={beat}
         assets={assets}
         accentColor={accentColor}
+        yieldsHistory={yieldsHistory}
       />
     </AbsoluteFill>
   );
@@ -299,8 +301,10 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
   owlTransitionAudios = {},
   owlAudioDurations,
   segmentAudioDurations,
+  ...restProps
 }) => {
   const { fps } = useVideoConfig();
+  const yieldsHistoryData = (restProps as any).yieldsHistory;
   const mood = script.direction?.moodMusic ?? "neutre_analytique";
   const accentColor =
     BRAND.moodAccent[mood] ?? BRAND.colors.accentDefault;
@@ -651,6 +655,7 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
                     accentColor={accentColor}
                     durationInFrames={bt.duration}
                     fadeFrames={effectiveFade}
+                    yieldsHistory={yieldsHistoryData}
                   />
                   {/* Segment title overlay on first beat + letterpress stamp SFX */}
                   {j === 0 && section && (
