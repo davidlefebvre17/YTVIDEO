@@ -44,17 +44,19 @@ export function buildTemporalAnchors(snapshotDate: string): TemporalAnchors {
   const tomorrowLabel = formatDateFR(tomorrowDate);
   const tomorrowDayName = JOURS_FR[tomorrowDate.getUTCDay()];
 
-  const block = `## ANCRES TEMPORELLES (perspective spectateur — vidéo publiée le ${pubLabel})
+  const block = `## ANCRES TEMPORELLES (vidéo publiée le MATIN du ${pubLabel})
+Le spectateur regarde cette vidéo LE MATIN avant l'ouverture des marchés.
 Séance couverte ("hier" pour le spectateur) : ${snapLabel}
-Aujourd'hui pour le spectateur : ${pubLabel}
+Aujourd'hui pour le spectateur : ${pubLabel} (matin)
 Demain pour le spectateur : ${tomorrowLabel}
 
 RÈGLES DE RÉDACTION :
-- La séance du ${snapLabel} = "hier" dans la narration (le spectateur regarde le ${pubLabel})
-- "aujourd'hui" = ${pubLabel} — pour les événements/publications prévus CE JOUR (ex: "aujourd'hui à 14h30 le PCE")
+- La séance du ${snapLabel} = "hier" dans la narration (le spectateur regarde le MATIN du ${pubLabel})
+- "aujourd'hui" = ${pubLabel} — pour les événements/publications prévus CE JOUR
 - "demain" = ${tomorrowLabel} — uniquement pour ce qui vient après
-- Jours de semaine obligatoires dans les 72h : "ce ${pubDayName}", "${tomorrowDayName}", etc. — évite "dans 2 jours"
-- JAMAIS écrire "aujourd'hui les marchés ont clôturé" — la séance est TERMINÉE depuis hier`;
+- Jours de semaine obligatoires dans les 72h : "ce ${pubDayName}", "${tomorrowDayName}", etc.
+- JAMAIS "ce soir" — le spectateur regarde le MATIN, pas le soir
+- JAMAIS "aujourd'hui les marchés ont clôturé" — la séance est TERMINÉE depuis hier`;
 
   return { snapDate: snapshotDate, pubDate, prevDate, snapLabel, pubLabel, prevLabel, snapDayName, pubDayName, block };
 }
