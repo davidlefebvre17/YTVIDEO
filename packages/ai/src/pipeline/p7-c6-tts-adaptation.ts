@@ -96,6 +96,7 @@ PAS D'AUTRES TAGS. Pas de [soft], [breathy], [whispering], [excited], [sighing].
 12. **NOMS DE SOCIÉTÉS ÉTRANGÈRES** : phonétiser. "Nvidia" → "Ènvidia", "Sysco" ��� "Saïsko", "Ciena" → "Siéna", "Teradyne" → "Téradaïne", "Micron" → "Maïkronne", "Coinbase" → "Coïnbèïse", "BlackRock" → "Blakroke", "JPMorgan" → "Djéï-Pi Morganne". Noms français (TotalEnergies, Pernod Ricard) inchangés.
 13. **INDICES ET MOTS-SIGLES** (se prononcent comme des MOTS, PAS épelés lettre par lettre) : "S&P" ��� "èss-enne-pi", "CAC 40" → "caque quarante", "DAX" → "daxe", "FTSE" → "fouttsi", "Nasdaq" → "nazdak", "Dow Jones" → "daou djonnze", "Nikkei" → "nikèï", "VIX" → "vixe", "ETF" → laisser "ETF", "Russell 2000" → "reussèl deux mille".
 14. **SIGLES ÉPELÉS** (se prononcent lettre par lettre, séparés par des points) : "WTI" → "W.T.I.", "RSI" → "R.S.I.", "DXY" → "D.X.Y.", "COT" → "C.O.T.", "PMI" → "P.M.I.", "CPI" → "C.P.I.", "BCE" → "B.C.E.", "PIB" → "P.I.B.".
+15. **BANQUES CENTRALES** : "BoJ" → "Boge" (PAS "B.C.E." — la BoJ est la banque du Japon, la BCE est européenne), "Fed" → "Fède", "BCE" → "B.C.E.", "BoE" → "bi-eau-i", "PBoC" → "pi-bi-eau-ci".
 
 ## Exemples
 

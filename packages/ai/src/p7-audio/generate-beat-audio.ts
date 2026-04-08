@@ -146,7 +146,9 @@ function sanitizeForTTS(text: string): string {
     .replace(/\bS&P\b/g, 'essenne pi')
     .replace(/\bS\. and P\./g, 'essenne pi')
     .replace(/èss-enne-pi/g, 'essenne pi')
-    // ETF reste tel quel — se prononce comme un mot, pas épelé
+    .replace(/\bE\.T\.F\.\b/g, 'eutéèf')
+    .replace(/\bE\.T\.F\./g, 'eutéèf')
+    .replace(/\bETF\b/g, 'eutéèf')
     .replace(/\bUSDC\b/g, 'U.S.D.C.')
     .replace(/\bUSDT\b/g, 'U.S.D.T.')
     .replace(/\bAUD\b/g, 'A.U.D.')
@@ -234,8 +236,16 @@ async function generateSegmentAudio(
     console.log(`    Segment ${segId}: ${narrativeBeats.length} beats, generating...`);
 
     // 1. Concatenate all narrationTTS for this segment
+    //    Then fix hallucinated abbreviations by cross-checking with narrationChunk
     const fullTTS = narrativeBeats
-      .map(b => (b as any).narrationTTS || b.narrationChunk)
+      .map(b => {
+        let tts = (b as any).narrationTTS || b.narrationChunk;
+        // Fix Haiku hallucinations: if chunk says BoJ but TTS says B.C.E., correct it
+        if (b.narrationChunk?.match(/\bBoJ\b/i) && /B\.C\.E\./.test(tts)) {
+          tts = tts.replace(/B\.C\.E\./g, 'BoJ');
+        }
+        return tts;
+      })
       .join(' ');
     const sanitized = sanitizeForTTS(fullTTS);
 
@@ -429,7 +439,11 @@ export async function generateBeatAudio(
     }
 
     try {
-      const ttsText = (beat as any).narrationTTS || beat.narrationChunk;
+      let ttsText = (beat as any).narrationTTS || beat.narrationChunk;
+      // Fix Haiku hallucinations: if chunk says BoJ but TTS says B.C.E., correct it
+      if (beat.narrationChunk?.match(/\bBoJ\b/i) && /B\.C\.E\./.test(ttsText)) {
+        ttsText = ttsText.replace(/B\.C\.E\./g, 'BoJ');
+      }
       const sanitized = sanitizeForTTS(ttsText);
 
       if (provider === 'fish') {
