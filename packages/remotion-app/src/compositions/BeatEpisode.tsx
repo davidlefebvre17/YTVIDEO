@@ -214,6 +214,13 @@ function layoutBeats(
 
 // ── Total duration (used by calculateMetadata in Root.tsx) ────
 
+/** Get owl closing duration in frames, using real audio duration if available. */
+function getOwlClosingFrames(fps: number, owlAudioDurations?: Record<string, number>): number {
+  const dur = owlAudioDurations?.owl_closing;
+  if (dur && dur > 0) return Math.round(dur * fps) + 15;
+  return 0;
+}
+
 export function computeNewspaperDuration(
   beats: Beat[],
   script: EpisodeScript,
@@ -247,9 +254,10 @@ export function computeNewspaperDuration(
     if (i < segIds.length - 1) segTotal += getBetweenFrames(segIds[i], fps, owlAudioDurations);
   }
 
-  const closingDur = groups.has("closing")
+  const closingBeatsDur = groups.has("closing")
     ? groupDurationFrames(groups.get("closing")!, fps) + 60
     : MIN_CLOSING_FRAMES;
+  const closingDur = closingBeatsDur + getOwlClosingFrames(fps, owlAudioDurations);
 
   const owlTotal = OWL_INTRO_FRAMES + OWL_DIVE_FRAMES - OWL_CLIP_OVERLAP;
   return owlTotal + newspaperIntro + segTotal + closingDur;
@@ -309,10 +317,33 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
   const accentColor =
     BRAND.moodAccent[mood] ?? BRAND.colors.accentDefault;
 
+  // ── Step 0: Fill missing imagePath from nearest sibling in same segment ──
+  const patchedBeats = useMemo(() => {
+    const grouped = new Map<string, typeof beats>();
+    for (const b of beats) {
+      const arr = grouped.get(b.segmentId) ?? [];
+      arr.push(b);
+      grouped.set(b.segmentId, arr);
+    }
+    return beats.map((b) => {
+      if (b.imagePath) return b;
+      const siblings = grouped.get(b.segmentId) ?? [];
+      const idx = siblings.indexOf(b);
+      // Search outward from current position for nearest sibling with an image
+      for (let dist = 1; dist < siblings.length; dist++) {
+        const before = siblings[idx - dist];
+        if (before?.imagePath) return { ...b, imagePath: before.imagePath };
+        const after = siblings[idx + dist];
+        if (after?.imagePath) return { ...b, imagePath: after.imagePath };
+      }
+      return b;
+    });
+  }, [beats]);
+
   // ── Step 1: Group and classify beats ──
   const beatGroups = useMemo(
-    () => groupBeatsBySegment(beats),
-    [beats],
+    () => groupBeatsBySegment(patchedBeats),
+    [patchedBeats],
   );
 
   const segmentIds = useMemo(
@@ -433,9 +464,11 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
     // Closing
     const closingStart = segCum;
     sectionStarts.set("closing", closingStart);
-    const closingDur = beatGroups.has("closing")
+    const closingBeatsDur = beatGroups.has("closing")
       ? groupDurationFrames(beatGroups.get("closing")!, fps) + 60
       : MIN_CLOSING_FRAMES;
+    const owlClosingF = getOwlClosingFrames(fps, owlAudioDurations as any);
+    const closingDur = closingBeatsDur + owlClosingF;
 
     // Per-section beat layouts
     const sectionLayouts = new Map<
@@ -447,8 +480,8 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
       sectionLayouts.set(segId, layoutBeats(segBeats, start, fps));
     }
 
-    // Build allBeatTimings aligned with beats array
-    const allBeatTimings = beats.map((beat) => {
+    // Build allBeatTimings aligned with patchedBeats array
+    const allBeatTimings = patchedBeats.map((beat) => {
       const sectionBeats = beatGroups.get(beat.segmentId) ?? [];
       const idx = sectionBeats.indexOf(beat);
       const layout = sectionLayouts.get(beat.segmentId) ?? [];
@@ -462,12 +495,12 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
       closingDur,
       allBeatTimings,
     };
-  }, [beats, beatGroups, segmentIds, fps]);
+  }, [patchedBeats, beatGroups, segmentIds, fps, owlAudioDurations]);
 
   // ── Step 4: Subtitle lines ──
   const subtitleLines = useMemo(
     (): SubtitleLine[] =>
-      beats
+      patchedBeats
         .map((beat, i) => {
           const t = timings.allBeatTimings[i];
           if (
@@ -483,7 +516,7 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
           };
         })
         .filter((l): l is SubtitleLine => l !== null),
-    [beats, timings.allBeatTimings],
+    [patchedBeats, timings.allBeatTimings],
   );
 
   // ── Shared newspaper props ──
@@ -634,7 +667,7 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
 
             {/* Beats play full-screen (first beat overlaps zoom-in end for smooth crossfade) */}
             {segBeats.map((beat, j) => {
-              const globalIdx = beats.indexOf(beat);
+              const globalIdx = patchedBeats.indexOf(beat);
               const bt = timings.allBeatTimings[globalIdx];
               if (!bt) return null;
               // First beat gets extra fade-in frames to blend with zoom
@@ -787,12 +820,17 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
         );
       })}
 
-      {/* ── Owl audio: closing — skip if closing beats have segment audio (would double-play) ── */}
-      {owlClosingAudio && !(beatGroups.get("closing") ?? []).some((b: any) => b.audioPath || (b as any).audioSegmentPath) && (
-        <Sequence from={timings.closingStart} durationInFrames={timings.closingDur}>
-          <Audio src={staticFile(owlClosingAudio)} volume={1} />
-        </Sequence>
-      )}
+      {/* ── Owl audio: closing — plays AFTER closing beats (CTA outro) ── */}
+      {owlClosingAudio && (() => {
+        const owlF = getOwlClosingFrames(fps, owlAudioDurations as any);
+        if (owlF <= 0) return null;
+        const owlStart = timings.closingStart + timings.closingDur - owlF;
+        return (
+          <Sequence from={owlStart} durationInFrames={owlF}>
+            <Audio src={staticFile(owlClosingAudio)} volume={1} />
+          </Sequence>
+        );
+      })()}
 
       {/* ── Beat audio: voice TTS + SFX ── */}
       <BeatAudioTrack
@@ -806,8 +844,8 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
       {timings.segTimings.map((st) => {
         const segBeats = beatGroups.get(st.segId) ?? [];
         if (segBeats.length === 0) return null;
-        const firstBeatIdx = beats.indexOf(segBeats[0]);
-        const lastBeatIdx = beats.indexOf(segBeats[segBeats.length - 1]);
+        const firstBeatIdx = patchedBeats.indexOf(segBeats[0]);
+        const lastBeatIdx = patchedBeats.indexOf(segBeats[segBeats.length - 1]);
         const firstTiming = timings.allBeatTimings[firstBeatIdx];
         const lastTiming = timings.allBeatTimings[lastBeatIdx];
         if (!firstTiming || !lastTiming) return null;
@@ -831,8 +869,8 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
         if (!panoramaSeg) return null;
         const segBeats = beatGroups.get("seg_panorama") ?? [];
         if (segBeats.length === 0) return null;
-        const firstIdx = beats.indexOf(segBeats[0]);
-        const lastIdx = beats.indexOf(segBeats[segBeats.length - 1]);
+        const firstIdx = patchedBeats.indexOf(segBeats[0]);
+        const lastIdx = patchedBeats.indexOf(segBeats[segBeats.length - 1]);
         const firstT = timings.allBeatTimings[firstIdx];
         const lastT = timings.allBeatTimings[lastIdx];
         if (!firstT || !lastT) return null;

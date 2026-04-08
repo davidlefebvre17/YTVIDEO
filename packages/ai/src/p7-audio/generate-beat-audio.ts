@@ -129,7 +129,9 @@ function sanitizeForTTS(text: string): string {
     .replace(/€/g, ' euros')
     // Mots anglais — laisser tels quels, Fish Audio les prononce mieux que la phonétisation
     // Abréviations
-    .replace(/\bWTI\b/g, 'W.T.I.')
+    .replace(/\bW\.T\.I\.\b/g, 'doublevé té i')
+    .replace(/\bW\.T\.I\./g, 'doublevé té i')
+    .replace(/\bWTI\b/g, 'doublevé té i')
     .replace(/\bDXY\b/g, 'D.X.Y.')
     .replace(/\bRSI\b/g, 'R.S.I.')
     .replace(/\bCOT\b/g, 'C.O.T.')
@@ -138,8 +140,12 @@ function sanitizeForTTS(text: string): string {
     .replace(/\bSMA20\b/g, 'S.M.A. vingt')
     .replace(/\bEMA\b/g, 'E.M.A.')
     .replace(/\bFed\b/g, 'Fède')
+    .replace(/\bBoJ\b/gi, 'Boge')
+    .replace(/\bquarante\b/g, 'karante')
     .replace(/\bBCE\b/g, 'B.C.E.')
-    .replace(/\bS&P\b/g, 'S. and P.')
+    .replace(/\bS&P\b/g, 'essenne pi')
+    .replace(/\bS\. and P\./g, 'essenne pi')
+    .replace(/èss-enne-pi/g, 'essenne pi')
     // ETF reste tel quel — se prononce comme un mot, pas épelé
     .replace(/\bUSDC\b/g, 'U.S.D.C.')
     .replace(/\bUSDT\b/g, 'U.S.D.T.')

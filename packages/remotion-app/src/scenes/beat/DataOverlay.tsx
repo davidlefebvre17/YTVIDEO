@@ -427,12 +427,14 @@ const OverlayContent: React.FC<OverlayContentProps> = ({ type, data, assets, acc
       const allCandles = asset?.dailyCandles ?? asset?.candles ?? [];
 
       if (allCandles.length < 5) {
-        // No candle data — show as stat or text instead of broken chart
+        // No candle data — show stat if we have a price, otherwise skip entirely
         const label = humanize((data.name as string) ?? (asset?.name as string) ?? sym, assets);
         const price = (data.price as number);
         if (price) {
           return <AnimatedStat value={price} label={label} suffix="" accentColor={accentColor} size="md" />;
         }
+        // Asset not in snapshot — don't show raw ticker symbol
+        if (!asset) return null;
         return <TextCard text={label} accentColor={accentColor} />;
       }
 
