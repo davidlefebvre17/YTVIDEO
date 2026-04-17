@@ -17,15 +17,17 @@ import { existsSync, mkdirSync, writeFileSync, statSync } from 'fs';
 import { join } from 'path';
 import type { Beat, Language } from '@yt-maker/core';
 import { fishTTS, FISH_PRESETS } from './fish-tts';
+import { elevenLabsTTS } from './elevenlabs-tts';
 import { alignSegmentAudio } from './align-segment-audio';
 
 // ─── TTS Provider ───────────────────────────────────────────────
 
-type TTSProvider = 'edge' | 'fish';
+type TTSProvider = 'edge' | 'fish' | 'elevenlabs';
 
 function getTTSProvider(): TTSProvider {
   const provider = process.env.TTS_PROVIDER || 'edge';
   if (provider === 'fish' || provider === 'fish-audio') return 'fish';
+  if (provider === 'elevenlabs' || provider === '11labs') return 'elevenlabs';
   return 'edge';
 }
 
@@ -107,55 +109,18 @@ function numberToFrench(n: string): string {
 }
 
 /** Nettoyer le texte pour TTS — supprimer symboles non-prononçables */
+/**
+ * Minimal sanitization — prononciation is already handled by preProcessForTTS().
+ * This only does: unsupported tags cleanup + newlines after sentences for intonation.
+ */
 function sanitizeForTTS(text: string): string {
   return text
-    .replace(/\*\*/g, '')
-    .replace(/\*/g, '')
-    .replace(/#{1,6}\s/g, '')
-    .replace(/—/g, ' — ')
-    .replace(/\.\.\./g, '…')
-    // Chiffres → lettres (pour prononciation TTS)
-    .replace(/(\d+)[.,](\d+)\s*%/g, (_, a, b) => `${numberToFrench(a)} virgule ${numberToFrench(b)} pour cent`)
-    .replace(/(\d+)\s*%/g, (_, n) => `${numberToFrench(n)} pour cent`)
-    .replace(/(\d+)[.,](\d+)\s*\$/g, (_, a, b) => `${numberToFrench(a)} dollars ${numberToFrench(b)}`)
-    .replace(/(\d+)\s*\$/g, (_, n) => `${numberToFrench(n)} dollars`)
-    .replace(/(\d+)[.,](\d+)\s*€/g, (_, a, b) => `${numberToFrench(a)} euros ${numberToFrench(b)}`)
-    .replace(/(\d+)\s*€/g, (_, n) => `${numberToFrench(n)} euros`)
-    .replace(/\b(\d{1,9})\b/g, (_, n) => numberToFrench(n))
-    // Symboles financiers → texte
-    .replace(/\+(\d)/g, 'plus $1')
-    .replace(/%/g, ' pour cent')
-    .replace(/\$/g, ' dollars')
-    .replace(/€/g, ' euros')
-    // Mots anglais — laisser tels quels, Fish Audio les prononce mieux que la phonétisation
-    // Abréviations
-    .replace(/\bW\.T\.I\.\b/g, 'doublevé té i')
-    .replace(/\bW\.T\.I\./g, 'doublevé té i')
-    .replace(/\bWTI\b/g, 'doublevé té i')
-    .replace(/\bDXY\b/g, 'D.X.Y.')
-    .replace(/\bRSI\b/g, 'R.S.I.')
-    .replace(/\bCOT\b/g, 'C.O.T.')
-    .replace(/\bSMA200\b/g, 'S.M.A. deux cents')
-    .replace(/\bSMA50\b/g, 'S.M.A. cinquante')
-    .replace(/\bSMA20\b/g, 'S.M.A. vingt')
-    .replace(/\bEMA\b/g, 'E.M.A.')
-    .replace(/\bFed\b/g, 'Fède')
-    .replace(/\bBoJ\b/gi, 'Boge')
-    .replace(/\bquarante\b/g, 'karante')
-    .replace(/\bBCE\b/g, 'B.C.E.')
-    .replace(/\bS&P\b/g, 'essenne pi')
-    .replace(/\bS\. and P\./g, 'essenne pi')
-    .replace(/èss-enne-pi/g, 'essenne pi')
-    .replace(/\bE\.T\.F\.\b/g, 'eutéèf')
-    .replace(/\bE\.T\.F\./g, 'eutéèf')
-    .replace(/\bETF\b/g, 'eutéèf')
-    .replace(/\bUSDC\b/g, 'U.S.D.C.')
-    .replace(/\bUSDT\b/g, 'U.S.D.T.')
-    .replace(/\bAUD\b/g, 'A.U.D.')
-    .replace(/\bCPI\b/g, 'C.P.I.')
-    .replace(/\bPMI\b/g, 'P.M.I.')
-    .replace(/&/g, ' et ')
-    .replace(/\s+/g, ' ')
+    .replace(/\[long pause\]/g, '[pause]')
+    // Fin de phrase → saut de ligne pour forcer Fish Audio à marquer l'intonation descendante
+    .replace(/\.\s+/g, '.\n')
+    .replace(/\?\s+/g, '?\n')
+    .replace(/!\s+/g, '!\n')
+    .replace(/[ \t]+/g, ' ')
     .trim();
 }
 
@@ -193,6 +158,18 @@ async function generateBeatWithFish(
   });
 }
 
+async function generateBeatWithElevenLabs(
+  sanitized: string,
+  mp3Path: string,
+  speed?: number,
+): Promise<void> {
+  await elevenLabsTTS({
+    text: sanitized,
+    outputPath: mp3Path,
+    speed: speed ?? 1.0,
+  });
+}
+
 // ─── Segment-level TTS generation ───────────────────────────────
 
 /** Group beats by segmentId, preserving order */
@@ -214,6 +191,7 @@ async function generateSegmentAudio(
   outputDir: string,
   publicRelativePrefix: string,
   speed?: number,
+  provider: 'fish' | 'elevenlabs' = 'fish',
 ): Promise<{ successSegments: number; segmentDurations: Record<string, number> }> {
   const segmentsDir = join(outputDir, 'segments');
   if (!existsSync(segmentsDir)) mkdirSync(segmentsDir, { recursive: true });
@@ -240,9 +218,12 @@ async function generateSegmentAudio(
     const fullTTS = narrativeBeats
       .map(b => {
         let tts = (b as any).narrationTTS || b.narrationChunk;
-        // Fix Haiku hallucinations: if chunk says BoJ but TTS says B.C.E., correct it
+        // Fix Haiku hallucinations by cross-checking with narrationChunk
         if (b.narrationChunk?.match(/\bBoJ\b/i) && /B\.C\.E\./.test(tts)) {
           tts = tts.replace(/B\.C\.E\./g, 'BoJ');
+        }
+        if (b.narrationChunk?.includes('Terafab') && /Téradaïne/i.test(tts)) {
+          tts = tts.replace(/Téradaïne/gi, 'Térafab');
         }
         return tts;
       })
@@ -250,18 +231,29 @@ async function generateSegmentAudio(
     const sanitized = sanitizeForTTS(fullTTS);
 
     // 2. Generate 1 MP3 for the whole segment
+    //    Short segments (hook, thread) get a speed bump so Fish doesn't slow down
+    const isShortSeg = segId === 'hook' || segId === 'thread' || segId === 'closing';
+    const segSpeed = speed ?? (isShortSeg ? 1.05 : FISH_PRESETS.FOCUS.speed);
     try {
-      await fishTTS({
-        text: sanitized,
-        outputPath: segMp3,
-        format: 'mp3',
-        speed: speed ?? FISH_PRESETS.FOCUS.speed,
-        temperature: FISH_PRESETS.FOCUS.temperature,
-        topP: FISH_PRESETS.FOCUS.topP,
-        repetitionPenalty: FISH_PRESETS.FOCUS.repetitionPenalty,
-      });
+      if (provider === 'elevenlabs') {
+        await elevenLabsTTS({
+          text: sanitized,
+          outputPath: segMp3,
+          speed: segSpeed,
+        });
+      } else {
+        await fishTTS({
+          text: sanitized,
+          outputPath: segMp3,
+          format: 'mp3',
+          speed: segSpeed,
+          temperature: FISH_PRESETS.FOCUS.temperature,
+          topP: FISH_PRESETS.FOCUS.topP,
+          repetitionPenalty: FISH_PRESETS.FOCUS.repetitionPenalty,
+        });
+      }
     } catch (err) {
-      console.warn(`    Fish Audio failed for segment ${segId}: ${(err as Error).message.slice(0, 100)}`);
+      console.warn(`    ${provider} failed for segment ${segId}: ${(err as Error).message.slice(0, 100)}`);
       // Mark all beats as no audio
       for (const b of segBeats) { (b as any).audioSegmentPath = ''; }
       continue;
@@ -356,11 +348,11 @@ export async function generateBeatAudio(
 
   if (!existsSync(outputDir)) mkdirSync(outputDir, { recursive: true });
 
-  // ── Segment mode: Fish Audio + Echogarden alignment ──
-  if (provider === 'fish' && !options?.legacyMode) {
+  // ── Segment mode: Fish/ElevenLabs + Echogarden alignment ──
+  if ((provider === 'fish' || provider === 'elevenlabs') && !options?.legacyMode) {
     console.log(`\n  Generating TTS per SEGMENT (${provider}, segment mode)...`);
     const { successSegments, segmentDurations } = await generateSegmentAudio(
-      beats, outputDir, publicRelativePrefix, options?.speed,
+      beats, outputDir, publicRelativePrefix, options?.speed, provider,
     );
 
     // Recalculate cumulative startSec
@@ -381,7 +373,9 @@ export async function generateBeatAudio(
         relativePath: (b as any).audioSegmentPath || '',
         startSec: (b as any).startSec ?? 0,
         durationSec: b.durationSec,
-        voice: process.env.FISH_VOICE_ID ?? 'fish-s2-pro',
+        voice: provider === 'elevenlabs'
+          ? (process.env.ELEVENLABS_VOICE_ID ?? 'elevenlabs')
+          : (process.env.FISH_VOICE_ID ?? 'fish-s2-pro'),
       })),
     };
     const manifestPath = join(outputDir, 'beat-audio-manifest.json');
@@ -405,6 +399,8 @@ export async function generateBeatAudio(
     voice = options?.voice ?? EDGE_VOICES[lang] ?? EDGE_VOICES.fr;
     edgeTts = new MsEdgeTTS({});
     await edgeTts.setMetadata(voice, OUTPUT_FORMAT.AUDIO_24KHZ_96KBITRATE_MONO_MP3);
+  } else if (provider === 'elevenlabs') {
+    voice = process.env.ELEVENLABS_VOICE_ID ?? 'elevenlabs';
   } else {
     voice = process.env.FISH_VOICE_ID ?? 'fish-s2-pro';
   }
@@ -440,14 +436,19 @@ export async function generateBeatAudio(
 
     try {
       let ttsText = (beat as any).narrationTTS || beat.narrationChunk;
-      // Fix Haiku hallucinations: if chunk says BoJ but TTS says B.C.E., correct it
+      // Fix Haiku hallucinations by cross-checking with narrationChunk
       if (beat.narrationChunk?.match(/\bBoJ\b/i) && /B\.C\.E\./.test(ttsText)) {
         ttsText = ttsText.replace(/B\.C\.E\./g, 'BoJ');
+      }
+      if (beat.narrationChunk?.includes('Terafab') && /Téradaïne/i.test(ttsText)) {
+        ttsText = ttsText.replace(/Téradaïne/gi, 'Térafab');
       }
       const sanitized = sanitizeForTTS(ttsText);
 
       if (provider === 'fish') {
         await generateBeatWithFish(sanitized, mp3Path, undefined, options?.speed);
+      } else if (provider === 'elevenlabs') {
+        await generateBeatWithElevenLabs(sanitized, mp3Path, options?.speed);
       } else {
         await generateBeatWithEdge(edgeTts, sanitized, mp3Path);
       }

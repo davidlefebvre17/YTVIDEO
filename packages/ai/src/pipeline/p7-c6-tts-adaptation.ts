@@ -1,20 +1,43 @@
 /**
  * P7 — C6 Haiku : Adaptation TTS
  *
- * Prend les beats annotés (P7a.5) et adapte le texte de narration
- * pour Fish Audio S2-Pro :
- *   - Injection de tags émotionnels ([grave], [calme], [emphase]...)
- *   - Raccourcissement des phrases > 20 mots
- *   - Suppression des références visuelles ("comme on le voit")
- *   - Ajout de [pause] aux transitions
- *   - Respect du beatPacing et de l'emotion annotés
+ * Architecture en 2 étapes :
+ *   1. PRÉ-TRAITEMENT CODE (déterministe) — toute la prononciation
+ *      Chiffres → lettres, sigles, indices, anglicismes, noms propres
+ *   2. C6 HAIKU (LLM) — UNIQUEMENT placement de [pause]
+ *      Ne touche PAS au texte, ne reformule rien, ne phonétise rien
  *
- * Coût : ~$0.01/épisode (Haiku, ~40 beats × ~100 tokens)
+ * Le texte d'Opus arrive intact à Fish Audio, juste nettoyé par le code
+ * et rythmé par les pauses de C6.
+ *
+ * Coût : ~$0.005/épisode (Haiku, ~10 segments × ~50 tokens)
  */
 
 import type { BeatEmotion } from '@yt-maker/core';
 import { generateStructuredJSON } from '../llm-client';
 import type { BeatAnnotation } from './p7a5-beat-annotator';
+import { existsSync, readFileSync } from 'fs';
+import { join } from 'path';
+
+// ─── Ticker → Phonetic map (loaded once from company-profiles.json) ──
+
+let _tickerMap: Map<string, string> | null = null;
+
+function getTickerMap(): Map<string, string> {
+  if (_tickerMap) return _tickerMap;
+  _tickerMap = new Map();
+  const filePath = join(process.cwd(), 'data', 'company-profiles.json');
+  if (!existsSync(filePath)) return _tickerMap;
+  try {
+    const profiles: Array<{ symbol: string; name: string; phonetic?: string }> =
+      JSON.parse(readFileSync(filePath, 'utf-8'));
+    for (const p of profiles) {
+      if (p.phonetic) _tickerMap.set(p.symbol, p.phonetic);
+    }
+    console.log(`  [TTS] Loaded ${_tickerMap.size} ticker pronunciations`);
+  } catch { /* non-critical */ }
+  return _tickerMap;
+}
 
 // ─── Types ──────────────────────────────────────────────────────
 
@@ -32,9 +55,6 @@ interface C6Input {
   beats: Array<{
     beatId: string;
     narration: string;
-    emotion: BeatEmotion;
-    pacing: string;
-    depth: string;
     isSegmentStart: boolean;
     isSegmentEnd: boolean;
     isKeyMoment: boolean;
@@ -48,87 +68,245 @@ interface C6Output {
   }>;
 }
 
-// ─── Emotion → Fish Audio tag mapping ───────────────────────────
-
-const EMOTION_TAG_MAP: Record<BeatEmotion, string> = {
-  tension: '',
-  impact: '[emphasis]',
-  revelation: '[emphasis]',
-  analyse: '',
-  contexte: '',
-  respiration: '',
-  conclusion: '',
-};
-
 const PACING_TO_PRESET: Record<string, TTSBeat['fishPreset']> = {
   rapide: 'FLASH',
   posé: 'FOCUS',
   lent: 'DEEP',
 };
 
-// ─── System Prompt ──────────────────────────────────────────────
+// ─── C6 System Prompt — PAUSE PLACEMENT ONLY ───────────────────
 
-const C6_SYSTEM_PROMPT = `Tu es un adaptateur de texte pour synthèse vocale (TTS) Fish Audio S2-Pro.
+const C6_SYSTEM_PROMPT = `Tu es un directeur de respiration pour synthèse vocale. Le texte que tu reçois est DÉJÀ PRÊT à être lu (chiffres en lettres, prononciation corrigée). Tu n'as qu'UN SEUL job.
 
-## Ton rôle
-Transformer la narration écrite en texte vivant pour l'oreille. Tu places des tags d'intonation DEVANT les mots clés pour guider la voix.
+## Ton UNIQUE rôle
+Placer des tags [pause] dans le texte pour guider le rythme et l'intonation de la voix.
 
-## Tags Fish Audio S2 — UNIQUEMENT ces 3 tags
-- [emphasis] — insistance sur le mot qui suit. 2-4 par beat max. Sur les chiffres importants, les mots de surprise, les contrastes.
-- [pause] — silence court. Entre deux idées, avant un chiffre clé, après une révélation.
-- [long pause] — silence plus long. Entre deux sous-parties d'un segment, ou avant un retournement.
+## Le tag [pause]
+- Silence court (~0.3s) qui force la voix à redescendre en intonation
+- Place-le : entre deux idées, avant un chiffre clé, après une révélation, aux fins de phrases importantes
+- NE PAS en mettre après CHAQUE point — seulement quand le rythme le demande
+- Maximum 3-4 [pause] par beat — trop de pauses casse le flow
 
-PAS D'AUTRES TAGS. Pas de [soft], [breathy], [whispering], [excited], [sighing]. Ils déforment la voix.
+## RÈGLES ABSOLUES
+1. **NE CHANGE AUCUN MOT.** Pas un seul. Le texte est déjà prêt. Tu ajoutes SEULEMENT des [pause].
+2. **NE reformule PAS.** NE coupe PAS les phrases. NE réarrange PAS l'ordre des mots.
+3. **NE phonétise PAS.** La prononciation est déjà gérée par le code. Si tu vois "essenne pi" ou "praïcé", laisse tel quel.
+4. **NE supprime PAS de texte.** Chaque mot de l'input doit se retrouver dans l'output.
+5. **isSegmentStart=true** → commencer par [pause].
+6. **isSegmentEnd=true** → ajouter [pause] avant les 3 derniers mots pour marquer la descente finale.
+7. **isKeyMoment=true** → ajouter [pause] avant le passage clé.
 
-## Règles
-
-1. **[emphasis] DEVANT le mot** : "un aller-retour de [emphasis]quinze dollars". Le tag accentue le MOT qui le suit immédiatement.
-2. **2-4 [emphasis] par beat** — pas plus. Choisis les mots qui COMPTENT.
-3. **[pause] entre les idées** — pas à chaque phrase. Avant un chiffre clé, après une révélation.
-4. **Phrases > 20 mots** : couper en 2 phrases distinctes.
-5. **Supprimer** les références visuelles : "comme tu peux le voir", "sur ce graphique".
-6. **Ne PAS changer le sens** — reformuler pour l'oral, pas réécrire.
-7. **isSegmentStart=true** → commencer par [pause].
-8. **isSegmentEnd=true** → ajouter [long pause] avant les 2-3 derniers mots ET terminer par un point final bien marqué. La dernière phrase doit être COURTE et CONCLUSIVE.
-9. **isKeyMoment=true** → utiliser [emphasis] sur le mot clé.
-10. **CHIFFRES → LETTRES** : TOUS les nombres en toutes lettres. C'est OBLIGATOIRE.
-11. **MOTS ANGLAIS** : phonétiser pour qu'un francophone lise la prononciation anglaise correcte. Exemples : "spread" → "sprèdd", "squeeze" → "skouize", "pricing" → "praïcingue", "pricé" → "praïcé", "price" → "praïce", "bull run" → "boull reune", "dead cat bounce" → "dèdd catt baounce", "hedge" → "hèdje", "hedging" → "hèdjingue", "trader" → "trèdeur", "short" → "shorte", "spike" → "spikke", "spot" → "spotte", "move" → "mouve". Applique ce principe à TOUT mot anglais, même conjugué en français ("pric��", "pricait", "shortait").
-12. **NOMS DE SOCIÉTÉS ÉTRANGÈRES** : phonétiser. "Nvidia" → "Ènvidia", "Sysco" ��� "Saïsko", "Ciena" → "Siéna", "Teradyne" → "Téradaïne", "Micron" → "Maïkronne", "Coinbase" → "Coïnbèïse", "BlackRock" → "Blakroke", "JPMorgan" → "Djéï-Pi Morganne". Noms français (TotalEnergies, Pernod Ricard) inchangés.
-13. **INDICES ET MOTS-SIGLES** (se prononcent comme des MOTS, PAS épelés lettre par lettre) : "S&P" ��� "èss-enne-pi", "CAC 40" → "caque quarante", "DAX" → "daxe", "FTSE" → "fouttsi", "Nasdaq" → "nazdak", "Dow Jones" → "daou djonnze", "Nikkei" → "nikèï", "VIX" → "vixe", "ETF" → laisser "ETF", "Russell 2000" → "reussèl deux mille".
-14. **SIGLES ÉPELÉS** (se prononcent lettre par lettre, séparés par des points) : "WTI" → "W.T.I.", "RSI" → "R.S.I.", "DXY" → "D.X.Y.", "COT" → "C.O.T.", "PMI" → "P.M.I.", "CPI" → "C.P.I.", "BCE" → "B.C.E.", "PIB" → "P.I.B.".
-15. **BANQUES CENTRALES** : "BoJ" → "Boge" (PAS "B.C.E." — la BoJ est la banque du Japon, la BCE est européenne), "Fed" → "Fède", "BCE" → "B.C.E.", "BoE" → "bi-eau-i", "PBoC" → "pi-bi-eau-ci".
-
-## Exemples
-
-Input: "Le Brent a touché 105$ hier — un aller-retour de 15$ en moins de 48 heures."
-Output: "Le Brent a touché [emphasis]cent cinq dollars hier. [pause] Un aller-retour de [emphasis]quinze dollars en moins de quarante-huit heures."
-
-Input: "L'or enregistre sa pire semaine en 40 ans avec une baisse de -9%."
-Output: "L'or enregistre sa [emphasis]pire semaine en quarante ans. [pause] Moins neuf pour cent."
-
-Input: "Le marché avait pricé la reconquête. Le VIX est à 23."
-Output: "Le marché avait [emphasis]praïcé la reconquête. Le vixe est à vingt-trois."
+## Où placer les pauses (guide)
+- Avant un contraste ("mais", "sauf que", "pourtant") → [pause] optionnel pour créer l'effet
+- Après une révélation ou une punchline → [pause] pour laisser le temps d'absorber
+- Avant un chiffre important → [pause] pour créer l'attente
+- Entre deux idées distinctes dans un même beat
+- PAS entre chaque phrase — ça saccade le récit
 
 ## Output JSON
-
 \`\`\`json
 {
   "beats": [
-    { "beatId": "beat_001", "adapted": "[pause] Texte adapté..." },
-    { "beatId": "beat_002", "adapted": "Suite du texte..." }
+    { "beatId": "beat_001", "adapted": "[pause] Texte identique avec pauses ajoutées." },
+    { "beatId": "beat_002", "adapted": "Suite du texte. [pause] Avec pauses stratégiques." }
   ]
 }
 \`\`\``;
 
-// ─── Main function ──────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// ÉTAPE 1 — PRÉ-TRAITEMENT CODE (déterministe, toute la prononciation)
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Pipeline unique de pré-traitement : C3 text → texte prêt pour Fish Audio.
+ * Fusionne chiffres, symboles, sigles, indices, anglicismes, noms propres.
+ * Appliqué AVANT C6 — C6 ne voit que du texte propre.
+ */
+export function preProcessForTTS(text: string): string {
+  let result = text;
+
+  // ── Tickers entre guillemets → nom phonétique ──
+  // "GS" → goldmane-sax, "AAPL" → apple, "CL=F" → pétrole-wti
+  const tickerMap = getTickerMap();
+  result = result.replace(/"([A-Z0-9^=.\-]{1,15})"/g, (match, ticker) => {
+    const phonetic = tickerMap.get(ticker);
+    return phonetic ?? match; // Si pas trouvé, laisser tel quel
+  });
+
+  // ── Nettoyage markdown ──
+  result = result.replace(/\*\*/g, '');
+  result = result.replace(/\*/g, '');
+  result = result.replace(/#{1,6}\s/g, '');
+  result = result.replace(/—/g, ' — ');
+  result = result.replace(/\.\.\./g, '…');
+
+  // ── Symboles → texte (AVANT conversion chiffres) ──
+  result = result.replace(/\+(\d)/g, 'plus $1');
+  // & → "et" SAUF dans S&P (traité par pronunciation fixes)
+  result = result.replace(/(?<!S)&(?!P)/g, ' et ');
+
+  // ── Chiffres → lettres françaises ──
+  result = convertNumbersToFrench(result);
+
+  // ── Résidus symboles post-conversion ──
+  result = result.replace(/%/g, ' pour cent');
+  result = result.replace(/\$/g, ' dollars');
+  result = result.replace(/€/g, ' euros');
+
+  // ── Prononciation unifiée (un seul passage, ordre déterministe) ──
+  for (const [pattern, replacement] of ALL_PRONUNCIATION_FIXES) {
+    result = result.replace(pattern, replacement);
+  }
+
+  // ── Références visuelles ──
+  result = result.replace(/comme (vous pouvez |on (peut )?)?le (voir|constater) (sur (le|ce) graphique)?/gi, '');
+  result = result.replace(/observez /gi, '');
+  result = result.replace(/ci-dessous/gi, '');
+
+  // ── Nettoyage final ──
+  result = result.replace(/\s{2,}/g, ' ').trim();
+
+  return result;
+}
+
+// ─── Table de prononciation unifiée ─────────────────────────────
+// Un seul tableau, un seul passage. Ordre : spécifique → général.
+
+const ALL_PRONUNCIATION_FIXES: [RegExp, string][] = [
+  // ── Fish Audio bugs ──
+  [/\bgrimpe\b/gi, 'grimp'],
+  [/(?<=\s|^)grimpé(?=\s|$|[.,;:!?])/gi, 'grimpé'],
+  [/\bgrimper\b/gi, 'grimper'],
+  [/\bvingt-onze\b/gi, 'vingt onze'],
+  [/\bP\.P\.I\./g, 'pé-pé-i'],
+  [/\bPPI\b/g, 'pé-pé-i'],
+
+  // ── Noms propres instables ──
+  [/\bTesla\b/g, 'Tessla'],
+  [/\bASML\b/g, 'A.S.M.L.'],
+  [/\bMusk\b/g, 'Meusk'],
+  [/\bMousk\b/g, 'Meusk'],
+  [/\bON Semiconductor\b/gi, 'Onne Semi-conducteur'],
+  [/\bSemiconductor\b/gi, 'Semi-conducteur'],
+
+  // ── Anglicismes (testés 2026-04-16 : phonétisation nécessaire) ──
+  // NB: \b ne marche PAS avec les accents en JS — utiliser (?<=\s|^) et (?=\s|$|[.,;:!?]) pour les mots accentués
+  [/\bpricer\b/gi, 'praille-cé'],
+  [/\bpricing\b/gi, 'praille-cingue'],
+  [/(?<=\s|^)pricé(?=\s|$|[.,;:!?])/gi, 'praïcé'],
+  [/\bprice\b/gi, 'praïce'],
+  [/(?<=\s|^)pricait(?=\s|$|[.,;:!?])/gi, 'praïçait'],
+  [/(?<=\s|^)pricent(?=\s|$|[.,;:!?])/gi, 'praïcent'],
+  [/\bbull run\b/gi, 'boull reune'],
+  [/\bbullish\b/gi, 'boulliche'],
+  [/\bbearish\b/gi, 'bèriche'],
+  // spread, risk-on, hedge, trading, trader, short squeeze → raw OK
+
+  // ── Suffixes anglais courants → français (couvre des centaines de sociétés) ──
+  [/\bSemiconductor\b/gi, 'Semi-conducteur'],
+  [/\bTechnologies\b/gi, 'Tèknolodji'],
+  [/\bHoldings\b/gi, 'Holdingz'],
+  [/\bCorporation\b/gi, 'Corporation'],
+  [/\bTherapeutics\b/gi, 'Térapeutiks'],
+  [/\bPartners\b/gi, 'Parteneurse'],
+
+  // ── Noms de sociétés récurrents ──
+  [/\bNvidia\b/g, 'Ènvidia'],
+  [/\bCoinbase\b/g, 'Coïnbèïse'],
+  [/\bBlackRock\b/g, 'Blakroke'],
+  [/\bJPMorgan\b/g, 'Djéï-Pi Morganne'],
+  [/\bMicron\b/g, 'Maïkronne'],
+  [/\bTeradyne\b/g, 'Téradaïne'],
+  [/\bBroadcom\b/g, 'Brodcome'],
+  [/\bCoreWeave\b/g, 'Core-ouive'],
+  [/\bServiceNow\b/g, 'Seurvissnao'],
+  [/\bMicroStrategy\b/g, 'Maïkro-stratédji'],
+  [/\bFastenal\b/g, 'Fasstenol'],
+  [/\bHelloFresh\b/g, 'Hélo-frèche'],
+  [/\bDelivery Hero\b/g, 'Déliveri Hiéro'],
+  [/\bGoldman Sachs\b/g, 'Goldmane Sax'],
+  [/\bWells Fargo\b/g, 'Ouèlse Fargo'],
+  [/\bCitigroup\b/g, 'Citigroupe'],
+  [/\bSoftBank\b/g, 'Softe-banque'],
+  [/\bTokyo Electron\b/g, 'Tokyo Élèctrone'],
+  [/\bJ\.?B\.?\s?Hunt\b/g, 'Djéï-bi Heunte'],
+  [/\bC\.?H\.?\s?Robinson\b/g, 'Ci-eïtch Robinsonne'],
+  [/\bBNY Mellon\b/g, 'Bi-ène-ouaï Mèlone'],
+  [/\bMorgan Stanley\b/g, 'Morgane Stanlé'],
+  [/\bBank of America\b/g, 'Banque of América'],
+  [/\bCharles Schwab\b/g, 'Charlse Chouab'],
+  [/\bDeutsche\b/g, 'Doïtche'],
+  // ── Abréviations courantes (filet de sécurité si Opus raccourcit) ──
+  [/\bBofA\b/g, 'Banque of América'],
+  [/\bGS\b/g, 'Goldmane Sax'],
+  [/\bMS\b(?!\.)(?!CI)/g, 'Morgane Stanlé'],  // MS mais pas MSCI
+  [/\bTSMC\b/g, 'Ti-èss-èmm-ci'],
+  [/\bAMD\b/g, 'A.M.D.'],
+
+  // ── Indices boursiers (composés en premier) ──
+  [/\bS&P 500\b/gi, 'essenne pi cinq cents'],
+  [/\bS\. and P\./g, 'essenne pi'],
+  [/\bS&P\b/gi, 'essenne pi'],
+  [/\bCAC 40\b/gi, 'caque karante'],
+  [/\bC\.A\.C\./g, 'caque'],
+  [/\bCAC\b/g, 'caque'],
+  [/\bDAX\b/gi, 'daxe'],
+  [/\bD\.A\.X\./g, 'daxe'],
+  [/\bFTSE\b/gi, 'fouttsi'],
+  [/\bF\.T\.S\.E\./g, 'fouttsi'],
+  [/\bKOSPI\b/gi, 'kospi'],
+  [/\bNasdaq\b/gi, 'nazdak'],
+  [/\bDow Jones\b/gi, 'daou djonnze'],
+  [/\bNikkei\b/gi, 'nikèï'],
+  [/\bVIX\b/gi, 'vixe'],
+  [/\bV\.I\.X\./g, 'vixe'],
+  [/\bRussell 2000\b/gi, 'reussèl deux mille'],
+  [/\bMSCI\b/gi, 'èmm-èss-ci-aï'],
+  [/\bM\.S\.C\.I\./g, 'èmm-èss-ci-aï'],
+
+  // ── Sigles épelés ──
+  [/\bW\.T\.I\.\b/g, 'doublevé té i'],
+  [/\bW\.T\.I\./g, 'doublevé té i'],
+  [/\bWTI\b/g, 'doublevé té i'],
+  [/\bDXY\b/g, 'D.X.Y.'],
+  [/\bRSI\b/g, 'R.S.I.'],
+  [/\bCOT\b/g, 'C.O.T.'],
+  [/\bSMA200\b/g, 'S.M.A. deux cents'],
+  [/\bSMA50\b/g, 'S.M.A. cinquante'],
+  [/\bSMA20\b/g, 'S.M.A. vingt'],
+  [/\bEMA\b/g, 'E.M.A.'],
+  [/\bCPI\b/g, 'C.P.I.'],
+  [/\bPMI\b/g, 'P.M.I.'],
+  [/\bUSDC\b/g, 'U.S.D.C.'],
+  [/\bUSDT\b/g, 'U.S.D.T.'],
+  [/\bAUD\b/g, 'A.U.D.'],
+
+  // ── Rattrapage sigles post-sanitize ──
+  [/\bE\.T\.F\./g, 'eutéèf'],
+  [/\bÉ\.T\.F\./g, 'eutéèf'],
+  [/\bETF\b/g, 'eutéèf'],
+
+  // ── Banques centrales ──
+  [/\bFed\b/g, 'Fède'],
+  [/\bBoJ\b/gi, 'Boge'],
+  [/\bBCE\b/g, 'B.C.E.'],
+  [/\bBoE\b/g, 'bi-eau-i'],
+  [/\bPBoC\b/g, 'pi-bi-eau-ci'],
+
+  // ── Prononciation française ──
+  [/\bquarante\b/g, 'karante'],
+];
+
+// ═══════════════════════════════════════════════════════════════
+// ÉTAPE 2 — C6 HAIKU (placement de pauses uniquement)
+// ═══════════════════════════════════════════════════════════════
 
 /**
  * Adapte les narrations pour Fish Audio TTS.
- * Traite par segments pour rester dans les limites de tokens Haiku.
  *
- * @param beats - Beats bruts avec narrationChunk
- * @param annotations - Annotations P7a.5 (emotion, pacing, isKeyMoment)
- * @returns TTSBeat[] avec texte adapté + preset Fish Audio
+ * 1. Pré-traite chaque beat avec preProcessForTTS() (code, déterministe)
+ * 2. Envoie le texte propre à C6 Haiku qui ajoute SEULEMENT des [pause]
+ * 3. Retourne le texte final prêt pour Fish Audio
  */
 export async function adaptForTTS(
   beats: Array<{
@@ -149,15 +327,19 @@ export async function adaptForTTS(
     const segBeats = beats.filter(b => b.segmentId === segId);
     console.log(`    C6 TTS adapt segment ${segId}: ${segBeats.length} beats...`);
 
+    // Step 1: Pre-process ALL beats with code (deterministic)
+    const preProcessed = new Map<string, string>();
+    for (const beat of segBeats) {
+      preProcessed.set(beat.id, preProcessForTTS(beat.narrationChunk));
+    }
+
+    // Step 2: Send pre-processed text to C6 for pause placement only
     const c6Input: C6Input = {
       beats: segBeats.map(b => {
         const ann = annotMap.get(b.id);
         return {
           beatId: b.id,
-          narration: b.narrationChunk,
-          emotion: ann?.emotion ?? 'contexte',
-          pacing: ann?.beatPacing ?? 'posé',
-          depth: b.segmentDepth,
+          narration: preProcessed.get(b.id)!,
           isSegmentStart: b.isSegmentStart,
           isSegmentEnd: b.isSegmentEnd,
           isKeyMoment: ann?.isKeyMoment ?? false,
@@ -176,15 +358,17 @@ export async function adaptForTTS(
 
       for (const beat of segBeats) {
         const ann = annotMap.get(beat.id);
-        const adapted = adaptedBeats.find(a => a.beatId === beat.id);
+        const c6Result = adaptedBeats.find(a => a.beatId === beat.id);
         const depth = beat.segmentDepth.toUpperCase();
         const pacing = ann?.beatPacing ?? 'posé';
 
-        const rawAdapted = adapted?.adapted ?? fallbackAdapt(beat.narrationChunk, ann);
+        // Use C6 result if available, otherwise use pre-processed text as-is
+        const adapted = c6Result?.adapted ?? preProcessed.get(beat.id)!;
+
         allResults.push({
           beatId: beat.id,
           original: beat.narrationChunk,
-          adapted: applyPronunciationFixes(rawAdapted),
+          adapted,
           fishPreset: depth === 'DEEP' ? 'DEEP'
             : depth === 'FLASH' ? 'FLASH'
             : PACING_TO_PRESET[pacing] ?? 'FOCUS',
@@ -192,12 +376,13 @@ export async function adaptForTTS(
       }
     } catch (err) {
       console.warn(`    C6 failed for ${segId}, using fallback: ${(err as Error).message.slice(0, 80)}`);
+      // Fallback: pre-processed text without pauses (still clean and pronounceable)
       for (const beat of segBeats) {
         const ann = annotMap.get(beat.id);
         allResults.push({
           beatId: beat.id,
           original: beat.narrationChunk,
-          adapted: applyPronunciationFixes(fallbackAdapt(beat.narrationChunk, ann)),
+          adapted: preProcessed.get(beat.id)!,
           fishPreset: 'FOCUS',
         });
       }
@@ -252,7 +437,7 @@ function convertNumbersToFrench(text: string): string {
   };
 
   let result = text;
-  // First: merge space-separated thousands (3 450 → 3450, 1 000 000 → 1000000)
+  // Merge space-separated thousands (3 450 → 3450)
   let prev = '';
   while (prev !== result) {
     prev = result;
@@ -266,103 +451,10 @@ function convertNumbersToFrench(text: string): string {
   result = result.replace(/(\d+)[.,](\d+)\s*\$/g, (_, a, b) => `${numberToFrench(a)} dollars ${numberToFrench(b)}`);
   // Prices without decimals
   result = result.replace(/(\d+)\s*\$/g, (_, n) => `${numberToFrench(n)} dollars`);
-  // Plain numbers (up to 999 999 999)
+  // Euro prices
+  result = result.replace(/(\d+)[.,](\d+)\s*€/g, (_, a, b) => `${numberToFrench(a)} euros ${numberToFrench(b)}`);
+  result = result.replace(/(\d+)\s*€/g, (_, n) => `${numberToFrench(n)} euros`);
+  // Plain numbers
   result = result.replace(/\b(\d{1,9})\b/g, (_, n) => numberToFrench(n));
   return result;
-}
-
-// ─── Pronunciation fixes (Fish Audio quirks) ────────────────────
-
-/**
- * Words Fish Audio mispronounces or reads in wrong language.
- * Key = word as written, Value = phonetic hint for Fish Audio.
- */
-const PRONUNCIATION_FIXES: [RegExp, string][] = [
-  // Fish Audio stutters on "grimpe" → force clean pronunciation
-  [/\bgrimpe\b/gi, 'grimp'],
-  [/\bgrimpé\b/gi, 'grimpé'],
-  [/\bgrimper\b/gi, 'grimper'],
-  // English finance terms Fish Audio reads as French
-  [/\bpricer\b/gi, 'praille-cé'],
-  [/\bpricing\b/gi, 'praille-cingue'],
-  [/\bpricé\b/gi, 'praïcé'],
-  [/\bprice\b/gi, 'praïce'],
-  [/\bpricait\b/gi, 'praïcait'],
-  [/\bpricent\b/gi, 'praïcent'],
-  [/\bspread\b/gi, 'sprèdd'],
-  [/\bshort squeeze\b/gi, 'shorte skouize'],
-  [/\bsqueeze\b/gi, 'skouize'],
-  [/\bdead cat bounce\b/gi, 'dèdd catt baounnce'],
-  [/\bdeath cross\b/gi, 'dèss crosse'],
-  [/\bbull run\b/gi, 'boull reune'],
-  [/\bbullish\b/gi, 'boulliche'],
-  [/\bbearish\b/gi, 'bèriche'],
-  [/\brisk-off\b/gi, 'risque-off'],
-  [/\brisk-on\b/gi, 'risque-on'],
-  [/\bhedge\b/gi, 'hèdje'],
-  [/\bhedging\b/gi, 'hèdjingue'],
-  [/\btrading\b/gi, 'trèdingue'],
-  [/\btrader\b/gi, 'trèdeur'],
-  [/\btraders\b/gi, 'trèdeurse'],
-  // Indices boursiers (both raw and post-sanitize forms)
-  [/\bS&P 500\b/gi, 'èss-enne-pi cinq cents'],
-  [/\bS\. and P\./g, 'èss-enne-pi'],
-  [/\bS&P\b/gi, 'èss-enne-pi'],
-  [/\bCAC 40\b/gi, 'caque quarante'],
-  [/\bC\.A\.C\./g, 'caque'],
-  [/\bCAC\b/g, 'caque'],
-  [/\bDAX\b/gi, 'daxe'],
-  [/\bD\.A\.X\./g, 'daxe'],
-  [/\bFTSE\b/gi, 'fouttsi'],
-  [/\bF\.T\.S\.E\./g, 'fouttsi'],
-  [/\bKOSPI\b/gi, 'kospi'],
-  [/\bNasdaq\b/gi, 'nazdak'],
-  [/\bDow Jones\b/gi, 'daou djonnze'],
-  [/\bNikkei\b/gi, 'nikèï'],
-  [/\bVIX\b/gi, 'vixe'],
-  [/\bV\.I\.X\./g, 'vixe'],
-  [/\bRussell 2000\b/gi, 'reussèl deux mille'],
-  [/\bMSCI\b/gi, 'èmm-èss-ci-aï'],
-  [/\bM\.S\.C\.I\./g, 'èmm-èss-ci-aï'],
-  // Mots prononcés tels quels (pas épelés) — rattrapage post-sanitize
-  [/\bE\.T\.F\./g, 'ETF'],
-  [/\bÉ\.T\.F\./g, 'ETF'],
-];
-
-function applyPronunciationFixes(text: string): string {
-  let result = text;
-  for (const [pattern, replacement] of PRONUNCIATION_FIXES) {
-    result = result.replace(pattern, replacement);
-  }
-  return result;
-}
-
-// ─── Fallback mécanique (si Haiku échoue) ───────────────────────
-
-function fallbackAdapt(text: string, ann?: BeatAnnotation): string {
-  let adapted = text;
-
-  // Convert numbers to French first
-  adapted = convertNumbersToFrench(adapted);
-
-  // Supprimer références visuelles
-  adapted = adapted.replace(/comme (vous pouvez |on (peut )?)?le (voir|constater) (sur (le|ce) graphique)?/gi, '');
-  adapted = adapted.replace(/observez /gi, '');
-  adapted = adapted.replace(/ci-dessous/gi, '');
-  adapted = adapted.replace(/\s{2,}/g, ' ').trim();
-
-  // Ajouter tag émotion basé sur annotation
-  if (ann) {
-    const tag = EMOTION_TAG_MAP[ann.emotion];
-    if (tag) {
-      adapted = `${tag} ${adapted}`;
-    }
-  }
-
-  // Ajouter [pause] en début de segment
-  if (ann?.isKeyMoment) {
-    adapted = `[pause] ${adapted}`;
-  }
-
-  return adapted;
 }

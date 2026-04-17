@@ -122,18 +122,24 @@ Pour CHAQUE beat:
 
 1. **primaryAsset** (string|null): Identifie l'actif principal mentionné (symbole ticker exact). Résous les pronoms en lisant les beats précédents. Si aucun actif: null.
 
-2. **overlayType** (enum): Classe le type d'overlay visuel:
-   - 'chart': Quand la narration mentionne un PRIX, un NIVEAU technique (support, résistance, SMA, moyenne mobile), ou un RSI → TOUJOURS chart. Inclure levels et rsi dans overlaySpec.
-   - 'stat': Quand la narration donne un CHIFFRE CLÉ (variation %, prix absolu, volume) SANS contexte de niveaux techniques → stat avec count-up animé
-   - 'causal_chain': Quand la narration EXPLIQUE un mécanisme cause→effet entre actifs
-   - 'scenario_fork': Quand la narration présente des SCÉNARIOS haussier/baissier avec cibles
+2. **overlayType** (enum): Classe le type d'overlay visuel. RESPECTE CET ORDRE DE PRIORITÉ — en cas de doute, choisis le type le plus haut dans la liste :
+
+   **PRIORITÉ 1 — GRAPHIQUES (c'est une chaîne de FINANCE, le spectateur veut VOIR les courbes) :**
+   - 'chart': Dès qu'un PRIX, NIVEAU technique, support, résistance, SMA, moyenne mobile, ou seuil est mentionné → TOUJOURS chart. C'est le type par DÉFAUT pour une chaîne financière. Inclure levels dans overlaySpec. Si la narration parle d'un actif et de son prix, c'est un chart.
+   - 'spread_chart': Quand la narration parle d'un SPREAD ou ÉCART entre deux actifs. Affiche les deux courbes superposées.
    - 'gauge': RSI extrême (<30 ou >70), Fear&Greed, VIX → jauge circulaire
+
+   **PRIORITÉ 2 — DONNÉES :**
+   - 'stat': Quand la narration donne un CHIFFRE CLÉ (variation %, volume) SANS prix ni niveau technique → stat avec count-up animé
    - 'comparison': Quand la narration COMPARE explicitement 2+ actifs côte à côte
-   - 'spread_chart': Quand la narration parle d'un SPREAD ou ÉCART entre deux actifs (ex: "spread WTI-Brent", "écart 10 ans - 2 ans", "courbe des taux"). Affiche les deux courbes superposées.
+
+   **PRIORITÉ 3 — CONTEXTE :**
+   - 'causal_chain': UNIQUEMENT quand la narration explique un mécanisme cause→effet ET qu'aucun prix/niveau n'est mentionné dans le beat. Si un prix est cité dans le même beat, utiliser 'chart' à la place.
+   - 'scenario_fork': Quand la narration présente des SCÉNARIOS haussier/baissier avec cibles
    - 'headline': Quand la narration cite une ACTUALITÉ spécifique ou déclaration politique
    - 'none': Transitions, contexte général, respiration — pas de données à afficher
 
-   RÈGLE CRITIQUE : dès que la narration cite un PRIX ou NIVEAU (ex: "à 6506", "SMA 200 à 6624", "résistance à 99", "RSI à 30"), c'est TOUJOURS un chart ou gauge, JAMAIS "none".
+   RÈGLE CRITIQUE : dès que la narration cite un PRIX ou NIVEAU (ex: "à 6506", "SMA 200 à 6624", "résistance à 99", "RSI à 30", "clôture à 88 dollars"), c'est TOUJOURS un chart ou gauge, JAMAIS stat, causal_chain, ou none. Le CHART est le cœur visuel de la chaîne — vise minimum 25% de beats avec chart/spread_chart.
 
 3. **overlaySpec** (object|null): Données structurées type-spécifiques:
    - chart: { asset, levels: [support, resistance], type: "price_line"|"zone_highlight"|... }
@@ -179,8 +185,9 @@ Pour CHAQUE beat:
 
 - **Chaîne causale = ce que le narrateur enseigne MAINTENANT**: Si overlayType='causal_chain', lis le narrationChunk du beat et extrais le MÉCANISME que le narrateur est en train d'expliquer. Les steps illustrent la logique de la narration en cours, pas un résumé du segment. Si le narrateur dit "quand les taux montent, l'or perd de son attrait", les steps doivent être : "Taux réels montent → Coût d'opportunité augmente → Or moins attractif vs obligations → Pression vendeuse". Chaque step est un maillon du raisonnement, pas un fait daté.
 - **Extraction numérique**: "un virgule cinquante et un pour cent" → {value: 1.51, format: "%"}
-- **Ratio overlay**: Max 65% de beats avec overlay (non-'none') — privilégie les données visuelles
+- **Ratio overlay**: Max 65% de beats avec overlay (non-'none'). Minimum 25% de beats avec chart ou spread_chart — le spectateur regarde une chaîne de FINANCE, il veut voir des courbes.
 - **Pas 3 consécutifs**: Interdiction de 3 beats consécutifs avec le même overlayType
+- **causal_chain ≤ 15%**: Ne pas sur-indexer sur les chaînes causales textuelles — si tu hésites entre causal_chain et chart, choisis chart.
 - **Asset validation**: primaryAsset doit exister dans la snapshot ou être null
 - **triggerWord**: Doit être trouvé dans narrationChunk (case-insensitive)
 - **Stat plausibilité**: % ≤ 50, niveaux chart ±50% autour du prix spot

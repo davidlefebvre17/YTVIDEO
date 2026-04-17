@@ -35,6 +35,8 @@ export interface FishTTSOptions {
   topP?: number;
   /** Repetition penalty to avoid monotone (default 1.2) */
   repetitionPenalty?: number;
+  /** Disable text normalization — required for phoneme tags (default true) */
+  normalize?: boolean;
 }
 
 export interface FishTTSResult {
@@ -42,12 +44,12 @@ export interface FishTTSResult {
   bytes: number;
 }
 
-/** Presets par type de segment — speed uniforme 0.90 */
+/** Presets par type de segment — uniforme, dynamique et percutant */
 export const FISH_PRESETS = {
-  DEEP: { speed: 0.90, temperature: 0.7, topP: 0.8, repetitionPenalty: 1.2 },
-  FOCUS: { speed: 0.90, temperature: 0.75, topP: 0.8, repetitionPenalty: 1.2 },
-  FLASH: { speed: 0.90, temperature: 0.8, topP: 0.85, repetitionPenalty: 1.1 },
-  COLD_OPEN: { speed: 0.90, temperature: 0.8, topP: 0.85, repetitionPenalty: 1.2 },
+  DEEP: { speed: 0.95, temperature: 0.6, topP: 0.8, repetitionPenalty: 1.2 },
+  FOCUS: { speed: 0.95, temperature: 0.6, topP: 0.8, repetitionPenalty: 1.2 },
+  FLASH: { speed: 0.95, temperature: 0.6, topP: 0.8, repetitionPenalty: 1.2 },
+  COLD_OPEN: { speed: 0.95, temperature: 0.6, topP: 0.8, repetitionPenalty: 1.2 },
 } as const;
 
 function getFishConfig() {
@@ -78,7 +80,7 @@ export async function fishTTS(opts: FishTTSOptions): Promise<FishTTSResult> {
   const body: Record<string, unknown> = {
     text: opts.text,
     format,
-    normalize: true,
+    normalize: opts.normalize ?? true,
     temperature: opts.temperature ?? 0.7,
     top_p: opts.topP ?? 0.8,
     repetition_penalty: opts.repetitionPenalty ?? 1.2,
