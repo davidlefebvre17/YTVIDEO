@@ -83,25 +83,26 @@ Placer des tags [pause] dans le texte pour guider le rythme et l'intonation de l
 
 ## Le tag [pause]
 - Silence court (~0.3s) qui force la voix à redescendre en intonation
-- Place-le : entre deux idées, avant un chiffre clé, après une révélation, aux fins de phrases importantes
-- NE PAS en mettre après CHAQUE point — seulement quand le rythme le demande
-- Maximum 3-4 [pause] par beat — trop de pauses casse le flow
+- Place-le APRÈS un point (.) — quand la phrase finit et l'idée change, la pause marque la fin
+- JAMAIS après une virgule (,) — la virgule crée déjà sa propre micro-respiration, ajouter [pause] casse le flow et donne un effet saccadé
+- Pas obligatoire après CHAQUE point — seulement quand la phrase qui finit marque une vraie rupture d'idée
+- Maximum 2-3 [pause] par beat — trop de pauses casse le flow
 
 ## RÈGLES ABSOLUES
 1. **NE CHANGE AUCUN MOT.** Pas un seul. Le texte est déjà prêt. Tu ajoutes SEULEMENT des [pause].
 2. **NE reformule PAS.** NE coupe PAS les phrases. NE réarrange PAS l'ordre des mots.
 3. **NE phonétise PAS.** La prononciation est déjà gérée par le code. Si tu vois "essenne pi" ou "praïcé", laisse tel quel.
 4. **NE supprime PAS de texte.** Chaque mot de l'input doit se retrouver dans l'output.
-5. **isSegmentStart=true** → commencer par [pause].
-6. **isSegmentEnd=true** → ajouter [pause] avant les 3 derniers mots pour marquer la descente finale.
-7. **isKeyMoment=true** → ajouter [pause] avant le passage clé.
+5. **JAMAIS [pause] après une virgule.** La virgule = respiration naturelle, le [pause] = fin d'idée.
+6. **JAMAIS [pause] au début d'un beat isSegmentStart=true.** Les segments sont déjà joints par owl transitions, ajouter une pause au début crée un silence inutile.
+7. **JAMAIS [pause] à la fin d'un beat isSegmentEnd=true.** La pause en fin de segment se confond avec la pause naturelle du changement de segment — ça fait une double respiration qui saccade. Terminer le beat sur le dernier mot, point final.
+8. **isKeyMoment=true** → [pause] AVANT le passage clé (pas après).
 
 ## Où placer les pauses (guide)
-- Avant un contraste ("mais", "sauf que", "pourtant") → [pause] optionnel pour créer l'effet
-- Après une révélation ou une punchline → [pause] pour laisser le temps d'absorber
-- Avant un chiffre important → [pause] pour créer l'attente
-- Entre deux idées distinctes dans un même beat
-- PAS entre chaque phrase — ça saccade le récit
+- Après un point qui ferme une idée majeure → [pause] pour laisser absorber
+- Avant un contraste ("Mais", "Sauf que", "Pourtant") en début de phrase → [pause] AVANT pour créer l'effet
+- Avant un chiffre important qui arrive → [pause] pour créer l'attente
+- PAS après une virgule, PAS en début/fin de segment
 
 ## Output JSON
 \`\`\`json
@@ -190,13 +191,17 @@ const ALL_PRONUNCIATION_FIXES: [RegExp, string][] = [
   [/\bSemiconductor\b/gi, 'Semi-conducteur'],
 
   // ── Anglicismes (testés 2026-04-16 : phonétisation nécessaire) ──
-  // NB: \b ne marche PAS avec les accents en JS — utiliser (?<=\s|^) et (?=\s|$|[.,;:!?]) pour les mots accentués
-  [/\bpricer\b/gi, 'praille-cé'],
-  [/\bpricing\b/gi, 'praille-cingue'],
+  // ── Anglicismes : PAS de remplacement en code ──
+  // Les anglicismes doivent être éliminés par Opus (prompt C3 axe 2).
+  // Le code ne peut pas remplacer car la grammaire de la phrase dépend du mot.
+  // Seule exception : la phonétisation pour les mots qu'Opus pourrait encore laisser passer
+  // et que Fish Audio ne prononce pas correctement en raw.
   [/(?<=\s|^)pricé(?=\s|$|[.,;:!?])/gi, 'praïcé'],
-  [/\bprice\b/gi, 'praïce'],
   [/(?<=\s|^)pricait(?=\s|$|[.,;:!?])/gi, 'praïçait'],
   [/(?<=\s|^)pricent(?=\s|$|[.,;:!?])/gi, 'praïcent'],
+  [/\bpricer\b/gi, 'praille-cé'],
+  [/\bpricing\b/gi, 'praille-cingue'],
+  [/\bprice\b/gi, 'praïce'],
   [/\bbull run\b/gi, 'boull reune'],
   [/\bbullish\b/gi, 'boulliche'],
   [/\bbearish\b/gi, 'bèriche'],

@@ -11,7 +11,7 @@
       "le Dow",
       "le Dow Jones"
     ],
-    "phonetic": "dao-djonze"
+    "phonetic": "do djonnze"
   },
   {
     "symbol": "^FCHI",
@@ -25,7 +25,7 @@
       "le CAC",
       "la Bourse de Paris"
     ],
-    "phonetic": "kak-karante"
+    "phonetic": "caque karante"
   },
   {
     "symbol": "^FTSE",
@@ -40,7 +40,7 @@
       "la City",
       "Londres"
     ],
-    "phonetic": "foutsie-cent"
+    "phonetic": "fouttsi cent"
   },
   {
     "symbol": "^FVX",
@@ -53,7 +53,7 @@
     "aliases": [
       "le cinq ans"
     ],
-    "phonetic": "u-esse-cinq-ans"
+    "phonetic": "yu èss cinq ans"
   },
   {
     "symbol": "^GDAXI",
@@ -82,7 +82,7 @@
       "le S&P",
       "l'indice américain"
     ],
-    "phonetic": "esse-et-pi-cinq-cents"
+    "phonetic": "èsse et pi cinq cents"
   },
   {
     "symbol": "^HSI",
@@ -96,7 +96,7 @@
       "le Hang Seng",
       "Hong Kong"
     ],
-    "phonetic": "ang-seng"
+    "phonetic": "ang seng"
   },
   {
     "symbol": "^IRX",
@@ -109,7 +109,7 @@
     "aliases": [
       "le trois mois"
     ],
-    "phonetic": "u-esse-trois-mois"
+    "phonetic": "yu èss trois mois"
   },
   {
     "symbol": "^IXIC",
@@ -123,7 +123,7 @@
       "le Nasdaq",
       "la tech américaine"
     ],
-    "phonetic": "nazdak-kompozite"
+    "phonetic": "nazdac composite"
   },
   {
     "symbol": "^KS11",
@@ -137,7 +137,7 @@
       "le KOSPI",
       "Séoul"
     ],
-    "phonetic": "kospi"
+    "phonetic": "cospi"
   },
   {
     "symbol": "^N225",
@@ -151,7 +151,7 @@
       "le Nikkei",
       "Tokyo"
     ],
-    "phonetic": "nikéï-deux-cent-vingt-cinq"
+    "phonetic": "nikkèï deux cent vingt cinq"
   },
   {
     "symbol": "^STOXX",
@@ -165,7 +165,7 @@
       "le Stoxx",
       "les marchés européens"
     ],
-    "phonetic": "euro-stoks-six-cents"
+    "phonetic": "euro stocks six cents"
   },
   {
     "symbol": "^TNX",
@@ -180,7 +180,7 @@
       "le 10Y",
       "le taux long"
     ],
-    "phonetic": "u-esse-dix-ans"
+    "phonetic": "yu èss dix ans"
   },
   {
     "symbol": "^TYX",
@@ -193,7 +193,7 @@
     "aliases": [
       "le trente ans"
     ],
-    "phonetic": "u-esse-trente-ans"
+    "phonetic": "yu èss trente ans"
   },
   {
     "symbol": "^VIX",
@@ -208,7 +208,7 @@
       "le VIX",
       "le baromètre de la peur"
     ],
-    "phonetic": "viks"
+    "phonetic": "vikss"
   },
   {
     "symbol": "000001.SS",
@@ -222,7 +222,7 @@
       "Shanghai",
       "la Bourse de Shanghai"
     ],
-    "phonetic": "changaï-kompozite"
+    "phonetic": "shanghai composite"
   },
   {
     "symbol": "0001.HK",
@@ -232,7 +232,7 @@
     "correlation": "Conglomérat HK — CK Hutchison",
     "index": "HSI30",
     "description": "Li Ka-shing's conglomerate — ports, telecoms, retail, energy, infrastructure",
-    "phonetic": "cé-ka-utchissone"
+    "phonetic": "ci ka hutchison"
   },
   {
     "symbol": "0002.HK",
@@ -242,7 +242,7 @@
     "correlation": "Défensif HK — CLP Holdings",
     "index": "HSI30",
     "description": "Hong Kong electric utility, power generation across Asia-Pacific",
-    "phonetic": "cé-elle-pé-oldingz"
+    "phonetic": "ci èl pé holdings"
   },
   {
     "symbol": "0003.HK",
@@ -252,7 +252,7 @@
     "correlation": "Gaz HK — HK & China Gas",
     "index": "HSI30",
     "description": "Hong Kong & mainland China gas distribution, oldest utility in HK",
-    "phonetic": "ache-ka-et-tchaïna-gaz"
+    "phonetic": "ache ka et chine gaz"
   },
   {
     "symbol": "0005.HK",
@@ -262,7 +262,7 @@
     "correlation": "Yields, Asie — HSBC HK",
     "index": "HSI30",
     "description": "Global bank headquartered in London, major Asia/Europe presence",
-    "phonetic": "ache-esse-bé-cé-oldingz"
+    "phonetic": "ache èsse bé ci holdings"
   },
   {
     "symbol": "0006.HK",
@@ -272,7 +272,7 @@
     "correlation": "Énergie HK — Power Assets",
     "index": "HSI30",
     "description": "International power investment holding, Li Ka-shing group",
-    "phonetic": "paouer-assèts"
+    "phonetic": "power assets"
   },
   {
     "symbol": "0011.HK",
@@ -282,7 +282,7 @@
     "correlation": "Immobilier HK — Hang Seng Bank",
     "index": "HSI30",
     "description": "Major Hong Kong retail bank, subsidiary of HSBC",
-    "phonetic": "ang-seng-banke"
+    "phonetic": "ang seng bank"
   },
   {
     "symbol": "0012.HK",
@@ -292,7 +292,7 @@
     "correlation": "Immobilier HK — Henderson Land",
     "index": "HSI30",
     "description": "Major Hong Kong property developer, residential & commercial",
-    "phonetic": "èndeursone-lande"
+    "phonetic": "henderson land"
   },
   {
     "symbol": "0016.HK",
@@ -302,7 +302,7 @@
     "correlation": "Immobilier HK — SHK Properties",
     "index": "HSI30",
     "description": "Hong Kong's largest property developer by market cap",
-    "phonetic": "seune-ong-kaï-propeurtiize"
+    "phonetic": "seune oung kaï properties"
   },
   {
     "symbol": "0017.HK",
@@ -312,7 +312,7 @@
     "correlation": "Immobilier HK — New World Development",
     "index": "HSI30",
     "description": "Hong Kong property developer, also hotels & infrastructure",
-    "phonetic": "niou-weurlde-dévélopmènte"
+    "phonetic": "new world development"
   },
   {
     "symbol": "0388.HK",
@@ -322,7 +322,7 @@
     "correlation": "Volumes HK — HKEX",
     "index": "HSI30",
     "description": "Operator of Hong Kong Stock Exchange, connects global capital to China",
-    "phonetic": "ong-kong-ekstchéïndjize"
+    "phonetic": "hong kong exchanges"
   },
   {
     "symbol": "0669.HK",
@@ -332,7 +332,7 @@
     "correlation": "Outillage, Milwaukee — Techtronic",
     "index": "HSI30",
     "description": "Power tools maker (Milwaukee, Ryobi brands), HK-based global manufacturer",
-    "phonetic": "tèktronik-indeustriize"
+    "phonetic": "techtronic industries"
   },
   {
     "symbol": "0688.HK",
@@ -342,7 +342,7 @@
     "correlation": "Immobilier Chine — China Overseas Land",
     "index": "HSI30",
     "description": "One of China's largest state-backed property developers",
-    "phonetic": "tchaïna-oveursiize-lande"
+    "phonetic": "chine overseas land"
   },
   {
     "symbol": "0700.HK",
@@ -356,7 +356,7 @@
       "Tencent",
       "le géant tech chinois"
     ],
-    "phonetic": "tèncènte-oldingz"
+    "phonetic": "tencent holdings"
   },
   {
     "symbol": "0762.HK",
@@ -366,7 +366,7 @@
     "correlation": "Télécom Chine — China Unicom",
     "index": "HSI30",
     "description": "China's second-largest mobile operator, state-owned telecom",
-    "phonetic": "tchaïna-yunikome"
+    "phonetic": "chine unicom"
   },
   {
     "symbol": "0883.HK",
@@ -376,7 +376,7 @@
     "correlation": "CL=F ↑↑, pétrole offshore Chine — CNOOC",
     "index": "HSI30",
     "description": "China's largest offshore oil & gas producer, major crude explorer",
-    "phonetic": "cé-ène-o-o-cé"
+    "phonetic": "ci ène o o ci"
   },
   {
     "symbol": "0939.HK",
@@ -386,7 +386,7 @@
     "correlation": "Banque Chine — CCB",
     "index": "HSI30",
     "description": "One of China's Big Four state-owned banks, infrastructure lending",
-    "phonetic": "tchaïna-konstreukcheune-banke"
+    "phonetic": "chine construction bank"
   },
   {
     "symbol": "0941.HK",
@@ -396,7 +396,7 @@
     "correlation": "Télécom Chine — China Mobile",
     "index": "HSI30",
     "description": "China's largest mobile telecom operator, 950M+ subscribers",
-    "phonetic": "tchaïna-mobaïle"
+    "phonetic": "chine mobile"
   },
   {
     "symbol": "0960.HK",
@@ -406,7 +406,7 @@
     "correlation": "Immobilier Chine — Longfor",
     "index": "HSI30",
     "description": "Chinese private property developer, also mall operator",
-    "phonetic": "longfor-propeurtiize"
+    "phonetic": "longfor properties"
   },
   {
     "symbol": "1038.HK",
@@ -416,7 +416,7 @@
     "correlation": "Énergie HK — CK Infrastructure",
     "index": "HSI30",
     "description": "Global infrastructure group — utilities, transport, waste, Li Ka-shing empire",
-    "phonetic": "cé-ka-infrastreuktcheure"
+    "phonetic": "ci ka infrastructure"
   },
   {
     "symbol": "1093.HK",
@@ -426,7 +426,7 @@
     "correlation": "Pharma Chine — CSPC",
     "index": "HSI30",
     "description": "Chinese pharmaceutical company, generics & innovative drugs",
-    "phonetic": "cé-esse-pé-cé-farmasseutikale"
+    "phonetic": "ci èsse pé ci pharmaceutique"
   },
   {
     "symbol": "1177.HK",
@@ -436,7 +436,7 @@
     "correlation": "Pharma Chine — Sino Biopharma",
     "index": "HSI30",
     "description": "Chinese pharmaceutical group, oncology & hepatitis drugs",
-    "phonetic": "sino-bio-farmasseutikale"
+    "phonetic": "sino bio pharmaceutique"
   },
   {
     "symbol": "1299.HK",
@@ -446,7 +446,7 @@
     "correlation": "Asie, yields — AIA Group",
     "index": "HSI30",
     "description": "Asia's largest life insurance group, 18 markets across Asia-Pacific",
-    "phonetic": "a-i-a-groupe"
+    "phonetic": "a i a groupe"
   },
   {
     "symbol": "1398.HK",
@@ -456,7 +456,7 @@
     "correlation": "Banque Chine — ICBC",
     "index": "HSI30",
     "description": "Industrial & Commercial Bank of China — world's largest bank by assets",
-    "phonetic": "i-cé-bé-cé"
+    "phonetic": "i ci bé ci"
   },
   {
     "symbol": "1COV.DE",
@@ -466,7 +466,7 @@
     "correlation": "Cycle industriel — Covestro, polymères",
     "index": "DAX40",
     "description": "German specialty chemicals, polycarbonates & polyurethanes, ex-Bayer",
-    "phonetic": "kovèstro"
+    "phonetic": "covestro"
   },
   {
     "symbol": "2269.HK",
@@ -476,7 +476,7 @@
     "correlation": "Pharma Chine — WuXi Biologics",
     "index": "HSI30",
     "description": "Chinese biotech contract manufacturer (CDMO), global biologics outsourcing",
-    "phonetic": "ou-chi-baïolodjiksz"
+    "phonetic": "wouxi biologics"
   },
   {
     "symbol": "2318.HK",
@@ -486,7 +486,7 @@
     "correlation": "Chine, yields — Ping An",
     "index": "HSI30",
     "description": "China's largest private insurer, also fintech/healthtech conglomerate",
-    "phonetic": "ping-ane-inchourancee"
+    "phonetic": "ping ane insurance"
   },
   {
     "symbol": "2382.HK",
@@ -496,7 +496,7 @@
     "correlation": "Optique, smartphones — Sunny Optical",
     "index": "HSI30",
     "description": "Chinese optical lens & camera module maker, supplier to smartphone OEMs",
-    "phonetic": "seuni-optikale"
+    "phonetic": "sunny optical"
   },
   {
     "symbol": "3382.T",
@@ -506,7 +506,7 @@
     "correlation": "Consommateur JP — Seven & i Holdings",
     "index": "NIKKEI50",
     "description": "Parent of 7-Eleven convenience stores, world's largest convenience chain",
-    "phonetic": "sèvène-et-aï-oldingz"
+    "phonetic": "sèven et i holdings"
   },
   {
     "symbol": "3690.HK",
@@ -520,7 +520,7 @@
       "Meituan",
       "le géant de la livraison chinois"
     ],
-    "phonetic": "méï-touane"
+    "phonetic": "méï touane"
   },
   {
     "symbol": "399001.SZ",
@@ -533,7 +533,7 @@
     "aliases": [
       "Shenzhen"
     ],
-    "phonetic": "chèndjène-komponènte"
+    "phonetic": "shenzhen composant"
   },
   {
     "symbol": "4063.T",
@@ -543,7 +543,7 @@
     "correlation": "Semi-conducteurs, silicone — Shin-Etsu Chemical",
     "index": "NIKKEI50",
     "description": "World's largest producer of PVC & silicon wafers for semiconductors",
-    "phonetic": "chine-ètsou-kémikale"
+    "phonetic": "shin etsou chemical"
   },
   {
     "symbol": "4502.T",
@@ -553,7 +553,7 @@
     "correlation": "Pharma — Takeda",
     "index": "NIKKEI50",
     "description": "Japan's largest pharma company, global presence in GI, oncology, neuroscience",
-    "phonetic": "takéda-farmasseutikale"
+    "phonetic": "takéda pharmaceutique"
   },
   {
     "symbol": "4507.T",
@@ -573,7 +573,7 @@
     "correlation": "Pharma, oncologie — Chugai Pharma",
     "index": "NIKKEI50",
     "description": "Japanese pharma, majority-owned by Roche, oncology & antibody drugs",
-    "phonetic": "tchougaï-farmasseutikale"
+    "phonetic": "chougaï pharmaceutique"
   },
   {
     "symbol": "4543.T",
@@ -593,7 +593,7 @@
     "correlation": "Pharma, vaccins — Daiichi Sankyo",
     "index": "NIKKEI50",
     "description": "Japanese pharma, breakthrough antibody-drug conjugates (Enhertu with AstraZeneca)",
-    "phonetic": "daïitchi-sankyo"
+    "phonetic": "daïitchi sankyo"
   },
   {
     "symbol": "4661.T",
@@ -603,7 +603,7 @@
     "correlation": "Tokyo Disney — Oriental Land",
     "index": "NIKKEI50",
     "description": "Operator of Tokyo Disney Resort (Disneyland & DisneySea)",
-    "phonetic": "orièntal-lande"
+    "phonetic": "oriental land"
   },
   {
     "symbol": "4704.T",
@@ -613,7 +613,7 @@
     "correlation": "Cybersécurité — Trend Micro",
     "index": "NIKKEI50",
     "description": "Japanese-American cybersecurity company, enterprise antivirus & cloud security",
-    "phonetic": "trènde-mikro"
+    "phonetic": "trend micro"
   },
   {
     "symbol": "4911.T",
@@ -623,7 +623,7 @@
     "correlation": "Cosmétiques, Chine — Shiseido",
     "index": "NIKKEI50",
     "description": "Japan's largest cosmetics company, luxury skincare & beauty, global brand",
-    "phonetic": "chissédo"
+    "phonetic": "chisséido"
   },
   {
     "symbol": "5108.T",
@@ -633,7 +633,7 @@
     "correlation": "Pneus, cycle auto — Bridgestone",
     "index": "NIKKEI50",
     "description": "World's largest tire manufacturer, Japanese multinational",
-    "phonetic": "bridjstone"
+    "phonetic": "bridgestone"
   },
   {
     "symbol": "6098.T",
@@ -643,7 +643,7 @@
     "correlation": "Recrutement, RH — Recruit Holdings",
     "index": "NIKKEI50",
     "description": "Japanese HR & staffing conglomerate, owns Indeed and Glassdoor",
-    "phonetic": "rikroute-oldingz"
+    "phonetic": "recrouit holdings"
   },
   {
     "symbol": "6273.T",
@@ -653,7 +653,7 @@
     "correlation": "Pelles mécaniques — SMC Corp",
     "index": "NIKKEI50",
     "description": "World leader in pneumatic automation components, factory equipment",
-    "phonetic": "esse-ème-cé-korporécheune"
+    "phonetic": "èsse èm ci corporation"
   },
   {
     "symbol": "6367.T",
@@ -663,7 +663,7 @@
     "correlation": "Climatisation, industrie — Daikin",
     "index": "NIKKEI50",
     "description": "World's largest air conditioning manufacturer, Japanese HVAC leader",
-    "phonetic": "daïkine-indeustriize"
+    "phonetic": "daïkine industries"
   },
   {
     "symbol": "6501.T",
@@ -683,7 +683,7 @@
     "correlation": "Batteries EV, électronique — Panasonic",
     "index": "NIKKEI50",
     "description": "Japanese electronics group, major Tesla battery supplier (EV batteries)",
-    "phonetic": "panasonik"
+    "phonetic": "panasonic"
   },
   {
     "symbol": "6758.T",
@@ -696,7 +696,7 @@
     "aliases": [
       "Sony"
     ],
-    "phonetic": "soni-groupe"
+    "phonetic": "sony groupe"
   },
   {
     "symbol": "6861.T",
@@ -706,7 +706,7 @@
     "correlation": "Automatisation — Keyence",
     "index": "NIKKEI50",
     "description": "Japanese industrial automation & sensors maker, extremely high margins",
-    "phonetic": "kiènce"
+    "phonetic": "kienss"
   },
   {
     "symbol": "6902.T",
@@ -716,7 +716,7 @@
     "correlation": "Pièces auto, Toyota supplier — Denso",
     "index": "NIKKEI50",
     "description": "World's second-largest auto parts supplier, Toyota affiliate, EV components",
-    "phonetic": "dènso"
+    "phonetic": "denso"
   },
   {
     "symbol": "6954.T",
@@ -726,7 +726,7 @@
     "correlation": "Automatisation, robots — Fanuc",
     "index": "NIKKEI50",
     "description": "World leader in industrial robots & CNC machine tools, factory automation",
-    "phonetic": "fanouk"
+    "phonetic": "fanouc"
   },
   {
     "symbol": "7011.T",
@@ -736,7 +736,7 @@
     "correlation": "Défense JP, turbines — MHI",
     "index": "NIKKEI50",
     "description": "Japanese defense, energy & aerospace conglomerate — turbines, ships, rockets",
-    "phonetic": "mitssoubichi-èvi-indeustriize"
+    "phonetic": "mitsoubichi évi industries"
   },
   {
     "symbol": "7203.T",
@@ -750,7 +750,7 @@
       "Toyota",
       "le premier constructeur mondial"
     ],
-    "phonetic": "toyota-moteur"
+    "phonetic": "toyota motor"
   },
   {
     "symbol": "7267.T",
@@ -760,7 +760,7 @@
     "correlation": "JPY, tarifs — Honda",
     "index": "NIKKEI50",
     "description": "Japanese automaker & motorcycle manufacturer, also robotics & aviation",
-    "phonetic": "onda-moteur"
+    "phonetic": "onda motor"
   },
   {
     "symbol": "7733.T",
@@ -770,7 +770,7 @@
     "correlation": "Endoscopie — Olympus",
     "index": "NIKKEI50",
     "description": "Japanese medical endoscopy world leader (~70% global share), formerly cameras",
-    "phonetic": "olimmpusse"
+    "phonetic": "olimpusse"
   },
   {
     "symbol": "7741.T",
@@ -790,7 +790,7 @@
     "correlation": "Gaming, jouets — Bandai Namco",
     "index": "NIKKEI50",
     "description": "Japanese entertainment — toys (Gundam), video games (Tekken, Elden Ring), anime",
-    "phonetic": "bandaï-namko"
+    "phonetic": "bandaï namco"
   },
   {
     "symbol": "7974.T",
@@ -803,7 +803,7 @@
     "aliases": [
       "Nintendo"
     ],
-    "phonetic": "nintèndo"
+    "phonetic": "nintendo"
   },
   {
     "symbol": "8031.T",
@@ -813,7 +813,7 @@
     "correlation": "Matières premières — Mitsui & Co",
     "index": "NIKKEI50",
     "description": "Japanese trading house (sogo shosha), commodities, energy, infrastructure",
-    "phonetic": "mitsouï-et-co"
+    "phonetic": "mitsouï et co"
   },
   {
     "symbol": "8035.T",
@@ -823,7 +823,7 @@
     "correlation": "Équipement semi-conducteurs — Tokyo Electron",
     "index": "NIKKEI50",
     "description": "World's third-largest semiconductor equipment maker, critical chip tooling",
-    "phonetic": "tokyo-élèktrone"
+    "phonetic": "tokyo electron"
   },
   {
     "symbol": "8053.T",
@@ -833,7 +833,7 @@
     "correlation": "Matières premières — Sumitomo",
     "index": "NIKKEI50",
     "description": "Japanese trading house, metals, transport, infrastructure, media, real estate",
-    "phonetic": "soumitomo-korporécheune"
+    "phonetic": "soumitomo corporation"
   },
   {
     "symbol": "8058.T",
@@ -843,7 +843,7 @@
     "correlation": "Matières premières diversifiées — Mitsubishi Corp",
     "index": "NIKKEI50",
     "description": "Japan's largest trading house, commodities, metals, energy, food, chemicals",
-    "phonetic": "mitssoubichi-korporécheune"
+    "phonetic": "mitsoubichi corporation"
   },
   {
     "symbol": "8306.T",
@@ -853,7 +853,7 @@
     "correlation": "BOJ yields, JPY — MUFG",
     "index": "NIKKEI50",
     "description": "Japan's largest bank (MUFG), global investment banking & retail",
-    "phonetic": "mitssoubichi-u-èf-ji-fainanciale"
+    "phonetic": "mitsoubichi u èf ji financial"
   },
   {
     "symbol": "8316.T",
@@ -863,7 +863,7 @@
     "correlation": "BOJ yields, JPY — SMFG",
     "index": "NIKKEI50",
     "description": "Japan's second-largest banking group (SMFG), retail & wholesale banking",
-    "phonetic": "soumitomo-mitsouï-fainanciale"
+    "phonetic": "soumitomo mitsouï financial"
   },
   {
     "symbol": "8801.T",
@@ -873,7 +873,7 @@
     "correlation": "Immobilier JP, taux BOJ — Mitsui Fudosan",
     "index": "NIKKEI50",
     "description": "Japan's largest real estate developer, office buildings, malls, residential",
-    "phonetic": "mitsouï-foudossane"
+    "phonetic": "mitsouï foudossan"
   },
   {
     "symbol": "9020.T",
@@ -883,7 +883,7 @@
     "correlation": "Transport JP — East Japan Railway",
     "index": "NIKKEI50",
     "description": "Japan's largest rail operator (JR East), Tokyo metropolitan trains + Shinkansen",
-    "phonetic": "iste-japane-réïlouéï"
+    "phonetic": "iste japan railway"
   },
   {
     "symbol": "9022.T",
@@ -893,7 +893,7 @@
     "correlation": "Shinkansen — Central Japan Railway",
     "index": "NIKKEI50",
     "description": "Operator of Tokaido Shinkansen (Tokyo-Osaka bullet train), JR Central",
-    "phonetic": "cèntrale-japane-réïlouéï"
+    "phonetic": "central japan railway"
   },
   {
     "symbol": "9432.T",
@@ -903,7 +903,7 @@
     "correlation": "Défensif, dividendes — NTT",
     "index": "NIKKEI50",
     "description": "Nippon Telegraph & Telephone — Japan's largest telecom, global IT services",
-    "phonetic": "ène-té-té"
+    "phonetic": "ène té té"
   },
   {
     "symbol": "9433.T",
@@ -913,7 +913,7 @@
     "correlation": "Défensif — KDDI",
     "index": "NIKKEI50",
     "description": "Japan's second-largest telecom operator (au mobile brand)",
-    "phonetic": "ka-dé-dé-i"
+    "phonetic": "ka dé dé i"
   },
   {
     "symbol": "9613.T",
@@ -923,7 +923,7 @@
     "correlation": "IT services JP — NTT Data",
     "index": "NIKKEI50",
     "description": "Japanese IT services & consulting, NTT subsidiary, global digital transformation",
-    "phonetic": "ène-té-té-data"
+    "phonetic": "ène té té data"
   },
   {
     "symbol": "9618.HK",
@@ -933,7 +933,7 @@
     "correlation": "E-commerce Chine — JD.com",
     "index": "HSI30",
     "description": "Chinese e-commerce & logistics giant, direct retail model (vs Alibaba marketplace)",
-    "phonetic": "ji-di-dote-kome"
+    "phonetic": "ji di dot com"
   },
   {
     "symbol": "9984.T",
@@ -947,7 +947,7 @@
       "SoftBank",
       "le fonds Vision Fund"
     ],
-    "phonetic": "softebanke-groupe"
+    "phonetic": "soft bank groupe"
   },
   {
     "symbol": "9988.HK",
@@ -961,7 +961,7 @@
       "Alibaba",
       "le Amazon chinois"
     ],
-    "phonetic": "alibaba-groupe"
+    "phonetic": "alibaba groupe"
   },
   {
     "symbol": "9999.HK",
@@ -971,7 +971,7 @@
     "correlation": "Gaming Chine — NetEase",
     "index": "HSI30",
     "description": "Chinese gaming & internet company, rival to Tencent in online games",
-    "phonetic": "nètize"
+    "phonetic": "netease"
   },
   {
     "symbol": "A",
@@ -981,7 +981,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Lab instruments and consumables for DNA sequencing, diagnostics, drug discovery worldwide",
-    "phonetic": "adjilènte-tèknolodjiize"
+    "phonetic": "adjilent technologies"
   },
   {
     "symbol": "AA",
@@ -1001,7 +1001,7 @@
     "correlation": "CL=F (pétrole) ↓↓ — kérosène = 1er poste de coûts",
     "index": "SP500",
     "description": "Major US airline, regional/domestic hub model, leisure and business travel",
-    "phonetic": "amérikane-èrlaïnze"
+    "phonetic": "américan airlines"
   },
   {
     "symbol": "AAL.L",
@@ -1011,7 +1011,7 @@
     "correlation": "Platine, diamants, cuivre — Anglo American",
     "index": "FTSE100",
     "description": "South African-British mining giant — diamonds (De Beers), copper, platinum, iron ore",
-    "phonetic": "anglo-amèrikane"
+    "phonetic": "anglo américain"
   },
   {
     "symbol": "AAPL",
@@ -1052,7 +1052,7 @@
     "aliases": [
       "Airbnb"
     ],
-    "phonetic": "airbi-ène-bi"
+    "phonetic": "airbi ène bi"
   },
   {
     "symbol": "ABT",
@@ -1062,7 +1062,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Healthcare giant, diagnostic devices, medical equipment, generic drugs",
-    "phonetic": "abote-laboratorize"
+    "phonetic": "abbott laboratoires"
   },
   {
     "symbol": "ACA.PA",
@@ -1072,7 +1072,7 @@
     "correlation": "Yields ↑, spread 10Y-2Y ↑",
     "index": "CAC40",
     "description": "Première banque de détail en France, aussi assurance & gestion d'actifs",
-    "phonetic": "crédi-agricole"
+    "phonetic": "crédit agricole"
   },
   {
     "symbol": "ACGL",
@@ -1082,7 +1082,7 @@
     "correlation": "Réassurance catastrophes — Arch Capital",
     "index": "SP500",
     "description": "Reinsurance company covering catastrophe and property losses worldwide",
-    "phonetic": "artch-kapital-groupe"
+    "phonetic": "arch capital groupe"
   },
   {
     "symbol": "ACN",
@@ -1092,7 +1092,7 @@
     "correlation": "^IXIC ↑, taux ↓↓",
     "index": "SP500",
     "description": "Global IT consulting and outsourcing firm, cloud and digital transformation",
-    "phonetic": "akcentioure"
+    "phonetic": "accenture"
   },
   {
     "symbol": "ADBE",
@@ -1112,7 +1112,7 @@
     "correlation": "^IXIC ↑, ^KS11 — supply chain asiatique",
     "index": "SP500",
     "description": "Analog chip designer, power management and signal processing for industrial IoT",
-    "phonetic": "anolog-divaisez"
+    "phonetic": "analog devices"
   },
   {
     "symbol": "ADM",
@@ -1122,7 +1122,7 @@
     "correlation": "Commodités agricoles — ADM",
     "index": "SP500",
     "description": "Agricultural commodities processor, grains, oils, animal feed, biofuels",
-    "phonetic": "artcher-danyelz-midlande"
+    "phonetic": "archer daniels midland"
   },
   {
     "symbol": "ADP",
@@ -1132,7 +1132,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "HR outsourcing payroll processor for millions of US businesses annually",
-    "phonetic": "otomatic-data-prosèsing"
+    "phonetic": "automatic data processing"
   },
   {
     "symbol": "ADS.DE",
@@ -1142,7 +1142,7 @@
     "correlation": "Consommateur sport, Chine",
     "index": "DAX40",
     "description": "German sportswear giant, world's second-largest after Nike",
-    "phonetic": "adidas"
+    "phonetic": "adidasse"
   },
   {
     "symbol": "ADSK",
@@ -1162,7 +1162,7 @@
     "correlation": "Défensif, taux — utility Midwest",
     "index": "SP500",
     "description": "Utility company providing electricity to Missouri and Illinois regions",
-    "phonetic": "amérine"
+    "phonetic": "amèrine"
   },
   {
     "symbol": "AEP",
@@ -1172,7 +1172,7 @@
     "correlation": "Défensif, taux — utility US centrale",
     "index": "SP500",
     "description": "Major US electric utility, central and midwest regional power distribution",
-    "phonetic": "amérikane-élektrik-paoueure"
+    "phonetic": "américan electric power"
   },
   {
     "symbol": "AES",
@@ -1182,7 +1182,7 @@
     "correlation": "Renouvelables global — AES",
     "index": "SP500",
     "description": "Global energy and infrastructure company, renewable power and electricity distribution",
-    "phonetic": "aya-isso"
+    "phonetic": "a eu èsse"
   },
   {
     "symbol": "AFL",
@@ -1202,7 +1202,7 @@
     "correlation": "Gaz industriels — cyclique, industrie mondiale",
     "index": "CAC40",
     "description": "Leader mondial des gaz industriels & médicaux, fournisseur hydrogène",
-    "phonetic": "air-likide"
+    "phonetic": "air liquide"
   },
   {
     "symbol": "AIG",
@@ -1212,7 +1212,7 @@
     "correlation": "Yields ↑ — portefeuille obligataire",
     "index": "SP500",
     "description": "Mega insurance conglomerate, property, life, accident coverage globally",
-    "phonetic": "amérikane-internacionale-groupe"
+    "phonetic": "américan international groupe"
   },
   {
     "symbol": "AIR.DE",
@@ -1222,7 +1222,7 @@
     "correlation": "= AIR.PA Airbus — double listing",
     "index": "DAX40",
     "description": "European aircraft manufacturer, Boeing's main rival, also defense & space",
-    "phonetic": "airbus"
+    "phonetic": "airbusse"
   },
   {
     "symbol": "AIR.PA",
@@ -1236,7 +1236,7 @@
       "Airbus",
       "l'avionneur européen"
     ],
-    "phonetic": "airbus"
+    "phonetic": "airbusse"
   },
   {
     "symbol": "AIZ",
@@ -1246,7 +1246,7 @@
     "correlation": "Assurance — Assurant",
     "index": "SP500",
     "description": "Insurance company, property and casualty, renters, mobile home coverage",
-    "phonetic": "ashouérante"
+    "phonetic": "assurant"
   },
   {
     "symbol": "AJG",
@@ -1256,7 +1256,7 @@
     "correlation": "Courtage assurance — Gallagher",
     "index": "SP500",
     "description": "Insurance broker and risk management, commercial and personal lines consultant",
-    "phonetic": "artoure-djé-gallagher"
+    "phonetic": "arthur ji gallagher"
   },
   {
     "symbol": "AKAM",
@@ -1266,7 +1266,7 @@
     "correlation": "^IXIC, cybersécurité CDN — Akamai",
     "index": "SP500",
     "description": "Content delivery network and cybersecurity, edge computing infrastructure",
-    "phonetic": "akamaï-tèknolodjiize"
+    "phonetic": "akamaï"
   },
   {
     "symbol": "ALB",
@@ -1276,7 +1276,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Chemical company, lithium mining for batteries, bromine, specialty chemicals",
-    "phonetic": "albermale"
+    "phonetic": "albemarle"
   },
   {
     "symbol": "ALGN",
@@ -1286,7 +1286,7 @@
     "correlation": "Consommation santé — Invisalign",
     "index": "SP500",
     "description": "Invisalign clear braces and digital orthodontics technology",
-    "phonetic": "aligne-tèknolodjiize"
+    "phonetic": "align technology"
   },
   {
     "symbol": "ALK",
@@ -1296,7 +1296,7 @@
     "correlation": "CL=F (pétrole) ↓↓ — kérosène = 1er poste de coûts",
     "index": "SP500",
     "description": "Alaska's major airline, West Coast regional service, leisure and business",
-    "phonetic": "alaska-air-groupe"
+    "phonetic": "alaska air"
   },
   {
     "symbol": "ALL",
@@ -1306,7 +1306,7 @@
     "correlation": "Yields ↑ — portefeuille obligataire",
     "index": "SP500",
     "description": "Insurance company, auto and home coverage, large regional player USA",
-    "phonetic": "alstète"
+    "phonetic": "allstate"
   },
   {
     "symbol": "ALLE",
@@ -1316,7 +1316,7 @@
     "correlation": "Sécurité bâtiment — Allegion",
     "index": "SP500",
     "description": "Smart locks and access control systems, residential and commercial security",
-    "phonetic": "allédjion"
+    "phonetic": "allegion"
   },
   {
     "symbol": "ALV.DE",
@@ -1330,7 +1330,7 @@
       "Allianz",
       "le premier assureur européen"
     ],
-    "phonetic": "allianze"
+    "phonetic": "allianz"
   },
   {
     "symbol": "AMAT",
@@ -1340,7 +1340,7 @@
     "correlation": "^IXIC ↑, ^KS11 — supply chain asiatique",
     "index": "SP500",
     "description": "Semiconductor equipment manufacturer, chip production machinery leader",
-    "phonetic": "aplaide-matériouze"
+    "phonetic": "applied materials"
   },
   {
     "symbol": "AMCR",
@@ -1350,7 +1350,7 @@
     "correlation": "Packaging plastique — Amcor",
     "index": "SP500",
     "description": "Packaging materials company, flexible and rigid plastic food packaging",
-    "phonetic": "amkore"
+    "phonetic": "amcor"
   },
   {
     "symbol": "AMD",
@@ -1364,7 +1364,7 @@
       "AMD",
       "Advanced Micro Devices"
     ],
-    "phonetic": "advancede-microe-divaisez"
+    "phonetic": "a èm dé"
   },
   {
     "symbol": "AME",
@@ -1374,7 +1374,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Industrial electronics and sensors, precision instruments for manufacturing",
-    "phonetic": "amètèk"
+    "phonetic": "amétek"
   },
   {
     "symbol": "AMGN",
@@ -1384,7 +1384,7 @@
     "correlation": "FDA, pipelines — très binaire (approbation ou rejet)",
     "index": "SP500",
     "description": "Biotech pharmaceutical, oncology, cardiovascular, immunology focus",
-    "phonetic": "amdjène"
+    "phonetic": "amjène"
   },
   {
     "symbol": "AMP",
@@ -1394,7 +1394,7 @@
     "correlation": "Wealth management — Ameriprise",
     "index": "SP500",
     "description": "Financial advisory and wealth management for high-net-worth individuals",
-    "phonetic": "amériprise-fainanciale"
+    "phonetic": "amériprise financial"
   },
   {
     "symbol": "AMT",
@@ -1404,7 +1404,7 @@
     "correlation": "Taux ↓↓ — sensible aux taux hypothécaires",
     "index": "SP500",
     "description": "Real estate investment trust, cell towers and broadcast infrastructure owner",
-    "phonetic": "amérikane-taoueure"
+    "phonetic": "américan tower"
   },
   {
     "symbol": "AMZN",
@@ -1418,7 +1418,7 @@
       "Amazon",
       "le géant du e-commerce"
     ],
-    "phonetic": "amazon"
+    "phonetic": "amazone"
   },
   {
     "symbol": "ANET",
@@ -1428,7 +1428,7 @@
     "correlation": "^IXIC, data centers cloud — Arista",
     "index": "SP500",
     "description": "High-speed networking switches and software, data center cloud infrastructure",
-    "phonetic": "arista-nètoueurks"
+    "phonetic": "arista networks"
   },
   {
     "symbol": "ANTO.L",
@@ -1448,7 +1448,7 @@
     "correlation": "Courtage assurance risk — Aon",
     "index": "SP500",
     "description": "Insurance and risk management consulting, benefits and compensation advisor",
-    "phonetic": "aone"
+    "phonetic": "a o ène"
   },
   {
     "symbol": "AOS",
@@ -1458,7 +1458,7 @@
     "correlation": "Construction, eau chaude — A.O. Smith",
     "index": "SP500",
     "description": "A. O. Smith manufactures water heaters and treatment systems",
-    "phonetic": "aïo-smith"
+    "phonetic": "a o smith"
   },
   {
     "symbol": "APA",
@@ -1468,7 +1468,7 @@
     "correlation": "CL=F, BZ=F — E&P pétrole US",
     "index": "SP500",
     "description": "Oil and gas exploration and production, US onshore assets",
-    "phonetic": "aya-piya"
+    "phonetic": "a pé a"
   },
   {
     "symbol": "APD",
@@ -1478,7 +1478,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Industrial gases, hydrogen, oxygen, nitrogen for manufacturing and energy",
-    "phonetic": "air-prodeuktez-ète-kémikalez"
+    "phonetic": "air products"
   },
   {
     "symbol": "APH",
@@ -1488,7 +1488,7 @@
     "correlation": "Connecteurs semi/aéro — Amphenol",
     "index": "SP500",
     "description": "Electrical connectors and sensors for aerospace, automotive, IT infrastructure",
-    "phonetic": "amfenol"
+    "phonetic": "amphenol"
   },
   {
     "symbol": "APO",
@@ -1498,7 +1498,7 @@
     "correlation": "^GSPC, private equity — Apollo",
     "index": "SP500",
     "description": "Alternative asset manager, private equity, credit, real estate investor",
-    "phonetic": "apolloe-globale-manèdjment"
+    "phonetic": "apollo global"
   },
   {
     "symbol": "APP",
@@ -1528,7 +1528,7 @@
     "correlation": "Taux, biotech — REIT labos Alexandria",
     "index": "SP500",
     "description": "Life sciences real estate owner, biotech parks, lab buildings",
-    "phonetic": "alexandra-riyal-èstète-équités"
+    "phonetic": "alexandria real estate"
   },
   {
     "symbol": "ARES",
@@ -1538,7 +1538,7 @@
     "correlation": "^GSPC, crédit alternatif — Ares",
     "index": "SP500",
     "description": "Alternative asset manager, credit, infrastructure, private equity funds",
-    "phonetic": "arèze-manèdjment"
+    "phonetic": "ares management"
   },
   {
     "symbol": "ARM",
@@ -1552,7 +1552,7 @@
       "ARM",
       "le fournisseur de plans de puces"
     ],
-    "phonetic": "arm-oldingz"
+    "phonetic": "arm holdings"
   },
   {
     "symbol": "ATO",
@@ -1562,7 +1562,7 @@
     "correlation": "NG=F, gaz naturel — Atmos",
     "index": "SP500",
     "description": "Natural gas utility, supplies households and businesses southeastern US",
-    "phonetic": "atmosse-énèrdjie"
+    "phonetic": "atmos energy"
   },
   {
     "symbol": "AUDUSD=X",
@@ -1575,7 +1575,7 @@
     "aliases": [
       "l'aussie"
     ],
-    "phonetic": "aud-u-esse-dé"
+    "phonetic": "dollar australien"
   },
   {
     "symbol": "AVB",
@@ -1585,7 +1585,7 @@
     "correlation": "Taux, immobilier — REIT appartements",
     "index": "SP500",
     "description": "Multifamily apartments owner, residential real estate investment trust",
-    "phonetic": "avalon-bay-kommounité-ze"
+    "phonetic": "avalon bay"
   },
   {
     "symbol": "AVGO",
@@ -1598,7 +1598,7 @@
     "aliases": [
       "Broadcom"
     ],
-    "phonetic": "broadkom"
+    "phonetic": "broadcom"
   },
   {
     "symbol": "AVY",
@@ -1608,7 +1608,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Specialty materials, adhesive labels, packaging films and ID solutions",
-    "phonetic": "avérie-dènnison"
+    "phonetic": "avery dennison"
   },
   {
     "symbol": "AWK",
@@ -1618,7 +1618,7 @@
     "correlation": "Défensif, eau — American Water",
     "index": "SP500",
     "description": "Regional water utility, supplies households and businesses New Jersey area",
-    "phonetic": "amérikane-wouateure-weurkz"
+    "phonetic": "américan water works"
   },
   {
     "symbol": "AXA.PA",
@@ -1628,7 +1628,7 @@
     "correlation": "Yields ↑ — portefeuille obligataire",
     "index": "CAC40",
     "description": "Premier assureur européen, assurance vie, dommages & gestion d'actifs",
-    "phonetic": "aksa"
+    "phonetic": "akssa"
   },
   {
     "symbol": "AXON",
@@ -1638,7 +1638,7 @@
     "correlation": "Géopolitique ↑↑ — tensions = commandes",
     "index": "SP500",
     "description": "Law enforcement technology, tasers and body cameras, surveillance software",
-    "phonetic": "aksone-enteurprise"
+    "phonetic": "axon enterprise"
   },
   {
     "symbol": "AXP",
@@ -1648,7 +1648,7 @@
     "correlation": "Yields, ^GSPC",
     "index": "SP500",
     "description": "American Express, payment processor and lender, premium credit cards",
-    "phonetic": "amérikane-ekspresse"
+    "phonetic": "américan express"
   },
   {
     "symbol": "AZN.L",
@@ -1661,7 +1661,7 @@
     "aliases": [
       "AstraZeneca"
     ],
-    "phonetic": "astrazeneka"
+    "phonetic": "astra zénéca"
   },
   {
     "symbol": "AZO",
@@ -1671,7 +1671,7 @@
     "correlation": "Auto parts retail — AutoZone",
     "index": "SP500",
     "description": "Aftermarket automotive parts retailer, DIY and professional mechanics",
-    "phonetic": "autoeuzone"
+    "phonetic": "auto zone"
   },
   {
     "symbol": "BA",
@@ -1685,7 +1685,7 @@
       "Boeing",
       "l'avionneur américain"
     ],
-    "phonetic": "boeing"
+    "phonetic": "bo ingue"
   },
   {
     "symbol": "BAC",
@@ -1699,7 +1699,7 @@
       "Bank of America",
       "BofA"
     ],
-    "phonetic": "banke-ov-amérika"
+    "phonetic": "bank of améric"
   },
   {
     "symbol": "BALL",
@@ -1709,7 +1709,7 @@
     "correlation": "Packaging aluminium — Ball Corp",
     "index": "SP500",
     "description": "Aluminum beverage cans and containers, food and drink packaging leader",
-    "phonetic": "balle-korporécheune"
+    "phonetic": "balle"
   },
   {
     "symbol": "BAS.DE",
@@ -1719,7 +1719,7 @@
     "correlation": "Cycle industriel, gaz naturel Europe — BASF",
     "index": "DAX40",
     "description": "World's largest chemical company, German industrial cornerstone",
-    "phonetic": "basf"
+    "phonetic": "bé a èsse èf"
   },
   {
     "symbol": "BAT.L",
@@ -1729,7 +1729,7 @@
     "correlation": "Défensif, dividendes — BAT",
     "index": "FTSE100",
     "description": "World's second-largest tobacco company, also vaping & heated products",
-    "phonetic": "britis-amérikane-tobako"
+    "phonetic": "british américain tobacco"
   },
   {
     "symbol": "BATS.L",
@@ -1743,7 +1743,7 @@
       "BAE Systems",
       "le géant de la défense britannique"
     ],
-    "phonetic": "ba-è-sistema"
+    "phonetic": "bé a e systèmes"
   },
   {
     "symbol": "BAX",
@@ -1753,7 +1753,7 @@
     "correlation": "Medical devices IV — Baxter",
     "index": "SP500",
     "description": "Baxter medical devices, IV solutions, renal care, medications",
-    "phonetic": "baksteur-internacionale"
+    "phonetic": "baxter international"
   },
   {
     "symbol": "BAYN.DE",
@@ -1763,7 +1763,7 @@
     "correlation": "Pharma + agriculture — Bayer, litiges glyphosate",
     "index": "DAX40",
     "description": "German pharma & crop science group, acquired Monsanto, Roundup litigation",
-    "phonetic": "bayeure"
+    "phonetic": "bayère"
   },
   {
     "symbol": "BBY",
@@ -1773,7 +1773,7 @@
     "correlation": "Électronique retail — Best Buy",
     "index": "SP500",
     "description": "Consumer electronics retailer, computers, appliances, Geek Squad services",
-    "phonetic": "beste-baille"
+    "phonetic": "best buy"
   },
   {
     "symbol": "BDX",
@@ -1783,7 +1783,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Medical devices and diagnostic company, blood collection, needles, syringes",
-    "phonetic": "bektone-dikinsone"
+    "phonetic": "becton dickinson"
   },
   {
     "symbol": "BEI.DE",
@@ -1793,7 +1793,7 @@
     "correlation": "Consommation de base — Beiersdorf (Nivea)",
     "index": "DAX40",
     "description": "German skincare company — Nivea, Eucerin, La Prairie brands",
-    "phonetic": "beieursdorf"
+    "phonetic": "bayèrs dorf"
   },
   {
     "symbol": "BEN",
@@ -1803,7 +1803,7 @@
     "correlation": "^GSPC, flux ETF — Franklin Templeton",
     "index": "SP500",
     "description": "Franklin Templeton mutual funds and ETFs, asset management company",
-    "phonetic": "frankline-ressourses"
+    "phonetic": "franklin resources"
   },
   {
     "symbol": "BF.B",
@@ -1813,7 +1813,7 @@
     "correlation": "Spiritueux whiskey — Brown-Forman",
     "index": "SP500",
     "description": "Brown-Forman bourbon and whiskey distiller, Jack Daniel's owner",
-    "phonetic": "braone-formane"
+    "phonetic": "brown forman"
   },
   {
     "symbol": "BG",
@@ -1823,7 +1823,7 @@
     "correlation": "Commodités agricoles — Bunge",
     "index": "SP500",
     "description": "Bunge grains and agriculture, soy, wheat, sugar commodity processing",
-    "phonetic": "boundje-globale"
+    "phonetic": "bounje global"
   },
   {
     "symbol": "BIIB",
@@ -1833,7 +1833,7 @@
     "correlation": "Biotech Alzheimer FDA — Biogen",
     "index": "SP500",
     "description": "Biogen biotech, Alzheimer's disease, multiple sclerosis, neurodegenerative focus",
-    "phonetic": "bioddjène"
+    "phonetic": "biojène"
   },
   {
     "symbol": "BIO",
@@ -1843,7 +1843,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Biorad lab diagnostics equipment, clinical chemistry and immunohematology",
-    "phonetic": "bio-rade-laboratorize"
+    "phonetic": "bio rad laboratoires"
   },
   {
     "symbol": "BK",
@@ -1853,7 +1853,7 @@
     "correlation": "Yields, custody — BNY Mellon",
     "index": "SP500",
     "description": "BNY Mellon asset manager and custodian, institutional money and securities",
-    "phonetic": "bi-ène-i-mèlone"
+    "phonetic": "bé ène i mèlon"
   },
   {
     "symbol": "BKNG",
@@ -1867,7 +1867,7 @@
       "Booking",
       "Booking Holdings"
     ],
-    "phonetic": "bouking-oldingz"
+    "phonetic": "booking holdings"
   },
   {
     "symbol": "BKR",
@@ -1877,7 +1877,7 @@
     "correlation": "CL=F (pétrole) ↑↑",
     "index": "SP500",
     "description": "Baker Hughes oil and gas equipment, turbomachinery, drilling services",
-    "phonetic": "baker-ioutchez"
+    "phonetic": "baker hughes"
   },
   {
     "symbol": "BLDR",
@@ -1887,7 +1887,7 @@
     "correlation": "Construction immobilière — Builders FirstSource",
     "index": "SP500",
     "description": "Builders FirstSource lumber, building materials supplier to contractors",
-    "phonetic": "buildeurs-feurste-soursse"
+    "phonetic": "builders first source"
   },
   {
     "symbol": "BLK",
@@ -1902,7 +1902,7 @@
       "le géant de la gestion",
       "Larry Fink"
     ],
-    "phonetic": "blackrok"
+    "phonetic": "black rock"
   },
   {
     "symbol": "BMW.DE",
@@ -1912,7 +1912,7 @@
     "correlation": "EUR/USD, tarifs, transition EV — BMW",
     "index": "DAX40",
     "description": "German premium automaker — BMW, Mini, Rolls-Royce cars",
-    "phonetic": "bi-ème-daoublevé"
+    "phonetic": "bé èm doublevé"
   },
   {
     "symbol": "BMY",
@@ -1922,7 +1922,7 @@
     "correlation": "Pharma oncologie — Bristol Myers",
     "index": "SP500",
     "description": "Bristol Myers Squibb pharma, oncology, immunology, cardiovascular drugs",
-    "phonetic": "bristol-myeurz-skouib"
+    "phonetic": "bristol myers squibb"
   },
   {
     "symbol": "BN.PA",
@@ -1942,7 +1942,7 @@
     "correlation": "Yields ↑, spread 10Y-2Y ↑ — modèle bancaire",
     "index": "CAC40",
     "description": "Première banque de la zone euro par actifs, banque universelle mondiale",
-    "phonetic": "bi-ène-pi-paribus"
+    "phonetic": "bé ène pé paribasse"
   },
   {
     "symbol": "BNR.DE",
@@ -1952,7 +1952,7 @@
     "correlation": "Distribution chimique — Brenntag",
     "index": "DAX40",
     "description": "World's largest chemical distributor, middleman between producers & industries",
-    "phonetic": "brentak"
+    "phonetic": "brentag"
   },
   {
     "symbol": "BP.L",
@@ -1962,7 +1962,7 @@
     "correlation": "CL=F ↑↑ — BP, major pétrolière",
     "index": "FTSE100",
     "description": "British oil & gas major, one of world's top 5 energy supermajors",
-    "phonetic": "bi-pi"
+    "phonetic": "bé pé"
   },
   {
     "symbol": "BR",
@@ -1972,7 +1972,7 @@
     "correlation": "XLF, fintech compliance — Broadridge",
     "index": "SP500",
     "description": "Broadridge financial outsourcing, investment management, compliance software",
-    "phonetic": "broadriddje-fainanciale"
+    "phonetic": "broadridge financial"
   },
   {
     "symbol": "BRK-B",
@@ -1986,7 +1986,7 @@
       "Berkshire Hathaway",
       "Buffett"
     ],
-    "phonetic": "berkchire-athaway"
+    "phonetic": "berkshire hathaway"
   },
   {
     "symbol": "BRK.B",
@@ -2001,7 +2001,7 @@
       "le conglomérat de Buffett",
       "l'oracle d'Omaha"
     ],
-    "phonetic": "berkchire-athaway"
+    "phonetic": "berkshire hathaway"
   },
   {
     "symbol": "BRO",
@@ -2011,7 +2011,7 @@
     "correlation": "Courtage assurance — Brown & Brown",
     "index": "SP500",
     "description": "Brown and Brown insurance broker, commercial and personal risk consultant",
-    "phonetic": "braoun-and-braoun"
+    "phonetic": "braoun et braoun"
   },
   {
     "symbol": "BSX",
@@ -2021,7 +2021,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Boston Scientific medical devices, stents, pacemakers, surgical tools",
-    "phonetic": "boston-scientifique"
+    "phonetic": "boston scientifique"
   },
   {
     "symbol": "BT-A.L",
@@ -2031,7 +2031,7 @@
     "correlation": "Télécom UK — BT Group",
     "index": "FTSE100",
     "description": "UK's largest fixed-line telecom, broadband (Openreach) & mobile (EE)",
-    "phonetic": "bi-ti-groupe"
+    "phonetic": "bé té groupe"
   },
   {
     "symbol": "BTC-USD",
@@ -2046,7 +2046,7 @@
       "le BTC",
       "l'or numérique"
     ],
-    "phonetic": "bitcoin"
+    "phonetic": "bitcoïne"
   },
   {
     "symbol": "BX",
@@ -2056,7 +2056,7 @@
     "correlation": "^GSPC, immobilier PE — Blackstone",
     "index": "SP500",
     "description": "Blackstone private equity and alternatives, real estate, infrastructure funds",
-    "phonetic": "blaksstone"
+    "phonetic": "black stone"
   },
   {
     "symbol": "BXP",
@@ -2066,7 +2066,7 @@
     "correlation": "Taux, bureaux — Boston Properties REIT",
     "index": "SP500",
     "description": "Boston Properties office and real estate investment trust, urban properties",
-    "phonetic": "bé-iks-pi"
+    "phonetic": "bé iks pé"
   },
   {
     "symbol": "BZ=F",
@@ -2094,7 +2094,7 @@
       "Citigroup",
       "Citi"
     ],
-    "phonetic": "citigroupe"
+    "phonetic": "citi groupe"
   },
   {
     "symbol": "CA.PA",
@@ -2114,7 +2114,7 @@
     "correlation": "Alimentation surgelé — Conagra",
     "index": "SP500",
     "description": "Conagra Brands foods, frozen meals, spices, Birds Eye, Marie Callender's",
-    "phonetic": "conagra-brands"
+    "phonetic": "conagra brands"
   },
   {
     "symbol": "CAH",
@@ -2124,7 +2124,7 @@
     "correlation": "Distribution pharma — Cardinal Health",
     "index": "SP500",
     "description": "Cardinal Health pharmaceutical distributor and medical supplies wholesaler",
-    "phonetic": "cardinal-sante"
+    "phonetic": "cardinal health"
   },
   {
     "symbol": "CAP.PA",
@@ -2134,7 +2134,7 @@
     "correlation": "Services IT, ^IXIC ↑, transformation digitale",
     "index": "CAC40",
     "description": "Leader français du conseil & services IT, transformation digitale des entreprises",
-    "phonetic": "capgemini"
+    "phonetic": "cap jémini"
   },
   {
     "symbol": "CARR",
@@ -2144,7 +2144,7 @@
     "correlation": "HVAC climatisation — Carrier",
     "index": "SP500",
     "description": "Carrier HVAC systems and refrigeration, climate control leader globally",
-    "phonetic": "carrier-global"
+    "phonetic": "carrier global"
   },
   {
     "symbol": "CAT",
@@ -2168,7 +2168,7 @@
     "correlation": "Yields ↑ — portefeuille obligataire",
     "index": "SP500",
     "description": "Chubb insurance company, property, casualty, marine, specialty coverage",
-    "phonetic": "tchubbe"
+    "phonetic": "chubb"
   },
   {
     "symbol": "CBK.DE",
@@ -2178,7 +2178,7 @@
     "correlation": "Yields ↑ — Commerzbank",
     "index": "DAX40",
     "description": "Germany's second-largest commercial bank, corporate & SME focus",
-    "phonetic": "commerzbanke"
+    "phonetic": "commerz bank"
   },
   {
     "symbol": "CBOE",
@@ -2188,7 +2188,7 @@
     "correlation": "^VIX, ^GSPC — Cboe options exchange",
     "index": "SP500",
     "description": "Cboe stock exchange and derivatives, options trading and market data",
-    "phonetic": "sé-bi-o-i"
+    "phonetic": "ci bé o eu"
   },
   {
     "symbol": "CBRE",
@@ -2198,7 +2198,7 @@
     "correlation": "Immobilier commercial — CBRE services",
     "index": "SP500",
     "description": "CBRE real estate services, commercial property leasing and management",
-    "phonetic": "sé-bi-ar-i"
+    "phonetic": "ci bé ar eu"
   },
   {
     "symbol": "CCI",
@@ -2208,7 +2208,7 @@
     "correlation": "Taux, 5G — Crown Castle tours",
     "index": "SP500",
     "description": "Crown Castle cell tower and data center real estate investment trust",
-    "phonetic": "kraoun-kastle"
+    "phonetic": "crown castle"
   },
   {
     "symbol": "CCL",
@@ -2218,7 +2218,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Carnival cruise line operator, leisure travel entertainment at sea",
-    "phonetic": "karnival"
+    "phonetic": "carnival"
   },
   {
     "symbol": "CDNS",
@@ -2228,7 +2228,7 @@
     "correlation": "^IXIC, semi EDA — Cadence",
     "index": "SP500",
     "description": "Cadence semiconductor design software, chip development tools",
-    "phonetic": "kadence-désign-sistems"
+    "phonetic": "cadence design"
   },
   {
     "symbol": "CDW",
@@ -2238,7 +2238,7 @@
     "correlation": "^IXIC, distribution IT — CDW",
     "index": "SP500",
     "description": "Computer hardware and software distributor to businesses and government",
-    "phonetic": "sé-di-double-u"
+    "phonetic": "ci dé doublevé"
   },
   {
     "symbol": "CE",
@@ -2248,7 +2248,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Celanese chemicals and engineered materials, acetyl, specialty plastics",
-    "phonetic": "selanese"
+    "phonetic": "célanèse"
   },
   {
     "symbol": "CEG",
@@ -2258,7 +2258,7 @@
     "correlation": "Nucléaire énergie propre — Constellation",
     "index": "SP500",
     "description": "Constellation Energy nuclear power operator, emissions-free electricity",
-    "phonetic": "constellation-énerdji"
+    "phonetic": "constellation énergie"
   },
   {
     "symbol": "CF",
@@ -2268,7 +2268,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "CF Industries fertilizer producer, ammonia and urea for agriculture",
-    "phonetic": "sé-èf-indeustriize"
+    "phonetic": "ci-èf-ine-dustrize"
   },
   {
     "symbol": "CFG",
@@ -2278,7 +2278,7 @@
     "correlation": "Yields, banque — Citizens",
     "index": "SP500",
     "description": "Citizens Financial regional bank, commercial and consumer lending",
-    "phonetic": "sitizenz-fainanciale"
+    "phonetic": "citizens financial"
   },
   {
     "symbol": "CHD",
@@ -2288,7 +2288,7 @@
     "correlation": "Produits ménagers — Church & Dwight",
     "index": "SP500",
     "description": "Church and Dwight baking soda company, Arm and Hammer consumer products",
-    "phonetic": "tchurtch-and-dwaït"
+    "phonetic": "church et dwight"
   },
   {
     "symbol": "CHRW",
@@ -2298,7 +2298,7 @@
     "correlation": "Logistique freight — C.H. Robinson",
     "index": "SP500",
     "description": "C.H. Robinson logistics and freight broker, supply chain management",
-    "phonetic": "sé-ètch-robinson"
+    "phonetic": "ci ache robinson"
   },
   {
     "symbol": "CHTR",
@@ -2308,7 +2308,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Charter Communications cable provider, broadband, TV, internet",
-    "phonetic": "tcharter-kommunikécheunz"
+    "phonetic": "charter communications"
   },
   {
     "symbol": "CI",
@@ -2318,7 +2318,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Cigna health insurance company, medical and pharmacy coverage",
-    "phonetic": "cigna-groupe"
+    "phonetic": "cigna"
   },
   {
     "symbol": "CIEN",
@@ -2328,7 +2328,7 @@
     "correlation": "Fibre optique télécom — Ciena",
     "index": "SP500",
     "description": "Ciena optical networking systems, long-distance telecommunications fiber",
-    "phonetic": "siena"
+    "phonetic": "ciena"
   },
   {
     "symbol": "CINF",
@@ -2338,7 +2338,7 @@
     "correlation": "Assurance régionale — Cincinnati Financial",
     "index": "SP500",
     "description": "Cincinnati Financial insurance, property and casualty, regional carrier",
-    "phonetic": "sinsinati-fainanciale"
+    "phonetic": "cincinnati financial"
   },
   {
     "symbol": "CL",
@@ -2348,7 +2348,7 @@
     "correlation": "Hygiène dentaire — Colgate",
     "index": "SP500",
     "description": "Colgate-Palmolive toothpaste and personal care, oral hygiene leader",
-    "phonetic": "kolgète-palmolive"
+    "phonetic": "colgate palmolive"
   },
   {
     "symbol": "CL=F",
@@ -2363,7 +2363,7 @@
       "le brut américain",
       "le baril"
     ],
-    "phonetic": "pétrole-wti"
+    "phonetic": "pétrole américain"
   },
   {
     "symbol": "CLF",
@@ -2373,7 +2373,7 @@
     "correlation": "GC=F, SI=F — corrélé aux métaux précieux",
     "index": "SP500",
     "description": "Cleveland-Cliffs iron ore and steel, North American steelmaker",
-    "phonetic": "kleveland-klifs"
+    "phonetic": "cleveland cliffs"
   },
   {
     "symbol": "CLX",
@@ -2383,7 +2383,7 @@
     "correlation": "Produits ménagers — Clorox",
     "index": "SP500",
     "description": "Clorox bleach and cleaning products, Kingsford charcoal, Hidden Valley",
-    "phonetic": "kloroks"
+    "phonetic": "clorox"
   },
   {
     "symbol": "CMCSA",
@@ -2393,7 +2393,7 @@
     "correlation": "Défensif, dividendes",
     "index": "SP500",
     "description": "Comcast cable TV, internet, phone provider, NBCUniversal media owner",
-    "phonetic": "kommkast"
+    "phonetic": "comcast"
   },
   {
     "symbol": "CME",
@@ -2403,7 +2403,7 @@
     "correlation": "Yields, ^GSPC",
     "index": "SP500",
     "description": "CME Group futures and derivatives exchange, agricultural and financial contracts",
-    "phonetic": "sé-ème-i-groupe"
+    "phonetic": "ci èm eu groupe"
   },
   {
     "symbol": "CMG",
@@ -2413,7 +2413,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Chipotle Mexican Grill fast-casual restaurant, fresh ingredients model",
-    "phonetic": "chipôle-mexikaine"
+    "phonetic": "chipotle mexican grill"
   },
   {
     "symbol": "CMI",
@@ -2423,7 +2423,7 @@
     "correlation": "Moteurs diesel transport — Cummins",
     "index": "SP500",
     "description": "Diesel engine and power systems manufacturer for trucks, construction, mining equipment",
-    "phonetic": "kummins"
+    "phonetic": "cummins"
   },
   {
     "symbol": "CMS",
@@ -2433,7 +2433,7 @@
     "correlation": "Défensif — utility Michigan",
     "index": "SP500",
     "description": "Michigan utility providing electricity and natural gas to regional customers",
-    "phonetic": "sé-ème-esse-énerdji"
+    "phonetic": "ci èm èsse énergie"
   },
   {
     "symbol": "CNA.L",
@@ -2443,7 +2443,7 @@
     "correlation": "Gaz UK — Centrica",
     "index": "FTSE100",
     "description": "UK energy supplier (British Gas), also power generation & nuclear",
-    "phonetic": "sentrika"
+    "phonetic": "centrica"
   },
   {
     "symbol": "CNC",
@@ -2453,7 +2453,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Health insurance company serving Medicaid, Medicare, and marketplace customers",
-    "phonetic": "sentène"
+    "phonetic": "centène"
   },
   {
     "symbol": "CNP",
@@ -2463,7 +2463,7 @@
     "correlation": "Défensif — utility Texas",
     "index": "SP500",
     "description": "Texas energy company providing electricity and natural gas distribution",
-    "phonetic": "senteur-point-énerdji"
+    "phonetic": "center point énergie"
   },
   {
     "symbol": "COF",
@@ -2473,7 +2473,7 @@
     "correlation": "Yields, ^GSPC",
     "index": "SP500",
     "description": "Credit card and consumer finance lender issuing branded credit products",
-    "phonetic": "kapital-oune-fainanciale"
+    "phonetic": "capital one"
   },
   {
     "symbol": "COIN",
@@ -2487,7 +2487,7 @@
       "Coinbase",
       "la plateforme crypto"
     ],
-    "phonetic": "koinbase-global"
+    "phonetic": "coinbase"
   },
   {
     "symbol": "CON.DE",
@@ -2497,7 +2497,7 @@
     "correlation": "Cycle auto, pneus, capteurs",
     "index": "DAX40",
     "description": "German auto parts & tire manufacturer, autonomous driving tech",
-    "phonetic": "kontinental"
+    "phonetic": "continental"
   },
   {
     "symbol": "COO",
@@ -2507,7 +2507,7 @@
     "correlation": "Vision devices — Cooper",
     "index": "SP500",
     "description": "Surgical equipment manufacturer specializing in vision care and gynecology devices",
-    "phonetic": "kooper-kompanize"
+    "phonetic": "cooper companies"
   },
   {
     "symbol": "COP",
@@ -2520,7 +2520,7 @@
     "aliases": [
       "ConocoPhillips"
     ],
-    "phonetic": "konokofilips"
+    "phonetic": "conoco phillips"
   },
   {
     "symbol": "COR",
@@ -2530,7 +2530,7 @@
     "correlation": "Distribution pharma — Cencora",
     "index": "SP500",
     "description": "Largest pharmaceutical and healthcare distributor in North America",
-    "phonetic": "sencora"
+    "phonetic": "cencora"
   },
   {
     "symbol": "COST",
@@ -2543,7 +2543,7 @@
     "aliases": [
       "Costco"
     ],
-    "phonetic": "kostko-weulsseul"
+    "phonetic": "costco"
   },
   {
     "symbol": "CPAY",
@@ -2553,7 +2553,7 @@
     "correlation": "Fintech paiements B2B — Corpay",
     "index": "SP500",
     "description": "Payment technology company processing B2B and corporate transactions",
-    "phonetic": "korpeï"
+    "phonetic": "corpay"
   },
   {
     "symbol": "CPB",
@@ -2563,7 +2563,7 @@
     "correlation": "Soupes alimentation — Campbell",
     "index": "SP500",
     "description": "Food company making soup, snacks, and shelf-stable branded consumer products",
-    "phonetic": "kampbel's"
+    "phonetic": "campbell"
   },
   {
     "symbol": "CPG.L",
@@ -2573,7 +2573,7 @@
     "correlation": "Défensif — Compass Group",
     "index": "FTSE100",
     "description": "World's largest contract foodservice company, workplace & hospital catering",
-    "phonetic": "kompass-groupe"
+    "phonetic": "compass groupe"
   },
   {
     "symbol": "CPRT",
@@ -2583,7 +2583,7 @@
     "correlation": "Enchères auto assurance — Copart",
     "index": "SP500",
     "description": "Online insurance auction platform for salvage and damaged vehicles",
-    "phonetic": "kopart"
+    "phonetic": "copart"
   },
   {
     "symbol": "CPT",
@@ -2593,7 +2593,7 @@
     "correlation": "REIT appartements — Camden",
     "index": "SP500",
     "description": "Real estate trust owning multifamily apartments in US Sun Belt markets",
-    "phonetic": "kamden-propriété"
+    "phonetic": "camden"
   },
   {
     "symbol": "CRH",
@@ -2603,7 +2603,7 @@
     "correlation": "Matériaux construction — CRH",
     "index": "SP500",
     "description": "Irish building materials company making concrete, aggregates, asphalt, stone",
-    "phonetic": "sé-ar-ètch"
+    "phonetic": "ci ar ache"
   },
   {
     "symbol": "CRL",
@@ -2613,7 +2613,7 @@
     "correlation": "Recherche labo pharma — Charles River",
     "index": "SP500",
     "description": "Contract research organization conducting preclinical and clinical drug testing",
-    "phonetic": "tchorlz-river-laboratoriz"
+    "phonetic": "charles river"
   },
   {
     "symbol": "CRM",
@@ -2626,7 +2626,7 @@
     "aliases": [
       "Salesforce"
     ],
-    "phonetic": "sèlzforsse"
+    "phonetic": "salesforce"
   },
   {
     "symbol": "CRWD",
@@ -2639,7 +2639,7 @@
     "aliases": [
       "CrowdStrike"
     ],
-    "phonetic": "kraoud-strike"
+    "phonetic": "crowd strike"
   },
   {
     "symbol": "CSCO",
@@ -2652,7 +2652,7 @@
     "aliases": [
       "Cisco"
     ],
-    "phonetic": "sisko-sistems"
+    "phonetic": "cisco"
   },
   {
     "symbol": "CSGP",
@@ -2662,7 +2662,7 @@
     "correlation": "Data immobilier commercial — CoStar",
     "index": "SP500",
     "description": "Commercial real estate information platform and analytics software",
-    "phonetic": "ko-star-groupe"
+    "phonetic": "co star"
   },
   {
     "symbol": "CSX",
@@ -2672,7 +2672,7 @@
     "correlation": "Rail freight Est US — CSX",
     "index": "SP500",
     "description": "Freight railroad operating major rail network across eastern United States",
-    "phonetic": "sé-esse-iks-korporécheune"
+    "phonetic": "ci èsse iks"
   },
   {
     "symbol": "CTAS",
@@ -2682,7 +2682,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Uniform rental and facility services company cleaning and supplying workplaces",
-    "phonetic": "sintas"
+    "phonetic": "cintas"
   },
   {
     "symbol": "CTRA",
@@ -2692,7 +2692,7 @@
     "correlation": "NG=F, gaz E&P — Coterra",
     "index": "SP500",
     "description": "Oil and natural gas producer operating in Appalachian and Delaware basins",
-    "phonetic": "koterra"
+    "phonetic": "coterra"
   },
   {
     "symbol": "CTSH",
@@ -2702,7 +2702,7 @@
     "correlation": "^IXIC, IT outsourcing — Cognizant",
     "index": "SP500",
     "description": "IT services and consulting firm providing digital transformation and outsourcing",
-    "phonetic": "kognizante"
+    "phonetic": "cognizant"
   },
   {
     "symbol": "CTVA",
@@ -2712,7 +2712,7 @@
     "correlation": "Agriculture semences — Corteva",
     "index": "SP500",
     "description": "Agricultural biotechnology company making seeds and crop protection chemicals",
-    "phonetic": "korteva"
+    "phonetic": "corteva"
   },
   {
     "symbol": "CVNA",
@@ -2722,7 +2722,7 @@
     "correlation": "Auto e-commerce — Carvana",
     "index": "SP500",
     "description": "Online used car retailer buying, selling, and financing vehicles",
-    "phonetic": "karvana"
+    "phonetic": "carvana"
   },
   {
     "symbol": "CVS",
@@ -2732,7 +2732,7 @@
     "correlation": "Pharmacies santé retail — CVS",
     "index": "SP500",
     "description": "Pharmacy and health care services chain with retail clinics and insurance",
-    "phonetic": "sé-vi-esse-santé"
+    "phonetic": "ci vé èsse health"
   },
   {
     "symbol": "CVX",
@@ -2755,7 +2755,7 @@
     "correlation": "Taux ↓ — défensif, proxy obligataire",
     "index": "SP500",
     "description": "Utility providing electricity and natural gas to southeastern US customers",
-    "phonetic": "dominion-énerdji"
+    "phonetic": "dominion énergie"
   },
   {
     "symbol": "DAL",
@@ -2765,7 +2765,7 @@
     "correlation": "CL=F (pétrole) ↓↓ — kérosène = 1er poste de coûts",
     "index": "SP500",
     "description": "Major US airline operating domestic and international passenger flights",
-    "phonetic": "delta-èrlaïnz"
+    "phonetic": "delta airlines"
   },
   {
     "symbol": "DASH",
@@ -2775,7 +2775,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Food delivery platform connecting restaurants with customers and drivers",
-    "phonetic": "door-dash"
+    "phonetic": "door dash"
   },
   {
     "symbol": "DB1.DE",
@@ -2785,7 +2785,7 @@
     "correlation": "Volumes de marché — Deutsche Börse",
     "index": "DAX40",
     "description": "Operator of Frankfurt Stock Exchange, Eurex derivatives, Clearstream",
-    "phonetic": "deutsche-börze"
+    "phonetic": "dotche beurze"
   },
   {
     "symbol": "DBK.DE",
@@ -2795,7 +2795,7 @@
     "correlation": "Yields ↑, spread — Deutsche Bank",
     "index": "DAX40",
     "description": "Germany's largest bank, investment banking & asset management",
-    "phonetic": "deutsche-banke"
+    "phonetic": "dotche bank"
   },
   {
     "symbol": "DD",
@@ -2805,7 +2805,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Specialty chemicals company making polymers, pigments, coatings, agriculture products",
-    "phonetic": "diupont-de-nemours"
+    "phonetic": "du pont"
   },
   {
     "symbol": "DDOG",
@@ -2815,7 +2815,7 @@
     "correlation": "^IXIC ↑, taux ↓↓",
     "index": "SP500",
     "description": "Cloud monitoring and analytics software for infrastructure and applications",
-    "phonetic": "datadog"
+    "phonetic": "data dog"
   },
   {
     "symbol": "DE",
@@ -2829,7 +2829,7 @@
       "Deere",
       "John Deere"
     ],
-    "phonetic": "dierre-and-ko"
+    "phonetic": "deere et co"
   },
   {
     "symbol": "DECK",
@@ -2839,7 +2839,7 @@
     "correlation": "Chaussures premium — Deckers",
     "index": "SP500",
     "description": "Footwear and apparel company known for premium outdoor and casual shoes",
-    "phonetic": "dekkers-brands"
+    "phonetic": "deckers brands"
   },
   {
     "symbol": "DELL",
@@ -2849,7 +2849,7 @@
     "correlation": "^IXIC ↑, taux ↓↓",
     "index": "SP500",
     "description": "Computer hardware manufacturer making desktops, laptops, and server systems",
-    "phonetic": "del-tèknolodjiiz"
+    "phonetic": "dell technologies"
   },
   {
     "symbol": "DG",
@@ -2859,7 +2859,7 @@
     "correlation": "Discount retail rural — Dollar General",
     "index": "SP500",
     "description": "Discount retailer operating convenience stores in rural and underserved markets",
-    "phonetic": "dollar-djeneral"
+    "phonetic": "dollar général"
   },
   {
     "symbol": "DG.PA",
@@ -2869,7 +2869,7 @@
     "correlation": "Infrastructure, concessions autoroutières, taux",
     "index": "CAC40",
     "description": "Numéro un mondial du BTP & concessions (autoroutes, aéroports)",
-    "phonetic": "vinci"
+    "phonetic": "vanci"
   },
   {
     "symbol": "DGE.L",
@@ -2879,7 +2879,7 @@
     "correlation": "Défensif, spiritueux — Diageo",
     "index": "FTSE100",
     "description": "World's largest spirits company — Johnnie Walker, Guinness, Smirnoff, Tanqueray",
-    "phonetic": "diageo"
+    "phonetic": "diagéo"
   },
   {
     "symbol": "DGX",
@@ -2889,7 +2889,7 @@
     "correlation": "Diagnostic tests labo — Quest",
     "index": "SP500",
     "description": "Clinical laboratory company providing diagnostic testing and health screening",
-    "phonetic": "kouste-diagnostiks"
+    "phonetic": "quest diagnostics"
   },
   {
     "symbol": "DHER.DE",
@@ -2899,7 +2899,7 @@
     "correlation": "Delivery, e-commerce — Delivery Hero",
     "index": "DAX40",
     "description": "German food delivery platform, operates in 70+ countries (not in Germany itself)",
-    "phonetic": "délivéri-éro"
+    "phonetic": "délivéri éro"
   },
   {
     "symbol": "DHI",
@@ -2909,7 +2909,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Homebuilder constructing single-family homes in US residential markets",
-    "phonetic": "di-ère-orton"
+    "phonetic": "dé ar horton"
   },
   {
     "symbol": "DHL.DE",
@@ -2919,7 +2919,7 @@
     "correlation": "Commerce mondial, CL=F ↓ — DHL/Deutsche Post",
     "index": "DAX40",
     "description": "World's largest logistics company (ex-Deutsche Post), express, freight, supply chain",
-    "phonetic": "di-ache-elle-groupe"
+    "phonetic": "dé ache èl groupe"
   },
   {
     "symbol": "DHR",
@@ -2929,7 +2929,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Diversified science and technology conglomerate with life sciences and diagnostics",
-    "phonetic": "danaaer-korporécheune"
+    "phonetic": "danaher"
   },
   {
     "symbol": "DIS",
@@ -2944,7 +2944,7 @@
       "Walt Disney",
       "la souris"
     ],
-    "phonetic": "wolt-disney"
+    "phonetic": "walt disney"
   },
   {
     "symbol": "DLR",
@@ -2954,7 +2954,7 @@
     "correlation": "Taux, data centers — Digital Realty",
     "index": "SP500",
     "description": "Data center real estate company leasing colocation space to tech companies",
-    "phonetic": "dijital-réalité"
+    "phonetic": "digital realty"
   },
   {
     "symbol": "DLTR",
@@ -2964,7 +2964,7 @@
     "correlation": "Discount retail — Dollar Tree",
     "index": "SP500",
     "description": "Discount retailer selling discounted household items, toys, and seasonal goods",
-    "phonetic": "dolar-tri"
+    "phonetic": "dollar tree"
   },
   {
     "symbol": "DOC",
@@ -2974,7 +2974,7 @@
     "correlation": "REIT santé médical — Healthpeak",
     "index": "SP500",
     "description": "Healthcare real estate trust owning medical office buildings and facilities",
-    "phonetic": "ealthpeake-propeurtiize"
+    "phonetic": "health peak"
   },
   {
     "symbol": "DOV",
@@ -2984,7 +2984,7 @@
     "correlation": "Industrie fluides pompes — Dover",
     "index": "SP500",
     "description": "Industrial manufacturer making equipment for refrigeration, fluid handling, fueling",
-    "phonetic": "doveur-korporécheune"
+    "phonetic": "dover"
   },
   {
     "symbol": "DOW",
@@ -2994,7 +2994,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Chemical manufacturer making plastics, coatings, agriculture products, materials",
-    "phonetic": "daou"
+    "phonetic": "do kemikal"
   },
   {
     "symbol": "DPZ",
@@ -3004,7 +3004,7 @@
     "correlation": "Pizza livraison — Dominos",
     "index": "SP500",
     "description": "Pizza delivery company with largest delivery pizza chain in North America",
-    "phonetic": "domino-ize"
+    "phonetic": "dominos"
   },
   {
     "symbol": "DRI",
@@ -3014,7 +3014,7 @@
     "correlation": "Restaurants casual — Darden",
     "index": "SP500",
     "description": "Restaurant operator running casual dining chains like Olive Garden, Longhorn",
-    "phonetic": "dardène-réstaurante"
+    "phonetic": "darden restaurants"
   },
   {
     "symbol": "DSY.PA",
@@ -3024,7 +3024,7 @@
     "correlation": "^IXIC ↑, taux ↓↓ — valorisation tech",
     "index": "CAC40",
     "description": "Leader mondial des logiciels de modélisation 3D & PLM (CATIA, SolidWorks)",
-    "phonetic": "dassault-sistèmez"
+    "phonetic": "dassault systèmes"
   },
   {
     "symbol": "DTE",
@@ -3034,7 +3034,7 @@
     "correlation": "Défensif — utility Michigan DTE",
     "index": "SP500",
     "description": "Michigan utility providing electricity and natural gas to regional customers",
-    "phonetic": "di-té-énerji"
+    "phonetic": "dé té eu énergie"
   },
   {
     "symbol": "DTE.DE",
@@ -3044,7 +3044,7 @@
     "correlation": "Défensif, T-Mobile US — Deutsche Telekom",
     "index": "DAX40",
     "description": "Europe's largest telecom by revenue, majority owner of T-Mobile US",
-    "phonetic": "deautche-télekom"
+    "phonetic": "dotche télécom"
   },
   {
     "symbol": "DUK",
@@ -3054,7 +3054,7 @@
     "correlation": "Taux ↓ — défensif, proxy obligataire",
     "index": "SP500",
     "description": "Major utility providing electricity and natural gas to Carolinas and Florida",
-    "phonetic": "diouke-énerji"
+    "phonetic": "douke énergie"
   },
   {
     "symbol": "DVA",
@@ -3074,7 +3074,7 @@
     "correlation": "CL=F (pétrole) ↑↑",
     "index": "SP500",
     "description": "Oil and natural gas producer with operations in onshore US shale plays",
-    "phonetic": "dévone-énerji"
+    "phonetic": "devon énergie"
   },
   {
     "symbol": "DX-Y.NYB",
@@ -3090,7 +3090,7 @@
       "le roi dollar",
       "le DXY"
     ],
-    "phonetic": "dolar-indèks"
+    "phonetic": "indice du dollar"
   },
   {
     "symbol": "DXCM",
@@ -3100,7 +3100,7 @@
     "correlation": "Diabète monitoring — Dexcom",
     "index": "SP500",
     "description": "Continuous glucose monitoring company making wearable diabetes management devices",
-    "phonetic": "dèkscome"
+    "phonetic": "dexcom"
   },
   {
     "symbol": "EA",
@@ -3110,7 +3110,7 @@
     "correlation": "^IXIC, jeux vidéo sports — EA",
     "index": "SP500",
     "description": "Video game publisher making sports, action, simulation games for multiple platforms",
-    "phonetic": "éléktronic-arte"
+    "phonetic": "electronic arts"
   },
   {
     "symbol": "EBAY",
@@ -3120,7 +3120,7 @@
     "correlation": "^IXIC, e-commerce enchères — eBay",
     "index": "SP500",
     "description": "Online marketplace connecting buyers and sellers for auctions and fixed-price sales",
-    "phonetic": "i-bé"
+    "phonetic": "i bé"
   },
   {
     "symbol": "ECL",
@@ -3140,7 +3140,7 @@
     "correlation": "Défensif — utility New York ConEd",
     "index": "SP500",
     "description": "Utility providing electricity and natural gas to New York City area",
-    "phonetic": "konsolidé-édisone"
+    "phonetic": "consolidated edison"
   },
   {
     "symbol": "EFX",
@@ -3150,7 +3150,7 @@
     "correlation": "Crédit scoring data — Equifax",
     "index": "SP500",
     "description": "Credit reporting agency collecting and managing consumer financial data",
-    "phonetic": "ékuifaks"
+    "phonetic": "équifax"
   },
   {
     "symbol": "EG",
@@ -3160,7 +3160,7 @@
     "correlation": "Réassurance catastrophes — Everest",
     "index": "SP500",
     "description": "Reinsurance company providing catastrophe and excess insurance to insurers",
-    "phonetic": "éverèste-groupe"
+    "phonetic": "everest groupe"
   },
   {
     "symbol": "EIX",
@@ -3170,7 +3170,7 @@
     "correlation": "Californie wildfire risk — Edison",
     "index": "SP500",
     "description": "Utility providing electricity to California customers, wildfire risk exposure",
-    "phonetic": "édisone-intèrnational"
+    "phonetic": "edison international"
   },
   {
     "symbol": "EL",
@@ -3180,7 +3180,7 @@
     "correlation": "Luxe cosmétiques Chine — Estée Lauder",
     "index": "SP500",
     "description": "Luxury cosmetics and skincare company making premium beauty and wellness products",
-    "phonetic": "éstée-laudère"
+    "phonetic": "estée lauder"
   },
   {
     "symbol": "EL.PA",
@@ -3190,7 +3190,7 @@
     "correlation": "Défensif, optique/santé visuelle",
     "index": "CAC40",
     "description": "Leader mondial de l'optique — verres Essilor + lunettes Luxottica (Ray-Ban)",
-    "phonetic": "essilor-luxotika"
+    "phonetic": "essilor luxottica"
   },
   {
     "symbol": "ELV",
@@ -3200,7 +3200,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Health insurance company serving Medicaid, Medicare, and marketplace customers",
-    "phonetic": "élevancé-ealty"
+    "phonetic": "elevance health"
   },
   {
     "symbol": "EME",
@@ -3210,7 +3210,7 @@
     "correlation": "HVAC construction services — Emcor",
     "index": "SP500",
     "description": "Mechanical systems contractor providing HVAC, plumbing, electrical services",
-    "phonetic": "émkor"
+    "phonetic": "emcor"
   },
   {
     "symbol": "EMR",
@@ -3220,7 +3220,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Diversified manufacturer making climate control, valve, and automation systems",
-    "phonetic": "émersone-électrik"
+    "phonetic": "emerson electric"
   },
   {
     "symbol": "EN.PA",
@@ -3230,7 +3230,7 @@
     "correlation": "Bouygues — construction, télécom, médias",
     "index": "CAC40",
     "description": "Conglomérat français — BTP, télécom (Bouygues Telecom), médias (TF1)",
-    "phonetic": "bouygez"
+    "phonetic": "bouïgue"
   },
   {
     "symbol": "ENGI.PA",
@@ -3240,7 +3240,7 @@
     "correlation": "Gaz naturel, défensif, transition énergétique",
     "index": "CAC40",
     "description": "Groupe énergétique français, gaz naturel, renouvelables, réseaux de chaleur",
-    "phonetic": "éngie"
+    "phonetic": "anjie"
   },
   {
     "symbol": "ENR.DE",
@@ -3250,7 +3250,7 @@
     "correlation": "Transition énergétique — Siemens Energy",
     "index": "DAX40",
     "description": "German energy technology — gas turbines, wind (Gamesa), grid solutions",
-    "phonetic": "siémènze-énerji"
+    "phonetic": "zimèns énergie"
   },
   {
     "symbol": "EOAN.DE",
@@ -3260,7 +3260,7 @@
     "correlation": "Gaz naturel, transition énergétique — E.ON",
     "index": "DAX40",
     "description": "Major German utility, electricity & gas distribution, energy networks",
-    "phonetic": "i-o-ène"
+    "phonetic": "e o ène"
   },
   {
     "symbol": "EOG",
@@ -3270,7 +3270,7 @@
     "correlation": "CL=F (pétrole) ↑↑",
     "index": "SP500",
     "description": "Oil and natural gas producer with unconventional resource focus",
-    "phonetic": "i-o-ji-ressource"
+    "phonetic": "eu o gé resources"
   },
   {
     "symbol": "EPAM",
@@ -3280,7 +3280,7 @@
     "correlation": "^IXIC, IT outsourcing — EPAM",
     "index": "SP500",
     "description": "IT services and software engineering company providing digital transformation services",
-    "phonetic": "i-pi-a-ème-sistème"
+    "phonetic": "eu pé a èm systèmes"
   },
   {
     "symbol": "EQIX",
@@ -3290,7 +3290,7 @@
     "correlation": "Taux ↓↓ — sensible aux taux hypothécaires",
     "index": "SP500",
     "description": "Data center real estate company with global colocation and interconnection services",
-    "phonetic": "ékuiniks"
+    "phonetic": "équinix"
   },
   {
     "symbol": "EQR",
@@ -3300,7 +3300,7 @@
     "correlation": "REIT appartements US — Equity Residential",
     "index": "SP500",
     "description": "Residential real estate trust owning apartment communities in US markets",
-    "phonetic": "ékouité-résidenche"
+    "phonetic": "équité résidentielle"
   },
   {
     "symbol": "EQT",
@@ -3310,7 +3310,7 @@
     "correlation": "NG=F, gaz Appalachian — EQT",
     "index": "SP500",
     "description": "Natural gas producer and midstream company with Appalachian operations",
-    "phonetic": "i-kou-ti-korporécheune"
+    "phonetic": "eu kou té"
   },
   {
     "symbol": "ERF.PA",
@@ -3320,7 +3320,7 @@
     "correlation": "Tests labo, pharma — Eurofins",
     "index": "CAC40",
     "description": "Leader mondial des services d'analyses (alimentaire, pharma, environnement)",
-    "phonetic": "ourofins-scientifik"
+    "phonetic": "eurofins scientifique"
   },
   {
     "symbol": "ERIE",
@@ -3330,7 +3330,7 @@
     "correlation": "Assurance régionale — Erie",
     "index": "SP500",
     "description": "Regional property and casualty insurance company serving homeowners and auto",
-    "phonetic": "éri-indémnité"
+    "phonetic": "érie indemnity"
   },
   {
     "symbol": "ES",
@@ -3340,7 +3340,7 @@
     "correlation": "Défensif — utility New England",
     "index": "SP500",
     "description": "Utility providing electricity and natural gas to New England customers",
-    "phonetic": "éveur-sourse-énerji"
+    "phonetic": "ever source énergie"
   },
   {
     "symbol": "ESS",
@@ -3350,7 +3350,7 @@
     "correlation": "REIT Californie — Essex",
     "index": "SP500",
     "description": "California residential real estate trust owning and operating apartment communities",
-    "phonetic": "éssèks-propeurté-truste"
+    "phonetic": "essex property"
   },
   {
     "symbol": "ETH-USD",
@@ -3364,7 +3364,7 @@
       "l'Ethereum",
       "l'ETH"
     ],
-    "phonetic": "ésérium"
+    "phonetic": "éthérium"
   },
   {
     "symbol": "ETN",
@@ -3374,7 +3374,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Industrial manufacturer making electrical equipment and power distribution systems",
-    "phonetic": "iaton-korporécheune"
+    "phonetic": "eaton"
   },
   {
     "symbol": "ETR",
@@ -3397,7 +3397,7 @@
     "aliases": [
       "l'euro-livre"
     ],
-    "phonetic": "ouro-livre"
+    "phonetic": "euro livre"
   },
   {
     "symbol": "EURJPY=X",
@@ -3410,7 +3410,7 @@
     "aliases": [
       "l'euro-yen"
     ],
-    "phonetic": "ouro-yène"
+    "phonetic": "euro yène"
   },
   {
     "symbol": "EURUSD=X",
@@ -3424,7 +3424,7 @@
       "l'euro-dollar",
       "la paire reine"
     ],
-    "phonetic": "ouro-dolar"
+    "phonetic": "euro dollar"
   },
   {
     "symbol": "EVRG",
@@ -3434,7 +3434,7 @@
     "correlation": "Défensif — utility Kansas",
     "index": "SP500",
     "description": "Kansas and Oklahoma utility providing electricity and natural gas services",
-    "phonetic": "éverji"
+    "phonetic": "everji"
   },
   {
     "symbol": "EW",
@@ -3444,7 +3444,7 @@
     "correlation": "Devices cardiaque — Edwards",
     "index": "SP500",
     "description": "Medical device company making cardiac, structural, and neurovascular devices",
-    "phonetic": "édouardz-laifsiensse"
+    "phonetic": "edwards life sciences"
   },
   {
     "symbol": "EXC",
@@ -3454,7 +3454,7 @@
     "correlation": "Taux ↓ — défensif, proxy obligataire",
     "index": "SP500",
     "description": "Major utility providing electricity and natural gas to mid-Atlantic customers",
-    "phonetic": "éksélone-korporécheune"
+    "phonetic": "exelon"
   },
   {
     "symbol": "EXE",
@@ -3464,7 +3464,7 @@
     "correlation": "NG=F, renouvelables — Expand Energy",
     "index": "SP500",
     "description": "Energy company developing and operating renewable power generation projects",
-    "phonetic": "ékspand-énerji"
+    "phonetic": "expand énergie"
   },
   {
     "symbol": "EXPD",
@@ -3474,7 +3474,7 @@
     "correlation": "Logistique freight international — Expeditors",
     "index": "SP500",
     "description": "Freight forwarding and logistics company handling air, ocean, and ground shipping",
-    "phonetic": "èkspéditorz-intèrnational"
+    "phonetic": "expeditors international"
   },
   {
     "symbol": "EXPE",
@@ -3484,7 +3484,7 @@
     "correlation": "^IXIC, voyages en ligne — Expedia",
     "index": "SP500",
     "description": "Online travel company offering hotel, flight, and vacation rental bookings",
-    "phonetic": "èkspédia-groupe"
+    "phonetic": "expedia"
   },
   {
     "symbol": "EXPN.L",
@@ -3494,7 +3494,7 @@
     "correlation": "Données crédit — Experian",
     "index": "FTSE100",
     "description": "World's largest credit bureau, consumer & business credit data",
-    "phonetic": "èkspérianne"
+    "phonetic": "expérianne"
   },
   {
     "symbol": "EXR",
@@ -3504,7 +3504,7 @@
     "correlation": "REIT self-storage — Extra Space",
     "index": "SP500",
     "description": "Self-storage real estate trust operating climate-controlled storage facilities",
-    "phonetic": "èkstra-spasse-storage"
+    "phonetic": "extra space storage"
   },
   {
     "symbol": "EZJ.L",
@@ -3514,7 +3514,7 @@
     "correlation": "CL=F ↓↓ — easyJet, low cost",
     "index": "FTSE100",
     "description": "UK's largest low-cost airline, European short-haul",
-    "phonetic": "iji-jet"
+    "phonetic": "izi jet"
   },
   {
     "symbol": "F",
@@ -3527,7 +3527,7 @@
     "aliases": [
       "Ford"
     ],
-    "phonetic": "forde-moteur"
+    "phonetic": "ford motor"
   },
   {
     "symbol": "FANG",
@@ -3537,7 +3537,7 @@
     "correlation": "CL=F (pétrole) ↑↑",
     "index": "SP500",
     "description": "Oil and gas producer focused on shale reserves in Permian Basin",
-    "phonetic": "diamondback-énerji"
+    "phonetic": "diamond back énergie"
   },
   {
     "symbol": "FAST",
@@ -3557,7 +3557,7 @@
     "correlation": "GC=F, SI=F — corrélé aux métaux précieux",
     "index": "SP500",
     "description": "Copper mining company with operations in Peru, Indonesia, and United States",
-    "phonetic": "fripeur-mcmoran"
+    "phonetic": "freeport mac moran"
   },
   {
     "symbol": "FDS",
@@ -3567,7 +3567,7 @@
     "correlation": "Yields, ^GSPC",
     "index": "SP500",
     "description": "Financial data and analytics company providing investment research and tools",
-    "phonetic": "factset-ricerche-sistème"
+    "phonetic": "factset research"
   },
   {
     "symbol": "FDX",
@@ -3577,7 +3577,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Global logistics company delivering packages and freight for businesses and consumers",
-    "phonetic": "féédéks"
+    "phonetic": "fedex"
   },
   {
     "symbol": "FE",
@@ -3587,7 +3587,7 @@
     "correlation": "Défensif — utility Ohio",
     "index": "SP500",
     "description": "Utility providing electricity to Ohio, Pennsylvania, West Virginia customers",
-    "phonetic": "ferste-énerji"
+    "phonetic": "first énergie"
   },
   {
     "symbol": "FERG.L",
@@ -3597,7 +3597,7 @@
     "correlation": "Plomberie, construction — Ferguson",
     "index": "FTSE100",
     "description": "World's largest plumbing & HVAC distributor, mainly US operations",
-    "phonetic": "férguson"
+    "phonetic": "ferguson"
   },
   {
     "symbol": "FFIV",
@@ -3607,7 +3607,7 @@
     "correlation": "Cybersécurité réseau — F5",
     "index": "SP500",
     "description": "Application delivery controller providing network security and optimization software",
-    "phonetic": "èf-faiave"
+    "phonetic": "èf faïve"
   },
   {
     "symbol": "FICO",
@@ -3617,7 +3617,7 @@
     "correlation": "Crédit scoring analytics — Fair Isaac",
     "index": "SP500",
     "description": "Credit scoring company providing decision analytics for lending and fraud detection",
-    "phonetic": "fère-isaak"
+    "phonetic": "faïre isaac"
   },
   {
     "symbol": "FIS",
@@ -3627,7 +3627,7 @@
     "correlation": "XLF, fintech banking — FIS",
     "index": "SP500",
     "description": "Financial services software company providing banking, payments, trading systems",
-    "phonetic": "fidélité-national-information-servisse"
+    "phonetic": "fidélité national information"
   },
   {
     "symbol": "FISV",
@@ -3637,7 +3637,7 @@
     "correlation": "XLF, fintech paiements — Fiserv",
     "index": "SP500",
     "description": "Financial software company processing payments and managing banking systems",
-    "phonetic": "fizerve"
+    "phonetic": "fiserv"
   },
   {
     "symbol": "FITB",
@@ -3647,7 +3647,7 @@
     "correlation": "Yields, banque régionale — Fifth Third",
     "index": "SP500",
     "description": "Regional bank providing consumer and commercial banking services",
-    "phonetic": "fifse-tird-bankorp"
+    "phonetic": "fifth third bancorp"
   },
   {
     "symbol": "FIX",
@@ -3657,7 +3657,7 @@
     "correlation": "HVAC services commercial — Comfort Systems",
     "index": "SP500",
     "description": "HVAC and electrical services company for commercial and industrial customers",
-    "phonetic": "konfort-sistème-u-esse-a"
+    "phonetic": "comfort systems u èss a"
   },
   {
     "symbol": "FLTR.L",
@@ -3667,7 +3667,7 @@
     "correlation": "Paris sportifs — Flutter (FanDuel)",
     "index": "FTSE100",
     "description": "World's largest online sports betting group — FanDuel, Paddy Power, Betfair",
-    "phonetic": "flouteur-entertainmène"
+    "phonetic": "flouteur entertainment"
   },
   {
     "symbol": "FOX",
@@ -3677,7 +3677,7 @@
     "correlation": "Médias news TV — Fox Corp",
     "index": "SP500",
     "description": "Media company producing and broadcasting entertainment and news programming",
-    "phonetic": "foks"
+    "phonetic": "fox"
   },
   {
     "symbol": "FOXA",
@@ -3687,7 +3687,7 @@
     "correlation": "Médias news TV — Fox Corp A",
     "index": "SP500",
     "description": "Media company producing and broadcasting entertainment and news content",
-    "phonetic": "foks"
+    "phonetic": "fox"
   },
   {
     "symbol": "FRE.DE",
@@ -3707,7 +3707,7 @@
     "correlation": "REIT retail — Federal Realty",
     "index": "SP500",
     "description": "Real estate trust owning shopping centers and outdoor malls nationwide",
-    "phonetic": "fédéral-réalité-invèstmène-truste"
+    "phonetic": "federal realty"
   },
   {
     "symbol": "FSLR",
@@ -3717,7 +3717,7 @@
     "correlation": "Solaire panneaux utility — First Solar",
     "index": "SP500",
     "description": "Solar panel manufacturer making photovoltaic modules for utility and residential",
-    "phonetic": "ferste-solaire"
+    "phonetic": "first solar"
   },
   {
     "symbol": "FTNT",
@@ -3727,7 +3727,7 @@
     "correlation": "^IXIC, cybersécurité firewalls — Fortinet",
     "index": "SP500",
     "description": "Cybersecurity company making firewalls and network security appliances",
-    "phonetic": "fortinète"
+    "phonetic": "fortinet"
   },
   {
     "symbol": "FTV",
@@ -3737,7 +3737,7 @@
     "correlation": "Prix agricoles (blé, maïs, soja) — santé économie agricole",
     "index": "SP500",
     "description": "Industrial technology conglomerate making precision equipment and software solutions",
-    "phonetic": "fortaïve"
+    "phonetic": "fortive"
   },
   {
     "symbol": "GBPJPY=X",
@@ -3750,7 +3750,7 @@
     "aliases": [
       "la livre-yen"
     ],
-    "phonetic": "gé-bé-pi-djipi-waï"
+    "phonetic": "livre yène"
   },
   {
     "symbol": "GBPUSD=X",
@@ -3764,7 +3764,7 @@
       "le câble",
       "la livre sterling"
     ],
-    "phonetic": "gé-bé-pi-you-esse-dé"
+    "phonetic": "livre dollar"
   },
   {
     "symbol": "GC=F",
@@ -3790,7 +3790,7 @@
     "correlation": "Géopolitique ↑↑ — tensions = commandes",
     "index": "SP500",
     "description": "Defense contractor making military aircraft, missiles, and surveillance systems",
-    "phonetic": "djiénéral-daïnamiks"
+    "phonetic": "général dynamics"
   },
   {
     "symbol": "GDDY",
@@ -3800,7 +3800,7 @@
     "correlation": "^IXIC, hébergement web PME — GoDaddy",
     "index": "SP500",
     "description": "Web hosting and domain registration company serving small business websites",
-    "phonetic": "go-daddi"
+    "phonetic": "go daddy"
   },
   {
     "symbol": "GE",
@@ -3810,7 +3810,7 @@
     "correlation": "Géopolitique ↑↑ — tensions = commandes",
     "index": "SP500",
     "description": "Industrial conglomerate making power, aviation, renewable energy equipment",
-    "phonetic": "djiénéral-élèktrik"
+    "phonetic": "général electric"
   },
   {
     "symbol": "GEHC",
@@ -3820,7 +3820,7 @@
     "correlation": "Imagerie médicale IRM CT — GE HealthCare",
     "index": "SP500",
     "description": "Medical devices company making imaging, monitoring, and diagnostics equipment",
-    "phonetic": "djiénéral-élèktrik-héalstchéïr"
+    "phonetic": "gé eu healthcare"
   },
   {
     "symbol": "GEN",
@@ -3830,7 +3830,7 @@
     "correlation": "Cybersécurité endpoint — Gen Digital",
     "index": "SP500",
     "description": "Cybersecurity software company providing endpoint protection and threat detection",
-    "phonetic": "djèn-didjitale"
+    "phonetic": "jène digital"
   },
   {
     "symbol": "GEV",
@@ -3840,7 +3840,7 @@
     "correlation": "Grid énergie modernisation — GE Vernova",
     "index": "SP500",
     "description": "Energy infrastructure company providing grid modernization and energy storage",
-    "phonetic": "djiénéral-élèktrik-vèrnova"
+    "phonetic": "gé eu vernova"
   },
   {
     "symbol": "GILD",
@@ -3850,7 +3850,7 @@
     "correlation": "FDA, pipelines — très binaire (approbation ou rejet)",
     "index": "SP500",
     "description": "HIV and hepatitis C antivirals, oncology drugs—global pharma giant",
-    "phonetic": "djiléade-saïénsèze"
+    "phonetic": "gilead sciences"
   },
   {
     "symbol": "GIS",
@@ -3860,7 +3860,7 @@
     "correlation": "Céréales alimentation — General Mills",
     "index": "SP500",
     "description": "Breakfast cereals, yogurt, pet food—packaged consumer staples brand",
-    "phonetic": "djiénéral-millze"
+    "phonetic": "général mills"
   },
   {
     "symbol": "GL",
@@ -3870,7 +3870,7 @@
     "correlation": "Assurance vie — Globe Life",
     "index": "SP500",
     "description": "Life insurance and annuities—financial security for working Americans",
-    "phonetic": "globa-laïfe"
+    "phonetic": "globe life"
   },
   {
     "symbol": "GLE.PA",
@@ -3880,7 +3880,7 @@
     "correlation": "Yields ↑, spread 10Y-2Y ↑",
     "index": "CAC40",
     "description": "Grande banque française, banque de détail, financement & marchés",
-    "phonetic": "sosyété-djiénérale"
+    "phonetic": "société générale"
   },
   {
     "symbol": "GLEN.L",
@@ -3890,7 +3890,7 @@
     "correlation": "Matières premières diversifiées — Glencore",
     "index": "FTSE100",
     "description": "Swiss-British commodities trader & miner — copper, cobalt, zinc, coal, oil",
-    "phonetic": "glènkor"
+    "phonetic": "glène core"
   },
   {
     "symbol": "GLW",
@@ -3900,7 +3900,7 @@
     "correlation": "Verre tech fibre optique — Corning",
     "index": "SP500",
     "description": "Glass and ceramics for tech, automotive, industrial applications worldwide",
-    "phonetic": "korning"
+    "phonetic": "corning"
   },
   {
     "symbol": "GM",
@@ -3914,7 +3914,7 @@
       "General Motors",
       "GM"
     ],
-    "phonetic": "djiénéral-moteurz"
+    "phonetic": "général motors"
   },
   {
     "symbol": "GNRC",
@@ -3924,7 +3924,7 @@
     "correlation": "Générateurs backup énergie — Generac",
     "index": "SP500",
     "description": "Backup generators for homes and businesses during power outages",
-    "phonetic": "djiénérak"
+    "phonetic": "jénérac"
   },
   {
     "symbol": "GOOG",
@@ -3938,7 +3938,7 @@
       "Google",
       "Alphabet"
     ],
-    "phonetic": "alfabète"
+    "phonetic": "alphabet"
   },
   {
     "symbol": "GOOGL",
@@ -3953,7 +3953,7 @@
       "Alphabet",
       "la maison mère de Google"
     ],
-    "phonetic": "alfabète"
+    "phonetic": "alphabet"
   },
   {
     "symbol": "GPC",
@@ -3963,7 +3963,7 @@
     "correlation": "Auto parts distribution — Genuine Parts",
     "index": "SP500",
     "description": "Auto parts, tools, supplies distribution to mechanics and retailers",
-    "phonetic": "djéniouïne-parts-kompagni"
+    "phonetic": "génuine parts"
   },
   {
     "symbol": "GPN",
@@ -3973,7 +3973,7 @@
     "correlation": "Fintech paiements marchands — Global Payments",
     "index": "SP500",
     "description": "Digital payment processing and commerce infrastructure for merchants",
-    "phonetic": "globa-payménts"
+    "phonetic": "global payments"
   },
   {
     "symbol": "GRMN",
@@ -3998,7 +3998,7 @@
       "Goldman",
       "la banque d'affaires"
     ],
-    "phonetic": "goldman-saks-groupe"
+    "phonetic": "goldman sachs"
   },
   {
     "symbol": "GSK.L",
@@ -4008,7 +4008,7 @@
     "correlation": "Pharma défensif — GSK",
     "index": "FTSE100",
     "description": "British pharma (ex-GlaxoSmithKline), vaccines, specialty medicines",
-    "phonetic": "djiéssé-ké"
+    "phonetic": "gé èsse ka"
   },
   {
     "symbol": "GWW",
@@ -4018,7 +4018,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Industrial equipment and supplies distribution to business and construction",
-    "phonetic": "doubelyou-doubelyou-grédjineur"
+    "phonetic": "doublevé doublevé grainger"
   },
   {
     "symbol": "H",
@@ -4028,7 +4028,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Luxury hotel chain—Park Hyatt, Hyatt, Andaz, other premium brands",
-    "phonetic": "hyate-otèlz"
+    "phonetic": "hyatt hotels"
   },
   {
     "symbol": "HAL",
@@ -4038,7 +4038,7 @@
     "correlation": "CL=F (pétrole) ↑↑",
     "index": "SP500",
     "description": "Oil and gas drilling services, equipment, chemicals for energy sector",
-    "phonetic": "alibeurton"
+    "phonetic": "alliburton"
   },
   {
     "symbol": "HAS",
@@ -4048,7 +4048,7 @@
     "correlation": "Jouets divertissement — Hasbro",
     "index": "SP500",
     "description": "Toy manufacturer—Play-Doh, Transformers, My Little Pony, board games",
-    "phonetic": "aazbro"
+    "phonetic": "hasbro"
   },
   {
     "symbol": "HBAN",
@@ -4058,7 +4058,7 @@
     "correlation": "Yields, banque régionale — Huntington",
     "index": "SP500",
     "description": "Regional bank headquartered in Columbus, Ohio—consumer and commercial loans",
-    "phonetic": "ontington-banks"
+    "phonetic": "huntington bancshares"
   },
   {
     "symbol": "HCA",
@@ -4068,7 +4068,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Hospital operator—largest private healthcare chain in United States",
-    "phonetic": "atch-sé-a-héalstchéïr"
+    "phonetic": "ache ci a healthcare"
   },
   {
     "symbol": "HD",
@@ -4081,7 +4081,7 @@
     "aliases": [
       "Home Depot"
     ],
-    "phonetic": "om-dépô"
+    "phonetic": "home depot"
   },
   {
     "symbol": "HEI.DE",
@@ -4091,7 +4091,7 @@
     "correlation": "Gaz naturel, ciment — HeidelbergCement",
     "index": "DAX40",
     "description": "Major global cement & building materials producer (ex-HeidelbergCement)",
-    "phonetic": "aydelberg-matérialz"
+    "phonetic": "aïdelberg matériaux"
   },
   {
     "symbol": "HFG.DE",
@@ -4101,7 +4101,7 @@
     "correlation": "Meal kits, consommateur — HelloFresh",
     "index": "DAX40",
     "description": "World's largest meal kit delivery company, German-founded",
-    "phonetic": "élofresh"
+    "phonetic": "éllo fresh"
   },
   {
     "symbol": "HG=F",
@@ -4116,7 +4116,7 @@
       "Dr Copper",
       "le docteur Cuivre"
     ],
-    "phonetic": "kuivre"
+    "phonetic": "cuivre"
   },
   {
     "symbol": "HIG",
@@ -4126,7 +4126,7 @@
     "correlation": "Assurance P&C — Hartford",
     "index": "SP500",
     "description": "Property and casualty insurance—risk management for businesses and homes",
-    "phonetic": "artford"
+    "phonetic": "hartford"
   },
   {
     "symbol": "HII",
@@ -4136,7 +4136,7 @@
     "correlation": "Géopolitique ↑↑ — tensions = commandes",
     "index": "SP500",
     "description": "Military shipbuilder—submarines, destroyers, aircraft carriers for Navy",
-    "phonetic": "ontington-ingallz-indeustriize"
+    "phonetic": "huntington ingalls"
   },
   {
     "symbol": "HLN.L",
@@ -4146,7 +4146,7 @@
     "correlation": "Santé consommateur, OTC — Haleon",
     "index": "FTSE100",
     "description": "Consumer health spinoff from GSK — Sensodyne, Advil, Voltaren, Centrum",
-    "phonetic": "ayléone"
+    "phonetic": "aléon"
   },
   {
     "symbol": "HLT",
@@ -4156,7 +4156,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Hotel franchiser—Hilton, DoubleTree, Hampton across luxury and midscale",
-    "phonetic": "ilton-ouerldouïde-oldingz"
+    "phonetic": "hilton worldwide"
   },
   {
     "symbol": "HNR1.DE",
@@ -4166,7 +4166,7 @@
     "correlation": "Énergie — Hannover Rück",
     "index": "DAX40",
     "description": "World's third-largest reinsurer, property/casualty & life/health",
-    "phonetic": "anover-ré"
+    "phonetic": "anovère ré"
   },
   {
     "symbol": "HO.PA",
@@ -4176,7 +4176,7 @@
     "correlation": "Géopolitique ↑↑, défense, cybersécurité",
     "index": "CAC40",
     "description": "Groupe français de défense, aérospatial, cybersécurité & transport",
-    "phonetic": "talèz"
+    "phonetic": "talèsse"
   },
   {
     "symbol": "HOLX",
@@ -4186,7 +4186,7 @@
     "correlation": "Diagnostic santé femme — Hologic",
     "index": "SP500",
     "description": "Women's health diagnostics and breast imaging devices and software",
-    "phonetic": "olodjik"
+    "phonetic": "hologic"
   },
   {
     "symbol": "HON",
@@ -4196,7 +4196,7 @@
     "correlation": "Cycle économique, PMI Manufacturing",
     "index": "SP500",
     "description": "Aerospace, building controls, safety equipment—diversified industrial",
-    "phonetic": "onèouèle-intèrnassyonal"
+    "phonetic": "honeywell international"
   },
   {
     "symbol": "HOOD",
@@ -4209,7 +4209,7 @@
     "aliases": [
       "Robinhood"
     ],
-    "phonetic": "robinood-markèts"
+    "phonetic": "robinhood markets"
   },
   {
     "symbol": "HPE",
@@ -4219,7 +4219,7 @@
     "correlation": "^IXIC ↑, taux ↓↓",
     "index": "SP500",
     "description": "Enterprise IT infrastructure—servers, storage, networking for data centers",
-    "phonetic": "youépète-èntèrpraïze"
+    "phonetic": "ache pé eu enterprise"
   },
   {
     "symbol": "HPQ",
@@ -4229,7 +4229,7 @@
     "correlation": "^IXIC ↑, taux ↓↓",
     "index": "SP500",
     "description": "Desktop and laptop computers plus printers—consumer and business tech",
-    "phonetic": "atch-pi"
+    "phonetic": "ache pé"
   },
   {
     "symbol": "HRL",
@@ -4239,7 +4239,7 @@
     "correlation": "Viande alimentation — Hormel",
     "index": "SP500",
     "description": "Canned meat, bacon, pepperoni—iconic American processed meat brand",
-    "phonetic": "ormel-fouds"
+    "phonetic": "hormel foods"
   },
   {
     "symbol": "HSBA.L",
@@ -4249,7 +4249,7 @@
     "correlation": "Yields ↑, Asie — HSBC",
     "index": "FTSE100",
     "description": "Europe's largest bank, headquarters London, dominant in Asia",
-    "phonetic": "atch-esse-bé-sé"
+    "phonetic": "ache èsse bé ci"
   },
   {
     "symbol": "HSIC",
@@ -4259,7 +4259,7 @@
     "correlation": "Distribution dentaire — Henry Schein",
     "index": "SP500",
     "description": "Dental and healthcare supplies distributor to practitioners worldwide",
-    "phonetic": "enri-chaïne"
+    "phonetic": "henry schein"
   },
   {
     "symbol": "HST",
@@ -4269,7 +4269,7 @@
     "correlation": "REIT hôtels luxe — Host Hotels",
     "index": "SP500",
     "description": "Luxury hotel real estate REIT—owns Marriott and Hyatt properties",
-    "phonetic": "ost-otèlz-rèzortz"
+    "phonetic": "host hotels"
   },
   {
     "symbol": "HSY",
@@ -4279,7 +4279,7 @@
     "correlation": "Chocolat confiserie — Hershey",
     "index": "SP500",
     "description": "Chocolate and candy manufacturer—Hershey's, Reese's, Kisses iconic brands",
-    "phonetic": "érché"
+    "phonetic": "hershey"
   },
   {
     "symbol": "HUBB",
@@ -4289,7 +4289,7 @@
     "correlation": "Électrique infrastructure — Hubbell",
     "index": "SP500",
     "description": "Electrical and utility products, power distribution, industrial connectors",
-    "phonetic": "oubbèle-inkorporéïtèd"
+    "phonetic": "hubbell"
   },
   {
     "symbol": "HUM",
@@ -4299,7 +4299,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Medicare Advantage and managed healthcare plans for elderly and disabled",
-    "phonetic": "youmana"
+    "phonetic": "humana"
   },
   {
     "symbol": "HWM",
@@ -4309,7 +4309,7 @@
     "correlation": "Aérospatial aluminium — Howmet",
     "index": "SP500",
     "description": "Aerospace aluminum and metal parts—jet engines, defense, commercial planes",
-    "phonetic": "oumèt-érospass"
+    "phonetic": "howmet aerospace"
   },
   {
     "symbol": "IAG.L",
@@ -4319,7 +4319,7 @@
     "correlation": "CL=F ↓↓ — British Airways, Iberia",
     "index": "FTSE100",
     "description": "International Airlines Group — British Airways, Iberia, Vueling, Aer Lingus",
-    "phonetic": "a-i-a-djizie"
+    "phonetic": "i a gé"
   },
   {
     "symbol": "IBKR",
@@ -4329,7 +4329,7 @@
     "correlation": "^GSPC, courtage pro — Interactive Brokers",
     "index": "SP500",
     "description": "Discount broker for professionals—trading, prime brokerage, wealth management",
-    "phonetic": "intèraktif-brokeurz"
+    "phonetic": "interactive brokers"
   },
   {
     "symbol": "IBM",
@@ -4343,7 +4343,7 @@
       "IBM",
       "Big Blue"
     ],
-    "phonetic": "a-i-bé-ème"
+    "phonetic": "i bé èm"
   },
   {
     "symbol": "ICE",
@@ -4353,7 +4353,7 @@
     "correlation": "Yields, ^GSPC",
     "index": "SP500",
     "description": "Stock exchange operator—NYSE, commodity futures, data and analytics",
-    "phonetic": "intèrkontinèntale-èkstchangé"
+    "phonetic": "intercontinental exchange"
   },
   {
     "symbol": "IDXX",
@@ -4363,7 +4363,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Animal health diagnostics and software for veterinary clinics worldwide",
-    "phonetic": "aïdèks-laboratoriize"
+    "phonetic": "i dé iks iks laboratoires"
   },
   {
     "symbol": "IEX",
@@ -4373,7 +4373,7 @@
     "correlation": "Pompes fluides industrie — IDEX",
     "index": "SP500",
     "description": "Fluid power and motion control systems for industrial manufacturing",
-    "phonetic": "aïdèks-korporécheune"
+    "phonetic": "i dé iks"
   },
   {
     "symbol": "IFF",
@@ -4383,7 +4383,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Flavors, fragrances, cosmetic ingredients for food and beauty industries",
-    "phonetic": "intèrnassyonal-flavourz-fragrancèz"
+    "phonetic": "international flavors"
   },
   {
     "symbol": "IFX.DE",
@@ -4393,7 +4393,7 @@
     "correlation": "^IXIC ↑, auto EV — Infineon",
     "index": "DAX40",
     "description": "German semiconductor maker, leader in automotive chips & power semiconductors",
-    "phonetic": "infinéone-tèknolodjiize"
+    "phonetic": "infinéon technologies"
   },
   {
     "symbol": "IHG.L",
@@ -4403,7 +4403,7 @@
     "correlation": "Tourisme, voyage — InterContinental",
     "index": "FTSE100",
     "description": "British hotel group — Holiday Inn, Crowne Plaza, Six Senses, 6000+ hotels",
-    "phonetic": "intèrkontinèntale-otèlz"
+    "phonetic": "intercontinental hôtels"
   },
   {
     "symbol": "III.L",
@@ -4413,7 +4413,7 @@
     "correlation": "Gestion actifs — 3i Group",
     "index": "FTSE100",
     "description": "British private equity & infrastructure investor, owns Action discount stores",
-    "phonetic": "troïz-i-groupe"
+    "phonetic": "trois i groupe"
   },
   {
     "symbol": "ILMN",
@@ -4423,7 +4423,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "DNA sequencing technology—genetic testing, cancer research, precision medicine",
-    "phonetic": "illouminA"
+    "phonetic": "illumina"
   },
   {
     "symbol": "IMB.L",
@@ -4433,7 +4433,7 @@
     "correlation": "Défensif, dividendes — Imperial Brands",
     "index": "FTSE100",
     "description": "British tobacco company — Winston, Davidoff, Gauloises",
-    "phonetic": "impérial-brandz"
+    "phonetic": "impérial brands"
   },
   {
     "symbol": "INCY",
@@ -4457,7 +4457,7 @@
       "Intel",
       "le fondeur historique"
     ],
-    "phonetic": "intèle"
+    "phonetic": "intel"
   },
   {
     "symbol": "INTU",
@@ -4467,7 +4467,7 @@
     "correlation": "^IXIC ↑, taux ↓↓",
     "index": "SP500",
     "description": "Tax software (TurboTax), accounting (QuickBooks)—finance for individuals",
-    "phonetic": "intouïte"
+    "phonetic": "intuit"
   },
   {
     "symbol": "INVH",
@@ -4477,7 +4477,7 @@
     "correlation": "REIT maisons individuelles — Invitation Homes",
     "index": "SP500",
     "description": "Single-family home rental REIT—manages residential properties nationwide",
-    "phonetic": "invitatyoun-omèz"
+    "phonetic": "invitation homes"
   },
   {
     "symbol": "IP",
@@ -4487,7 +4487,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Cardboard, packaging, pulp paper—corrugated boxes for shipping and commerce",
-    "phonetic": "intèrnassyonal-papeurz"
+    "phonetic": "international paper"
   },
   {
     "symbol": "IQV",
@@ -4497,7 +4497,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Clinical trial services and healthcare data analytics for pharmaceutical companies",
-    "phonetic": "a-ikiouvizizia"
+    "phonetic": "i kou vi a"
   },
   {
     "symbol": "IR",
@@ -4507,7 +4507,7 @@
     "correlation": "Prix agricoles (blé, maïs, soja) — santé économie agricole",
     "index": "SP500",
     "description": "Diversified industrial—compressors, air handlers, controls, aftermarket services",
-    "phonetic": "indjirsol-rand"
+    "phonetic": "ingersoll rand"
   },
   {
     "symbol": "IRM",
@@ -4517,7 +4517,7 @@
     "correlation": "Data centers stockage — Iron Mountain",
     "index": "SP500",
     "description": "Data center and records management REIT—physical document and data storage",
-    "phonetic": "aïrne-mountain"
+    "phonetic": "iron mountain"
   },
   {
     "symbol": "ISRG",
@@ -4527,7 +4527,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Robotic surgery systems (da Vinci)—surgical automation for hospitals",
-    "phonetic": "intouïtif-sourdjikal"
+    "phonetic": "intuitive surgical"
   },
   {
     "symbol": "IT",
@@ -4547,7 +4547,7 @@
     "correlation": "Prix agricoles (blé, maïs, soja) — santé économie agricole",
     "index": "SP500",
     "description": "Diversified manufacturer—tools, fasteners, automotive, food equipment",
-    "phonetic": "illinoïz-tool-ourkz"
+    "phonetic": "illinois tool works"
   },
   {
     "symbol": "IVZ",
@@ -4557,7 +4557,7 @@
     "correlation": "^GSPC, gestion ETF fonds — Invesco",
     "index": "SP500",
     "description": "Asset management—mutual funds, ETFs, wealth management globally",
-    "phonetic": "invèsko"
+    "phonetic": "invesco"
   },
   {
     "symbol": "J",
@@ -4567,7 +4567,7 @@
     "correlation": "Ingénierie infrastructure — Jacobs",
     "index": "SP500",
     "description": "Engineering and construction services—infrastructure, industrial projects",
-    "phonetic": "djakobz-solutyounz"
+    "phonetic": "jacobs solutions"
   },
   {
     "symbol": "JBHT",
@@ -4577,7 +4577,7 @@
     "correlation": "Transport camions — J.B. Hunt",
     "index": "SP500",
     "description": "Trucking and logistics—freight transportation across North America",
-    "phonetic": "djibi-ont"
+    "phonetic": "ji bé hunt"
   },
   {
     "symbol": "JBL",
@@ -4587,7 +4587,7 @@
     "correlation": "Fabrication électronique — Jabil",
     "index": "SP500",
     "description": "Electronics manufacturing—printed circuit boards, enclosures, outsourcing",
-    "phonetic": "djiabil"
+    "phonetic": "jabil"
   },
   {
     "symbol": "JCI",
@@ -4597,7 +4597,7 @@
     "correlation": "HVAC sécurité bâtiment — Johnson Controls",
     "index": "SP500",
     "description": "Building systems—HVAC, security, fire control for commercial real estate",
-    "phonetic": "djoinson-kontrôlz"
+    "phonetic": "johnson controls"
   },
   {
     "symbol": "JKHY",
@@ -4607,7 +4607,7 @@
     "correlation": "XLF, fintech banques régionales — Jack Henry",
     "index": "SP500",
     "description": "Fintech for regional banks—core banking, payment processing, cybersecurity",
-    "phonetic": "djaak-énri-assossyéïtèz"
+    "phonetic": "jack henry"
   },
   {
     "symbol": "JNJ",
@@ -4621,7 +4621,7 @@
       "Johnson & Johnson",
       "J&J"
     ],
-    "phonetic": "djoinson-et-djoinson"
+    "phonetic": "johnson et johnson"
   },
   {
     "symbol": "JPM",
@@ -4636,7 +4636,7 @@
       "JPMorgan Chase",
       "Jamie Dimon"
     ],
-    "phonetic": "dji-pi-ème"
+    "phonetic": "djé pi morgane"
   },
   {
     "symbol": "KDP",
@@ -4646,7 +4646,7 @@
     "correlation": "Boissons café soda — Keurig Dr Pepper",
     "index": "SP500",
     "description": "Coffee pods (Keurig), Dr Pepper soda—beverage conglomerate",
-    "phonetic": "ka-dé-pi"
+    "phonetic": "keurig docteur pepper"
   },
   {
     "symbol": "KER.PA",
@@ -4656,7 +4656,7 @@
     "correlation": "Chine ↑↑, EUR/USD — Gucci, Saint-Laurent",
     "index": "CAC40",
     "description": "Groupe de luxe français — Gucci, Saint Laurent, Bottega Veneta, Balenciaga",
-    "phonetic": "keringe"
+    "phonetic": "kerinne"
   },
   {
     "symbol": "KEY",
@@ -4666,7 +4666,7 @@
     "correlation": "Yields, banque régionale — KeyCorp",
     "index": "SP500",
     "description": "Regional bank—consumer banking, commercial loans across Midwest",
-    "phonetic": "ka-i-grek"
+    "phonetic": "key corp"
   },
   {
     "symbol": "KEYS",
@@ -4676,7 +4676,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Electronic measurement equipment—oscilloscopes, spectrum analyzers for engineers",
-    "phonetic": "kéïsaïte-tèknolodjiize"
+    "phonetic": "keysight technologies"
   },
   {
     "symbol": "KHC",
@@ -4686,7 +4686,7 @@
     "correlation": "Alimentation Kraft Heinz — packaged foods",
     "index": "SP500",
     "description": "Packaged foods—Kraft, Heinz, Philadelphia cheese, Ore-Ida potatoes",
-    "phonetic": "kraft-ainz"
+    "phonetic": "kraft heinz"
   },
   {
     "symbol": "KIM",
@@ -4696,7 +4696,7 @@
     "correlation": "REIT retail strip malls — Kimco",
     "index": "SP500",
     "description": "Shopping center REIT—owns strip malls and neighborhood retail properties",
-    "phonetic": "kimko-réalité"
+    "phonetic": "kimco realty"
   },
   {
     "symbol": "KKR",
@@ -4706,7 +4706,7 @@
     "correlation": "Yields, ^GSPC",
     "index": "SP500",
     "description": "Private equity powerhouse—buyouts, growth equity, infrastructure, real assets",
-    "phonetic": "ka-ka-ène"
+    "phonetic": "ka ka ar"
   },
   {
     "symbol": "KLAC",
@@ -4716,7 +4716,7 @@
     "correlation": "^IXIC ↑, ^KS11 — supply chain asiatique",
     "index": "SP500",
     "description": "Semiconductor manufacturing equipment—inspection and process control tools",
-    "phonetic": "ka-elle-a"
+    "phonetic": "ka èl a"
   },
   {
     "symbol": "KMB",
@@ -4726,7 +4726,7 @@
     "correlation": "Hygiène consommation — Kimberly-Clark",
     "index": "SP500",
     "description": "Personal care—Kleenex, Huggies, Kotex, Scott tissue brands",
-    "phonetic": "kimbeurly-klark"
+    "phonetic": "kimberly clark"
   },
   {
     "symbol": "KMI",
@@ -4736,7 +4736,7 @@
     "correlation": "NG=F, CL=F — Kinder Morgan pipelines",
     "index": "SP500",
     "description": "Energy pipelines and terminals—natural gas and crude oil transport infrastructure",
-    "phonetic": "kindeur-morgane"
+    "phonetic": "kinder morgan"
   },
   {
     "symbol": "KO",
@@ -4750,7 +4750,7 @@
       "Coca-Cola",
       "le géant d'Atlanta"
     ],
-    "phonetic": "koka-kola"
+    "phonetic": "coca cola"
   },
   {
     "symbol": "KR",
@@ -4760,7 +4760,7 @@
     "correlation": "Supermarchés — Kroger",
     "index": "SP500",
     "description": "Grocery chain—supermarkets and fuel stations across western United States",
-    "phonetic": "krogueur"
+    "phonetic": "kroger"
   },
   {
     "symbol": "KVUE",
@@ -4770,7 +4770,7 @@
     "correlation": "Santé consommateur OTC — Kenvue",
     "index": "SP500",
     "description": "Consumer health and personal care—spinoff from J&J, over-the-counter products",
-    "phonetic": "kènvioue"
+    "phonetic": "ken vue"
   },
   {
     "symbol": "L",
@@ -4780,7 +4780,7 @@
     "correlation": "Holding diversifié — Loews",
     "index": "SP500",
     "description": "Diversified holding company—insurance, oil, hotels, boardgame properties",
-    "phonetic": "louèz"
+    "phonetic": "loews"
   },
   {
     "symbol": "LDOS",
@@ -4790,7 +4790,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Defense and intelligence contractor—cyber, IT services for US government",
-    "phonetic": "léïdose-oldingz"
+    "phonetic": "leidos holdings"
   },
   {
     "symbol": "LEN",
@@ -4800,7 +4800,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Residential home builder—new construction for single-family homes nationwide",
-    "phonetic": "lenare"
+    "phonetic": "lennar"
   },
   {
     "symbol": "LGEN.L",
@@ -4810,7 +4810,7 @@
     "correlation": "Yields ↑, retraites — Legal & General",
     "index": "FTSE100",
     "description": "UK insurance & investment management group, major pension provider",
-    "phonetic": "légal-dji-néral"
+    "phonetic": "légal et général"
   },
   {
     "symbol": "LH",
@@ -4820,7 +4820,7 @@
     "correlation": "Diagnostic labo tests — Labcorp",
     "index": "SP500",
     "description": "Lab testing and diagnostics—blood tests, drug screening for patients",
-    "phonetic": "labkorp"
+    "phonetic": "labcorp"
   },
   {
     "symbol": "LHX",
@@ -4830,7 +4830,7 @@
     "correlation": "Géopolitique ↑↑ — tensions = commandes",
     "index": "SP500",
     "description": "Aerospace and defense electronics—missiles, military communications systems",
-    "phonetic": "elle-trois-arris-tèknolodjiize"
+    "phonetic": "èl trois harris technologies"
   },
   {
     "symbol": "LII",
@@ -4840,7 +4840,7 @@
     "correlation": "HVAC chauffage — Lennox",
     "index": "SP500",
     "description": "HVAC and refrigeration equipment—heating, cooling systems for buildings",
-    "phonetic": "lènoks-inteurnaticheune"
+    "phonetic": "lennox international"
   },
   {
     "symbol": "LIN",
@@ -4850,7 +4850,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Industrial gases (oxygen, nitrogen) and engineering solutions for manufacturing",
-    "phonetic": "lindè"
+    "phonetic": "linde"
   },
   {
     "symbol": "LLOY.L",
@@ -4860,7 +4860,7 @@
     "correlation": "Yields ↑, immobilier UK — Lloyds",
     "index": "FTSE100",
     "description": "UK's largest retail bank, mortgage lender & insurer",
-    "phonetic": "loidz-banke-groupe"
+    "phonetic": "lloyds banking groupe"
   },
   {
     "symbol": "LLY",
@@ -4874,7 +4874,7 @@
       "Eli Lilly",
       "Lilly"
     ],
-    "phonetic": "éli-lili-et-compagnie"
+    "phonetic": "éli lilly"
   },
   {
     "symbol": "LMT",
@@ -4888,7 +4888,7 @@
       "Lockheed Martin",
       "le géant de la défense"
     ],
-    "phonetic": "lockid-martin"
+    "phonetic": "lockheed martin"
   },
   {
     "symbol": "LNT",
@@ -4898,7 +4898,7 @@
     "correlation": "Défensif — utility Wisconsin",
     "index": "SP500",
     "description": "Utility company—electric and gas power distribution in Wisconsin, Minnesota",
-    "phonetic": "alliane-éneurdjie"
+    "phonetic": "alliant énergie"
   },
   {
     "symbol": "LOW",
@@ -4908,7 +4908,7 @@
     "correlation": "Consommateur US, confiance, emploi",
     "index": "SP500",
     "description": "Home improvement retail—Lowe's stores, tools, materials nationwide",
-    "phonetic": "loéz-kumpagnie"
+    "phonetic": "lowes"
   },
   {
     "symbol": "LR.PA",
@@ -4918,7 +4918,7 @@
     "correlation": "Construction, rénovation bâtiment",
     "index": "CAC40",
     "description": "Leader mondial des infrastructures électriques & numériques du bâtiment",
-    "phonetic": "lègrande"
+    "phonetic": "legrande"
   },
   {
     "symbol": "LRCX",
@@ -4928,7 +4928,7 @@
     "correlation": "^IXIC ↑, ^KS11 — supply chain asiatique",
     "index": "SP500",
     "description": "Semiconductor equipment—chip manufacturing etching and deposition tools",
-    "phonetic": "lame-richerche"
+    "phonetic": "lam research"
   },
   {
     "symbol": "LULU",
@@ -4938,7 +4938,7 @@
     "correlation": "Mode sportive yoga — Lululemon",
     "index": "SP500",
     "description": "Yoga and athletic apparel—premium leggings and sportswear for women",
-    "phonetic": "lululèmone-atlétikale"
+    "phonetic": "lululemon athletica"
   },
   {
     "symbol": "LUV",
@@ -4948,7 +4948,7 @@
     "correlation": "CL=F (pétrole) ↓↓ — kérosène = 1er poste de coûts",
     "index": "SP500",
     "description": "Budget airline—low-cost carrier, point-to-point flights across America",
-    "phonetic": "souèste-érlaïnz"
+    "phonetic": "southwest airlines"
   },
   {
     "symbol": "LVS",
@@ -4958,7 +4958,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Casino and hotel operator—luxury resorts in Las Vegas and Macao",
-    "phonetic": "lasse-védguasse-sande"
+    "phonetic": "las vegas sands"
   },
   {
     "symbol": "LW",
@@ -4968,7 +4968,7 @@
     "correlation": "Frites alimentation food service — Lamb Weston",
     "index": "SP500",
     "description": "Frozen potato products—french fries, hash browns for food service",
-    "phonetic": "lambe-weston"
+    "phonetic": "lamb weston"
   },
   {
     "symbol": "LYB",
@@ -4978,7 +4978,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Petrochemicals and refining—plastics, solvents, fuels from crude oil",
-    "phonetic": "liondèlbazèle"
+    "phonetic": "liondèlbasèl"
   },
   {
     "symbol": "LYFT",
@@ -4998,7 +4998,7 @@
     "correlation": "Concerts événements live — Live Nation",
     "index": "SP500",
     "description": "Live entertainment—concerts, festivals, sports events promotion globally",
-    "phonetic": "live-naticheune-enteurenainmènte"
+    "phonetic": "live nation entertainment"
   },
   {
     "symbol": "MA",
@@ -5011,7 +5011,7 @@
     "aliases": [
       "Mastercard"
     ],
-    "phonetic": "masteurkarde"
+    "phonetic": "mastercard"
   },
   {
     "symbol": "MAA",
@@ -5021,7 +5021,7 @@
     "correlation": "REIT appartements Sun Belt — Mid-America",
     "index": "SP500",
     "description": "Apartment REIT—owns multifamily residential properties across US states",
-    "phonetic": "mide-amérikaïne-apartmènte-komiounités"
+    "phonetic": "mid america apartments"
   },
   {
     "symbol": "MAR",
@@ -5031,7 +5031,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Hotel franchiser—Marriott, Ritz-Carlton, Sheraton brands worldwide",
-    "phonetic": "mariage-inteurnaticheune"
+    "phonetic": "marriott international"
   },
   {
     "symbol": "MAS",
@@ -5041,7 +5041,7 @@
     "correlation": "Produits construction maison — Masco",
     "index": "SP500",
     "description": "Building products—cabinets, hardware, installation services for construction",
-    "phonetic": "masquo"
+    "phonetic": "masco"
   },
   {
     "symbol": "MBG.DE",
@@ -5051,7 +5051,7 @@
     "correlation": "EUR/USD, tarifs — Mercedes-Benz",
     "index": "DAX40",
     "description": "German luxury automaker, trucks & vans, EV transition",
-    "phonetic": "mèrséède-bènze"
+    "phonetic": "mercédès benz"
   },
   {
     "symbol": "MC.PA",
@@ -5066,7 +5066,7 @@
       "le géant du luxe",
       "Bernard Arnault"
     ],
-    "phonetic": "élvèè-ème"
+    "phonetic": "èl vé èm ache"
   },
   {
     "symbol": "MCD",
@@ -5080,7 +5080,7 @@
       "McDonald's",
       "McDo"
     ],
-    "phonetic": "mak-donalds"
+    "phonetic": "mac donalds"
   },
   {
     "symbol": "MCHP",
@@ -5090,7 +5090,7 @@
     "correlation": "^IXIC, semi IoT microcontrôleurs — Microchip",
     "index": "SP500",
     "description": "Microcontroller and semiconductor chips—embedded systems, IoT devices",
-    "phonetic": "maïkrotchipe-tèknolodjiize"
+    "phonetic": "microchip technology"
   },
   {
     "symbol": "MCK",
@@ -5100,7 +5100,7 @@
     "correlation": "Distribution pharma — McKesson",
     "index": "SP500",
     "description": "Pharmaceutical distributor—delivers drugs to pharmacies and hospitals",
-    "phonetic": "mak-kèssone"
+    "phonetic": "mac kesson"
   },
   {
     "symbol": "MCO",
@@ -5110,7 +5110,7 @@
     "correlation": "Yields, ^GSPC",
     "index": "SP500",
     "description": "Credit rating agency—Moody's ratings for bonds, securities, companies",
-    "phonetic": "moudize"
+    "phonetic": "moodys"
   },
   {
     "symbol": "MDLZ",
@@ -5120,7 +5120,7 @@
     "correlation": "Snacks Oreo Cadbury — Mondelez",
     "index": "SP500",
     "description": "Snack foods—Oreo, Trident, Cadbury, Halls across over 150 countries",
-    "phonetic": "mondélèze-inteurnaticheune"
+    "phonetic": "mondelez international"
   },
   {
     "symbol": "MDT",
@@ -5130,7 +5130,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Medical devices—pacemakers, insulin pumps, surgical robotics, diagnostics",
-    "phonetic": "mèdtronike"
+    "phonetic": "medtronic"
   },
   {
     "symbol": "MET",
@@ -5140,7 +5140,7 @@
     "correlation": "Yields ↑ — portefeuille obligataire",
     "index": "SP500",
     "description": "Life insurance and annuities—financial protection and retirement products",
-    "phonetic": "mètlaïfe"
+    "phonetic": "met life"
   },
   {
     "symbol": "META",
@@ -5156,7 +5156,7 @@
       "la maison mère de Facebook",
       "Zuckerberg"
     ],
-    "phonetic": "métale-plateformes"
+    "phonetic": "méta"
   },
   {
     "symbol": "MGM",
@@ -5166,7 +5166,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Casino and resort operator—Bellagio, Mandalay, properties in Las Vegas",
-    "phonetic": "ème-dji-ème-rezorte-inteurnaticheune"
+    "phonetic": "èm ji èm resorts"
   },
   {
     "symbol": "MKC",
@@ -5176,7 +5176,7 @@
     "correlation": "Épices assaisonnements — McCormick",
     "index": "SP500",
     "description": "Spice and seasoning manufacturer—McCormick brand, vanilla, pepper globally",
-    "phonetic": "mak-kormike-et-kompagnie"
+    "phonetic": "mac cormick"
   },
   {
     "symbol": "ML.PA",
@@ -5186,7 +5186,7 @@
     "correlation": "Manganèse, nickel — métaux industriels",
     "index": "CAC40",
     "description": "Leader mondial des pneumatiques, aussi guide gastronomique & cartes",
-    "phonetic": "michèline"
+    "phonetic": "michelin"
   },
   {
     "symbol": "MLM",
@@ -5196,7 +5196,7 @@
     "correlation": "Agrégats construction — Martin Marietta",
     "index": "SP500",
     "description": "Construction aggregates and building materials—limestone, asphalt supplier",
-    "phonetic": "martin-mariètta-matériaux"
+    "phonetic": "martin marietta"
   },
   {
     "symbol": "MMC",
@@ -5206,7 +5206,7 @@
     "correlation": "Courtage assurance — Marsh McLennan",
     "index": "SP500",
     "description": "Global insurance broker and risk consultant — manages claims and employee benefits",
-    "phonetic": "marc-et-mak-lènane"
+    "phonetic": "marsh et mac lennan"
   },
   {
     "symbol": "MMM",
@@ -5216,7 +5216,7 @@
     "correlation": "Cycle économique, PMI Manufacturing",
     "index": "SP500",
     "description": "Diversified industrial manufacturer — Post-it, scotch tape, safety, healthcare products",
-    "phonetic": "trois-ème"
+    "phonetic": "trois èm"
   },
   {
     "symbol": "MNDI.L",
@@ -5236,7 +5236,7 @@
     "correlation": "Gestion actifs — M&G",
     "index": "FTSE100",
     "description": "British investment & savings group, ex-Prudential UK, asset management",
-    "phonetic": "ème-et-dji"
+    "phonetic": "èm et gé"
   },
   {
     "symbol": "MNST",
@@ -5246,7 +5246,7 @@
     "correlation": "Energy drinks boissons — Monster",
     "index": "SP500",
     "description": "Energy drink maker — Monster caffeine-laden beverages targeting gamers and athletes",
-    "phonetic": "monsteùr-béveurèdji"
+    "phonetic": "monster beverage"
   },
   {
     "symbol": "MO",
@@ -5256,7 +5256,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Tobacco giant — Marlboro cigarettes, reduced-risk products, shrinking US market",
-    "phonetic": "altria-groupe"
+    "phonetic": "altria"
   },
   {
     "symbol": "MOH",
@@ -5266,7 +5266,7 @@
     "correlation": "Assurance Medicaid — Molina",
     "index": "SP500",
     "description": "Medicaid-focused health insurer — manages government health coverage for lower-income populations",
-    "phonetic": "molina-sante"
+    "phonetic": "molina healthcare"
   },
   {
     "symbol": "MOS",
@@ -5276,7 +5276,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Fertilizer and chemicals producer — potash and phosphate for global agriculture",
-    "phonetic": "mozaïque"
+    "phonetic": "mosaïc"
   },
   {
     "symbol": "MPC",
@@ -5286,7 +5286,7 @@
     "correlation": "CL=F (pétrole) ↑↑",
     "index": "SP500",
     "description": "Refinery operator and fuel distributor — turns crude oil into gasoline and diesel",
-    "phonetic": "maracone-pétroleum"
+    "phonetic": "marathon petroleum"
   },
   {
     "symbol": "MPWR",
@@ -5296,7 +5296,7 @@
     "correlation": "^IXIC, semi power analog — Monolithic",
     "index": "SP500",
     "description": "Power semiconductor design firm — analog chips for industrial and computing applications",
-    "phonetic": "monolitik-paueur-sistème"
+    "phonetic": "monolithic power"
   },
   {
     "symbol": "MRK",
@@ -5309,7 +5309,7 @@
     "aliases": [
       "Merck"
     ],
-    "phonetic": "mèrk-et-kompagnie"
+    "phonetic": "merck"
   },
   {
     "symbol": "MRK.DE",
@@ -5319,7 +5319,7 @@
     "correlation": "Pharma, semi-conducteurs — Merck KGaA",
     "index": "DAX40",
     "description": "German pharma & life science group (not US Merck), lab equipment & materials",
-    "phonetic": "mèrk-ka-gé-a"
+    "phonetic": "merk ka gé a"
   },
   {
     "symbol": "MRNA",
@@ -5342,7 +5342,7 @@
     "correlation": "Courtage risk consulting — Marsh McLennan",
     "index": "SP500",
     "description": "Global consulting and risk firm — insurance broking, HR advisory, actuarial services",
-    "phonetic": "marc-mak-lènane"
+    "phonetic": "marsh mac lennan"
   },
   {
     "symbol": "MS",
@@ -5355,7 +5355,7 @@
     "aliases": [
       "Morgan Stanley"
     ],
-    "phonetic": "morgane-stanly"
+    "phonetic": "morgan stanley"
   },
   {
     "symbol": "MSCI",
@@ -5365,7 +5365,7 @@
     "correlation": "Yields, ^GSPC",
     "index": "SP500",
     "description": "Index and analytics provider — tracks markets, manages ESG ratings and research",
-    "phonetic": "ème-esse-cé-i"
+    "phonetic": "èm èsse ci i"
   },
   {
     "symbol": "MSFT",
@@ -5379,7 +5379,7 @@
       "Microsoft",
       "le géant de Redmond"
     ],
-    "phonetic": "maïkrosof"
+    "phonetic": "maïkrossoft"
   },
   {
     "symbol": "MSI",
@@ -5389,7 +5389,7 @@
     "correlation": "Radios sécurité publique — Motorola Solutions",
     "index": "SP500",
     "description": "Security and communications equipment — radios, cameras, software for public safety",
-    "phonetic": "motorola-soluticheune"
+    "phonetic": "motorola solutions"
   },
   {
     "symbol": "MT.AS",
@@ -5409,7 +5409,7 @@
     "correlation": "Yields, banque régionale — M&T Bank",
     "index": "SP500",
     "description": "Regional bank — serves Northeast and Mid-Atlantic, commercial and retail banking",
-    "phonetic": "ème-et-té-banke"
+    "phonetic": "èm et té bank"
   },
   {
     "symbol": "MTCH",
@@ -5419,7 +5419,7 @@
     "correlation": "^IXIC, apps dating Tinder — Match Group",
     "index": "SP500",
     "description": "Dating app ecosystem — Tinder, Hinge, Match, Plenty of Fish monetized via subscriptions",
-    "phonetic": "matche-groupe"
+    "phonetic": "match"
   },
   {
     "symbol": "MTD",
@@ -5429,7 +5429,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Laboratory instruments — balances, titrators, thermal analysis for pharmaceuticals and chemicals",
-    "phonetic": "mètleûr-toledo-inteurnaticheune"
+    "phonetic": "mettler toledo"
   },
   {
     "symbol": "MTX.DE",
@@ -5439,7 +5439,7 @@
     "correlation": "Gaz spéciaux — MTU Aero Engines",
     "index": "DAX40",
     "description": "German aircraft engine manufacturer, maintenance & repair (MRO)",
-    "phonetic": "ème-té-ou-aéro-èndjine"
+    "phonetic": "èm té u aéro enjines"
   },
   {
     "symbol": "MU",
@@ -5449,7 +5449,7 @@
     "correlation": "^IXIC ↑, ^KS11 — supply chain asiatique",
     "index": "SP500",
     "description": "Memory chip manufacturer — DRAM and NAND flash for PCs, servers, data centers",
-    "phonetic": "mikrone-tèknolodjiize"
+    "phonetic": "micron"
   },
   {
     "symbol": "MUV2.DE",
@@ -5459,7 +5459,7 @@
     "correlation": "Yields ↑, catastrophes naturelles — Munich Re",
     "index": "DAX40",
     "description": "World's largest reinsurer, also primary insurance (ERGO)",
-    "phonetic": "munich-ré"
+    "phonetic": "munich ré"
   },
   {
     "symbol": "NCLH",
@@ -5469,7 +5469,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Cruise line operator — ships, leisure travel, competing with Carnival and Royal Caribbean",
-    "phonetic": "norouédji-krouz-ligne-oldingz"
+    "phonetic": "norwegian cruise line"
   },
   {
     "symbol": "NDAQ",
@@ -5479,7 +5479,7 @@
     "correlation": "^IXIC, exchange trading — Nasdaq",
     "index": "SP500",
     "description": "Stock exchange operator — Nasdaq listing, trading, technology services for markets",
-    "phonetic": "nazdak"
+    "phonetic": "nazdac"
   },
   {
     "symbol": "NDSN",
@@ -5489,7 +5489,7 @@
     "correlation": "Adhésifs automation — Nordson",
     "index": "SP500",
     "description": "Industrial adhesives and automation — coating systems, fluid dispensing, industrial components",
-    "phonetic": "nordzone-korporéchïun"
+    "phonetic": "nordson"
   },
   {
     "symbol": "NEE",
@@ -5499,7 +5499,7 @@
     "correlation": "Taux ↓ — défensif, proxy obligataire",
     "index": "SP500",
     "description": "Renewable energy giant — NextEra, nuclear, solar, wind across US and globally",
-    "phonetic": "nékstra-éneurdjie"
+    "phonetic": "next era énergie"
   },
   {
     "symbol": "NEM",
@@ -5509,7 +5509,7 @@
     "correlation": "GC=F, SI=F — corrélé aux métaux précieux",
     "index": "SP500",
     "description": "Gold mining leader — operations globally, hedging inflation and currency risk",
-    "phonetic": "nioumont-korporéchïun"
+    "phonetic": "newmont"
   },
   {
     "symbol": "NET",
@@ -5519,7 +5519,7 @@
     "correlation": "^IXIC ↑, taux ↓↓",
     "index": "SP500",
     "description": "Cloud security and performance — DDoS protection, WAF, CDN for website protection",
-    "phonetic": "kloudflère"
+    "phonetic": "cloudflare"
   },
   {
     "symbol": "NFLX",
@@ -5532,7 +5532,7 @@
     "aliases": [
       "Netflix"
     ],
-    "phonetic": "nètflix"
+    "phonetic": "netflix"
   },
   {
     "symbol": "NG.L",
@@ -5542,7 +5542,7 @@
     "correlation": "Gaz, électricité UK — National Grid",
     "index": "FTSE100",
     "description": "UK & US electricity/gas transmission grid operator, regulated utility",
-    "phonetic": "natsheunnale-gride"
+    "phonetic": "national grid"
   },
   {
     "symbol": "NG=F",
@@ -5556,7 +5556,7 @@
       "le gaz naturel",
       "le gaz"
     ],
-    "phonetic": "gaz-naturèle"
+    "phonetic": "gaz naturel"
   },
   {
     "symbol": "NI",
@@ -5566,7 +5566,7 @@
     "correlation": "NG=F, gaz Midwest — NiSource",
     "index": "SP500",
     "description": "Gas utility operator — natural gas distribution, heating for Midwest and Mid-South",
-    "phonetic": "nissorse"
+    "phonetic": "ni source"
   },
   {
     "symbol": "NKE",
@@ -5586,7 +5586,7 @@
     "correlation": "Géopolitique ↑↑ — tensions = commandes",
     "index": "SP500",
     "description": "Defense contractor — missiles, satellites, sensors for US military and space programs",
-    "phonetic": "nortrope-groumannne"
+    "phonetic": "northrop grumman"
   },
   {
     "symbol": "NOW",
@@ -5599,7 +5599,7 @@
     "aliases": [
       "ServiceNow"
     ],
-    "phonetic": "sèrvise-naou"
+    "phonetic": "service now"
   },
   {
     "symbol": "NRG",
@@ -5609,7 +5609,7 @@
     "correlation": "Énergie Texas indépendant — NRG",
     "index": "SP500",
     "description": "Independent power producer — natural gas plants, renewable energy, Texas operations",
-    "phonetic": "ènère-djiize"
+    "phonetic": "ène ar gé énergie"
   },
   {
     "symbol": "NSC",
@@ -5619,7 +5619,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Railroad operator — freight rail network spanning Eastern US, coal and intermodal",
-    "phonetic": "norfolk-soudèrne"
+    "phonetic": "norfolk southern"
   },
   {
     "symbol": "NTAP",
@@ -5629,7 +5629,7 @@
     "correlation": "^IXIC, stockage cloud — NetApp",
     "index": "SP500",
     "description": "Storage software and hardware — data management, cloud integration for enterprises",
-    "phonetic": "nète-appe"
+    "phonetic": "net app"
   },
   {
     "symbol": "NTRS",
@@ -5639,7 +5639,7 @@
     "correlation": "Yields, wealth custody — Northern Trust",
     "index": "SP500",
     "description": "Wealth and asset manager — Northern Trust Bank, custody, investment services",
-    "phonetic": "nordèrne-trouste"
+    "phonetic": "northern trust"
   },
   {
     "symbol": "NUE",
@@ -5649,7 +5649,7 @@
     "correlation": "GC=F, SI=F — corrélé aux métaux précieux",
     "index": "SP500",
     "description": "Steel manufacturer — electric arc furnaces, structural steel for construction and automotive",
-    "phonetic": "nukor"
+    "phonetic": "nucor"
   },
   {
     "symbol": "NVDA",
@@ -5664,7 +5664,7 @@
       "le roi de l'IA",
       "le géant des GPU"
     ],
-    "phonetic": "ènvidiya"
+    "phonetic": "ène vidia"
   },
   {
     "symbol": "NVR",
@@ -5674,7 +5674,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Homebuilder — construction and sales in Northeast, luxury and standard residential",
-    "phonetic": "ènvi-aure"
+    "phonetic": "ène vé ar"
   },
   {
     "symbol": "NWG.L",
@@ -5684,7 +5684,7 @@
     "correlation": "Yields ↑, retail banking UK — NatWest",
     "index": "FTSE100",
     "description": "UK major bank (ex-Royal Bank of Scotland), retail & commercial",
-    "phonetic": "nate-ouest-groupe"
+    "phonetic": "nat ouèst groupe"
   },
   {
     "symbol": "NWS",
@@ -5694,7 +5694,7 @@
     "correlation": "Médias presse WSJ — News Corp B",
     "index": "SP500",
     "description": "Media and publishing empire — Fox News, Wall Street Journal, Book Publishing",
-    "phonetic": "niouze"
+    "phonetic": "news corp"
   },
   {
     "symbol": "NWSA",
@@ -5704,7 +5704,7 @@
     "correlation": "Médias presse WSJ — News Corp A",
     "index": "SP500",
     "description": "News Corp Class A shares — Fox News, newspapers, digital media, Rupert Murdoch",
-    "phonetic": "niouze"
+    "phonetic": "news corp"
   },
   {
     "symbol": "NXPI",
@@ -5714,7 +5714,7 @@
     "correlation": "^IXIC, semi auto NFC — NXP",
     "index": "SP500",
     "description": "Automotive and mobile semiconductors — NFC, automotive processors, Dutch-listed",
-    "phonetic": "ènèkesse-pi-sèmikondoukteurz"
+    "phonetic": "ène iks pé semi conducteurs"
   },
   {
     "symbol": "NZDUSD=X",
@@ -5727,7 +5727,7 @@
     "aliases": [
       "le kiwi"
     ],
-    "phonetic": "énézète-us-dollaire"
+    "phonetic": "dollar néo zélandais"
   },
   {
     "symbol": "O",
@@ -5737,7 +5737,7 @@
     "correlation": "Taux, dividende mensuel — Realty Income",
     "index": "SP500",
     "description": "Dividend aristocrat REIT — commercial real estate, monthly distributions, inflation hedge",
-    "phonetic": "réalti-inkomé"
+    "phonetic": "realty income"
   },
   {
     "symbol": "ODFL",
@@ -5747,7 +5747,7 @@
     "correlation": "Freight LTL — Old Dominion",
     "index": "SP500",
     "description": "LTL freight carrier — less-than-truckload shipping, regional logistics network",
-    "phonetic": "olde-dominieune"
+    "phonetic": "old dominion"
   },
   {
     "symbol": "OKE",
@@ -5757,7 +5757,7 @@
     "correlation": "CL=F (pétrole) ↑↑",
     "index": "SP500",
     "description": "Midstream energy infrastructure — natural gas pipelines, storage, distribution",
-    "phonetic": "ouane-ok"
+    "phonetic": "ouan ok"
   },
   {
     "symbol": "OKTA",
@@ -5777,7 +5777,7 @@
     "correlation": "Publicité agences — Omnicom",
     "index": "SP500",
     "description": "Advertising and marketing — Omnicom Group, creative agencies, digital marketing",
-    "phonetic": "omnikom-groupe"
+    "phonetic": "omnicom"
   },
   {
     "symbol": "ON",
@@ -5787,7 +5787,7 @@
     "correlation": "^IXIC, semi auto power — ON Semi",
     "index": "SP500",
     "description": "Analog and power semiconductors — sensing, power management, automotive solutions",
-    "phonetic": "o-ène-sèmikondoukteur"
+    "phonetic": "o ène semi conducteurs"
   },
   {
     "symbol": "OR.PA",
@@ -5797,7 +5797,7 @@
     "correlation": "Consommateur mondial, Chine, cosmétiques",
     "index": "CAC40",
     "description": "Numéro un mondial des cosmétiques, 36 marques internationales",
-    "phonetic": "loréale"
+    "phonetic": "loréal"
   },
   {
     "symbol": "ORA.PA",
@@ -5807,7 +5807,7 @@
     "correlation": "Défensif, dividendes, régulation télécom",
     "index": "CAC40",
     "description": "Premier opérateur télécom français, aussi présent en Afrique & Europe",
-    "phonetic": "orandje"
+    "phonetic": "orange"
   },
   {
     "symbol": "ORCL",
@@ -5820,7 +5820,7 @@
     "aliases": [
       "Oracle"
     ],
-    "phonetic": "orakèle"
+    "phonetic": "oracle"
   },
   {
     "symbol": "ORLY",
@@ -5830,7 +5830,7 @@
     "correlation": "Auto parts retail — O'Reilly",
     "index": "SP500",
     "description": "Auto parts retailer — O'Reilly stores, DIY and professional mechanics supplies",
-    "phonetic": "o-réïlyi-otomotiv"
+    "phonetic": "o reilly automotive"
   },
   {
     "symbol": "OTIS",
@@ -5840,7 +5840,7 @@
     "correlation": "Ascenseurs urbanisation — Otis",
     "index": "SP500",
     "description": "Elevator and escalator manufacturer — Otis brand, maintenance and modernization services",
-    "phonetic": "o-tisse-mondiale"
+    "phonetic": "otis worldwide"
   },
   {
     "symbol": "OXY",
@@ -5854,7 +5854,7 @@
       "Occidental",
       "Occidental Petroleum"
     ],
-    "phonetic": "ossi-dentale-pètroleum"
+    "phonetic": "occidental pétrole"
   },
   {
     "symbol": "P911.DE",
@@ -5864,7 +5864,7 @@
     "correlation": "Luxe auto, Chine — Porsche AG",
     "index": "DAX40",
     "description": "German luxury sports car maker (911, Cayenne, Taycan), VW subsidiary",
-    "phonetic": "porsche"
+    "phonetic": "porsché"
   },
   {
     "symbol": "PAH3.DE",
@@ -5874,7 +5874,7 @@
     "correlation": "Volkswagen, Porsche, Bugatti — holding auto",
     "index": "DAX40",
     "description": "Holding company of Porsche/Piëch families, controls Volkswagen Group",
-    "phonetic": "porsche"
+    "phonetic": "porsché"
   },
   {
     "symbol": "PANW",
@@ -5887,7 +5887,7 @@
     "aliases": [
       "Palo Alto Networks"
     ],
-    "phonetic": "palo-alto-nètouorks"
+    "phonetic": "palo alto networks"
   },
   {
     "symbol": "PAYC",
@@ -5897,7 +5897,7 @@
     "correlation": "Fintech paie RH cloud — Paycom",
     "index": "SP500",
     "description": "Cloud payroll and HR software — Paycom, SMB payroll processing and automation",
-    "phonetic": "peï-komme"
+    "phonetic": "pay com"
   },
   {
     "symbol": "PAYX",
@@ -5907,7 +5907,7 @@
     "correlation": "Fintech paie PME — Paychex",
     "index": "SP500",
     "description": "Payroll processing and HR services — Paychex, outsourced payroll and benefits",
-    "phonetic": "peï-tchèkse"
+    "phonetic": "pay chex"
   },
   {
     "symbol": "PCAR",
@@ -5917,7 +5917,7 @@
     "correlation": "Camions transport — Paccar",
     "index": "SP500",
     "description": "Truck manufacturer — Paccar brand, medium-duty commercial vehicles, global sales",
-    "phonetic": "pakare"
+    "phonetic": "paccar"
   },
   {
     "symbol": "PCG",
@@ -5927,7 +5927,7 @@
     "correlation": "Californie wildfire — PG&E",
     "index": "SP500",
     "description": "California utility company — Pacific Gas and Electric, electricity and natural gas",
-    "phonetic": "pi-dji-è-korporécheune"
+    "phonetic": "pé ji et eu"
   },
   {
     "symbol": "PEG",
@@ -5937,7 +5937,7 @@
     "correlation": "Défensif — utility New Jersey PSEG",
     "index": "SP500",
     "description": "New Jersey and New York utility — Public Service Enterprise Group, electricity and gas",
-    "phonetic": "peubblike-sèrvisse-entèrpraïze"
+    "phonetic": "public service enterprise"
   },
   {
     "symbol": "PEP",
@@ -5951,7 +5951,7 @@
       "PepsiCo",
       "Pepsi"
     ],
-    "phonetic": "pèpsi-ko"
+    "phonetic": "pepsico"
   },
   {
     "symbol": "PFE",
@@ -5964,7 +5964,7 @@
     "aliases": [
       "Pfizer"
     ],
-    "phonetic": "pfaïzer"
+    "phonetic": "faïzer"
   },
   {
     "symbol": "PFG",
@@ -5974,7 +5974,7 @@
     "correlation": "Retraite assurance — Principal",
     "index": "SP500",
     "description": "Financial services and insurance — Principal Financial, retirement and insurance products",
-    "phonetic": "printsipale-fainanciale-groupe"
+    "phonetic": "principal financial"
   },
   {
     "symbol": "PG",
@@ -5984,7 +5984,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Consumer goods powerhouse — Tide, Gillette, Pampers, Olay, Crest, Oral-B",
-    "phonetic": "proksètère-et-gamblé"
+    "phonetic": "procter et gamble"
   },
   {
     "symbol": "PGR",
@@ -5994,7 +5994,7 @@
     "correlation": "Yields ↑ — portefeuille obligataire",
     "index": "SP500",
     "description": "Insurance company — Progressive, auto insurance, digital-first claims and underwriting",
-    "phonetic": "pro-grèssiv"
+    "phonetic": "progressive"
   },
   {
     "symbol": "PH",
@@ -6004,7 +6004,7 @@
     "correlation": "Prix agricoles (blé, maïs, soja) — santé économie agricole",
     "index": "SP500",
     "description": "Industrial machinery — Parker-Hannifin, hydraulics, pneumatics, motion control systems",
-    "phonetic": "parkère-annifinn"
+    "phonetic": "parker hannifin"
   },
   {
     "symbol": "PHM",
@@ -6014,7 +6014,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Homebuilder — Pultegroup, mass-market residential construction and master-planned communities",
-    "phonetic": "poulte-groupe"
+    "phonetic": "pulte groupe"
   },
   {
     "symbol": "PKG",
@@ -6024,7 +6024,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Corrugated packaging manufacturer — cardboard boxes, recycled containerboard producer",
-    "phonetic": "pakajing-korp-amérikaine"
+    "phonetic": "packaging corp of america"
   },
   {
     "symbol": "PL=F",
@@ -6047,7 +6047,7 @@
     "correlation": "Taux ↓↓ — sensible aux taux hypothécaires",
     "index": "SP500",
     "description": "Logistics REIT — warehouses and distribution centers, e-commerce real estate",
-    "phonetic": "prologisse"
+    "phonetic": "prologis"
   },
   {
     "symbol": "PLTR",
@@ -6061,7 +6061,7 @@
       "Palantir",
       "le spécialiste du big data"
     ],
-    "phonetic": "palantire-tèknolodjiize"
+    "phonetic": "palantir"
   },
   {
     "symbol": "PM",
@@ -6071,7 +6071,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Cigarette manufacturer — Philip Morris, Marlboro international, heated tobacco products",
-    "phonetic": "phillip-morise-internassheunnale"
+    "phonetic": "philip morris international"
   },
   {
     "symbol": "PNC",
@@ -6081,7 +6081,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Regional banking powerhouse — Pittsburgh-based, commercial and retail banking",
-    "phonetic": "pi-ène-tche-fainanciale-sèrvisse"
+    "phonetic": "pé ène ci financial"
   },
   {
     "symbol": "PNR",
@@ -6091,7 +6091,7 @@
     "correlation": "Eau filtration — Pentair",
     "index": "SP500",
     "description": "Industrial equipment manufacturer — Pentair pumps, filtration, water management",
-    "phonetic": "pèntère"
+    "phonetic": "pentair"
   },
   {
     "symbol": "PNW",
@@ -6101,7 +6101,7 @@
     "correlation": "Défensif — utility Arizona",
     "index": "SP500",
     "description": "Arizona electric utility — Pinnacle West Capital, APS subsidiary, Southwest power",
-    "phonetic": "pinakle-ouest-kapitale"
+    "phonetic": "pinnacle west"
   },
   {
     "symbol": "PODD",
@@ -6111,7 +6111,7 @@
     "correlation": "Diabète pompe insuline — Insulet",
     "index": "SP500",
     "description": "Medical device maker — Insulet, insulin pump systems, wearable diabetes management",
-    "phonetic": "insulète-korporécheune"
+    "phonetic": "insulet"
   },
   {
     "symbol": "POOL",
@@ -6121,7 +6121,7 @@
     "correlation": "Piscines équipement — Pool Corp",
     "index": "SP500",
     "description": "Swimming pool supplies distributor — Pool Corp, equipment and chemicals nationwide",
-    "phonetic": "poule-korporécheune"
+    "phonetic": "pool corporation"
   },
   {
     "symbol": "PPG",
@@ -6131,7 +6131,7 @@
     "correlation": "Peintures revêtements industrie — PPG",
     "index": "SP500",
     "description": "Paints and coatings manufacturer — industrial, aerospace, automotive, architectural",
-    "phonetic": "pi-pi-dji-indeustriize"
+    "phonetic": "pé pé ji industries"
   },
   {
     "symbol": "PPL",
@@ -6141,7 +6141,7 @@
     "correlation": "Défensif — utility Pennsylvania",
     "index": "SP500",
     "description": "Utility company — PPL Electric, Pennsylvania-Kentucky-Indiana power transmission",
-    "phonetic": "pi-pi-elle-korporécheune"
+    "phonetic": "pé pé èl"
   },
   {
     "symbol": "PRU",
@@ -6151,7 +6151,7 @@
     "correlation": "Yields ↑ — portefeuille obligataire",
     "index": "SP500",
     "description": "Life insurance and annuities — Prudential Financial, retirement income, protection",
-    "phonetic": "prudènchiale-fainanciale"
+    "phonetic": "prudential financial"
   },
   {
     "symbol": "PRU.L",
@@ -6161,7 +6161,7 @@
     "correlation": "Asie, yields — Prudential",
     "index": "FTSE100",
     "description": "British insurer focused on Asia & Africa, life insurance & asset management",
-    "phonetic": "prudènchiale"
+    "phonetic": "prudential"
   },
   {
     "symbol": "PSA",
@@ -6171,7 +6171,7 @@
     "correlation": "REIT self-storage — Public Storage",
     "index": "SP500",
     "description": "Self-storage REIT — Public Storage, mini storage facilities across US and Europe",
-    "phonetic": "peubblike-storadje"
+    "phonetic": "public storage"
   },
   {
     "symbol": "PSKY",
@@ -6181,7 +6181,7 @@
     "correlation": "Streaming films TV — Paramount Skydance",
     "index": "SP500",
     "description": "Entertainment conglomerate — Paramount Skydance, streaming, films, CBS, Showtime",
-    "phonetic": "paramount-skydinse"
+    "phonetic": "paramount skydance"
   },
   {
     "symbol": "PSON.L",
@@ -6191,7 +6191,7 @@
     "correlation": "Éducation — Pearson",
     "index": "FTSE100",
     "description": "British education publisher, world's largest learning company, textbooks & digital",
-    "phonetic": "piersonne"
+    "phonetic": "pirsonne"
   },
   {
     "symbol": "PSX",
@@ -6201,7 +6201,7 @@
     "correlation": "CL=F (pétrole) ↑↑",
     "index": "SP500",
     "description": "Refinery and midstream operator — Phillips 66, fuel distribution and logistics",
-    "phonetic": "phillips-soïxante-sisse"
+    "phonetic": "phillips soixante six"
   },
   {
     "symbol": "PTC",
@@ -6211,7 +6211,7 @@
     "correlation": "^IXIC, IoT industrie 4.0 — PTC",
     "index": "SP500",
     "description": "Industrial software — PLM, IoT, augmented reality for manufacturing and field service",
-    "phonetic": "pi-ti-tche"
+    "phonetic": "pé té ci"
   },
   {
     "symbol": "PUB.PA",
@@ -6221,7 +6221,7 @@
     "correlation": "Publicité, cycle économique",
     "index": "CAC40",
     "description": "Troisième groupe mondial de publicité & communication (Saatchi, Leo Burnett)",
-    "phonetic": "publicisse-groupe"
+    "phonetic": "publicis groupe"
   },
   {
     "symbol": "PWR",
@@ -6231,7 +6231,7 @@
     "correlation": "Infrastructure énergie grids — Quanta",
     "index": "SP500",
     "description": "Energy infrastructure services — Quanta Services, power grids, fiber optics, renewable",
-    "phonetic": "koutante-sèrvisse"
+    "phonetic": "quanta services"
   },
   {
     "symbol": "PXD",
@@ -6241,7 +6241,7 @@
     "correlation": "CL=F ↑↑ — Pioneer Natural Resources",
     "index": "SP500",
     "description": "Oil exploration and production — Pioneer Natural Resources, Permian Basin legacy",
-    "phonetic": "paionière-natourale-resorse"
+    "phonetic": "pioneer natural resources"
   },
   {
     "symbol": "PYPL",
@@ -6254,7 +6254,7 @@
     "aliases": [
       "PayPal"
     ],
-    "phonetic": "peï-pale-oldingz"
+    "phonetic": "pay pal"
   },
   {
     "symbol": "Q",
@@ -6264,7 +6264,7 @@
     "correlation": "Semi test équipement — Qnity",
     "index": "SP500",
     "description": "Electronics testing equipment — Qnity Electronics, semiconductor and component testing",
-    "phonetic": "kyouniti-électroniks"
+    "phonetic": "kiounity electronics"
   },
   {
     "symbol": "QCOM",
@@ -6277,7 +6277,7 @@
     "aliases": [
       "Qualcomm"
     ],
-    "phonetic": "koualkomme"
+    "phonetic": "qualcomm"
   },
   {
     "symbol": "QGEN.DE",
@@ -6287,7 +6287,7 @@
     "correlation": "Diagnostics moléculaires — Qiagen",
     "index": "DAX40",
     "description": "Dutch-German biotech, molecular diagnostics & sample preparation tech",
-    "phonetic": "kiyagène"
+    "phonetic": "kiagène"
   },
   {
     "symbol": "RCL",
@@ -6297,7 +6297,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Cruise line operator — Royal Caribbean, Icon Class ships, Caribbean and Mediterranean",
-    "phonetic": "royale-karibienne-kroèz"
+    "phonetic": "royale karibeunne crouz"
   },
   {
     "symbol": "REG",
@@ -6307,7 +6307,7 @@
     "correlation": "REIT retail — Regency Centers",
     "index": "SP500",
     "description": "Shopping center REIT — Regency Centers, neighborhood and community retail",
-    "phonetic": "rejantchi-sèntérze"
+    "phonetic": "regency centers"
   },
   {
     "symbol": "REGN",
@@ -6317,7 +6317,7 @@
     "correlation": "FDA, pipelines — très binaire (approbation ou rejet)",
     "index": "SP500",
     "description": "Biotech pharmaceutical — Regeneron, monoclonal antibodies, immunology pipeline",
-    "phonetic": "régénérone-farmasseutikale"
+    "phonetic": "regeneron"
   },
   {
     "symbol": "REL.L",
@@ -6327,7 +6327,7 @@
     "correlation": "Édition scientifique — RELX",
     "index": "FTSE100",
     "description": "British-Dutch data analytics & publishing — Elsevier, LexisNexis",
-    "phonetic": "rèlèksse"
+    "phonetic": "èr è èl iks"
   },
   {
     "symbol": "RF",
@@ -6337,7 +6337,7 @@
     "correlation": "Yields, banque régionale — Regions",
     "index": "SP500",
     "description": "Regional bank — Regions Financial, Southeast banking, commercial and consumer",
-    "phonetic": "régionze-fainanciale"
+    "phonetic": "regions financial"
   },
   {
     "symbol": "RHM.DE",
@@ -6351,7 +6351,7 @@
       "Rheinmetall",
       "le groupe de défense allemand"
     ],
-    "phonetic": "raïne-mètale"
+    "phonetic": "raïn métal"
   },
   {
     "symbol": "RI.PA",
@@ -6361,7 +6361,7 @@
     "correlation": "Défensif, consommation de base — Pernod Ricard",
     "index": "CAC40",
     "description": "Numéro deux mondial des spiritueux — Absolut, Jameson, Ricard, Chivas",
-    "phonetic": "pèrnod-rikare"
+    "phonetic": "pèrno ricare"
   },
   {
     "symbol": "RIO.L",
@@ -6371,7 +6371,7 @@
     "correlation": "Fer, cuivre, Chine — Rio Tinto",
     "index": "FTSE100",
     "description": "Anglo-Australian mining giant, iron ore, aluminium, copper, lithium",
-    "phonetic": "rio-tinte"
+    "phonetic": "rio tinto"
   },
   {
     "symbol": "RJF",
@@ -6381,7 +6381,7 @@
     "correlation": "^GSPC, wealth management — Raymond James",
     "index": "SP500",
     "description": "Investment bank and broker — Raymond James, wealth management, capital markets",
-    "phonetic": "rémond-djèimze-fainanciale"
+    "phonetic": "raymond james financial"
   },
   {
     "symbol": "RKT.L",
@@ -6391,7 +6391,7 @@
     "correlation": "Consommation de base — Reckitt",
     "index": "FTSE100",
     "description": "British consumer health & hygiene — Dettol, Lysol, Durex, Nurofen, Enfamil",
-    "phonetic": "rèkit"
+    "phonetic": "rékit"
   },
   {
     "symbol": "RL",
@@ -6401,7 +6401,7 @@
     "correlation": "Mode luxe US — Ralph Lauren",
     "index": "SP500",
     "description": "Luxury fashion house — Ralph Lauren, premium apparel, accessories, home products",
-    "phonetic": "ralph-lorène-korporécheune"
+    "phonetic": "ralph lauren"
   },
   {
     "symbol": "RMD",
@@ -6411,7 +6411,7 @@
     "correlation": "Respiratoire devices — ResMed",
     "index": "SP500",
     "description": "Medical device company — ResMed, respiratory and cloud-connected health devices",
-    "phonetic": "rèz-mèd"
+    "phonetic": "res med"
   },
   {
     "symbol": "RMS.PA",
@@ -6435,7 +6435,7 @@
     "correlation": "EUR/USD, tarifs, transition EV",
     "index": "CAC40",
     "description": "Constructeur automobile français, alliance avec Nissan, virage électrique",
-    "phonetic": "renoue"
+    "phonetic": "reno"
   },
   {
     "symbol": "ROK",
@@ -6445,7 +6445,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Industrial automation — Rockwell Automation, factory control systems, software",
-    "phonetic": "rokouèl-autoumécheune"
+    "phonetic": "rockwell automation"
   },
   {
     "symbol": "ROL",
@@ -6455,7 +6455,7 @@
     "correlation": "Pest control services — Rollins",
     "index": "SP500",
     "description": "Pest control services — Rollins Inc, professional extermination and fumigation",
-    "phonetic": "rolinze"
+    "phonetic": "rollins"
   },
   {
     "symbol": "ROP",
@@ -6465,7 +6465,7 @@
     "correlation": "Logiciel industrie — Roper",
     "index": "SP500",
     "description": "Diversified industrial conglomerate — Roper, Xylem, water and industrial software",
-    "phonetic": "ropeur-tèknolodjiize"
+    "phonetic": "roper technologies"
   },
   {
     "symbol": "ROST",
@@ -6475,7 +6475,7 @@
     "correlation": "Retail discount — Ross Stores",
     "index": "SP500",
     "description": "Off-price retailer — Ross Stores, discounted brand-name apparel and home goods",
-    "phonetic": "rosse-storize"
+    "phonetic": "ross stores"
   },
   {
     "symbol": "RR.L",
@@ -6489,7 +6489,7 @@
       "Rolls-Royce",
       "le motoriste britannique"
     ],
-    "phonetic": "rolze-roise"
+    "phonetic": "rolls royce"
   },
   {
     "symbol": "RSG",
@@ -6499,7 +6499,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Waste management — Republic Services, trash collection and recycling services",
-    "phonetic": "république-seurvicesz"
+    "phonetic": "republic services"
   },
   {
     "symbol": "RTX",
@@ -6513,7 +6513,7 @@
       "Raytheon",
       "RTX"
     ],
-    "phonetic": "ar-té-tèks"
+    "phonetic": "ar té iks"
   },
   {
     "symbol": "RVTY",
@@ -6523,7 +6523,7 @@
     "correlation": "Life sciences diagnostic — Revvity",
     "index": "SP500",
     "description": "Life sciences tools — Revvity, laboratory equipment, diagnostics, imaging products",
-    "phonetic": "révvité"
+    "phonetic": "revvity"
   },
   {
     "symbol": "RWE.DE",
@@ -6533,7 +6533,7 @@
     "correlation": "Énergie renouvelable, charbon, gaz — RWE",
     "index": "DAX40",
     "description": "Major German utility, largest wind power producer in Europe, energy transition",
-    "phonetic": "ar-ou-vé"
+    "phonetic": "èr doublevé eu"
   },
   {
     "symbol": "SAF.PA",
@@ -6553,7 +6553,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Defense contractor — Science Applications Int'l, government IT and engineering services",
-    "phonetic": "saïènce-apliceïcheunze-inteurnacioneul"
+    "phonetic": "science applications"
   },
   {
     "symbol": "SAN.PA",
@@ -6567,7 +6567,7 @@
       "Sanofi",
       "le géant pharmaceutique français"
     ],
-    "phonetic": "sanofé"
+    "phonetic": "sanofi"
   },
   {
     "symbol": "SAP.DE",
@@ -6591,7 +6591,7 @@
     "correlation": "REIT tours 5G — SBA Communications",
     "index": "SP500",
     "description": "Wireless tower REIT — SBA Communications, cell towers, colocation infrastructure",
-    "phonetic": "essé-bé-a-komunikacieuunz"
+    "phonetic": "èsse bé a communications"
   },
   {
     "symbol": "SBUX",
@@ -6604,7 +6604,7 @@
     "aliases": [
       "Starbucks"
     ],
-    "phonetic": "startbakz"
+    "phonetic": "starbucks"
   },
   {
     "symbol": "SCHW",
@@ -6614,7 +6614,7 @@
     "correlation": "Yields, ^GSPC",
     "index": "SP500",
     "description": "Brokerage and investment services — Charles Schwab, retail investing, robo-advisor",
-    "phonetic": "tcharleze-tchob"
+    "phonetic": "charles schwab"
   },
   {
     "symbol": "SDR.L",
@@ -6624,7 +6624,7 @@
     "correlation": "Gestion actifs — Schroders",
     "index": "FTSE100",
     "description": "British asset management firm, one of UK's oldest fund managers",
-    "phonetic": "shroudeurz"
+    "phonetic": "schroders"
   },
   {
     "symbol": "SGE.L",
@@ -6634,7 +6634,7 @@
     "correlation": "ERP PME — Sage Group",
     "index": "FTSE100",
     "description": "British business software company, accounting & payroll for SMEs",
-    "phonetic": "séïdj-groupe"
+    "phonetic": "sage groupe"
   },
   {
     "symbol": "SGO.PA",
@@ -6644,7 +6644,7 @@
     "correlation": "Construction, immobilier, taux",
     "index": "CAC40",
     "description": "Leader mondial des matériaux de construction, isolation, vitrage",
-    "phonetic": "san-gobain"
+    "phonetic": "sain gobin"
   },
   {
     "symbol": "SHEL.L",
@@ -6668,7 +6668,7 @@
     "correlation": "Défensif, dialyse — Siemens Healthineers",
     "index": "DAX40",
     "description": "German medical technology — imaging (MRI, CT), lab diagnostics, Varian oncology",
-    "phonetic": "zimeneze-élcthièneeurz"
+    "phonetic": "zimèns healthineers"
   },
   {
     "symbol": "SHOP",
@@ -6678,7 +6678,7 @@
     "correlation": "^IXIC ↑, taux ↓↓",
     "index": "SP500",
     "description": "E-commerce platform — Shopify, merchant platform, point-of-sale systems",
-    "phonetic": "chopi-faïe"
+    "phonetic": "shopify"
   },
   {
     "symbol": "SHW",
@@ -6688,7 +6688,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Paint and coatings — Sherwin-Williams, architectural, industrial, DIY retail",
-    "phonetic": "chèrouine-ouiliamz"
+    "phonetic": "sherwin williams"
   },
   {
     "symbol": "SI=F",
@@ -6702,7 +6702,7 @@
       "l'argent",
       "le métal gris"
     ],
-    "phonetic": "ardjanne"
+    "phonetic": "argent"
   },
   {
     "symbol": "SIE.DE",
@@ -6715,7 +6715,7 @@
     "aliases": [
       "Siemens"
     ],
-    "phonetic": "zimeneze"
+    "phonetic": "zimèns"
   },
   {
     "symbol": "SJM",
@@ -6725,7 +6725,7 @@
     "correlation": "Alimentation confiture — Smucker",
     "index": "SP500",
     "description": "Food manufacturer — J.M. Smucker, jams, peanut butter, pet food brands",
-    "phonetic": "ji-ème-smeuker"
+    "phonetic": "ji èm smucker"
   },
   {
     "symbol": "SKG.L",
@@ -6735,7 +6735,7 @@
     "correlation": "Emballage, cycle industriel — Smurfit Kappa",
     "index": "FTSE100",
     "description": "Irish corrugated packaging leader, now merged with WestRock",
-    "phonetic": "smeuurfite-kappa"
+    "phonetic": "smeurfit kappa"
   },
   {
     "symbol": "SLB",
@@ -6749,7 +6749,7 @@
       "Schlumberger",
       "le leader des services pétroliers"
     ],
-    "phonetic": "èsse-èlle-bé"
+    "phonetic": "èsse èl bé"
   },
   {
     "symbol": "SMCI",
@@ -6763,7 +6763,7 @@
       "Super Micro",
       "Supermicro"
     ],
-    "phonetic": "souper-maïkro-kompiouteur"
+    "phonetic": "super micro computer"
   },
   {
     "symbol": "SNA",
@@ -6773,7 +6773,7 @@
     "correlation": "Outils professionnels — Snap-on",
     "index": "SP500",
     "description": "Snap-on makes professional tools for technicians and engineers",
-    "phonetic": "snaponne"
+    "phonetic": "snap on"
   },
   {
     "symbol": "SNAP",
@@ -6783,7 +6783,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Snapchat owner, image-focused social platform with advertising",
-    "phonetic": "snappe"
+    "phonetic": "snap"
   },
   {
     "symbol": "SNDK",
@@ -6803,7 +6803,7 @@
     "correlation": "^IXIC ↑, taux ↓↓",
     "index": "SP500",
     "description": "Snowflake provides cloud data warehouse platform for enterprise",
-    "phonetic": "snoufleuike"
+    "phonetic": "snowflake"
   },
   {
     "symbol": "SNPS",
@@ -6813,7 +6813,7 @@
     "correlation": "^IXIC ↑, taux ↓↓",
     "index": "SP500",
     "description": "Synopsys creates semiconductor design software and tools",
-    "phonetic": "sinopsiz"
+    "phonetic": "synopsys"
   },
   {
     "symbol": "SO",
@@ -6823,7 +6823,7 @@
     "correlation": "Taux ↓ — défensif, proxy obligataire",
     "index": "SP500",
     "description": "Southern Company operates electric utility serving Southeast US",
-    "phonetic": "soueutcheurne"
+    "phonetic": "southern"
   },
   {
     "symbol": "SOL-USD",
@@ -6847,7 +6847,7 @@
     "correlation": "Infection prévention santé — Solventum",
     "index": "SP500",
     "description": "Solventum provides healthcare solutions and infection prevention products",
-    "phonetic": "solventeum"
+    "phonetic": "solventum"
   },
   {
     "symbol": "SPG",
@@ -6857,7 +6857,7 @@
     "correlation": "Taux ↓↓ — sensible aux taux hypothécaires",
     "index": "SP500",
     "description": "Simon Property Group owns and operates shopping malls nationwide",
-    "phonetic": "simon-propreté-groupe"
+    "phonetic": "simon property"
   },
   {
     "symbol": "SPGI",
@@ -6867,7 +6867,7 @@
     "correlation": "Yields, ^GSPC",
     "index": "SP500",
     "description": "S&P Global provides credit ratings, index data, analytics",
-    "phonetic": "esse-et-pé-globale"
+    "phonetic": "èsse et pé global"
   },
   {
     "symbol": "SQ",
@@ -6877,7 +6877,7 @@
     "correlation": "Fintech, crypto — Block (Square)",
     "index": "SP500",
     "description": "Block operates Square payments and Cash App platforms",
-    "phonetic": "blok"
+    "phonetic": "block"
   },
   {
     "symbol": "SRE",
@@ -6897,7 +6897,7 @@
     "correlation": "Biopharma equipment — Sartorius",
     "index": "DAX40",
     "description": "German bioprocess equipment & lab instruments, pharma manufacturing tools",
-    "phonetic": "sartorieus"
+    "phonetic": "sartorius"
   },
   {
     "symbol": "SSE.L",
@@ -6907,7 +6907,7 @@
     "correlation": "Énergie renouvelable UK — SSE",
     "index": "FTSE100",
     "description": "Scottish energy company, largest UK renewable electricity generator, wind farms",
-    "phonetic": "èsse-èsse-è"
+    "phonetic": "èsse èsse eu"
   },
   {
     "symbol": "STAN.L",
@@ -6917,7 +6917,7 @@
     "correlation": "Yields, Asie — Standard Chartered",
     "index": "FTSE100",
     "description": "British bank focused on Asia, Africa & Middle East, trade finance",
-    "phonetic": "standarde-tcharteurèd"
+    "phonetic": "standard chartered"
   },
   {
     "symbol": "STE",
@@ -6927,7 +6927,7 @@
     "correlation": "Stérilisation médicale — Steris",
     "index": "SP500",
     "description": "Steris sterilizes medical equipment and supplies for hospitals",
-    "phonetic": "steuris"
+    "phonetic": "steris"
   },
   {
     "symbol": "STLAM.MI",
@@ -6947,7 +6947,7 @@
     "correlation": "Acier production — Steel Dynamics",
     "index": "SP500",
     "description": "Steel Dynamics produces flat-rolled and structural steel products",
-    "phonetic": "stiel-dinamikz"
+    "phonetic": "steel dynamics"
   },
   {
     "symbol": "STMPA.PA",
@@ -6957,7 +6957,7 @@
     "correlation": "^IXIC ↑, ^KS11 — semi-conducteurs européens",
     "index": "CAC40",
     "description": "Fabricant européen de semi-conducteurs, capteurs, puces auto & industriel",
-    "phonetic": "essé-té-mikreulèktroniks"
+    "phonetic": "èsse té èm micro électronique"
   },
   {
     "symbol": "STT",
@@ -6967,7 +6967,7 @@
     "correlation": "Yields, custody data — State Street",
     "index": "SP500",
     "description": "State Street provides financial data and custody services",
-    "phonetic": "stéït-strite"
+    "phonetic": "state street"
   },
   {
     "symbol": "STX",
@@ -6977,7 +6977,7 @@
     "correlation": "Stockage disques durs — Seagate",
     "index": "SP500",
     "description": "Seagate manufactures hard drives and storage solutions",
-    "phonetic": "siègate-tèknolodjiize"
+    "phonetic": "seagate technology"
   },
   {
     "symbol": "STZ",
@@ -6987,7 +6987,7 @@
     "correlation": "Bière Corona spiritueux — Constellation",
     "index": "SP500",
     "description": "Constellation Brands brews Corona beer and spirits globally",
-    "phonetic": "konstelléïcheune-brandz"
+    "phonetic": "constellation brands"
   },
   {
     "symbol": "SU.PA",
@@ -6997,7 +6997,7 @@
     "correlation": "Automatisation, transition énergétique, industrie",
     "index": "CAC40",
     "description": "Leader mondial de la gestion de l'énergie & automatisation industrielle",
-    "phonetic": "tchneïdeur-élèktrike"
+    "phonetic": "schnaïdeur électrique"
   },
   {
     "symbol": "SVNL.L",
@@ -7007,7 +7007,7 @@
     "correlation": "Outsourcing gouvernement UK — Serco",
     "index": "FTSE100",
     "description": "British outsourcing & government services — prisons, transport, defense",
-    "phonetic": "seurceu"
+    "phonetic": "serco"
   },
   {
     "symbol": "SVT.L",
@@ -7017,7 +7017,7 @@
     "correlation": "Eau UK — Severn Trent",
     "index": "FTSE100",
     "description": "UK water utility, serves central England & Wales",
-    "phonetic": "sèveurne-trènte"
+    "phonetic": "severn trent"
   },
   {
     "symbol": "SW",
@@ -7027,7 +7027,7 @@
     "correlation": "Packaging carton — Smurfit Westrock",
     "index": "SP500",
     "description": "Smurfit Westrock produces corrugated packaging and paper products",
-    "phonetic": "smeuurfite-ouèstrok"
+    "phonetic": "smurfit westrock"
   },
   {
     "symbol": "SW.PA",
@@ -7037,7 +7037,7 @@
     "correlation": "Restauration collective, services",
     "index": "CAC40",
     "description": "Leader mondial de la restauration collective & services aux entreprises",
-    "phonetic": "sodèkso"
+    "phonetic": "sodexo"
   },
   {
     "symbol": "SWK",
@@ -7047,7 +7047,7 @@
     "correlation": "Outils construction — Stanley Black & Decker",
     "index": "SP500",
     "description": "Stanley Black & Decker makes tools, locks, home equipment",
-    "phonetic": "stanlie-blak-et-dèkeur"
+    "phonetic": "stanley black et decker"
   },
   {
     "symbol": "SWKS",
@@ -7057,7 +7057,7 @@
     "correlation": "^IXIC, semi mobile RF — Skyworks",
     "index": "SP500",
     "description": "Skyworks Solutions designs semiconductor chips for mobile devices",
-    "phonetic": "skyourkz-solucieuunz"
+    "phonetic": "skyworks solutions"
   },
   {
     "symbol": "SY1.DE",
@@ -7067,7 +7067,7 @@
     "correlation": "Semi-conducteurs, Infineon spin-off — Siemens Energy",
     "index": "DAX40",
     "description": "German flavors & fragrances producer, food/cosmetics ingredients",
-    "phonetic": "simraïze"
+    "phonetic": "simraïss"
   },
   {
     "symbol": "SYF",
@@ -7077,7 +7077,7 @@
     "correlation": "Crédit consommateur cartes — Synchrony",
     "index": "SP500",
     "description": "Synchrony Financial provides credit cards and consumer financing",
-    "phonetic": "sinkronaï-fainanciale"
+    "phonetic": "synchrony financial"
   },
   {
     "symbol": "SYK",
@@ -7087,7 +7087,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Stryker manufactures orthopedic and medical devices for hospitals",
-    "phonetic": "straïkeur"
+    "phonetic": "stryker"
   },
   {
     "symbol": "SYY",
@@ -7097,7 +7097,7 @@
     "correlation": "Distribution alimentaire restaurants — Sysco",
     "index": "SP500",
     "description": "Sysco distributes food and beverages to restaurants and institutions",
-    "phonetic": "sisko"
+    "phonetic": "sysco"
   },
   {
     "symbol": "T",
@@ -7110,7 +7110,7 @@
     "aliases": [
       "AT&T"
     ],
-    "phonetic": "a-té-et-té"
+    "phonetic": "a té et té"
   },
   {
     "symbol": "TAP",
@@ -7120,7 +7120,7 @@
     "correlation": "Bière brasseur — Molson Coors",
     "index": "SP500",
     "description": "Molson Coors brews and distributes beer nationwide and globally",
-    "phonetic": "molson-kouerze-béveuradjiize"
+    "phonetic": "molson coors"
   },
   {
     "symbol": "TDG",
@@ -7130,7 +7130,7 @@
     "correlation": "Géopolitique ↑↑ — tensions = commandes",
     "index": "SP500",
     "description": "TransDigm Group supplies aircraft components and aerospace systems",
-    "phonetic": "tranz-didjenne-groupe"
+    "phonetic": "transdigm"
   },
   {
     "symbol": "TDY",
@@ -7140,7 +7140,7 @@
     "correlation": "Capteurs aérospatial — Teledyne",
     "index": "SP500",
     "description": "Teledyne Technologies designs sensors and instruments for aerospace",
-    "phonetic": "têlèdaïne-tèknolodjiize"
+    "phonetic": "teledyne technologies"
   },
   {
     "symbol": "TECH",
@@ -7150,7 +7150,7 @@
     "correlation": "Réactifs life sciences — Bio-Techne",
     "index": "SP500",
     "description": "Bio-Techne manufactures life science research reagents and instruments",
-    "phonetic": "bio-tèkne"
+    "phonetic": "bio techne"
   },
   {
     "symbol": "TEL",
@@ -7160,7 +7160,7 @@
     "correlation": "Connecteurs auto aéro — TE Connectivity",
     "index": "SP500",
     "description": "TE Connectivity makes connectors and sensors for electronics",
-    "phonetic": "té-è-konnèktivité"
+    "phonetic": "té eu connectivity"
   },
   {
     "symbol": "TEP.PA",
@@ -7170,7 +7170,7 @@
     "correlation": "Services BPO, externalisation, emploi",
     "index": "CAC40",
     "description": "Leader mondial des centres d'appels & services clients externalisés",
-    "phonetic": "télé-peurformancee"
+    "phonetic": "téléperformance"
   },
   {
     "symbol": "TER",
@@ -7180,7 +7180,7 @@
     "correlation": "^IXIC, semi test équipement — Teradyne",
     "index": "SP500",
     "description": "Teradyne manufactures semiconductor test equipment for chip makers",
-    "phonetic": "tèradaïne"
+    "phonetic": "teradyne"
   },
   {
     "symbol": "TFC",
@@ -7190,7 +7190,7 @@
     "correlation": "Yields, banque régionale — Truist",
     "index": "SP500",
     "description": "Truist Financial provides banking and wealth management services",
-    "phonetic": "truïste-fainanciale"
+    "phonetic": "truist financial"
   },
   {
     "symbol": "TGT",
@@ -7200,7 +7200,7 @@
     "correlation": "Consommateur US, confiance, emploi",
     "index": "SP500",
     "description": "Target operates discount retail stores across United States",
-    "phonetic": "targèt"
+    "phonetic": "target"
   },
   {
     "symbol": "TJX",
@@ -7210,7 +7210,7 @@
     "correlation": "Consommateur US, confiance, emploi",
     "index": "SP500",
     "description": "TJX Companies runs off-price stores including TJ Maxx and Marshalls",
-    "phonetic": "té-ji-èks-kompanieuz"
+    "phonetic": "té ji iks"
   },
   {
     "symbol": "TKO",
@@ -7220,7 +7220,7 @@
     "correlation": "Sports UFC WWE — TKO Group",
     "index": "SP500",
     "description": "TKO Group Holdings owns UFC and WWE sports entertainment",
-    "phonetic": "té-ka-o-groupe-oldingz"
+    "phonetic": "té ka o"
   },
   {
     "symbol": "TMO",
@@ -7230,7 +7230,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Thermo Fisher Scientific provides laboratory equipment and chemicals",
-    "phonetic": "tèrmo-ficheur-saïèntifiike"
+    "phonetic": "thermo fisher scientifique"
   },
   {
     "symbol": "TMUS",
@@ -7243,7 +7243,7 @@
     "aliases": [
       "T-Mobile"
     ],
-    "phonetic": "té-mobaïle-youèsse"
+    "phonetic": "té mobile u èsse"
   },
   {
     "symbol": "TOL",
@@ -7253,7 +7253,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Toll Brothers builds luxury residential homes in major markets",
-    "phonetic": "tolbreuzerze"
+    "phonetic": "toll brothers"
   },
   {
     "symbol": "TPL",
@@ -7263,7 +7263,7 @@
     "correlation": "CL=F, terres pétrole Texas — TPL",
     "index": "SP500",
     "description": "Texas Pacific Land owns oil and gas properties in Texas",
-    "phonetic": "tèksas-pasifiik-lande-korporécheune"
+    "phonetic": "texas pacific land"
   },
   {
     "symbol": "TPR",
@@ -7273,7 +7273,7 @@
     "correlation": "Mode luxe sacs Coach — Tapestry",
     "index": "SP500",
     "description": "Tapestry designs luxury handbags and fashion accessories",
-    "phonetic": "tapèstri"
+    "phonetic": "tapestry"
   },
   {
     "symbol": "TRGP",
@@ -7283,7 +7283,7 @@
     "correlation": "NG=F, CL=F — Targa Resources midstream",
     "index": "SP500",
     "description": "Targa Resources processes crude oil and natural gas",
-    "phonetic": "targa-ressourcez"
+    "phonetic": "targa resources"
   },
   {
     "symbol": "TRMB",
@@ -7293,7 +7293,7 @@
     "correlation": "^IXIC ↑, taux ↓↓",
     "index": "SP500",
     "description": "Trimble provides GPS positioning and construction software solutions",
-    "phonetic": "trimbeul"
+    "phonetic": "trimble"
   },
   {
     "symbol": "TROW",
@@ -7303,7 +7303,7 @@
     "correlation": "^GSPC, gestion fonds — T. Rowe Price",
     "index": "SP500",
     "description": "T. Rowe Price manages mutual funds and investment services",
-    "phonetic": "té-rowe-praïsse"
+    "phonetic": "té rowe price"
   },
   {
     "symbol": "TRV",
@@ -7313,7 +7313,7 @@
     "correlation": "Yields ↑ — portefeuille obligataire",
     "index": "SP500",
     "description": "Travelers Companies provides property and casualty insurance",
-    "phonetic": "travèleurze-kompanize"
+    "phonetic": "travelers"
   },
   {
     "symbol": "TSCO",
@@ -7323,7 +7323,7 @@
     "correlation": "Rural agriculture — Tractor Supply",
     "index": "SP500",
     "description": "Tractor Supply sells farm equipment and rural supplies",
-    "phonetic": "trakteur-soupplaï"
+    "phonetic": "tractor supply"
   },
   {
     "symbol": "TSCO.L",
@@ -7333,7 +7333,7 @@
     "correlation": "Consommateur UK — Tesco",
     "index": "FTSE100",
     "description": "UK's largest supermarket chain, also banking & mobile services",
-    "phonetic": "tèsko"
+    "phonetic": "tesco"
   },
   {
     "symbol": "TSLA",
@@ -7357,7 +7357,7 @@
     "correlation": "Viande volaille — Tyson Foods",
     "index": "SP500",
     "description": "Tyson Foods processes and sells poultry, beef, pork globally",
-    "phonetic": "taïssone-foudze"
+    "phonetic": "tyson foods"
   },
   {
     "symbol": "TT",
@@ -7367,7 +7367,7 @@
     "correlation": "HVAC climatisation — Trane",
     "index": "SP500",
     "description": "Trane Technologies makes HVAC and refrigeration systems",
-    "phonetic": "trène-tèknolodjiize"
+    "phonetic": "trane technologies"
   },
   {
     "symbol": "TTD",
@@ -7377,7 +7377,7 @@
     "correlation": "^IXIC, pub digitale — Trade Desk",
     "index": "SP500",
     "description": "Trade Desk provides programmatic advertising platform for marketers",
-    "phonetic": "trède-dèsk"
+    "phonetic": "trade desk"
   },
   {
     "symbol": "TTE.PA",
@@ -7392,7 +7392,7 @@
       "Total",
       "la major française"
     ],
-    "phonetic": "totalènérjiize"
+    "phonetic": "total énergies"
   },
   {
     "symbol": "TTWO",
@@ -7402,7 +7402,7 @@
     "correlation": "^IXIC, jeux vidéo GTA — Take-Two",
     "index": "SP500",
     "description": "Take-Two Interactive develops video games like GTA and NBA 2K",
-    "phonetic": "téïk-tuo-intéraktif"
+    "phonetic": "take two interactive"
   },
   {
     "symbol": "TXN",
@@ -7416,7 +7416,7 @@
       "Texas Instruments",
       "TI"
     ],
-    "phonetic": "tèksasse-instroumeunts"
+    "phonetic": "texas instruments"
   },
   {
     "symbol": "TXT",
@@ -7426,7 +7426,7 @@
     "correlation": "Hélicoptères défense — Textron",
     "index": "SP500",
     "description": "Textron makes helicopters, aircraft, and defense equipment",
-    "phonetic": "tèkstrone"
+    "phonetic": "textron"
   },
   {
     "symbol": "TYL",
@@ -7436,7 +7436,7 @@
     "correlation": "Logiciel gouvernement — Tyler",
     "index": "SP500",
     "description": "Tyler Technologies provides software for local governments",
-    "phonetic": "taileur-tèknolodjiize"
+    "phonetic": "tyler technologies"
   },
   {
     "symbol": "UAL",
@@ -7446,7 +7446,7 @@
     "correlation": "CL=F (pétrole) ↓↓ — kérosène = 1er poste de coûts",
     "index": "SP500",
     "description": "United Airlines operates flights across US and international routes",
-    "phonetic": "younaidèd-èrlaïnze"
+    "phonetic": "united airlines"
   },
   {
     "symbol": "UBER",
@@ -7459,7 +7459,7 @@
     "aliases": [
       "Uber"
     ],
-    "phonetic": "oubeur-tèknolodjiize"
+    "phonetic": "uber"
   },
   {
     "symbol": "UDR",
@@ -7469,7 +7469,7 @@
     "correlation": "REIT appartements — UDR",
     "index": "SP500",
     "description": "UDR operates residential apartment communities across United States",
-    "phonetic": "younaidèd-dévélopeursse"
+    "phonetic": "u dé ar"
   },
   {
     "symbol": "UHS",
@@ -7479,7 +7479,7 @@
     "correlation": "Hôpitaux psychiatrie — Universal Health",
     "index": "SP500",
     "description": "Universal Health Services operates hospitals and behavioral facilities",
-    "phonetic": "younivèrsal-elte-sèrvicize"
+    "phonetic": "universal health"
   },
   {
     "symbol": "ULTA",
@@ -7489,7 +7489,7 @@
     "correlation": "Cosmétiques retail — Ulta Beauty",
     "index": "SP500",
     "description": "Ulta Beauty operates cosmetics and beauty supply retail stores",
-    "phonetic": "oultah-biauté"
+    "phonetic": "ulta beauty"
   },
   {
     "symbol": "ULVR.L",
@@ -7499,7 +7499,7 @@
     "correlation": "Défensif, consommation de base — Unilever",
     "index": "FTSE100",
     "description": "British-Dutch consumer goods giant — Dove, Ben & Jerry's, Knorr",
-    "phonetic": "youniléveur"
+    "phonetic": "uni lever"
   },
   {
     "symbol": "UNH",
@@ -7513,7 +7513,7 @@
       "UnitedHealth",
       "le géant de l'assurance santé"
     ],
-    "phonetic": "younaidèd-elte-groupe"
+    "phonetic": "united health"
   },
   {
     "symbol": "UNP",
@@ -7523,7 +7523,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Union Pacific operates freight railroad across western United States",
-    "phonetic": "younione-pasifik"
+    "phonetic": "union pacific"
   },
   {
     "symbol": "UPS",
@@ -7533,7 +7533,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "United Parcel Service delivers packages and parcels worldwide",
-    "phonetic": "younaidèd-parcèl-sèrvice"
+    "phonetic": "united parcel service"
   },
   {
     "symbol": "URI",
@@ -7543,7 +7543,7 @@
     "correlation": "Location équipement construction — United Rentals",
     "index": "SP500",
     "description": "United Rentals leases heavy construction and mobile equipment",
-    "phonetic": "younaidèd-rèntals"
+    "phonetic": "united rentals"
   },
   {
     "symbol": "URW.AS",
@@ -7553,7 +7553,7 @@
     "correlation": "Taux ↓↓, centres commerciaux, commerce physique",
     "index": "CAC40",
     "description": "Premier opérateur européen de centres commerciaux premium",
-    "phonetic": "younibail-rodamko-wèstfielde"
+    "phonetic": "unibail rodamco westfield"
   },
   {
     "symbol": "USB",
@@ -7563,7 +7563,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "US Bancorp provides banking and wealth management services",
-    "phonetic": "younaidèd-stèts-bancorp"
+    "phonetic": "u èsse bancorp"
   },
   {
     "symbol": "USDCAD=X",
@@ -7576,7 +7576,7 @@
     "aliases": [
       "le loonie"
     ],
-    "phonetic": "dolar-kanada"
+    "phonetic": "dollar canadien"
   },
   {
     "symbol": "USDCHF=X",
@@ -7589,7 +7589,7 @@
     "aliases": [
       "le dollar-franc suisse"
     ],
-    "phonetic": "dolar-franck-suisse"
+    "phonetic": "dollar franc suisse"
   },
   {
     "symbol": "USDJPY=X",
@@ -7602,7 +7602,7 @@
     "aliases": [
       "le dollar-yen"
     ],
-    "phonetic": "dolar-iene"
+    "phonetic": "dollar yène"
   },
   {
     "symbol": "UU.L",
@@ -7612,7 +7612,7 @@
     "correlation": "Eau UK — United Utilities",
     "index": "FTSE100",
     "description": "UK's largest listed water company, serves North West England",
-    "phonetic": "younaidèd-youtilitize"
+    "phonetic": "united utilities"
   },
   {
     "symbol": "V",
@@ -7625,7 +7625,7 @@
     "aliases": [
       "Visa"
     ],
-    "phonetic": "viza"
+    "phonetic": "visa"
   },
   {
     "symbol": "VICI",
@@ -7635,7 +7635,7 @@
     "correlation": "REIT casinos Vegas — Vici",
     "index": "SP500",
     "description": "Vici Properties owns casino properties in Las Vegas and beyond",
-    "phonetic": "viki-propriètize"
+    "phonetic": "vici properties"
   },
   {
     "symbol": "VIE.PA",
@@ -7655,7 +7655,7 @@
     "correlation": "Médias, streaming, Canal+",
     "index": "CAC40",
     "description": "Groupe média français — Canal+, Havas, Gameloft, Editis",
-    "phonetic": "vivèndi"
+    "phonetic": "vivendi"
   },
   {
     "symbol": "VLO",
@@ -7665,7 +7665,7 @@
     "correlation": "CL=F (pétrole) ↑↑",
     "index": "SP500",
     "description": "Valero Energy refines crude oil into gasoline and fuels",
-    "phonetic": "valéro-énérji"
+    "phonetic": "valero énergie"
   },
   {
     "symbol": "VLTO",
@@ -7685,7 +7685,7 @@
     "correlation": "Agrégats pierre construction — Vulcan",
     "index": "SP500",
     "description": "Vulcan Materials Company extracts and sells aggregates and stone",
-    "phonetic": "voulkane-matérialze-kompani"
+    "phonetic": "vulcan materials"
   },
   {
     "symbol": "VNA.DE",
@@ -7705,7 +7705,7 @@
     "correlation": "Défensif, dividendes — Vodafone",
     "index": "FTSE100",
     "description": "British telecom, one of world's largest mobile operators, Europe & Africa",
-    "phonetic": "vodaphone"
+    "phonetic": "vodafone"
   },
   {
     "symbol": "VOW3.DE",
@@ -7715,7 +7715,7 @@
     "correlation": "EUR/USD, tarifs, transition EV — Volkswagen",
     "index": "DAX40",
     "description": "World's largest automaker by revenue — VW, Audi, Porsche, Lamborghini, Skoda",
-    "phonetic": "folksvagène"
+    "phonetic": "folks vagène"
   },
   {
     "symbol": "VRSK",
@@ -7725,7 +7725,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Verisk Analytics provides risk assessment and data analytics",
-    "phonetic": "vérissk-analitiksz"
+    "phonetic": "verisk analytics"
   },
   {
     "symbol": "VRSN",
@@ -7735,7 +7735,7 @@
     "correlation": "Domaines .com internet — Verisign",
     "index": "SP500",
     "description": "Verisign operates the .com and .net domain registry",
-    "phonetic": "vérisigne"
+    "phonetic": "verisign"
   },
   {
     "symbol": "VRTX",
@@ -7745,7 +7745,7 @@
     "correlation": "FDA, pipelines — très binaire (approbation ou rejet)",
     "index": "SP500",
     "description": "Vertex Pharmaceuticals develops cystic fibrosis and genetic disease drugs",
-    "phonetic": "vèrrtèks-farmasseutikale"
+    "phonetic": "vertex pharmaceuticals"
   },
   {
     "symbol": "VST",
@@ -7765,7 +7765,7 @@
     "correlation": "REIT senior housing santé — Ventas",
     "index": "SP500",
     "description": "Ventas owns senior housing and healthcare properties",
-    "phonetic": "vèntas"
+    "phonetic": "ventas"
   },
   {
     "symbol": "VTRS",
@@ -7788,7 +7788,7 @@
     "aliases": [
       "Verizon"
     ],
-    "phonetic": "vérizonne-komineunikcheunz"
+    "phonetic": "verizon"
   },
   {
     "symbol": "WAB",
@@ -7798,7 +7798,7 @@
     "correlation": "Locomotives rail transport — Wabtec",
     "index": "SP500",
     "description": "Wabtec manufactures locomotives and transit equipment",
-    "phonetic": "wabtèk"
+    "phonetic": "wabtec"
   },
   {
     "symbol": "WAT",
@@ -7808,7 +7808,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Waters Corporation makes laboratory analysis instruments and equipment",
-    "phonetic": "waturz"
+    "phonetic": "waters"
   },
   {
     "symbol": "WBA",
@@ -7818,7 +7818,7 @@
     "correlation": "Consommateur US, confiance, emploi",
     "index": "SP500",
     "description": "Walgreens operates pharmacy and retail drugstores nationwide",
-    "phonetic": "walgreunz-oldingz"
+    "phonetic": "walgreens"
   },
   {
     "symbol": "WBD",
@@ -7828,7 +7828,7 @@
     "correlation": "Streaming films TV — Warner Bros Discovery",
     "index": "SP500",
     "description": "Warner Bros Discovery produces and distributes film and television",
-    "phonetic": "warneur-bros-diskovéri"
+    "phonetic": "warner bros discovery"
   },
   {
     "symbol": "WDAY",
@@ -7848,7 +7848,7 @@
     "correlation": "Stockage disques — Western Digital",
     "index": "SP500",
     "description": "Western Digital manufactures data storage devices and controllers",
-    "phonetic": "wèsteurne-didjital"
+    "phonetic": "western digital"
   },
   {
     "symbol": "WEC",
@@ -7858,7 +7858,7 @@
     "correlation": "Défensif — utility Wisconsin",
     "index": "SP500",
     "description": "WEC Energy Group supplies electricity and natural gas to states",
-    "phonetic": "wèk-énérji-groupe"
+    "phonetic": "doublevé eu ci énergie"
   },
   {
     "symbol": "WEIR.L",
@@ -7868,7 +7868,7 @@
     "correlation": "Équipement minier — Weir Group",
     "index": "FTSE100",
     "description": "Scottish engineering, mining equipment & industrial pumps",
-    "phonetic": "weïr-groupe"
+    "phonetic": "weir groupe"
   },
   {
     "symbol": "WELL",
@@ -7878,7 +7878,7 @@
     "correlation": "REIT senior housing — Welltower",
     "index": "SP500",
     "description": "Welltower owns senior housing and healthcare real estate",
-    "phonetic": "welltaoueur"
+    "phonetic": "welltower"
   },
   {
     "symbol": "WFC",
@@ -7891,7 +7891,7 @@
     "aliases": [
       "Wells Fargo"
     ],
-    "phonetic": "wèlze-fargo"
+    "phonetic": "wells fargo"
   },
   {
     "symbol": "WIZZ.L",
@@ -7901,7 +7901,7 @@
     "correlation": "CL=F ↓↓ — low cost européen",
     "index": "FTSE100",
     "description": "Hungarian ultra-low-cost airline, Eastern Europe & Middle East routes",
-    "phonetic": "wizz-air"
+    "phonetic": "wizz air"
   },
   {
     "symbol": "WLN.PA",
@@ -7911,7 +7911,7 @@
     "correlation": "Paiements digitaux, fintech",
     "index": "CAC40",
     "description": "Leader européen des paiements électroniques & services transactionnels",
-    "phonetic": "worldline"
+    "phonetic": "worldlaïne"
   },
   {
     "symbol": "WM",
@@ -7921,7 +7921,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Waste Management collects and processes waste management services",
-    "phonetic": "wèste-manajemènte"
+    "phonetic": "waste management"
   },
   {
     "symbol": "WMB",
@@ -7931,7 +7931,7 @@
     "correlation": "NG=F — Williams pipelines gaz",
     "index": "SP500",
     "description": "Williams Companies operates natural gas pipeline infrastructure",
-    "phonetic": "williamz-kompanize"
+    "phonetic": "williams companies"
   },
   {
     "symbol": "WMT",
@@ -7945,7 +7945,7 @@
       "Walmart",
       "le géant de la distribution"
     ],
-    "phonetic": "walmarte"
+    "phonetic": "walmart"
   },
   {
     "symbol": "WPP.L",
@@ -7955,7 +7955,7 @@
     "correlation": "Publicité mondiale — WPP",
     "index": "FTSE100",
     "description": "World's largest advertising & PR holding company (Ogilvy, GroupM)",
-    "phonetic": "dablioué-pé-pé"
+    "phonetic": "doublevé pé pé"
   },
   {
     "symbol": "WRB",
@@ -7965,7 +7965,7 @@
     "correlation": "Assurance spécialisée — W.R. Berkley",
     "index": "SP500",
     "description": "W. R. Berkley provides specialty insurance products",
-    "phonetic": "dablioué-ar-bèrklay-korporécheune"
+    "phonetic": "doublevé ar berkley"
   },
   {
     "symbol": "WSM",
@@ -7975,7 +7975,7 @@
     "correlation": "Maison cuisine retail — Williams-Sonoma",
     "index": "SP500",
     "description": "Williams-Sonoma sells home furnishings and kitchenware retail",
-    "phonetic": "williamz-sonoma"
+    "phonetic": "williams sonoma"
   },
   {
     "symbol": "WST",
@@ -7985,7 +7985,7 @@
     "correlation": "Injection pharma packaging — West Pharma",
     "index": "SP500",
     "description": "West Pharmaceutical manufactures injectable drug delivery systems",
-    "phonetic": "wèste-farmassoutikale-sèrvicize"
+    "phonetic": "west pharmaceutique"
   },
   {
     "symbol": "WTW",
@@ -7995,7 +7995,7 @@
     "correlation": "Courtage risk assurance — Willis Towers",
     "index": "SP500",
     "description": "Willis Towers Watson provides insurance and risk management services",
-    "phonetic": "willisze-taueurz-watsone"
+    "phonetic": "willis towers watson"
   },
   {
     "symbol": "WY",
@@ -8005,7 +8005,7 @@
     "correlation": "Forêts bois timber — Weyerhaeuser",
     "index": "SP500",
     "description": "Weyerhaeuser owns and manages timber and forest properties",
-    "phonetic": "weyeurhéuzer"
+    "phonetic": "weyerhaeuser"
   },
   {
     "symbol": "WYNN",
@@ -8015,7 +8015,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Wynn Resorts operates luxury casino and resort properties",
-    "phonetic": "wynne-rezortz"
+    "phonetic": "wynn resorts"
   },
   {
     "symbol": "X",
@@ -8025,7 +8025,7 @@
     "correlation": "GC=F, SI=F — corrélé aux métaux précieux",
     "index": "SP500",
     "description": "United States Steel manufactures flat-rolled and tubular steel",
-    "phonetic": "younaidèd-stèts-stil"
+    "phonetic": "united states steel"
   },
   {
     "symbol": "XEL",
@@ -8035,7 +8035,7 @@
     "correlation": "Défensif — utility Ouest US Xcel",
     "index": "SP500",
     "description": "Xcel Energy provides electricity and natural gas to western states",
-    "phonetic": "eks-sèl-énérji"
+    "phonetic": "xcel énergie"
   },
   {
     "symbol": "XLE",
@@ -8049,7 +8049,7 @@
       "le secteur énergie",
       "l'ETF énergie"
     ],
-    "phonetic": "énérji-i-té-èf"
+    "phonetic": "énergie eu té èf"
   },
   {
     "symbol": "XLF",
@@ -8063,7 +8063,7 @@
       "le secteur financier",
       "l'ETF financier"
     ],
-    "phonetic": "fainancials-i-té-èf"
+    "phonetic": "financials eu té èf"
   },
   {
     "symbol": "XLK",
@@ -8077,7 +8077,7 @@
       "le secteur tech",
       "l'ETF tech"
     ],
-    "phonetic": "tèk-i-té-èf"
+    "phonetic": "tech eu té èf"
   },
   {
     "symbol": "XOM",
@@ -8092,7 +8092,7 @@
       "Exxon",
       "la major pétrolière"
     ],
-    "phonetic": "èksson-mobil"
+    "phonetic": "exxon mobil"
   },
   {
     "symbol": "XRX.L",
@@ -8102,7 +8102,7 @@
     "correlation": "Impression industrielle niche — Xaar",
     "index": "FTSE100",
     "description": "British industrial inkjet printhead manufacturer, niche printing technology",
-    "phonetic": "ksaar"
+    "phonetic": "xaar"
   },
   {
     "symbol": "XYL",
@@ -8112,7 +8112,7 @@
     "correlation": "Eau infrastructure — Xylem",
     "index": "SP500",
     "description": "Xylem manufactures water and wastewater equipment solutions",
-    "phonetic": "zailem"
+    "phonetic": "xylem"
   },
   {
     "symbol": "XYZ",
@@ -8122,7 +8122,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Fintech company (formerly Square) — Cash App, payments, Bitcoin services",
-    "phonetic": "blok"
+    "phonetic": "block"
   },
   {
     "symbol": "YUM",
@@ -8132,7 +8132,7 @@
     "correlation": "Fast food KFC Pizza Hut — Yum",
     "index": "SP500",
     "description": "Yum! Brands franchises KFC, Taco Bell, and Pizza Hut globally",
-    "phonetic": "yam-brands"
+    "phonetic": "yum brands"
   },
   {
     "symbol": "ZAL.DE",
@@ -8152,7 +8152,7 @@
     "correlation": "Implants orthopédiques — Zimmer Biomet",
     "index": "SP500",
     "description": "Zimmer Biomet manufactures orthopedic and surgical implants",
-    "phonetic": "zimeur-biomèt"
+    "phonetic": "zimmer biomet"
   },
   {
     "symbol": "ZBRA",
@@ -8162,7 +8162,7 @@
     "correlation": "Codes-barres RFID logistique — Zebra",
     "index": "SP500",
     "description": "Zebra Technologies provides barcode and RFID printing solutions",
-    "phonetic": "zébra-tèknolodjiize"
+    "phonetic": "zebra technologies"
   },
   {
     "symbol": "ZS",
@@ -8172,7 +8172,7 @@
     "correlation": "^IXIC ↑, taux ↓↓",
     "index": "SP500",
     "description": "Zscaler provides cloud-based cybersecurity and network security",
-    "phonetic": "zetis-kaleur"
+    "phonetic": "zscaler"
   },
   {
     "symbol": "ZTS",
@@ -8182,7 +8182,7 @@
     "correlation": "",
     "index": "SP500",
     "description": "Zoetis manufactures animal health pharmaceuticals and vaccines",
-    "phonetic": "zoètis"
+    "phonetic": "zoetis"
   },
   {
     "symbol": "ZW=F",
@@ -8205,6 +8205,6 @@
     "correlation": "NVDA ↑, SOX ↑ — fondeur mondial dominant",
     "index": "SP500",
     "description": "World largest chip foundry, manufactures for Apple, Nvidia, AMD, Qualcomm",
-    "phonetic": "ti-esse-ème-ci"
+    "phonetic": "té èsse èm ci"
   }
 ]

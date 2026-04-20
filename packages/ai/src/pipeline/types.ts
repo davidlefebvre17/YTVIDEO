@@ -53,10 +53,15 @@ export interface NewsCluster {
 
 export interface SnapshotFlagged {
   date: string;
+  /** Publication date override (YYYY-MM-DD). If omitted, defaults to date + 1. */
+  publishDate?: string;
+  /** True when pub = Monday AND weekend gap (market closed 2+ days). Used for Monday recap mode. */
+  isMondayRecap?: boolean;
   assets: FlaggedAsset[];
   events: EconomicEvent[];
   yesterdayEvents?: EconomicEvent[];
   upcomingEvents?: EconomicEvent[];
+  weekendEvents?: EconomicEvent[];
   yields?: BondYields;
   sentiment?: MarketSentiment;
   earnings: StockScreenResult[];
@@ -65,6 +70,13 @@ export interface SnapshotFlagged {
   news: NewsItem[];
   /** Stocks with high news volume but not in 38-asset watchlist */
   newsClusters: NewsCluster[];
+  /** Weekly technical brief — only populated in Monday recap mode */
+  weeklyBrief?: {
+    generated: string;
+    regime_summary: string;
+    notable_zones: Array<{ symbol: string; level: number; type: string; event: string }>;
+    watchlist_next_week: Array<{ symbol: string; reason: string }>;
+  };
 }
 
 // ── P2 C1 Editorial ─────────────────────────────────────
@@ -91,6 +103,10 @@ export interface PlannedSegment {
 
 export interface EditorialPlan {
   date: string;
+  /** Publication date override (YYYY-MM-DD). Defaults to date + 1 if omitted. */
+  publishDate?: string;
+  /** True when pub = Monday AND weekend gap. Triggers Monday recap mode. */
+  isMondayRecap?: boolean;
   dominantTheme: string;
   threadSummary: string;
   moodMarche: 'risk-on' | 'risk-off' | 'incertain' | 'rotation';
@@ -408,6 +424,10 @@ export interface PipelineOptions {
   startFrom?: PipelineStage;
   stopAt?: PipelineStage;
   dryRun?: boolean;
+  /** Override publication date (YYYY-MM-DD). If Monday, triggers weekly recap mode. */
+  publishDate?: string;
+  /** Pre-loaded weekly brief for Monday mode (loaded by caller from disk). */
+  weeklyBrief?: SnapshotFlagged['weeklyBrief'];
 }
 
 export interface PipelineResult {

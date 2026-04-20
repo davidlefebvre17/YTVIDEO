@@ -202,16 +202,18 @@ export const FrontPage: React.FC<FrontPageProps> = ({
             gap: 16,
           }}
         >
-          {/* Main headline (typewriter) */}
+          {/* Main headline (typewriter) — adaptive font for long titles */}
           <h1
             style={{
               fontFamily: BRAND.fonts.display,
-              fontSize: 42,
+              fontSize: title.length <= 45 ? 42 : title.length <= 65 ? 36 : 32,
               fontWeight: 700,
               color: BRAND.colors.ink,
               margin: 0,
-              lineHeight: 1.3,
-              minHeight: 120,
+              lineHeight: 1.2,
+              minHeight: 80,
+              maxHeight: 180,
+              overflow: "hidden",
             }}
           >
             {displayTitle}

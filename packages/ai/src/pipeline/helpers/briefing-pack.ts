@@ -75,6 +75,8 @@ export interface BriefingPack {
   cotDivergences: COTDivergence[];
   /** Upcoming high-impact events (J+1 to J+7) */
   upcomingHighImpact: string[];
+  /** Central bank speeches from yesterday that deserve editorial attention */
+  cbSpeechesYesterday: string[];
   /** Fear & Greed trend over last 7 days */
   sentimentTrend?: SentimentTrend;
 }
@@ -103,7 +105,11 @@ export const POLITICAL_ACTORS: Record<string, ActorConfig> = {
   },
   'Powell': {
     aliases: ['powell'],
-    // "fed chair" only matches if Powell is also mentioned, OR if no other name is nearby
+    domain: 'Fed',
+    linkedAssets: ['DX-Y.NYB', 'GC=F', '^GSPC'],
+  },
+  'Warsh': {
+    aliases: ['warsh', 'kevin warsh'],
     domain: 'Fed',
     linkedAssets: ['DX-Y.NYB', 'GC=F', '^GSPC'],
   },
@@ -406,6 +412,35 @@ export function buildBriefingPack(
       return `${dateLabel} ${e.time ?? '?'} ${e.name} (${e.currency})`;
     });
 
+  // ── CB speeches yesterday (detect from calendar, enriched later by BIS) ──
+  const CB_SPEECH_PATTERNS = /\b(speaks?|speech|press\s*conf|testimony|conférence|discours|audition)\b/i;
+  const CB_ACTORS_PATTERNS = /\b(powell|warsh|lagarde|schnabel|lane|ueda|bailey|jordan|macklem|fed\s*chair|ecb\s*president|boj\s*governor)\b/i;
+  const detectedCBSpeeches = (snapshot.yesterdayEvents ?? [])
+    .filter(e => {
+      const name = e.name ?? '';
+      return (e.impact === 'high' || e.impact === 'medium')
+        && CB_SPEECH_PATTERNS.test(name)
+        && CB_ACTORS_PATTERNS.test(name);
+    })
+    .map(e => {
+      const speaker = (e.name.match(CB_ACTORS_PATTERNS) ?? [''])[0];
+      return { speaker, eventName: e.name, currency: e.currency };
+    });
+
+  // Fallback: format without BIS content (enriched later by enrichBriefingPackCBSpeeches)
+  const cbSpeechesYesterday = detectedCBSpeeches.map(s => {
+    const relatedNews = snapshot.news
+      .filter(n => s.speaker && n.title.toLowerCase().includes(s.speaker.toLowerCase()))
+      .slice(0, 2)
+      .map(n => n.summary ? `${n.title} — ${n.summary.slice(0, 150)}` : n.title);
+
+    let line = `HIER: ${s.eventName} (${s.currency})`;
+    if (relatedNews.length > 0) {
+      line += ` → ${relatedNews.join(' | ')}`;
+    }
+    return line;
+  });
+
   // ── Sentiment trend (F&G over last 7 days from previous snapshots) ──
   const sentimentTrend = buildSentimentTrend(snapshot);
 
@@ -418,6 +453,7 @@ export function buildBriefingPack(
     cotHighlights,
     cotDivergences,
     upcomingHighImpact,
+    cbSpeechesYesterday,
     sentimentTrend,
   };
 }
@@ -486,6 +522,49 @@ function buildSentimentTrend(snapshot: DailySnapshot): SentimentTrend | undefine
 }
 
 /**
+ * Enrichit le briefing pack avec le contenu réel des discours CB via BIS RSS.
+ * Appelé dans le pipeline APRÈS buildBriefingPack (qui est synchrone).
+ * Ne fetch BIS que si des discours ont été détectés — coût 0 sinon.
+ */
+export async function enrichBriefingPackCBSpeeches(
+  pack: BriefingPack,
+  snapshot: DailySnapshot,
+): Promise<BriefingPack> {
+  if (pack.cbSpeechesYesterday.length === 0) return pack;
+
+  try {
+    const { enrichCBSpeeches } = await import("@yt-maker/data");
+
+    // Re-detect speakers from yesterdayEvents
+    const CB_SPEECH_PATTERNS = /\b(speaks?|speech|press\s*conf|testimony|conférence|discours|audition)\b/i;
+    const CB_ACTORS_PATTERNS = /\b(powell|warsh|lagarde|schnabel|lane|ueda|bailey|jordan|macklem|fed\s*chair|ecb\s*president|boj\s*governor)\b/i;
+
+    const detected = (snapshot.yesterdayEvents ?? [])
+      .filter(e => (e.impact === 'high' || e.impact === 'medium')
+        && CB_SPEECH_PATTERNS.test(e.name ?? '')
+        && CB_ACTORS_PATTERNS.test(e.name ?? ''))
+      .map(e => ({
+        speaker: (e.name.match(CB_ACTORS_PATTERNS) ?? [''])[0],
+        eventName: e.name,
+        currency: e.currency,
+      }));
+
+    if (detected.length === 0) return pack;
+
+    console.log(`  BIS enrichment: ${detected.length} CB speech(es) detected...`);
+    const enriched = await enrichCBSpeeches(detected, snapshot.date);
+
+    if (enriched.length > 0) {
+      return { ...pack, cbSpeechesYesterday: enriched };
+    }
+  } catch (err) {
+    console.warn(`  BIS enrichment failed: ${(err as Error).message.slice(0, 60)}`);
+  }
+
+  return pack;
+}
+
+/**
  * Format BriefingPack as text sections for injection into LLM prompts.
  */
 export function formatBriefingPack(pack: BriefingPack): string {
@@ -512,6 +591,15 @@ export function formatBriefingPack(pack: BriefingPack): string {
     for (const title of pack.topNewsTitles) {
       text += `- ${title}\n`;
     }
+    text += '\n';
+  }
+
+  if (pack.cbSpeechesYesterday.length) {
+    text += `## DISCOURS BANQUES CENTRALES HIER (contexte éditorial important)\n`;
+    for (const s of pack.cbSpeechesYesterday) {
+      text += `- ${s}\n`;
+    }
+    text += `→ Analyser : était-ce attendu ? Qu'est-ce que ça change pour la trajectoire future ? Le marché avait-il déjà pricé ?\n`;
     text += '\n';
   }
 

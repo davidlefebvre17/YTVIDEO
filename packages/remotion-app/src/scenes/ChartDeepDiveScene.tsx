@@ -31,11 +31,12 @@ export const ChartDeepDiveScene: React.FC<ChartDeepDiveSceneProps> = ({
 
   // Depth badge
   const depth = section.depth ?? 'focus';
-  const depthLabel = {
+  const depthLabel = ({
     deep: lang === 'fr' ? 'Analyse' : 'Deep Dive',
     focus: lang === 'fr' ? 'Focus' : 'Focus',
     flash: lang === 'fr' ? 'Flash' : 'Flash',
-  }[depth] ?? 'Focus';
+    panorama: lang === 'fr' ? 'Panorama' : 'Panorama',
+  } as Record<string, string>)[depth] ?? 'Focus';
 
   // Changer de couleur d'accent selon hausse/baisse
   const isUp = asset ? asset.changePct >= 0 : true;

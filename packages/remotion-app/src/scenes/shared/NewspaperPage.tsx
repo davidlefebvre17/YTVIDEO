@@ -30,28 +30,41 @@ interface NewspaperPageProps {
 const MARGIN_H = 40;
 const COL_GUTTER = 12;
 const MASTHEAD_H = 120;   // Masthead zone (title OWL STREET JOURNAL)
-const HEADLINE_TOP = MASTHEAD_H + 5;
-const HEADLINE_H = 55;    // Main headline typewriter
+const HEADLINE_TOP = MASTHEAD_H + 18;  // was +5 — more breathing room below double rule
+const HEADLINE_H = 120;   // Main headline — fits 3 lines at 32px (32 × 1.2 × 3 = 115px)
 const THREAD_TOP = HEADLINE_TOP + HEADLINE_H + 5;
 const THREAD_H = 40;      // Thread summary
 const CONTENT_TOP = THREAD_TOP + THREAD_H + 10;
 const CONTENT_H = 1080 - CONTENT_TOP - 10; // Fill remaining space
 const COL_COUNT = 4;
 
-const IMG_H = 160;
 const KICKER_H = 20;
 const TITLE_H = 42;
 const ARTICLE_GAP = 14;
 
+// Image heights per depth
+const IMG_H_DEEP = 240;
+const IMG_H_FOCUS = 140;
+const IMG_H_FLASH = 100;
+
+function imgHeightForDepth(depth?: string): number {
+  if (depth === 'deep') return IMG_H_DEEP;
+  if (depth === 'flash' || depth === 'panorama') return IMG_H_FLASH;
+  return IMG_H_FOCUS;
+}
+
 // ── Layout computation (shared between render + zoom rects) ──
+// DEEP segments span 2 columns, others 1 column.
 
 interface Placement {
   segIdx: number;
   col: number;
+  colSpan: number;
   x: number;
   y: number;
   w: number;
   h: number;
+  imgH: number;
   imgY: number;
 }
 
@@ -59,44 +72,91 @@ function computeLayout(segments: SegmentCard[]): Placement[] {
   const n = segments.length;
   if (n === 0) return [];
 
-  const colCount = Math.min(COL_COUNT, n);
+  // Filter out panorama from newspaper layout
+  const visible = segments.filter(s => (s.depth ?? 'focus') !== 'panorama');
+  const nVisible = visible.length;
+
   const colW = Math.floor(
-    (1920 - 2 * MARGIN_H - (colCount - 1) * COL_GUTTER) / colCount,
+    (1920 - 2 * MARGIN_H - (COL_COUNT - 1) * COL_GUTTER) / COL_COUNT,
   );
 
-  // Distribute articles sequentially into columns
-  const cols: number[][] = Array.from({ length: colCount }, () => []);
-  const base = Math.floor(n / colCount);
-  const extra = n % colCount;
-  let idx = 0;
-  for (let c = 0; c < colCount; c++) {
-    const count = base + (c < extra ? 1 : 0);
-    for (let j = 0; j < count; j++) {
-      cols[c].push(idx++);
-    }
+  if (nVisible === 0) return segments.map((_, i) => ({
+    segIdx: i, col: 0, colSpan: 1, x: MARGIN_H, y: CONTENT_TOP,
+    w: colW, h: 100, imgH: IMG_H_FOCUS, imgY: CONTENT_TOP + KICKER_H + TITLE_H,
+  }));
+
+  // DEEP segments take 1 column but double row height (bigger image).
+  // Others take 1 column, 1 row height.
+  // We fill columns left to right. DEEP costs 2 row-units, others 1.
+
+  const colFill = new Array(COL_COUNT).fill(0); // row-units consumed per column
+
+  interface Slot {
+    segIdx: number;
+    depth: string;
+    col: number;
+    rowStart: number;
+    rowSpan: number; // 2 for DEEP, 1 for others
   }
 
-  // Compute positions — articles share column height equally
-  const placements: Placement[] = new Array(n);
-  for (let c = 0; c < colCount; c++) {
-    const arts = cols[c];
-    if (arts.length === 0) continue;
-    const gaps = Math.max(0, arts.length - 1) * ARTICLE_GAP;
-    const artH = Math.floor((CONTENT_H - gaps) / arts.length);
-    const colX = MARGIN_H + c * (colW + COL_GUTTER);
+  const slots: Slot[] = [];
 
-    arts.forEach((segIdx, j) => {
-      const y = CONTENT_TOP + j * (artH + ARTICLE_GAP);
-      placements[segIdx] = {
-        segIdx,
-        col: c,
-        x: colX,
-        y,
-        w: colW,
-        h: artH,
-        imgY: y + KICKER_H + TITLE_H,
+  for (const seg of visible) {
+    const origIdx = segments.indexOf(seg);
+    const depth = seg.depth ?? 'focus';
+    const isDeep = depth === 'deep';
+    const rowSpan = isDeep ? 2 : 1;
+
+    // Find column with least fill
+    let bestCol = 0;
+    let bestFill = Infinity;
+    for (let c = 0; c < COL_COUNT; c++) {
+      if (colFill[c] < bestFill) {
+        bestFill = colFill[c];
+        bestCol = c;
+      }
+    }
+
+    const rowStart = colFill[bestCol];
+    colFill[bestCol] += rowSpan;
+
+    slots.push({ segIdx: origIdx, depth, col: bestCol, rowStart, rowSpan });
+  }
+
+  // Compute pixel positions
+  const maxUnits = Math.max(...colFill, 1);
+  const totalGaps = Math.max(0, maxUnits - 1) * ARTICLE_GAP;
+  const unitH = Math.floor((CONTENT_H - totalGaps) / maxUnits);
+
+  const placements: Placement[] = new Array(n);
+
+  for (const slot of slots) {
+    const x = MARGIN_H + slot.col * (colW + COL_GUTTER);
+    const y = CONTENT_TOP + slot.rowStart * (unitH + ARTICLE_GAP);
+    const h = slot.rowSpan * unitH + (slot.rowSpan - 1) * ARTICLE_GAP;
+    const imgH = imgHeightForDepth(slot.depth);
+
+    placements[slot.segIdx] = {
+      segIdx: slot.segIdx,
+      col: slot.col,
+      colSpan: 1,
+      x, y,
+      w: colW,
+      h,
+      imgH,
+      imgY: y + KICKER_H + TITLE_H,
+    };
+  }
+
+  // Fill missing placements (panorama etc) with dummy
+  for (let i = 0; i < n; i++) {
+    if (!placements[i]) {
+      placements[i] = {
+        segIdx: i, col: 0, colSpan: 1,
+        x: MARGIN_H, y: CONTENT_TOP, w: colW, h: unitH,
+        imgH: IMG_H_FOCUS, imgY: CONTENT_TOP + KICKER_H + TITLE_H,
       };
-    });
+    }
   }
 
   return placements;
@@ -112,7 +172,7 @@ export function computeSegmentRects(
     x: p.x,
     y: p.imgY,
     w: p.w,
-    h: IMG_H,
+    h: p.imgH,
   }));
 }
 
@@ -136,6 +196,7 @@ const DEPTH_LABELS: Record<string, string> = {
   deep: "ANALYSE",
   focus: "FOCUS",
   flash: "FLASH",
+  panorama: "PANORAMA",
 };
 
 // ── Article (rendered within a fixed-height zone) ────────────
@@ -144,6 +205,7 @@ const Article: React.FC<{
   seg: SegmentCard;
   width: number;
   height: number;
+  imgHeight: number;
   isActive: boolean;
   accentColor: string;
   frame: number;
@@ -153,6 +215,7 @@ const Article: React.FC<{
   seg,
   width,
   height,
+  imgHeight,
   isActive,
   accentColor,
   frame,
@@ -243,11 +306,11 @@ const Article: React.FC<{
         </h3>
       </div>
 
-      {/* Image — fixed IMG_H */}
+      {/* Image — height varies by depth */}
       <div
         style={{
           width,
-          height: IMG_H,
+          height: imgHeight,
           backgroundColor: BRAND.colors.creamDark,
           border: `1px solid ${BRAND.colors.rule}`,
           overflow: "hidden",
@@ -433,7 +496,7 @@ export const NewspaperPage: React.FC<NewspaperPageProps> = ({
         <div style={{ width: "100%", height: 2, backgroundColor: BRAND.colors.ink, marginTop: 3 }} />
       </div>
 
-      {/* ── Headline ── */}
+      {/* ── Headline — adaptive font for long titles ── */}
       <div
         style={{
           position: "absolute",
@@ -444,17 +507,19 @@ export const NewspaperPage: React.FC<NewspaperPageProps> = ({
           borderBottom: `1px solid ${BRAND.colors.rule}`,
           paddingBottom: 4,
           overflow: "hidden",
+          display: "flex",
+          alignItems: "center",
         }}
       >
         <h1
           style={{
             fontFamily: BRAND.fonts.display,
-            fontSize: 42,
+            fontSize: title.length <= 45 ? 42 : title.length <= 65 ? 36 : 32,
             fontWeight: 700,
             fontStyle: "italic",
             color: BRAND.colors.ink,
             margin: 0,
-            lineHeight: 1.15,
+            lineHeight: 1.2,
           }}
         >
           {displayTitle}
@@ -496,6 +561,8 @@ export const NewspaperPage: React.FC<NewspaperPageProps> = ({
       {/* ── Articles — absolutely positioned from computeLayout ── */}
       {placements.map((p) => {
         const seg = segments[p.segIdx];
+        // Skip panorama — excluded from layout, only has dummy placement
+        if ((seg.depth ?? 'focus') === 'panorama') return null;
         return (
           <div
             key={seg.id}
@@ -511,6 +578,7 @@ export const NewspaperPage: React.FC<NewspaperPageProps> = ({
               seg={seg}
               width={p.w}
               height={p.h}
+              imgHeight={p.imgH}
               isActive={activeSegmentIdx === p.segIdx}
               accentColor={accentColor}
               frame={frame}

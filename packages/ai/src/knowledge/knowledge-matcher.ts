@@ -88,7 +88,7 @@ const MACRO_KEYWORDS: Array<{ pattern: RegExp; theme: string }> = [
 // ── Central bank keywords ──
 
 const CB_KEYWORDS: Array<{ pattern: RegExp; theme: string }> = [
-  { pattern: /\b(fomc|fed|federal\s+reserve|réserve\s+fédérale|powell|waller|bowman|kashkari)\b/i, theme: "fed" },
+  { pattern: /\b(fomc|fed|federal\s+reserve|réserve\s+fédérale|powell|warsh|waller|bowman|kashkari)\b/i, theme: "fed" },
   { pattern: /\b(dot\s+plot|projections?\s+économiques|summary\s+of\s+economic)\b/i, theme: "fed" },
   { pattern: /\b(ecb|bce|lagarde|schnabel|lane|banque\s+centrale\s+européenne)\b/i, theme: "bce" },
   { pattern: /\b(zone\s+euro|eurozone|tpi|pepp)\b/i, theme: "bce" },

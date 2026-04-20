@@ -219,8 +219,22 @@ function buildC2UserPrompt(
   let prompt = '';
 
   // Temporal anchors — so C2 knows what "today/tomorrow/yesterday" mean
-  const anchors = buildTemporalAnchors(editorial.date);
+  const anchors = buildTemporalAnchors(editorial.date, editorial.publishDate);
   prompt += `${anchors.block}\n\n`;
+
+  // Monday recap: C2 doit savoir que les segments ont une sémantique différente
+  if (anchors.isMondayRecap) {
+    prompt += `## RECALIBRAGE ANALYSE EN MODE LUNDI\n`;
+    prompt += `Les depth levels ont un sens différent aujourd'hui :\n`;
+    prompt += `- DEEP = chaîne causale d'un MÉCANISME de la semaine passée (pas un événement du jour). Ton analyse doit raconter comment la semaine a construit ce mécanisme, pas décortiquer un mouvement isolé.\n`;
+    prompt += `- FOCUS = actualité du WEEKEND (samedi/dimanche) OU mouvement crypto du weekend (fallback si rien d'autre de notable).\n`;
+    prompt += `- FLASH = rendez-vous spécifique de la semaine à venir (earnings, macro, décision). Analyse légère, contextuelle.\n`;
+    prompt += `- PANORAMA = lecture SECTORIELLE HEBDO (pas inventaire de movers du jour). Regroupe par thème, performances 5 jours.\n\n`;
+    prompt += `Calibre la profondeur de ton analyse en conséquence :\n`;
+    prompt += `- Les scenarios bullish/bearish doivent raisonner sur la semaine à venir, pas sur J+1.\n`;
+    prompt += `- technicalReading : parle de "clôture hebdo", "niveaux testés cette semaine", pas "aujourd'hui".\n`;
+    prompt += `- causalChain : maille hebdo (cause → effet sur 5 jours), pas 24h.\n\n`;
+  }
 
   // Plan éditorial
   prompt += `## PLAN ÉDITORIAL\n`;

@@ -5,6 +5,17 @@ import { NP, zoneForSegment } from "./newspaper-layout";
 import { NewspaperArticle } from "./NewspaperArticle";
 import { TypewriterText } from "../shared/TypewriterText";
 
+/**
+ * Adaptive headline font size — shrinks for long titles to avoid truncation.
+ * Target: fit in ~100px height (2 lines max at chosen size).
+ */
+function headlineFontSize(title: string): number {
+  const len = title.length;
+  if (len <= 45) return 42;
+  if (len <= 65) return 36;
+  return 32;                   // minimum — wraps on 2-3 lines, stays readable
+}
+
 interface NewspaperCanvasProps {
   script: EpisodeScript;
   accentColor?: string;
@@ -81,7 +92,7 @@ export const NewspaperCanvas: React.FC<NewspaperCanvasProps> = ({
         </div>
       </div>
 
-      {/* ── Headline (typewriter effect) ── */}
+      {/* ── Headline (typewriter effect) — adaptive font for long titles ── */}
       <div
         style={{
           position: "absolute",
@@ -99,7 +110,7 @@ export const NewspaperCanvas: React.FC<NewspaperCanvasProps> = ({
           as="h1"
           style={{
             fontFamily: BRAND.fonts.display,
-            fontSize: NP.font.headlineSize,
+            fontSize: headlineFontSize(script.title),
             fontWeight: 700,
             fontStyle: "italic",
             color: BRAND.colors.ink,

@@ -46,10 +46,10 @@ export interface FishTTSResult {
 
 /** Presets par type de segment — uniforme, dynamique et percutant */
 export const FISH_PRESETS = {
-  DEEP: { speed: 0.95, temperature: 0.6, topP: 0.8, repetitionPenalty: 1.2 },
-  FOCUS: { speed: 0.95, temperature: 0.6, topP: 0.8, repetitionPenalty: 1.2 },
-  FLASH: { speed: 0.95, temperature: 0.6, topP: 0.8, repetitionPenalty: 1.2 },
-  COLD_OPEN: { speed: 0.95, temperature: 0.6, topP: 0.8, repetitionPenalty: 1.2 },
+  DEEP: { speed: 0.98, temperature: 0.6, topP: 0.8, repetitionPenalty: 1.2 },
+  FOCUS: { speed: 0.98, temperature: 0.6, topP: 0.8, repetitionPenalty: 1.2 },
+  FLASH: { speed: 0.98, temperature: 0.6, topP: 0.8, repetitionPenalty: 1.2 },
+  COLD_OPEN: { speed: 0.98, temperature: 0.6, topP: 0.8, repetitionPenalty: 1.2 },
 } as const;
 
 function getFishConfig() {

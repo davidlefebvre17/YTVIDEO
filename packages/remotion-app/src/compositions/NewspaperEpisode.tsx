@@ -30,7 +30,7 @@ export const NewspaperEpisode: React.FC<NewspaperEpisodeProps> = ({
   const accentColor = resolveAccent(script);
 
   const focusFrames = useMemo(() => buildFocusFrames(keyframes, 30), []);
-  const subtitleLines = useMemo(() => buildSubtitleLines(script, 30), [script]);
+  const subtitleLines = useMemo(() => buildSubtitleLines(script, assets, 30), [script, assets]);
 
   const slotsBySegId = useMemo(() => {
     const map: Record<string, VisualSlot[]> = {};
@@ -151,7 +151,13 @@ function getImageFramePosition(segIdx: number, depth: string): { x: number; y: n
   };
 }
 
-function buildSubtitleLines(script: EpisodeScript, fps: number): SubtitleLine[] {
+function humanizeTickers(text: string, assets: AssetSnapshot[]): string {
+  const nameBy = new Map<string, string>();
+  for (const a of assets) if (a.symbol && a.name) nameBy.set(a.symbol, a.name);
+  return text.replace(/"([A-Z0-9^=.\-]{1,15})"/g, (m, sym) => nameBy.get(sym) ?? sym);
+}
+
+function buildSubtitleLines(script: EpisodeScript, assets: AssetSnapshot[], fps: number): SubtitleLine[] {
   const lines: SubtitleLine[] = [];
   let currentSec = 0;
 
@@ -161,7 +167,8 @@ function buildSubtitleLines(script: EpisodeScript, fps: number): SubtitleLine[] 
       continue;
     }
 
-    const words = section.narration.split(/\s+/);
+    const humanized = humanizeTickers(section.narration, assets);
+    const words = humanized.split(/\s+/);
     const chunkSize = 13;
     const chunks: string[] = [];
     for (let i = 0; i < words.length; i += chunkSize) {

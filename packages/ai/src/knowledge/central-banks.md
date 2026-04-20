@@ -4,6 +4,8 @@
 
 Mandat dual : stabilité des prix (cible 2% PCE) + plein emploi.
 
+**Transition de présidence** : le mandat de Jerome Powell se termine le 15 mai 2026. Kevin Warsh a été nommé par Trump pour lui succéder (nomination envoyée au Sénat le 4 mars 2026). La confirmation fait face à un blocage sénatorial (au moins un sénateur républicain s'oppose). Warsh est perçu comme plus hawkish que Powell — sa confirmation pourrait signaler des taux plus élevés plus longtemps.
+
 **Indicateurs clés surveillés** : Core PCE (inflation préférée), NFP + taux de chômage, ISM Services/Manufacturing, salaires horaires moyens, croissance des salaires (aussi important que le NFP — si plus élevée que prévu, c'est inflationniste).
 
 **Mécanisme de transmission** :
@@ -166,8 +168,24 @@ Mandat : stabilité des prix + croissance. Historiquement ultra-accommodante.
 **Ce qui compte vraiment dans une décision de taux** :
 - Les taux eux-mêmes : le marché s'en fiche souvent (déjà pricés)
 - **Le discours** : ton, vocabulaire, nuances = 60% de la réaction marché
-- **Les projections** : trajectoire inflation, croissance, chômage = 30%
+- **Les projections (SEP/dot plot)** : trajectoire inflation, croissance, chômage = 30%. Si les projections montrent GDP et PCE revus à la hausse → le cycle de cuts sera limité → dollar haussier, même le jour d'un cut
 - La décision elle-même = 10% (sauf surprise totale)
+
+**Le forward looking mechanism — comment lire une séquence de données** :
+
+Le marché ne réagit pas aux annonces — il les anticipe via une chaîne de données qui confirment ou invalident progressivement les attentes. La séquence typique avant un FOMC :
+
+1. **Data de croissance** (NFP, emploi) → confirme ou invalide la nécessité d'agir. Si faible → le marché commence à pricer un cut → dollar chute EN AMONT
+2. **Data d'inflation** (CPI, PCE) → dernier verrou. Si conforme aux attentes → confirme le pricing. Si surprise à la hausse → remet tout en question
+3. **Décision de taux** → déjà pricée à ce stade. Ce qui bouge le marché : les projections économiques (SEP) et le ton du discours
+4. **Repricing post-décision** → le marché réévalue immédiatement la TRAJECTOIRE FUTURE, pas la décision passée
+
+**Les 3 questions du narrateur face à une annonce CB** :
+- **Était-ce attendu ?** Si le cut/hike était pricé à >80%, la décision est du passé dès qu'elle tombe
+- **Qu'est-ce que ça change pour la suite ?** Regarder les projections, le dot plot, le ton — pas le chiffre
+- **Le positionnement est-il asymétrique ?** Si tout le monde est dovish, la barre est haute pour surprendre dans ce sens — mais décevoir est très facile → repricing violent
+
+**Piège "buy the rumor, sell the news"** : le mouvement se fait en amont de l'annonce (pendant que le marché price). Le jour de l'annonce, si confirmation → le mouvement s'arrête ou s'inverse, parce qu'il n'y a plus d'acheteurs/vendeurs à convaincre. Le narrateur doit expliquer ce mécanisme au spectateur quand le marché "fait l'inverse de la logique"
 
 ## Règles de narration banques centrales
 

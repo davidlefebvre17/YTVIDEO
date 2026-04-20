@@ -183,8 +183,57 @@ function buildC1UserPrompt(
 ): string {
   let prompt = '';
 
-  const anchors = buildTemporalAnchors(flagged.date);
+  const anchors = buildTemporalAnchors(flagged.date, flagged.publishDate);
   prompt += `${anchors.block}\n\n`;
+
+  // Monday recap: inject weekly technical brief if present
+  if (anchors.isMondayRecap && flagged.weeklyBrief) {
+    const wb = flagged.weeklyBrief;
+    prompt += `## RÉCAP TECHNIQUE HEBDO (à utiliser pour le pilier 1 "récap semaine")\n`;
+    prompt += `Régime global : ${wb.regime_summary}\n`;
+    if (wb.notable_zones.length) {
+      prompt += `Niveaux notables balayés/testés cette semaine :\n`;
+      for (const z of wb.notable_zones.slice(0, 8)) {
+        prompt += `- ${z.symbol} ${z.type} ${z.level} — ${z.event}\n`;
+      }
+    }
+    if (wb.watchlist_next_week.length) {
+      prompt += `À surveiller la semaine à venir :\n`;
+      for (const w of wb.watchlist_next_week.slice(0, 8)) {
+        prompt += `- ${w.symbol} — ${w.reason}\n`;
+      }
+    }
+    prompt += '\n';
+  }
+
+  // Monday recap: recalibrate segment semantics — same depth levels, different meaning
+  if (anchors.isMondayRecap) {
+    prompt += `## RECALIBRAGE DES SEGMENTS EN MODE LUNDI (LIS AVANT DE SÉLECTIONNER)\n\n`;
+    prompt += `Les depth levels (DEEP/FOCUS/FLASH/PANORAMA) existent toujours, mais leur SENS CHANGE :\n\n`;
+    prompt += `🔹 **DEEP** ≠ événement majeur du jour. EN LUNDI : un des 2-3 MÉCANISMES STRUCTURANTS de la semaine passée.\n`;
+    prompt += `   Exemple : "Le pétrole a cassé sous sa moyenne 50 jours cette semaine suite à l'accord Hormuz — mécanisme prime-risque-qui-lâche".\n`;
+    prompt += `   PAS : "pétrole -11% vendredi" (ça c'était le DEEP de samedi).\n\n`;
+    prompt += `🔹 **FOCUS** ≠ actualité secondaire du jour. EN LUNDI : une actualité du WEEKEND (samedi/dimanche) qui change la donne.\n`;
+    prompt += `   Géopolitique, annonces corporates, résultats publiés en off-market, décisions politiques.\n`;
+    prompt += `   Si aucune actualité weekend notable : mets un FOCUS sur un mouvement crypto (si ±3% depuis vendredi).\n\n`;
+    prompt += `🔹 **FLASH** ≠ brève mention d'un move. EN LUNDI : un ITEM du SETUP semaine.\n`;
+    prompt += `   Earnings attendus cette semaine (nom + jour), macro calendrier (FOMC, CPI, NFP, BCE), décision politique attendue.\n`;
+    prompt += `   Chaque FLASH = un rendez-vous spécifique à surveiller dans les 5 prochains jours.\n\n`;
+    prompt += `🔹 **PANORAMA** ≠ tour des mouvements du jour. EN LUNDI : RÉCAP THÉMATIQUE DE LA SEMAINE.\n`;
+    prompt += `   Structure 2-3 arcs thématiques (ex: "l'énergie a toutes plongé", "la tech a surperformé", "le luxe a souffert").\n`;
+    prompt += `   Pour chaque arc : 3-5 actifs max + le thème commun. Parler en "perf sur la semaine" (±X% sur 5 jours), JAMAIS en variation du jour.\n`;
+    prompt += `   Le panorama du lundi n'est PAS un inventaire de prix — c'est une lecture sectorielle de la semaine.\n\n`;
+    prompt += `SÉLECTION (ordre de priorité en mode lundi) :\n`;
+    prompt += `1. 1-2 DEEP sur les mécanismes hebdo dominants (puise dans le RÉCAP TECHNIQUE HEBDO si présent)\n`;
+    prompt += `2. 1-2 FOCUS sur actualités weekend (news postérieures à vendredi soir) — crypto acceptable si rien d'autre\n`;
+    prompt += `3. 2-3 FLASH sur setup semaine (earnings, macro, décisions attendues)\n`;
+    prompt += `4. 1 PANORAMA thématique de la semaine (obligatoire si assez d'actifs disponibles)\n\n`;
+    prompt += `COMPTEURS : les "deepCount" et "flashCount" restent les mêmes — ce qui change c'est le CONTENU de chaque segment.\n\n`;
+    prompt += `INTERDICTIONS EN MODE LUNDI :\n`;
+    prompt += `- Ne PAS traiter les variations de prix comme si elles venaient d'avoir lieu. Elles datent de vendredi.\n`;
+    prompt += `- Ne PAS dupliquer un segment de l'épisode de samedi (même sujet, même angle). Prolonge, ne répète pas.\n`;
+    prompt += `- Ne PAS mettre un PANORAMA qui liste des "movers du jour". Pas de "du jour" possible un lundi.\n\n`;
+  }
 
   // News digest FIRST — structural events before raw data
   if (newsDigest?.events.length) {

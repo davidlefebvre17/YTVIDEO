@@ -86,8 +86,30 @@ async function main() {
   yesterday.setDate(yesterday.getDate() - 1);
   const date = (opts.date as string) || yesterday.toISOString().split("T")[0];
 
+  // ── Monday recap mode ──
+  // Auto-detect when today is Monday AND snap is previous Friday (or earlier)
+  // CLI override: --publish-date YYYY-MM-DD
+  // Force flag:  --monday (use today as pub, date as snap)
+  const cliPubDate = opts["publish-date"] as string | undefined;
+  const forceMonday = !!opts["monday"];
+  let publishDate: string | undefined = cliPubDate;
+  if (!publishDate && forceMonday) {
+    publishDate = new Date().toISOString().split("T")[0];
+  }
+  if (!publishDate) {
+    // Auto-detect: today is Monday AND date is at least 2 days ago
+    const today = new Date();
+    const todayStr = today.toISOString().split("T")[0];
+    const snapDate = new Date(date + "T12:00:00Z");
+    const gapDays = Math.round((today.getTime() - snapDate.getTime()) / 86400000);
+    if (today.getUTCDay() === 1 && gapDays >= 2) {
+      publishDate = todayStr;
+      console.log(`🔶 Auto-détecté : mode LUNDI (today=${todayStr}, snap=${date}, gap=${gapDays}j)`);
+    }
+  }
+
   console.log("=== Trading YouTube Maker ===");
-  console.log(`Date: ${date} | Lang: ${lang} | Script: ${skipScript ? "SKIP" : "ON"} | Images: ${skipImages ? "SKIP" : "ON"} | TTS: ${skipTts ? "SKIP" : "ON"} | Render: ${skipRender ? "SKIP" : "ON"}`);
+  console.log(`Date: ${date}${publishDate ? ` | Pub: ${publishDate}` : ""} | Lang: ${lang} | Script: ${skipScript ? "SKIP" : "ON"} | Images: ${skipImages ? "SKIP" : "ON"} | TTS: ${skipTts ? "SKIP" : "ON"} | Render: ${skipRender ? "SKIP" : "ON"}`);
 
   // Create episode folder + clean stale public files
   const epDir = createEpisodeDir(date);
@@ -221,8 +243,11 @@ async function main() {
     console.log(`  Zone events: ${triggeredAssets.map((u) => u.symbol).join(", ")}`);
   }
 
-  if (isWeeklyJobDay(date)) {
-    console.log("  Monday → weekly Sonnet job...");
+  // Weekly Sonnet job: trigger if publication day is Monday (not the snap date)
+  // In Monday recap mode, snap=Friday but publication=Monday, so isWeeklyJobDay(date) would miss it.
+  const weeklyJobTriggerDate = publishDate ?? date;
+  if (isWeeklyJobDay(weeklyJobTriggerDate)) {
+    console.log(`  Monday (${weeklyJobTriggerDate}) → weekly Sonnet job...`);
     const weeklyResult = await runWeeklyJob();
     console.log(`  Weekly: ${weeklyResult.success ? "OK" : "FAILED"} (${weeklyResult.assets_processed} assets)`);
   }
@@ -264,7 +289,7 @@ async function main() {
     script = await generateScript(snapshot, { type, lang, episodeNumber, newsDb, prevContext });
   } else {
     console.log("  Mode: PIPELINE C1→C5");
-    pipelineResult = await runPipeline({ snapshot, lang, episodeNumber, newsDb, prevContext, startFrom: startFrom as any });
+    pipelineResult = await runPipeline({ snapshot, lang, episodeNumber, newsDb, prevContext, startFrom: startFrom as any, publishDate });
     script = toEpisodeScript(pipelineResult.directedEpisode, episodeNumber, lang);
     console.log(`  Stats: ${pipelineResult.stats.llmCalls} LLM, ${pipelineResult.stats.retries} retries, ${(pipelineResult.stats.totalDurationMs / 1000).toFixed(1)}s`);
   }

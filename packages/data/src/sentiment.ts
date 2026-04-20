@@ -56,15 +56,23 @@ async function fetchFearGreed(targetDate?: string): Promise<{ value: number; lab
     if (!res.ok) return null;
     const data = await res.json();
 
+    // API returns timestamp as "DD-MM-YYYY" — convert to "YYYY-MM-DD" for comparison
+    const toISO = (ts: string) => {
+      const parts = ts.split('-');
+      return parts.length === 3 && parts[0].length === 2
+        ? `${parts[2]}-${parts[1]}-${parts[0]}`  // DD-MM-YYYY → YYYY-MM-DD
+        : ts;  // Already YYYY-MM-DD or unknown format
+    };
+
     let entry: { value: string; value_classification: string; timestamp: string } | undefined;
     if (targetDate) {
       // Find the entry whose date matches targetDate (format: "YYYY-MM-DD")
-      entry = data.data?.find((d: { timestamp: string }) => d.timestamp.startsWith(targetDate));
+      entry = data.data?.find((d: { timestamp: string }) => toISO(d.timestamp) === targetDate);
       // Fallback: closest prior day (weekend/holiday gaps)
       if (!entry) {
-        const sorted = (data.data ?? []).filter(
-          (d: { timestamp: string }) => d.timestamp <= targetDate,
-        );
+        const sorted = (data.data ?? [])
+          .filter((d: { timestamp: string }) => toISO(d.timestamp) <= targetDate)
+          .sort((a: { timestamp: string }, b: { timestamp: string }) => toISO(b.timestamp).localeCompare(toISO(a.timestamp)));
         entry = sorted[0];
       }
     } else {

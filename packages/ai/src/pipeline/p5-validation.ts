@@ -6,6 +6,8 @@ import type {
 } from "./types";
 import { loadMemory } from "@yt-maker/data";
 import { buildTemporalAnchors } from "./helpers/temporal-anchors";
+import { existsSync, readFileSync } from "fs";
+import { join } from "path";
 
 // ── Known bad patterns ──────────────────────────────────
 
@@ -20,12 +22,119 @@ const DISCLAIMER_PATTERNS = [
   /ce contenu est purement éducatif et ne constitue pas[^.]*/i,
 ];
 
-const ANGLICISM_FIXES: [RegExp, string][] = [
-  [/\bdeath cat bounce\b/gi, "dead cat bounce"],
-  [/\bsafe heaven\b/gi, "safe haven"],
-  [/\bbull market run\b/gi, "bull run"],
-  [/\bshort-squeeze\b/gi, "short squeeze"],
+// Anglicism fixes removed — the new paradigm is zero anglicisms (axe 2).
+// Opus writes in French, P5 must NOT reintroduce English terms.
+
+// ── Blacklists & whitelists (enforce C3 rules deterministically) ──
+
+/**
+ * Anglicismes évidents — filet rapide. Haiku fait la 2e passe pour les plus subtils.
+ * Le prompt C3 dit "ZÉRO anglicisme" sans liste exhaustive.
+ */
+const ANGLICISMES_BLACKLIST: RegExp[] = [
+  /\bspread\b/i, /\bspreads\b/i,
+  /\bpricing\b/i, /\bpricer\b/i, /\bpricé\b/i, /\bprice\b/i,
+  /\brisk-?on\b/i, /\brisk-?off\b/i,
+  /\bhedge\b/i, /\bhedging\b/i, /\bhedger\b/i,
+  /\btrader\b/i, /\btrading\b/i,
+  /\bshort\s+squeeze\b/i,
+  /\bearnings\b/i, /\bguidance\b/i,
+  /\bupside\b/i, /\bdownside\b/i,
+  /\bpullback\b/i, /\brebound\b/i,
+  /\bbenchmark\b/i,
+  /\bmarket\s+cap\b/i,
+  /\bsell-?off\b/i,
+  /\bbreakout\b/i, /\bbreakdown\b/i,
+  /\bdrawdown\b/i,
+  /\bleverage\b/i,
+  /\bbull\s+run\b/i, /\bbullish\b/i, /\bbearish\b/i,
+  /\brally\b/i,
+  /\bbuyback\b/i,
+  /\bmomentum\b/i,
+  // Added from audit: common finance anglicisms Opus slips
+  /\bmove\b/i, /\bmoves\b/i,
+  /\bspot\b/i,
+  /\bswap\b/i, /\bswaps\b/i,
+  /\bgap\b/i, /\bgaps\b/i,
+  /\bspike\b/i, /\bspikes\b/i,
+  /\bcrash\b/i,
+  /\bdip\b/i, /\bdips\b/i,
+  /\btight\b/i, /\bflat\b/i,
 ];
+
+/**
+ * Sigles techniques autorisés explicitement par le prompt C3 (whitelist).
+ * TOUT autre mot en MAJUSCULES 2-6 lettres sera flaggé comme blocker.
+ */
+const SIGLES_WHITELIST = new Set([
+  // Proper nouns explicitly allowed in C3 prompt (banques centrales exclues — noms complets)
+  'S&P', 'NASDAQ', 'NYSE',
+  // Article / lang markers common in French
+  'A', 'AU', 'AUX', 'LE', 'LA', 'LES', 'UN', 'UNE', 'DES',
+  'ET', 'OU', 'OÙ', 'NI', 'MAIS', 'SI',
+  'DE', 'DU', 'PAR', 'POUR', 'SUR', 'SOUS', 'DANS', 'AVEC', 'SANS', 'CHEZ',
+  // Common acronyms integrated into French (not technical jargon)
+  'PIB', 'TVA', 'UE', 'OTAN', 'ONU', 'OPEP', 'PME', 'PDG', 'RH',
+  'USA', 'UK', 'EU',
+  // Roman numerals often in proper nouns
+  'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X',
+]);
+
+/**
+ * Langage écrit formel à bannir — le prompt C3 cite ces patterns comme exemples d'anti-oral.
+ */
+const LANGAGE_FORMEL_PATTERNS: RegExp[] = [
+  /\bil convient de\b/i,
+  /\bforce est de\b/i,
+  /\bnonobstant\b/i,
+  /\beu égard\b/i,
+  /\bil sied\b/i,
+  /\bil importe de\b/i,
+];
+
+/**
+ * Recommandations directes interdites (AMF/MiFID II).
+ */
+const RECO_DIRECTE_PATTERNS: RegExp[] = [
+  /\bachetez\b/i, /\bvendez\b/i,
+  /\bil faut acheter\b/i, /\bil faut vendre\b/i,
+  /\b(c'est|voici|voilà) le bon moment (pour|d')\b/i,
+  /\bje recommande\b/i,
+  /\bon devrait (acheter|vendre|miser)\b/i,
+  /\bil faudrait (acheter|vendre|prendre position)\b/i,
+];
+
+/**
+ * Termes retail/clickbait interdits par le prompt C3.
+ */
+const TON_RETAIL_PATTERNS: RegExp[] = [
+  /\bto the moon\b/i,
+  /\bpépite\b/i,
+  /\bt'as vu\b/i,
+  /\bc'est dingue\b/i,
+];
+
+// ── Company names loader (cache) ────────────────────────
+
+let _companyNames: Array<{ name: string; symbol: string }> | null = null;
+
+function loadCompanyNames(): Array<{ name: string; symbol: string }> {
+  if (_companyNames) return _companyNames;
+  _companyNames = [];
+  const filePath = join(process.cwd(), 'data', 'company-profiles.json');
+  if (!existsSync(filePath)) return _companyNames;
+  try {
+    const profiles: Array<{ symbol: string; name: string }> = JSON.parse(readFileSync(filePath, 'utf-8'));
+    // Only keep companies with a real proper name (skip indices like "Dow Jones" which are allowed)
+    const ALLOWED_PROPER_NOUNS = new Set(['Dow Jones', 'Nasdaq', 'CAC 40', 'Bitcoin', 'Ethereum']);
+    for (const p of profiles) {
+      if (!p.name || p.name.length < 3) continue;
+      if (ALLOWED_PROPER_NOUNS.has(p.name)) continue;
+      _companyNames.push({ name: p.name, symbol: p.symbol });
+    }
+  } catch {}
+  return _companyNames;
+}
 
 // ── Mechanical validation (code) ────────────────────────
 
@@ -130,13 +239,13 @@ export function validateMechanical(
   const issues: ValidationIssue[] = [];
   const fullText = getAllNarration(draft);
 
-  // 1. Duration range (390-520s = 6.5-8.7 min)
+  // 1. Duration range (target 8-10 min = 480-600s, tolerance 7-12 min = 420-720s)
   const duration = draft.metadata?.totalDurationSec ?? 0;
-  if (duration < 390 || duration > 520) {
+  if (duration < 480 || duration > 720) {
     issues.push({
       type: 'length',
-      description: `Durée estimée ${duration}s hors range 390-520s`,
-      severity: duration < 300 || duration > 600 ? 'blocker' : 'warning',
+      description: `Durée estimée ${duration}s hors cible 480-720s (8-12 min)`,
+      severity: duration < 360 || duration > 840 ? 'blocker' : 'warning',
       source: 'code',
     });
   }
@@ -292,7 +401,7 @@ export function validateMechanical(
 
   // 12. Day-of-week consistency: verify day names match actual dates
   if (flagged) {
-    const anchors = buildTemporalAnchors(flagged.date);
+    const anchors = buildTemporalAnchors(flagged.date, flagged.publishDate);
     const JOURS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
     // Match patterns like "dimanche soir", "ce lundi", "mardi prochain", "demain dimanche"
     const dayMentions = fullText.matchAll(
@@ -327,6 +436,226 @@ export function validateMechanical(
           description: `"${m[0]}" incorrect — ${prefix} = ${expectedDay}, pas ${mentionedDay} (snap: ${anchors.snapDate}, pub: ${anchors.pubDate})`,
           severity: 'blocker',
           suggestedFix: `Remplacer "${mentionedDay}" par "${expectedDay}"`,
+          source: 'code',
+        });
+      }
+    }
+
+    // ── New rules enforcing C3 prompt deterministically ──
+
+    // 13. Anglicismes (blacklist rapide — Haiku fait la 2e passe)
+    for (const seg of draft.segments) {
+      for (const pattern of ANGLICISMES_BLACKLIST) {
+        const m = seg.narration.match(pattern);
+        if (m) {
+          issues.push({
+            type: 'tone',
+            segmentId: seg.segmentId,
+            description: `Anglicisme "${m[0]}" interdit (règle C3 : zéro anglicisme)`,
+            severity: 'blocker',
+            suggestedFix: `Remplacer "${m[0]}" par l'équivalent français naturel`,
+            source: 'code',
+          });
+        }
+      }
+    }
+
+    // 14. Sigles techniques (whitelist — flag tout autre MAJ 2-6 lettres)
+    // IMPORTANT : on strip les tickers quoted ("CL=F", "META") avant le match
+    // pour ne pas les flagger (ils sont gérés par la règle 15).
+    const sigleRe = /\b([A-Z]{2,6})\b/g;
+    for (const seg of draft.segments) {
+      const cleaned = seg.narration.replace(/"[^"]+"/g, '');
+      const found = new Set<string>();
+      for (const m of cleaned.matchAll(sigleRe)) {
+        const sigle = m[1];
+        if (SIGLES_WHITELIST.has(sigle)) continue;
+        if (found.has(sigle)) continue;
+        found.add(sigle);
+        issues.push({
+          type: 'tone',
+          segmentId: seg.segmentId,
+          description: `Sigle technique "${sigle}" en clair (règle C3 : nom complet français)`,
+          severity: 'blocker',
+          suggestedFix: `Remplacer "${sigle}" par son nom français complet`,
+          source: 'code',
+        });
+      }
+    }
+
+    // 15. Tickers nus — nom de société sans guillemets/ticker associé
+    const companies = loadCompanyNames();
+    for (const seg of draft.segments) {
+      for (const { name, symbol } of companies) {
+        // Escape regex special chars in name
+        const nameRe = new RegExp(`\\b${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'g');
+        const matches = [...seg.narration.matchAll(nameRe)];
+        if (matches.length === 0) continue;
+        // If the ticker symbol also appears in quotes nearby, it's fine
+        const tickerQuoted = new RegExp(`"${symbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"`);
+        if (tickerQuoted.test(seg.narration)) continue;
+        issues.push({
+          type: 'tone',
+          segmentId: seg.segmentId,
+          description: `Société "${name}" nommée en clair sans ticker (règle C3 : "${symbol}" entre guillemets)`,
+          severity: 'blocker',
+          suggestedFix: `Remplacer "${name}" par "${symbol}" entre guillemets (description après si première mention)`,
+          source: 'code',
+        });
+        break; // Un blocker par segment pour cette règle suffit
+      }
+    }
+
+    // 16. Chiffres non convertis en toutes lettres (hors tickers type "^GSPC" ou "CL=F")
+    // On flagge tout digit qui n'est pas dans un ticker quoted.
+    const digitRe = /\d+/g;
+    for (const seg of draft.segments) {
+      // Strip quoted tickers first (they may contain digits legitimately)
+      const cleaned = seg.narration.replace(/"[^"]+"/g, '');
+      const matches = [...cleaned.matchAll(digitRe)];
+      if (matches.length > 0) {
+        const samples = matches.slice(0, 3).map(m => m[0]).join(', ');
+        issues.push({
+          type: 'tone',
+          segmentId: seg.segmentId,
+          description: `Chiffres non convertis en lettres : ${samples} (règle C3 : TOUS les nombres en toutes lettres)`,
+          severity: 'blocker',
+          suggestedFix: `Écrire les nombres en toutes lettres (ex: "quatre mille cinq cents" au lieu de "4500")`,
+          source: 'code',
+        });
+      }
+    }
+
+    // 17. Parenthèses et crochets interdits
+    for (const seg of draft.segments) {
+      if (/[(\[]/.test(seg.narration)) {
+        issues.push({
+          type: 'structure',
+          segmentId: seg.segmentId,
+          description: `Parenthèses ou crochets dans la narration (règle C3 : pas de parenthèses, pas de crochets)`,
+          severity: 'blocker',
+          suggestedFix: `Supprimer les parenthèses/crochets, reformuler en une phrase`,
+          source: 'code',
+        });
+      }
+    }
+
+    // 18. Tirets en cascade (plus de 2 em-dash dans une même phrase)
+    for (const seg of draft.segments) {
+      const sentences = seg.narration.split(/[.!?]+/);
+      for (const sent of sentences) {
+        const dashCount = (sent.match(/—/g) ?? []).length;
+        if (dashCount > 2) {
+          issues.push({
+            type: 'tone',
+            segmentId: seg.segmentId,
+            description: `Tirets en cascade (${dashCount} dans une phrase) — rupture orale`,
+            severity: 'warning',
+            suggestedFix: `Scinder la phrase ou remplacer les incises par des virgules`,
+            source: 'code',
+          });
+          break;
+        }
+      }
+    }
+
+    // 19. Langage écrit formel
+    for (const seg of draft.segments) {
+      for (const pattern of LANGAGE_FORMEL_PATTERNS) {
+        const m = seg.narration.match(pattern);
+        if (m) {
+          issues.push({
+            type: 'tone',
+            segmentId: seg.segmentId,
+            description: `Langage écrit formel "${m[0]}" (règle C3 : écriture parlée uniquement)`,
+            severity: 'blocker',
+            suggestedFix: `Reformuler en langage parlé naturel`,
+            source: 'code',
+          });
+          break;
+        }
+      }
+    }
+
+    // 20. Recommandations directes (compliance AMF)
+    for (const seg of draft.segments) {
+      for (const pattern of RECO_DIRECTE_PATTERNS) {
+        const m = seg.narration.match(pattern);
+        if (m) {
+          issues.push({
+            type: 'compliance',
+            segmentId: seg.segmentId,
+            description: `Recommandation directe "${m[0]}" (interdit AMF/MiFID II)`,
+            severity: 'blocker',
+            suggestedFix: `Reformuler en observation neutre ou question ouverte`,
+            source: 'code',
+          });
+          break;
+        }
+      }
+    }
+
+    // 21. Ton retail/clickbait
+    for (const seg of draft.segments) {
+      for (const pattern of TON_RETAIL_PATTERNS) {
+        const m = seg.narration.match(pattern);
+        if (m) {
+          issues.push({
+            type: 'tone',
+            segmentId: seg.segmentId,
+            description: `Ton retail "${m[0]}" (règle C3 : sobre, humble, jamais racoleur)`,
+            severity: 'blocker',
+            suggestedFix: `Remplacer par une formulation sobre`,
+            source: 'code',
+          });
+          break;
+        }
+      }
+    }
+
+    // 22. editorialVisual manquant (requis par C3 pour le directeur artistique)
+    for (const seg of draft.segments) {
+      if (!seg.editorialVisual || seg.editorialVisual.trim().length < 20) {
+        issues.push({
+          type: 'structure',
+          segmentId: seg.segmentId,
+          description: `editorialVisual manquant ou trop court (requis par C3 pour P7 direction artistique)`,
+          severity: 'blocker',
+          suggestedFix: `Ajouter une scène narrative 1-2 phrases pour illustration éditoriale`,
+          source: 'code',
+        });
+      }
+    }
+
+    // 23. Listes à puces dans narration
+    for (const seg of draft.segments) {
+      if (/^\s*[-•*]\s/m.test(seg.narration) || /^\s*\d+\.\s/m.test(seg.narration)) {
+        issues.push({
+          type: 'structure',
+          segmentId: seg.segmentId,
+          description: `Liste à puces détectée dans la narration (interdite — prose orale uniquement)`,
+          severity: 'blocker',
+          suggestedFix: `Convertir en phrases connectées par des connecteurs parlés`,
+          source: 'code',
+        });
+      }
+    }
+
+    // 24. Années abrégées (ex: "avril vingt-six" pour 2026)
+    const MOIS = /(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)/i;
+    const ANNEE_ABR = new RegExp(
+      `\\b${MOIS.source}\\s+(vingt-?(?:et-?un|deux|trois|quatre|cinq|six|sept|huit|neuf)|trente|quarante)\\b`,
+      'i',
+    );
+    for (const seg of draft.segments) {
+      const m = seg.narration.match(ANNEE_ABR);
+      if (m) {
+        issues.push({
+          type: 'tone',
+          segmentId: seg.segmentId,
+          description: `Année abrégée "${m[0]}" — écrire l'année complète (deux mille vingt-six, pas vingt-six)`,
+          severity: 'blocker',
+          suggestedFix: `Remplacer par "${m[1]} deux mille ${m[2]}"`,
           source: 'code',
         });
       }
@@ -369,59 +698,56 @@ export function validateMechanical(
   return issues;
 }
 
-/**
- * Fix anglicisms in the draft (modifies in place).
- */
-function fixAnglicisms(draft: DraftScript): void {
-  const fixText = (text: string): string => {
-    let result = text;
-    for (const [pattern, replacement] of ANGLICISM_FIXES) {
-      result = result.replace(pattern, replacement);
-    }
-    return result;
-  };
-
-  if (draft.coldOpen) draft.coldOpen.narration = fixText(draft.coldOpen.narration);
-  if (draft.thread) draft.thread.narration = fixText(draft.thread.narration);
-  for (const seg of draft.segments) {
-    seg.narration = fixText(seg.narration);
-  }
-  if (draft.closing) draft.closing.narration = fixText(draft.closing.narration);
-}
+// fixAnglicisms removed — no longer needed with zero-anglicism paradigm.
 
 // ── Semantic validation (Haiku C4) ──────────────────────
 
 function buildC4SystemPrompt(): string {
   return `Tu es un validateur éditorial pour Owl Street Journal — une vidéo quotidienne d'analyse financière. Le narrateur est un hibou anthropomorphe qui TUTOIE le spectateur. Tout le texte est parlé à voix haute.
 
-RÔLE : Identifier les problèmes. Tu NE réécris PAS le script entier — tu corriges uniquement les problèmes mineurs (warnings).
+## TON RÔLE
 
-STRUCTURE DU SCRIPT :
-- owlIntro : accueil du hibou (salutation + date + disclaimer + abonne-toi)
-- coldOpen : fait choc (télégraphique)
-- thread : fil conducteur
-- segments[] : chacun avec narration + owlTransition (phrase courte du hibou entre segments)
-- owlClosing : mot de la fin du hibou
-- closing : conclusion factuelle
-Tous ces champs sont PARLÉS. Ne supprime aucun de ces champs.
+Tu NE RÉÉCRIS RIEN. Tu signales les problèmes. Point.
+Le rédacteur (Opus) a écrit le script. Sa prose est figée. Si tu détectes un blocker, c'est LUI qui corrigera son propre texte — pas toi.
 
-VÉRIFICATIONS :
-1. COMPLIANCE : Aucune recommandation directe, même déguisée ("le bon moment pour...", "on devrait..."). Le disclaimer est dans owlIntro — pas besoin de le répéter.
-2. TUTOIEMENT : Le hibou TUTOIE toujours. Jamais "vous". Corrige en blocker si vouvoiement détecté.
-3. TON : Sobre, humble, enseignant. Jamais retail ("t'as vu", "c'est dingue", "pépite", "to the moon"). Jamais racoleur.
-4. COHÉRENCE TEMPORELLE : J vs J-1 clairement distingués, pas d'ambiguïté
-5. CONTINUITÉS : Si le plan éditorial mentionne une continuité J-1, elle DOIT être dans la narration
-6. CONFIANCE : Le ton doit correspondre au confidenceLevel (speculative → conditionnel, high → direct)
-7. VOIX : Pas de sigles imprononçables (SMA200 → "moyenne mobile deux cents jours"). Chiffres écrits pour être lus.
+## CE QUE TU DOIS CHERCHER
 
-RÈGLES :
-- severity = "blocker" : recommandation directe, vouvoiement, ton retail persistant, continuité manquante
-- severity = "warning" : transition maladroite, formulation améliorable, sigle imprononçable
-- Pour les warnings : propose un suggestedFix ET corrige directement dans validatedScript
-- NE PAS inventer de problèmes — si le script est bon, retourne status: "pass"
-- Tu peux modifier le texte pour corriger des warnings mais JAMAIS changer le sens, la structure, ou supprimer owlIntro/owlClosing/owlTransition
+**ANGLICISMES** — Tout mot anglais dans la narration est un BLOCKER. Ne te limite à aucune liste préétablie. Le code a déjà attrapé les plus évidents (spread, pricing, trader, etc.), mais signale TOUT anglicisme que tu vois, même subtil : move, spot, bench, swap, cap, gap, flat, tight, wide, squeeze, crunch, overhang, fade, tape, order book, dip, flow, book, etc. Tout mot qui n'est pas français pur.
 
-SORTIE : JSON strict avec status, issues[], et validatedScript (le script éventuellement modifié).`;
+**TON RETAIL ou CLICKBAIT** — "t'as vu", "c'est dingue", "pépite", "to the moon", "explose", "pump", "moon", superlatifs excessifs. Blocker.
+
+**RECOMMANDATIONS DÉGUISÉES** — "le bon moment pour", "on devrait", "il faudrait", "mieux vaut acheter/vendre", "à surveiller pour entrée", "sortie à X niveau". Blocker compliance.
+
+**VOUVOIEMENT** — JAMAIS "vous". Toujours "tu". Blocker.
+
+**CONTINUITÉ J-1 MANQUANTE** — Si le plan éditorial mentionne une continuité J-1, elle DOIT apparaître dans la narration. Blocker si absente.
+
+**INCOHÉRENCE NARRATIVE** — Segment qui ne raconte rien, phrases juxtaposées sans lien, "rapport" au lieu de "récit", chiffre largué sans sens ("et alors ?"). Warning.
+
+**FORMULATION MALADROITE** — Transition cassée, répétition lourde, métaphore ratée. Warning.
+
+## CE QUE TU NE DOIS PAS FAIRE
+
+- NE PAS inventer de problèmes. Si tout est bon, retourne \`{"issues": []}\`.
+- NE PAS répéter les problèmes déjà signalés par le code (anglicismes évidents, sigles, chiffres, parenthèses, tickers nus, langage écrit formel — tout ça est déjà attrapé).
+- NE PAS renvoyer de validatedScript. Tu n'as AUCUN champ de texte à renvoyer. Uniquement la liste d'issues.
+
+## SORTIE (JSON STRICT)
+
+\`\`\`json
+{
+  "issues": [
+    {
+      "type": "tone" | "compliance" | "structure" | "repetition",
+      "segmentId": "seg_1",
+      "description": "Description précise du problème",
+      "severity": "blocker" | "warning",
+      "suggestedFix": "Comment corriger",
+      "source": "haiku"
+    }
+  ]
+}
+\`\`\``;
 }
 
 function buildC4UserPrompt(draft: DraftScript, plan: EditorialPlan, analysis: AnalysisBundle): string {
@@ -446,86 +772,17 @@ function buildC4UserPrompt(draft: DraftScript, plan: EditorialPlan, analysis: An
   }
   prompt += '\n';
 
-  prompt += `## FORMAT DE SORTIE
-{
-  "status": "pass" | "needs_revision",
-  "issues": [
-    {
-      "type": "compliance" | "tone" | "structure",
-      "segmentId": "seg_1",
-      "description": "Description du problème",
-      "severity": "blocker" | "warning",
-      "suggestedFix": "Texte de correction proposé",
-      "source": "haiku"
-    }
-  ],
-  "validatedScript": { ... le DraftScript complet, avec corrections des warnings appliquées ... }
-}`;
+  prompt += `Retourne UNIQUEMENT la liste d'issues. Aucun autre champ.`;
 
   return prompt;
 }
 
 /**
- * Merge C4 Haiku's validatedScript with the original draft.
- * C4 only sees narration text — it doesn't return metadata, timing, or structural fields.
- * We keep the original draft as base and only overlay narration corrections from C4.
- */
-function mergeValidatedScript(original: DraftScript, validated: DraftScript | undefined): DraftScript {
-  if (!validated) return original;
-
-  const merged: DraftScript = {
-    ...original,
-    // Preserve metadata from original (C4 never sees this)
-    metadata: original.metadata,
-    // Preserve owl fields (C4 doesn't touch these)
-    owlIntro: original.owlIntro,
-    owlClosing: original.owlClosing,
-    // Merge cold open narration if C4 provided one
-    coldOpen: original.coldOpen ? {
-      ...original.coldOpen,
-      narration: validated.coldOpen?.narration || original.coldOpen.narration,
-    } : original.coldOpen,
-    // Merge thread narration
-    thread: original.thread ? {
-      ...original.thread,
-      narration: validated.thread?.narration || original.thread.narration,
-    } : original.thread,
-    // Merge closing narration
-    closing: original.closing ? {
-      ...original.closing,
-      narration: validated.closing?.narration || original.closing.narration,
-    } : original.closing,
-    // Merge segment narrations while preserving all other fields
-    segments: original.segments.map(origSeg => {
-      const validSeg = validated.segments?.find(s => s.segmentId === origSeg.segmentId);
-      if (!validSeg) return origSeg;
-      return {
-        ...origSeg,
-        narration: validSeg.narration || origSeg.narration,
-        // Recalculate word count if narration changed
-        wordCount: (validSeg.narration || origSeg.narration).split(/\s+/).filter(Boolean).length,
-      };
-    }),
-  };
-
-  // Recalculate total duration if word counts changed
-  const totalWords = [
-    merged.coldOpen?.wordCount ?? 0,
-    merged.thread?.wordCount ?? 0,
-    ...merged.segments.map(s => s.wordCount),
-    merged.closing?.wordCount ?? 0,
-  ].reduce((a, b) => a + b, 0);
-  merged.metadata = {
-    ...merged.metadata,
-    totalDurationSec: Math.round(totalWords / 2.5),
-    totalWordCount: totalWords,
-  };
-
-  return merged;
-}
-
-/**
  * Run full P5 validation: mechanical (code) + semantic (Haiku).
+ *
+ * GARANTIE : le champ `validatedScript` retourné est TOUJOURS le draft Opus original,
+ * sans aucune modification. Haiku ne réécrit jamais. Si des blockers sont signalés,
+ * la correction passera par un nouvel appel Opus depuis le pipeline (boucle de retry).
  */
 export async function runValidation(
   draft: DraftScript,
@@ -534,54 +791,61 @@ export async function runValidation(
   budget: WordBudget,
   flagged?: SnapshotFlagged,
 ): Promise<ValidationResult> {
-  // Fix anglicisms first (always, no LLM needed)
-  fixAnglicisms(draft);
-
   // Step 1: Mechanical validation (with hallucination checks if flagged data available)
   const mechIssues = validateMechanical(draft, plan, budget, flagged);
   const mechBlockers = mechIssues.filter(i => i.severity === 'blocker');
 
   if (mechBlockers.length > 0) {
     console.log(`  P5 Code: ${mechBlockers.length} blockers mécaniques`);
+    // Log each blocker grouped by type for debugging
+    const byType: Record<string, string[]> = {};
+    for (const b of mechBlockers) {
+      const key = `${b.type}${b.segmentId ? `/${b.segmentId}` : ''}`;
+      (byType[key] ??= []).push(b.description);
+    }
+    for (const [key, descs] of Object.entries(byType)) {
+      const sample = descs.slice(0, 3).join(' | ');
+      const more = descs.length > 3 ? ` (+${descs.length - 3})` : '';
+      console.log(`    · ${key}: ${sample}${more}`);
+    }
     return {
       status: 'needs_revision',
       issues: mechIssues,
-      validatedScript: draft,
+      validatedScript: draft, // Opus intact
     };
   }
 
-  // Step 2: Semantic validation (Haiku C4)
+  // Step 2: Semantic validation (Haiku C4) — issues only, no rewriting
   console.log('  P5 C4 Haiku — validation sémantique...');
 
   try {
     const systemPrompt = buildC4SystemPrompt();
     const userPrompt = buildC4UserPrompt(draft, plan, analysis);
 
-    const result = await generateStructuredJSON<ValidationResult>(
+    const result = await generateStructuredJSON<{ issues?: ValidationIssue[] }>(
       systemPrompt,
       userPrompt,
       { role: 'fast' },
     );
 
-    // Merge mechanical warnings with Haiku issues
     const allIssues = [
       ...mechIssues,
       ...(result.issues ?? []).map(i => ({ ...i, source: 'haiku' as const })),
     ];
 
     const hasBlockers = allIssues.some(i => i.severity === 'blocker');
-
-    // Merge C4's validatedScript with original draft to preserve metadata/structure
-    const mergedScript = mergeValidatedScript(draft, result.validatedScript);
+    const haikuBlockerCount = (result.issues ?? []).filter(i => i.severity === 'blocker').length;
+    if (haikuBlockerCount > 0) {
+      console.log(`    Haiku: ${haikuBlockerCount} blocker(s) signalé(s) — Opus corrigera son propre texte`);
+    }
 
     return {
       status: hasBlockers ? 'needs_revision' : 'pass',
       issues: allIssues,
-      validatedScript: mergedScript,
+      validatedScript: draft, // Opus intact — pas de merge, pas de réécriture Haiku
     };
   } catch (err) {
     console.warn(`  C4 Haiku error: ${(err as Error).message.slice(0, 80)}`);
-    // If Haiku fails, pass with mechanical checks only
     return {
       status: mechIssues.some(i => i.severity === 'blocker') ? 'needs_revision' : 'pass',
       issues: mechIssues,

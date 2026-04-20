@@ -19,10 +19,10 @@ export const NP = {
 
   // ── Header rows ─────────────────────────────────
   masthead: { y: 15, h: 45 },
-  headline: { y: 65, h: 50 },
-  thread:   { y: 125, h: 40 },
-  contentTop: 175,   // grid starts here
-  contentH: 885,     // 1080 - 175 - 20 (bottom margin)
+  headline: { y: 78, h: 120 },   // fits 3 lines at 32px min font
+  thread:   { y: 208, h: 45 },
+  contentTop: 263,
+  contentH: 797,     // 1080 - 263 - 20
 
   // ── 5-column grid ───────────────────────────────
   // Usable: 1920 - 80 = 1840. Gutters: 4×12 = 48. Columns: 1792 total
@@ -35,9 +35,9 @@ export const NP = {
   },
 
   // ── Stacked splits (cols C and D) ───────────────
-  splitTop:    { h: 430 },     // top article in split column
+  splitTop:    { h: 383 },     // top article in split column
   splitGap:    12,
-  splitBottom: { h: 443 },     // bottom article (885 - 430 - 12)
+  splitBottom: { h: 402 },     // bottom article (797 - 383 - 12)
 
   // ── Image frame dimensions per depth ────────────
   imageFrame: {

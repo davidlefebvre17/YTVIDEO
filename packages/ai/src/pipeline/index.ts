@@ -11,6 +11,7 @@ import { runC3Writing } from "./p4-writing";
 import { runValidation } from "./p5-validation";
 import { runC5Direction } from "./p6-direction";
 import { computeWordBudget } from "./helpers/word-budget";
+import { buildTemporalAnchors } from "./helpers/temporal-anchors";
 import { buildEpisodeSummaries, formatRecentScriptsForC3 } from "./helpers/episode-summary";
 import { buildCausalBrief } from "./helpers/causal-brief";
 import { buildBriefingPack, enrichBriefingPackCBSpeeches } from "./helpers/briefing-pack";
@@ -199,6 +200,25 @@ export async function runPipeline(
     if (!loaded) throw new Error(`startFrom=${options.startFrom}: snapshot_flagged.json not found in episodes/${snapshot.date}`);
     flagged = loaded;
   }
+
+  // ── Monday recap metadata + weekly brief propagation ──
+  if (options.publishDate) {
+    flagged.publishDate = options.publishDate;
+    const anchors = buildTemporalAnchors(flagged.date, options.publishDate);
+    flagged.isMondayRecap = anchors.isMondayRecap;
+    if (anchors.isMondayRecap) {
+      console.log(`  🔶 Mode LUNDI activé (pub ${options.publishDate}, snap ${flagged.date})`);
+      // Prefer explicit brief from options, fallback to disk
+      const brief = options.weeklyBrief ?? loadWeeklyBriefRaw() ?? undefined;
+      if (brief) {
+        flagged.weeklyBrief = brief;
+        console.log(`  Weekly brief injecté (${brief.notable_zones.length} zones, ${brief.watchlist_next_week.length} à surveiller)`);
+      } else {
+        console.log(`  ⚠ Pas de weekly brief disponible — C1 travaillera sans récap technique`);
+      }
+    }
+  }
+
   console.log(
     `  ${flagged.assets.length} assets scorés, top: ${flagged.assets
       .slice(0, 3)
@@ -310,13 +330,19 @@ export async function runPipeline(
         .map((s) => `${s.id}[${s.depth}]`)
         .join(", ")}`
     );
-    saveIntermediate(snapshot.date, "editorial", editorial);
+    // Note: editorial.json saved AFTER panorama push below (was saved too early)
   } else {
     console.log("\nP2 — Chargement depuis disque...");
     const loaded = loadIntermediate<EditorialPlan>(snapshot.date, "editorial");
     if (!loaded) throw new Error(`startFrom=${options.startFrom}: editorial.json not found`);
     editorial = loaded;
     console.log(`  ${editorial.totalSegments} segments (loaded)`);
+  }
+
+  // Propagate Monday recap flag to editorial (inherited by P3/P4 via editorial.publishDate)
+  if (flagged.publishDate) {
+    editorial.publishDate = flagged.publishDate;
+    editorial.isMondayRecap = flagged.isMondayRecap;
   }
 
   // ── Auto-generate PANORAMA segment from skipped/uncovered assets ──
@@ -359,6 +385,9 @@ export async function runPipeline(
       editorial.totalSegments = editorial.segments.length;
       console.log(`  Panorama: ${panoramaAssets.length} assets (${panoramaAssets.slice(0, 5).join(', ')}...)`);
     }
+
+    // Save editorial AFTER panorama push so P5 validation sees correct structure
+    saveIntermediate(snapshot.date, "editorial", editorial);
   }
 
   // ── Knowledge RAG briefing (depends on editorial) ──

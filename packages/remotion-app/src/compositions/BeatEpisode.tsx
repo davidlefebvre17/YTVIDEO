@@ -44,6 +44,22 @@ import { ScrollingTicker } from "../scenes/shared/ScrollingTicker";
 import { NewsRollBanner } from "../scenes/shared/NewsRollBanner";
 import { StampOverlay } from "../scenes/shared/StampOverlay";
 
+/**
+ * Humanize subtitles : "CL=F" → Pétrole WTI (sans guillemets).
+ * Opus écrit tickers quoted dans la narration, on les remplace par le nom affichable.
+ */
+function humanizeSubtitle(text: string, assets: AssetSnapshot[] = []): string {
+  if (!text) return text;
+  const nameBySymbol = new Map<string, string>();
+  for (const a of assets) {
+    if (a.symbol && a.name) nameBySymbol.set(a.symbol, a.name);
+  }
+  // Replace "SYMBOL" (with quotes) → name (no quotes)
+  return text.replace(/"([A-Z0-9^=.\-]{1,15})"/g, (match, sym) => {
+    return nameBySymbol.get(sym) ?? match.replace(/"/g, '');
+  });
+}
+
 // ── Props ────────────────────────────────────────────────────
 export interface BeatEpisodeProps {
   script: EpisodeScript;
@@ -510,7 +526,7 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
           )
             return null;
           return {
-            text: beat.narrationChunk,
+            text: humanizeSubtitle(beat.narrationChunk, assets),
             startFrame: t.start,
             endFrame: t.start + t.duration,
           };

@@ -4,6 +4,7 @@ import type {
 } from "./types";
 import type { Language } from "@yt-maker/core";
 import { buildTemporalAnchors } from "./helpers/temporal-anchors";
+import { loadWeeklyBrief } from "@yt-maker/data";
 
 function buildC3SystemPrompt(lang: Language, knowledgeBriefing: string): string {
   return `Tu es la voix UNIQUE de toute la vidéo Owl Street Journal. Du premier au dernier mot, c'est toi qui parles. Il n'y a pas d'autre voix. Tu tutoies le spectateur. JAMAIS de vouvoiement, nulle part.
@@ -88,15 +89,45 @@ TECHNIQUE (CRUCIAL — chaque mot sera lu par une voix de synthèse) :
 CHIFFRES :
 - TOUS les nombres en TOUTES LETTRES. Pas "4 590$" mais "quatre mille cinq cent quatre-vingt-dix dollars". Pas "12%" mais "douze pour cent". C'est NON NÉGOCIABLE.
 - Chiffres ronds quand l'exact n'apporte rien. "Autour des cent dollars" plutôt que "quatre-vingt-dix-neuf dollars soixante-quatre".
+- ANNÉES COMPLÈTES : toujours quatre chiffres. Écris "deux mille vingt-six" pour 2026, JAMAIS "vingt-six" seul. Écris "deux mille vingt-trois" pour 2023, pas "vingt-trois". Le spectateur confond sinon avec un âge ou une quantité.
 - Pas de parenthèses, pas de crochets.
 
 SOCIÉTÉS ET ACTIFS → TICKERS ENTRE GUILLEMETS :
 - Toujours le ticker entre guillemets droits : "GS", "AAPL", "CL=F", "^GSPC". Le système convertit automatiquement en nom prononcé.
 - À la première mention, ajoute une description après le ticker : "GS", la banque d'investissement américaine.
 
-ZÉRO ANGLICISME — TOUT en français. La voix est française, le spectateur ne parle pas anglais. CHAQUE mot anglais que tu serais tenté d'utiliser a un équivalent français — trouve-le et utilise-le. Pas d'exception. Quelques exemples courants : spread→écart, pricing→intégrer dans le prix, risk-on→appétit pour le risque, hedging→couverture, trader→opérateur, short squeeze→rachat forcé des vendeurs, earnings→résultats, guidance→perspectives, move→mouvement, spot→comptant, spike→pic. Mais cette liste N'EST PAS exhaustive — la règle s'applique à TOUT mot anglais. Si un concept n'a vraiment pas d'équivalent, explique-le en une phrase française au lieu d'utiliser le mot anglais.
+ZÉRO ANGLICISME — TOUT en français. La voix est française, le spectateur ne parle pas anglais. CHAQUE mot anglais que tu serais tenté d'utiliser a un équivalent français — trouve-le et utilise-le. Pas d'exception.
 
-ZÉRO SIGLE TECHNIQUE — TOUJOURS le nom complet en français. Le spectateur ne connaît pas les acronymes. RSI→indice de force relative, VIX→indice de volatilité, WTI→brut américain, DXY→indice du dollar, PPI→indice des prix à la production, SMA→moyenne mobile, ETF→fonds indiciel, etc. Cette liste N'EST PAS exhaustive — AUCUN sigle technique, JAMAIS. Les seuls noms propres à garder tels quels : S&P 500, Nasdaq, Dow Jones, Bitcoin, Ethereum, Fed, BCE.
+**Mots que tu oublies systématiquement (CES MOTS SONT INTERDITS, PAS D'EXCEPTION)** :
+- momentum → élan, dynamique, lancée
+- rally / rallye → rebond, envolée, reprise
+- trading → négociation, courtage (ou reformuler : "les échanges sur les marchés")
+- guidance → perspectives, prévisions (celles que l'entreprise communique)
+- spread → écart (de taux, de prix)
+- pricing → intégrer dans le prix, valoriser
+- bullish / bearish → haussier / baissier
+- sell-off → vague de ventes, décrochage
+- rebound / bounce → rebond
+- breakout → cassure, franchissement
+- pullback → repli, correction
+- benchmark → référence, indice de référence
+- market cap → capitalisation boursière
+- hedging / hedge → couverture
+- leverage → effet de levier
+- drawdown → baisse maximale, repli maximum
+- upside / downside → potentiel de hausse / risque de baisse
+- earnings → résultats trimestriels, bénéfices
+- move → mouvement
+- spot → comptant
+- spike → pic, pointe
+- crash → effondrement
+- trader → opérateur
+- short squeeze → rachat forcé des vendeurs à découvert
+- risk-on / risk-off → appétit pour le risque / fuite vers la sécurité
+
+Cette liste N'EST PAS exhaustive — la règle s'applique à TOUT mot anglais. Si un concept n'a vraiment pas d'équivalent, explique-le en une phrase française au lieu d'utiliser le mot anglais. Un script avec UN SEUL anglicisme dans cette liste est un échec — la validation code les rejette systématiquement.
+
+ZÉRO SIGLE TECHNIQUE — TOUJOURS le nom complet en français. Le spectateur ne connaît pas les acronymes. RSI→indice de force relative, VIX→indice de volatilité, WTI→brut américain, DXY→indice du dollar, PPI→indice des prix à la production, SMA→moyenne mobile, ETF→fonds indiciel, Fed→Réserve fédérale (ou "banque centrale américaine"), BCE→Banque centrale européenne, BoJ→banque centrale du Japon, BoE→Banque d'Angleterre, USD→dollar, EUR→euro, JPY→yen. Cette liste N'EST PAS exhaustive — AUCUN sigle technique ni aucune abréviation de banque centrale ou devise, JAMAIS. Les seuls noms propres à garder tels quels : S&P 500, Nasdaq, Dow Jones, Bitcoin, Ethereum.
 
 ## GARDE-FOUS
 
@@ -198,8 +229,50 @@ function buildC3UserPrompt(
   let prompt = '';
 
   // Temporal anchors — injected first so LLM anchors all temporal refs
-  const anchors = buildTemporalAnchors(editorial.date);
+  const anchors = buildTemporalAnchors(editorial.date, editorial.publishDate);
   prompt += `${anchors.block}\n\n`;
+
+  // Monday recap: reload weekly brief + inject for narrative material
+  if (anchors.isMondayRecap) {
+    try {
+      const wb = loadWeeklyBrief();
+      if (wb) {
+        prompt += `## RÉCAP TECHNIQUE HEBDO (matière pour le pilier 1 de ta narration)\n`;
+        prompt += `Régime global : ${wb.regime_summary}\n`;
+        if (wb.notable_zones.length) {
+          prompt += `Niveaux balayés/testés cette semaine (à raconter comme "vendredi dernier", pas "aujourd'hui") :\n`;
+          for (const z of wb.notable_zones.slice(0, 8)) {
+            prompt += `- ${z.symbol} ${z.type} ${z.level} — ${z.event}\n`;
+          }
+        }
+        if (wb.watchlist_next_week.length) {
+          prompt += `À surveiller la semaine qui commence :\n`;
+          for (const w of wb.watchlist_next_week.slice(0, 8)) {
+            prompt += `- ${w.symbol} — ${w.reason}\n`;
+          }
+        }
+        prompt += '\n';
+      }
+    } catch {}
+
+    prompt += `## ÉCRITURE EN MODE LUNDI — RAPPEL PAR TYPE DE SEGMENT\n\n`;
+    prompt += `Les types de segments ont une sémantique DIFFÉRENTE en mode lundi — adapte ton angle narratif :\n\n`;
+    prompt += `- **DEEP** = tu expliques un mécanisme STRUCTURANT de la semaine écoulée, pas un événement du jour.\n`;
+    prompt += `  Arc narratif : comment la semaine a construit ce mécanisme, où on en est maintenant, ce que ça implique.\n`;
+    prompt += `  Temporalité : "cette semaine", "sur les cinq jours", "depuis lundi dernier". JAMAIS "aujourd'hui" ou "hier".\n\n`;
+    prompt += `- **FOCUS** = une actualité du WEEKEND (samedi/dimanche) ou un mouvement crypto du weekend.\n`;
+    prompt += `  Angle : qu'est-ce qui a vraiment changé pendant que les marchés étaient fermés ? Pourquoi ça va compter lundi.\n`;
+    prompt += `  Temporalité : "ce weekend", "samedi", "dimanche", "hier soir".\n\n`;
+    prompt += `- **FLASH** = un RENDEZ-VOUS spécifique de la semaine à venir.\n`;
+    prompt += `  Angle : nomme l'événement + le jour + pourquoi le spectateur doit le suivre. Une phrase crée l'attente, une phrase dit l'enjeu.\n`;
+    prompt += `  Temporalité : "ce ${anchors.pubDayName}", "mardi", "mercredi"... — dans les 5 jours à venir.\n\n`;
+    prompt += `- **PANORAMA** = récap THÉMATIQUE de la semaine, PAS un inventaire de prix.\n`;
+    prompt += `  Structure en 2-3 arcs ("les valeurs énergie ont toutes plongé", "la tech a surperformé"...).\n`;
+    prompt += `  Chaque arc : le thème + 3-5 actifs illustrateurs + la raison commune (pas un actif dans le vide).\n`;
+    prompt += `  Les chiffres sont des PERFORMANCES HEBDO (ex: "moins sept pour cent sur la semaine") — jamais "aujourd'hui".\n`;
+    prompt += `  Ne liste pas. Raconte la semaine par secteurs.\n\n`;
+    prompt += `CONTINUITÉ AVEC SAMEDI : si un segment de samedi a traité un sujet, tu PROLONGES — tu ne redis pas. Monte d'un cran dans l'analyse ("cette semaine nous a dit que..."), ne reprends pas les faits.\n\n`;
+  }
 
   // Editorial plan
   prompt += `## PLAN ÉDITORIAL\n`;
