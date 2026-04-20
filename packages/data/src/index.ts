@@ -5,7 +5,7 @@ export { fetchCBSpeechContent, enrichCBSpeeches } from "./cb-speeches";
 export { fetchEconomicCalendar } from "./calendar";
 export { fetchSupabaseCalendar } from "./supabase-calendar";
 export { fetchMarketSnapshot } from "./market-snapshot";
-export { computeTechnicals, computeMultiTFAnalysis } from "./technicals";
+export { computeTechnicals, computeMultiTFAnalysis, computePerf, getAssetGroup } from "./technicals";
 export { fetchBondYields, fetchYieldsHistory } from "./fred";
 export { fetchEconomicCalendar as fetchFinnhubCalendar, fetchEarningsCalendar, fetchFinnhubNews, fetchStockEarningsHistory, fetchFinnhubCompanyNews } from "./finnhub";
 export { fetchMarketSentiment } from "./sentiment";

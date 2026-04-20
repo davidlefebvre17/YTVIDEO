@@ -18,7 +18,7 @@ export async function fetchEconomicCalendar(
 
   const toDate = to || from;
   const url = `${FINNHUB_BASE}/calendar/economic?from=${from}&to=${toDate}&token=${apiKey}`;
-  console.log("  Fetching economic calendar from Finnhub...");
+  console.log(`  Fetching economic calendar from Finnhub (${from} → ${toDate})...`);
 
   try {
     const res = await fetch(url);
@@ -31,19 +31,26 @@ export async function fetchEconomicCalendar(
         time: string;
         country: string;
         impact: string;
-        estimate: string;
-        prev: string;
-        actual: string;
-      }) => ({
-        name: e.event,
-        date: from,
-        time: e.time || "00:00",
-        currency: e.country || "USD",
-        impact: mapImpact(e.impact),
-        forecast: e.estimate ?? undefined,
-        previous: e.prev ?? undefined,
-        actual: e.actual ?? undefined,
-      }),
+        estimate: number | string | null;
+        prev: number | string | null;
+        actual: number | string | null;
+      }) => {
+        // Finnhub `time` field = full datetime "YYYY-MM-DD HH:MM:SS"
+        const timeStr = e.time || "";
+        const hasDateTime = /^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}/.test(timeStr);
+        const eventDate = hasDateTime ? timeStr.slice(0, 10) : from;
+        const eventTime = hasDateTime ? timeStr.slice(11, 16) : "00:00";
+        return {
+          name: e.event,
+          date: eventDate,
+          time: eventTime,
+          currency: mapCountryToCurrency(e.country),
+          impact: mapImpact(e.impact),
+          forecast: e.estimate != null && e.estimate !== "" ? String(e.estimate) : undefined,
+          previous: e.prev != null && e.prev !== "" ? String(e.prev) : undefined,
+          actual: e.actual != null && e.actual !== "" ? String(e.actual) : undefined,
+        };
+      },
     );
 
     console.log(`  Finnhub: ${events.length} economic events`);
@@ -52,6 +59,37 @@ export async function fetchEconomicCalendar(
     console.warn(`  Finnhub economic calendar error: ${err}`);
     return [];
   }
+}
+
+/**
+ * Map ISO 2-letter country code (Finnhub format) to 3-letter currency code (EconomicEvent format).
+ * Covers all countries ingested from Finnhub economic calendar feed.
+ * Unknown → fallback "USD" (rare edge cases).
+ */
+function mapCountryToCurrency(country: string): string {
+  const c = (country || "").toUpperCase();
+  // Direct country → currency mapping (most finance-relevant)
+  const MAP: Record<string, string> = {
+    // Majors
+    US: "USD", CA: "CAD", GB: "GBP", UK: "GBP", JP: "JPY", CN: "CNY", AU: "AUD",
+    NZ: "NZD", CH: "CHF", HK: "HKD", SG: "SGD", TW: "TWD", KR: "KRW", IN: "INR",
+    // Eurozone countries → EUR
+    EU: "EUR", DE: "EUR", FR: "EUR", IT: "EUR", ES: "EUR", NL: "EUR", BE: "EUR",
+    AT: "EUR", IE: "EUR", PT: "EUR", FI: "EUR", GR: "EUR", LU: "EUR", SK: "EUR",
+    SI: "EUR", EE: "EUR", LV: "EUR", LT: "EUR", CY: "EUR", MT: "EUR",
+    // Europe (non-euro)
+    SE: "SEK", NO: "NOK", DK: "DKK", PL: "PLN", CZ: "CZK", HU: "HUF", RO: "RON",
+    BG: "BGN", RU: "RUB", TR: "TRY", UA: "UAH",
+    // Americas
+    BR: "BRL", MX: "MXN", AR: "ARS", CL: "CLP", CO: "COP", PE: "PEN",
+    // MEA
+    ZA: "ZAR", IL: "ILS", SA: "SAR", AE: "AED", EG: "EGP", NG: "NGN",
+    // Asia (non-major)
+    TH: "THB", MY: "MYR", PH: "PHP", ID: "IDR", VN: "VND", PK: "PKR", BD: "BDT",
+    // Oceania
+    FJ: "FJD",
+  };
+  return MAP[c] || c || "USD";
 }
 
 export async function fetchEarningsCalendar(
@@ -205,7 +243,13 @@ function nextDay(date: string): string {
 }
 
 function mapImpact(impact: string): "high" | "medium" | "low" {
-  const n = parseInt(impact, 10);
+  const s = (impact || "").toLowerCase().trim();
+  // Finnhub returns "high" | "medium" | "low" (strings)
+  if (s === "high") return "high";
+  if (s === "medium") return "medium";
+  if (s === "low") return "low";
+  // Fallback: legacy numeric format (1=low, 2=medium, 3=high)
+  const n = parseInt(s, 10);
   if (n >= 3) return "high";
   if (n === 2) return "medium";
   return "low";

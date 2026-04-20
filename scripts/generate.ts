@@ -82,9 +82,13 @@ async function main() {
   const skipFetch = !!opts["skip-fetch"];
   const skipScript = !!opts["skip-script"];
   const startFrom = opts["start-from"] as string | undefined;
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  const date = (opts.date as string) || yesterday.toISOString().split("T")[0];
+  // Default snap date = last trading day (skip weekend: Sat→Fri, Sun→Fri, Mon→Fri)
+  const defaultSnap = new Date();
+  defaultSnap.setDate(defaultSnap.getDate() - 1);
+  while (defaultSnap.getUTCDay() === 0 || defaultSnap.getUTCDay() === 6) {
+    defaultSnap.setDate(defaultSnap.getDate() - 1);
+  }
+  const date = (opts.date as string) || defaultSnap.toISOString().split("T")[0];
 
   // ── Monday recap mode ──
   // Auto-detect when today is Monday AND snap is previous Friday (or earlier)
@@ -164,7 +168,16 @@ async function main() {
     console.log(`  ${snapshot.assets?.length ?? 0} assets loaded`);
   } else {
     console.log("\n═══ Step 1: Fetching market data ═══");
-    snapshot = await fetchMarketSnapshot(date);
+    // Monday mode : fetch avec today pour récupérer crypto weekend moves + news live.
+    // Sinon (daily) : fetch avec la date d'épisode (comportement historique).
+    // snapshot.date est ensuite aligné sur la narrative (vendredi pour Monday, date pour daily).
+    const fetchDate = publishDate ? publishDate : date;
+    if (publishDate && fetchDate !== date) {
+      console.log(`  Monday mode: fetch avec ${fetchDate} (today), narrative snap = ${date}`);
+    }
+    snapshot = await fetchMarketSnapshot(fetchDate);
+    // Override narrative date: pipeline utilise snapshot.date pour temporal anchors
+    snapshot.date = date;
 
     // Enrich news summaries via article extraction (articles sans summary)
     console.log("\n── Step 1.0: Enriching news summaries ──");

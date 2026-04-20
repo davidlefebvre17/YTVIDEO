@@ -22,9 +22,33 @@ function formatAssetsCompact(flagged: SnapshotFlagged): string {
       const lo = a.snapshot.low24h;
       const range = (hi && lo && Math.abs(hi - lo) > 0) ? ` | séance:[${lo.toFixed(2)}–${hi.toFixed(2)}]` : '';
       const tag = a.promoted ? ' [PROMU — FOCUS/FLASH max]' : '';
-      return `${a.symbol} | ${a.name} | ${a.changePct >= 0 ? '+' : ''}${a.changePct.toFixed(2)}%${range} | score:${a.materialityScore} | flags:${a.flags.join(',') || 'none'} | drama:${drama}${tag}`;
+      const perf = formatPerfInline(a.snapshot.perf);
+      const grp = a.snapshot.group ? ` | grp:${a.snapshot.group}` : '';
+      return `${a.symbol} | ${a.name} | J:${a.changePct >= 0 ? '+' : ''}${a.changePct.toFixed(2)}%${perf}${range}${grp} | score:${a.materialityScore} | flags:${a.flags.join(',') || 'none'} | drama:${drama}${tag}`;
     })
     .join('\n');
+}
+
+/**
+ * Compact perf suffix combinant rolling + calendaire.
+ * Format court: " | 1S+3.2% 1M+12% 3M+18% 1A+45% YTD+30%"
+ * Rolling = matière pour "sur la semaine/le mois". Calendaire = matière pour "depuis le X".
+ */
+function formatPerfInline(perf: {
+  week?: number; month?: number; quarter?: number; year?: number;
+  wtd?: number; mtd?: number; qtd?: number; ytd?: number;
+} | undefined): string {
+  if (!perf) return '';
+  const parts: string[] = [];
+  const fmt = (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(1)}%`;
+  // Rolling
+  if (perf.week !== undefined) parts.push(`1S${fmt(perf.week)}`);
+  if (perf.month !== undefined) parts.push(`1M${fmt(perf.month)}`);
+  if (perf.quarter !== undefined) parts.push(`3M${fmt(perf.quarter)}`);
+  if (perf.year !== undefined) parts.push(`1A${fmt(perf.year)}`);
+  // Calendaire (plus court, pour alléger la ligne)
+  if (perf.ytd !== undefined) parts.push(`YTD${fmt(perf.ytd)}`);
+  return parts.length ? ` | ${parts.join(' ')}` : '';
 }
 
 function formatEventsCompact(flagged: SnapshotFlagged, snapDayName?: string): string {

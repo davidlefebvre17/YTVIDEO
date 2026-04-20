@@ -142,7 +142,47 @@ export interface AssetSnapshot {
   technicals?: TechnicalIndicators;
   // Multi-timeframe analysis (weekly 10y + daily 3y)
   multiTF?: MultiTimeframeAnalysis;
+  // Multi-timeframe performance (computed from dailyCandles)
+  perf?: {
+    // ── ROLLING (fenêtres glissantes, pour "sur la semaine/mois/année écoulée") ──
+    /** 5 trading days — rolling 1 semaine */
+    week?: number;
+    /** ~22 trading days — rolling 1 mois */
+    month?: number;
+    /** ~66 trading days — rolling 3 mois */
+    quarter?: number;
+    /** ~252 trading days — rolling 1 an */
+    year?: number;
+    // ── CALENDAIRE (to-date, pour "depuis le 1er janvier/du mois") ──
+    /** Week-to-date — depuis la clôture du dimanche (ou vendredi avant) */
+    wtd?: number;
+    /** Month-to-date — depuis la dernière clôture du mois précédent */
+    mtd?: number;
+    /** Quarter-to-date — depuis la dernière clôture du trimestre précédent */
+    qtd?: number;
+    /** Year-to-date — depuis la dernière clôture de l'année précédente */
+    ytd?: number;
+    // ── EXTRÊMES HISTORIQUES ──
+    /** Drawdown depuis plus haut historique (dans la fenêtre candles) */
+    fromATH?: number;
+    /** Rebond depuis plus bas 52 semaines */
+    from52wLow?: number;
+  };
+  /** Asset class for peer comparison (derived from symbol). Same group = comparable in narrative. */
+  group?: AssetGroup;
 }
+
+/** Asset grouping for peer comparison (e.g. S&P vs CAC = indices comparables). */
+export type AssetGroup =
+  | 'US_INDEX' | 'EU_INDEX' | 'ASIA_INDEX'
+  | 'FX_MAJOR'
+  | 'ENERGY' | 'METAL' | 'AGRI'
+  | 'CRYPTO'
+  | 'BOND_US' | 'BOND_EU'
+  | 'VOLATILITY'
+  | 'STOCK_US' | 'STOCK_FR' | 'STOCK_DE' | 'STOCK_UK' | 'STOCK_JP' | 'STOCK_HK' | 'STOCK_CN'
+  | 'ETF_SECTOR'
+  | 'OTHER';
 
 export interface TechnicalIndicators {
   sma20: number;

@@ -87,8 +87,29 @@ function formatAssetForC2(asset: FlaggedAsset, depth: 'DEEP' | 'FOCUS' | 'FLASH'
   const fmt = (n: number) => n.toFixed(asset.price > 100 ? 2 : 4);
   const hi = asset.snapshot.high24h;
   const lo = asset.snapshot.low24h;
-  let text = `### ${asset.name} (${asset.symbol}) — ${depth}\n`;
-  text += `Prix (clôture): ${fmt(asset.price)} | Var: ${asset.changePct >= 0 ? '+' : ''}${asset.changePct.toFixed(2)}%`;
+  const groupTag = asset.snapshot.group ? ` [${asset.snapshot.group}]` : '';
+  let text = `### ${asset.name} (${asset.symbol})${groupTag} — ${depth}\n`;
+  text += `Prix (clôture): ${fmt(asset.price)} | Var jour: ${asset.changePct >= 0 ? '+' : ''}${asset.changePct.toFixed(2)}%`;
+  const perf = asset.snapshot.perf;
+  if (perf) {
+    const p = (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(1)}%`;
+    // Rolling (sur la semaine/le mois/le trimestre/l'année écoulée)
+    const rolling: string[] = [];
+    if (perf.week !== undefined) rolling.push(`1S:${p(perf.week)}`);
+    if (perf.month !== undefined) rolling.push(`1M:${p(perf.month)}`);
+    if (perf.quarter !== undefined) rolling.push(`3M:${p(perf.quarter)}`);
+    if (perf.year !== undefined) rolling.push(`1A:${p(perf.year)}`);
+    if (rolling.length) text += ` | Rolling: ${rolling.join(' ')}`;
+    // Calendaire (to-date)
+    const cal: string[] = [];
+    if (perf.wtd !== undefined) cal.push(`WTD:${p(perf.wtd)}`);
+    if (perf.mtd !== undefined) cal.push(`MTD:${p(perf.mtd)}`);
+    if (perf.qtd !== undefined) cal.push(`QTD:${p(perf.qtd)}`);
+    if (perf.ytd !== undefined) cal.push(`YTD:${p(perf.ytd)}`);
+    if (cal.length) text += ` | Calendaire: ${cal.join(' ')}`;
+    if (perf.fromATH !== undefined) text += ` | depuis ATH: ${p(perf.fromATH)}`;
+    if (perf.from52wLow !== undefined) text += ` | depuis plus bas 52s: ${p(perf.from52wLow)}`;
+  }
   if (hi && lo) text += ` | Séance: low ${fmt(lo)} → high ${fmt(hi)}`;
   text += '\n';
 

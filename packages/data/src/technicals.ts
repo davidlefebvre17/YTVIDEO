@@ -1,4 +1,151 @@
-import type { Candle, TechnicalIndicators, MultiTimeframeAnalysis } from "@yt-maker/core";
+import type { Candle, TechnicalIndicators, MultiTimeframeAnalysis, AssetSnapshot, AssetGroup } from "@yt-maker/core";
+
+/**
+ * Compute multi-timeframe performance from daily candles + current price.
+ * - Rolling (week/month/quarter/year) : fenêtres glissantes en jours de bourse
+ * - Calendaire (wtd/mtd/qtd/ytd) : depuis la clôture de la période précédente
+ * - Extrêmes (fromATH, from52wLow)
+ *
+ * Graceful degradation : champs omis si l'historique est insuffisant (nouvelle IPO, etc.).
+ */
+export function computePerf(
+  candles: Candle[],
+  currentPrice: number,
+): AssetSnapshot["perf"] {
+  if (!candles || candles.length === 0 || !currentPrice || !Number.isFinite(currentPrice)) {
+    return undefined;
+  }
+
+  const ref = (n: number): number | undefined => {
+    const idx = candles.length - 1 - n;
+    if (idx < 0) return undefined;
+    return candles[idx].c;
+  };
+
+  const pctFrom = (past: number | undefined): number | undefined => {
+    if (past === undefined || !Number.isFinite(past) || past === 0) return undefined;
+    return ((currentPrice - past) / past) * 100;
+  };
+
+  const perf: AssetSnapshot["perf"] = {};
+
+  // ── ROLLING ──
+  const w = pctFrom(ref(5));
+  if (w !== undefined) perf.week = round2(w);
+  const m = pctFrom(ref(22));
+  if (m !== undefined) perf.month = round2(m);
+  const q = pctFrom(ref(66));
+  if (q !== undefined) perf.quarter = round2(q);
+  const y = pctFrom(ref(252));
+  if (y !== undefined) perf.year = round2(y);
+
+  // ── CALENDAIRE — référence = dernière clôture AVANT le début de la période ──
+  const lastCandleDate = candles[candles.length - 1].date.slice(0, 10);
+
+  const wtdRef = lastCloseBefore(candles, startOfWeek(lastCandleDate));
+  if (wtdRef !== undefined) perf.wtd = round2(pctFrom(wtdRef)!);
+
+  const mtdRef = lastCloseBefore(candles, startOfMonth(lastCandleDate));
+  if (mtdRef !== undefined) perf.mtd = round2(pctFrom(mtdRef)!);
+
+  const qtdRef = lastCloseBefore(candles, startOfQuarter(lastCandleDate));
+  if (qtdRef !== undefined) perf.qtd = round2(pctFrom(qtdRef)!);
+
+  const ytdRef = lastCloseBefore(candles, startOfYear(lastCandleDate));
+  if (ytdRef !== undefined) perf.ytd = round2(pctFrom(ytdRef)!);
+
+  // ── ATH & 52w low ──
+  let ath = -Infinity;
+  for (const c of candles) if (c.h > ath) ath = c.h;
+  if (ath > 0 && Number.isFinite(ath)) {
+    perf.fromATH = round2(((currentPrice - ath) / ath) * 100);
+  }
+
+  const last252 = candles.slice(-252);
+  if (last252.length > 0) {
+    let low52w = Infinity;
+    for (const c of last252) if (c.l < low52w) low52w = c.l;
+    if (low52w > 0 && Number.isFinite(low52w)) {
+      perf.from52wLow = round2(((currentPrice - low52w) / low52w) * 100);
+    }
+  }
+
+  return perf;
+}
+
+// ── Helpers calendaires ──
+
+function startOfWeek(dateIso: string): string {
+  // Return last Sunday's date (= cutoff : lundi de la semaine en cours)
+  const d = new Date(dateIso + "T12:00:00Z");
+  d.setUTCDate(d.getUTCDate() - d.getUTCDay());
+  return d.toISOString().slice(0, 10);
+}
+
+function startOfMonth(dateIso: string): string {
+  return dateIso.slice(0, 7) + "-01";
+}
+
+function startOfQuarter(dateIso: string): string {
+  const year = dateIso.slice(0, 4);
+  const month = parseInt(dateIso.slice(5, 7), 10);
+  // Q1: jan-mar, Q2: apr-jun, Q3: jul-sep, Q4: oct-dec
+  const qStartMonth = month - ((month - 1) % 3);
+  return `${year}-${String(qStartMonth).padStart(2, "0")}-01`;
+}
+
+function startOfYear(dateIso: string): string {
+  return dateIso.slice(0, 4) + "-01-01";
+}
+
+function lastCloseBefore(candles: Candle[], cutoffDate: string): number | undefined {
+  for (let i = candles.length - 1; i >= 0; i--) {
+    const cd = (candles[i].date || "").slice(0, 10);
+    if (cd && cd < cutoffDate) return candles[i].c;
+  }
+  return undefined;
+}
+
+function round2(n: number): number {
+  return Math.round(n * 100) / 100;
+}
+
+// ── Asset grouping (pour comparaisons narratives entre pairs) ──
+
+/**
+ * Map a ticker to its asset group. Used to identify comparable peers in narrative
+ * (ex: S&P vs CAC = both US_INDEX / EU_INDEX, divergence = narrative moment).
+ */
+export function getAssetGroup(symbol: string): AssetGroup {
+  const s = symbol || "";
+  // Indices
+  if (/^\^(GSPC|IXIC|DJI|NYA|RUT)$/.test(s)) return "US_INDEX";
+  if (/^\^(FCHI|GDAXI|FTSE|STOXX|IBEX|AEX|SSMI)$/.test(s)) return "EU_INDEX";
+  if (/^\^(N225|HSI|KS11|TWII|AXJO)$/.test(s) || s === "000001.SS" || s === "399001.SZ") return "ASIA_INDEX";
+  if (s === "^VIX") return "VOLATILITY";
+  // Bonds
+  if (/^\^(TNX|TYX|FVX|IRX)$/.test(s)) return "BOND_US";
+  // FX
+  if (s.includes("=X") || s === "DX-Y.NYB") return "FX_MAJOR";
+  // Futures
+  if (/^(CL|BZ|NG)=F$/.test(s)) return "ENERGY";
+  if (/^(GC|SI|HG|PL|PA)=F$/.test(s)) return "METAL";
+  if (/^(ZW|ZC|ZS|KC|SB|CC|CT)=F$/.test(s)) return "AGRI";
+  // Crypto
+  if (s.endsWith("-USD")) return "CRYPTO";
+  // Regional stocks
+  if (s.endsWith(".PA")) return "STOCK_FR";
+  if (s.endsWith(".DE")) return "STOCK_DE";
+  if (s.endsWith(".L")) return "STOCK_UK";
+  if (s.endsWith(".T")) return "STOCK_JP";
+  if (s.endsWith(".HK")) return "STOCK_HK";
+  if (s.endsWith(".SS") || s.endsWith(".SZ")) return "STOCK_CN";
+  // Sector ETFs
+  if (/^(XL[A-Z]|VGT|VFH|XBI|SMH|KRE|IWM|SPY|QQQ|DIA)$/.test(s)) return "ETF_SECTOR";
+  // Default: single stock (US when no suffix)
+  if (/^[A-Z.\-]{1,6}$/.test(s)) return "STOCK_US";
+  return "OTHER";
+}
 
 /**
  * Compute RSI (Relative Strength Index) over closing prices.

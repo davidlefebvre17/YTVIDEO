@@ -13,6 +13,7 @@ export type {
   EpisodeScript,
   EpisodeDirection,
   AssetSnapshot,
+  AssetGroup,
   TechnicalIndicators,
   MultiTimeframeAnalysis,
   NewsItem,

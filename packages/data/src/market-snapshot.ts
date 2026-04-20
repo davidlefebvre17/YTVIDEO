@@ -2,7 +2,7 @@ import type { DailySnapshot, EarningsEvent, NewsItem } from "@yt-maker/core";
 import { fetchAllAssets, fetchDailyCandles, fetchWeeklyCandles, fetchDaily3yCandles, DEFAULT_ASSETS } from "./yahoo";
 import { fetchNews } from "./news";
 import { fetchEconomicCalendar } from "./calendar";
-import { computeTechnicals, computeMultiTFAnalysis } from "./technicals";
+import { computeTechnicals, computeMultiTFAnalysis, computePerf, getAssetGroup } from "./technicals";
 import { fetchBondYields, fetchYieldsHistory } from "./fred";
 import { fetchMarketSentiment } from "./sentiment";
 import { fetchEarningsCalendar, fetchFinnhubNews, fetchFinnhubCompanyNews, fetchStockEarningsHistory } from "./finnhub";
@@ -132,6 +132,12 @@ export async function fetchMarketSnapshot(
         if (multiTF) {
           asset.multiTF = multiTF;
         }
+
+        // Multi-timeframe performance (rolling + calendaire + ATH / 52wLow)
+        const perf = computePerf(asset.dailyCandles, asset.price);
+        if (perf) asset.perf = perf;
+        // Asset group pour comparaisons narratives entre pairs
+        asset.group = getAssetGroup(asset.symbol);
 
         const newsForAsset = news.filter(
           (n) =>
