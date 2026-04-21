@@ -4,7 +4,7 @@ import type {
 } from "./types";
 import type { Language } from "@yt-maker/core";
 import type { BriefingPack } from "./helpers/briefing-pack";
-import { formatBriefingPack } from "./helpers/briefing-pack";
+import { formatBriefingPack, classifyEventTemporal } from "./helpers/briefing-pack";
 import type { NewsDigest } from "./p1b-news-digest";
 import { formatNewsDigest } from "./p1b-news-digest";
 import { detectCalendarPatterns, formatCalendarPatterns } from "./helpers/calendar-patterns";
@@ -51,11 +51,51 @@ function formatPerfInline(perf: {
   return parts.length ? ` | ${parts.join(' ')}` : '';
 }
 
-function formatEventsCompact(flagged: SnapshotFlagged, snapDayName?: string): string {
-  if (!flagged.events.length) return `Aucun événement économique ce ${snapDayName ?? 'jour'}.`;
-  return flagged.events
-    .map(e => `${e.time} ${e.name} (${e.currency}, ${e.impact})${e.forecast ? ` consensus:${e.forecast}` : ''}${e.actual ? ` résultat:${e.actual}` : ''}`)
-    .join('\n');
+function formatEventsCompact(flagged: SnapshotFlagged, snapDayName?: string, pubDate?: string): string {
+  const allEvents = [
+    ...(flagged.yesterdayEvents ?? []),
+    ...(flagged.events ?? []),
+    ...(flagged.upcomingEvents ?? []),
+  ];
+  if (!allEvents.length) return `Aucun événement économique pertinent.`;
+
+  const sessionDate = flagged.date;
+  const pubD = pubDate || (() => {
+    const d = new Date(sessionDate + 'T00:00:00Z');
+    d.setUTCDate(d.getUTCDate() + 1);
+    return d.toISOString().slice(0, 10);
+  })();
+
+  // Classify each event
+  const groups: Record<string, typeof allEvents> = {
+    pre_session: [], session_day: [], pub_morning_before: [], pub_morning_after: [], upcoming: [],
+  };
+  for (const e of allEvents) {
+    const when = classifyEventTemporal(e, sessionDate, pubD);
+    groups[when].push(e);
+  }
+
+  const labels = {
+    pre_session: `Avant la séance (contexte)`,
+    session_day: `Pendant la séance du ${snapDayName ?? sessionDate} (peut expliquer le move)`,
+    pub_morning_before: `Ce matin avant diffusion (déjà public au visionnage)`,
+    pub_morning_after: `Ce matin APRÈS diffusion (à venir / pas encore public au visionnage)`,
+    upcoming: `À venir cette semaine`,
+  };
+
+  let text = '';
+  for (const [tag, items] of Object.entries(groups)) {
+    if (!items.length) continue;
+    text += `**${labels[tag as keyof typeof labels]}** :\n`;
+    for (const e of items) {
+      text += `- [${e.date}] ${e.time ?? '??'} ${e.name} (${e.currency}, ${e.impact})`;
+      if (e.forecast) text += ` cons:${e.forecast}`;
+      if (e.actual) text += ` actual:${e.actual}`;
+      if (e.previous) text += ` prev:${e.previous}`;
+      text += '\n';
+    }
+  }
+  return text || 'Aucun événement.';
 }
 
 function formatEpisodeSummariesCompact(summaries: EpisodeSummary[]): string {
@@ -189,10 +229,11 @@ Règles :
 - COT (CFTC) : les données de positionnement sont toujours décalées de 7-11 jours. Tu peux t'en servir comme contexte de fond ("les spéculateurs étaient déjà positionés long avant le move") mais JAMAIS comme cause directe du move du jour. Ne pas écrire "la COT flip explique/confirme le +X% d'aujourd'hui".
 - DÉCISIONS À VENIR (banque centrale, politique, résultats) : tu CONSTATES qu'une décision approche et que le marché réagit, tu ne SPÉCULES PAS sur le résultat. "La Fed se réunit demain" = fait. "Le marché anticipe une baisse de taux" = spéculation INTERDITE sauf si des données chiffrées (futures, OIS, swaps) quantifient cette anticipation. Les angles et le threadSummary doivent rester factuels — l'interprétation éditoriale appartient aux étapes suivantes.
 
-PROFONDEURS :
-- DEEP : chaîne causale complète, 2 scénarios, technique + fondamental (70-90s, 175-225 mots)
-- FOCUS : move + catalyst + conséquences + 1 niveau + 1 scénario (40-60s, 100-150 mots)
-- FLASH : fait + cause + conséquence, 3 phrases max (20-30s, 50-75 mots)
+PROFONDEURS (aligné sur budget C3) :
+- DEEP : un MÉCANISME structurant enseigné à fond (la règle "1 concept par DEEP" de C3), avec scène du réel physique (300-450 mots, ~140-180s)
+- FOCUS : move + catalyst + conséquences + 1 niveau + 1 scénario (120-200 mots, ~60-80s)
+- FLASH : fait + cause + conséquence, 3 phrases max (50-75 mots, ~20-30s)
+- PANORAMA : récap thématique par arcs, 2-3 arcs, 6-8 actifs max (200-320 mots, ~80-120s)
 
 SORTIE : JSON strict, schéma EditorialPlan.`;
 }
@@ -277,7 +318,9 @@ function buildC1UserPrompt(
 
   prompt += `## THÈMES DU JOUR\n${formatThemesCompact(flagged)}\n\n`;
   prompt += `## ASSETS SCORÉS (${flagged.assets.length} total)\n${formatAssetsCompact(flagged)}\n\n`;
-  prompt += `## CALENDRIER ÉCO\n${formatEventsCompact(flagged, anchors.snapDayName)}\n\n`;
+  prompt += `## CALENDRIER ÉCO\n`;
+  prompt += `RÈGLE CAUSALITÉ : seuls les événements classés "Pendant la séance" peuvent expliquer le move du jour. Les événements "ce matin APRÈS diffusion" ou "à venir" sont FUTURS pour le spectateur — à présenter en anticipation ("ce matin à 11h", "mercredi").\n\n`;
+  prompt += `${formatEventsCompact(flagged, anchors.snapDayName, flagged.publishDate)}\n\n`;
 
   // Briefing Pack (raw editorial facts)
   if (briefingPack) {

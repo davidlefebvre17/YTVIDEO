@@ -90,33 +90,51 @@ async function main() {
   }
   const date = (opts.date as string) || defaultSnap.toISOString().split("T")[0];
 
-  // ── Monday recap mode ──
-  // Auto-detect when today is Monday AND snap is previous Friday (or earlier)
-  // CLI override: --publish-date YYYY-MM-DD
-  // Force flag:  --monday (use today as pub, date as snap)
+  // ── Publication date (ALWAYS defined = clé unique par épisode publié) ──
+  // Règle : publishDate = today si today > snap (publication après la séance).
+  //          sinon snap+1 (simulation "le lendemain matin" pour runs historiques).
+  // CLI override : --publish-date YYYY-MM-DD
+  // Flag --monday : force today comme publishDate (pratique pour catchup lundi)
   const cliPubDate = opts["publish-date"] as string | undefined;
   const forceMonday = !!opts["monday"];
-  let publishDate: string | undefined = cliPubDate;
-  if (!publishDate && forceMonday) {
-    publishDate = new Date().toISOString().split("T")[0];
+  const todayStr = new Date().toISOString().split("T")[0];
+  const snapPlus1 = (() => {
+    const d = new Date(date + "T12:00:00Z");
+    d.setUTCDate(d.getUTCDate() + 1);
+    return d.toISOString().split("T")[0];
+  })();
+  let publishDate: string;
+  if (cliPubDate) {
+    publishDate = cliPubDate;
+  } else if (forceMonday) {
+    publishDate = todayStr;
+  } else if (todayStr > date) {
+    // Publication réelle = aujourd'hui (cas normal : daily recap matinal)
+    publishDate = todayStr;
+  } else {
+    // Run historique ou en avance : simuler "le lendemain matin"
+    publishDate = snapPlus1;
   }
-  if (!publishDate) {
-    // Auto-detect: today is Monday AND date is at least 2 days ago
-    const today = new Date();
-    const todayStr = today.toISOString().split("T")[0];
-    const snapDate = new Date(date + "T12:00:00Z");
-    const gapDays = Math.round((today.getTime() - snapDate.getTime()) / 86400000);
-    if (today.getUTCDay() === 1 && gapDays >= 2) {
-      publishDate = todayStr;
-      console.log(`🔶 Auto-détecté : mode LUNDI (today=${todayStr}, snap=${date}, gap=${gapDays}j)`);
-    }
+
+  // Monday recap = pub est lundi ET gap snap→pub >= 2 jours (weekend)
+  const pubD = new Date(publishDate + "T12:00:00Z");
+  const snapD = new Date(date + "T12:00:00Z");
+  const gapDays = Math.round((pubD.getTime() - snapD.getTime()) / 86400000);
+  const isMondayRecap = pubD.getUTCDay() === 1 && gapDays >= 2;
+  if (isMondayRecap) {
+    console.log(`🔶 Mode LUNDI (pub=${publishDate}, snap=${date}, gap=${gapDays}j)`);
   }
+
+  // ── Episode date key = publishDate ──
+  // Chaque publication a son dossier unique. Samedi (pub=samedi) et Lundi (pub=lundi)
+  // couvrent la même séance vendredi mais vivent dans des dossiers distincts.
+  const episodeKey = publishDate;
 
   console.log("=== Trading YouTube Maker ===");
-  console.log(`Date: ${date}${publishDate ? ` | Pub: ${publishDate}` : ""} | Lang: ${lang} | Script: ${skipScript ? "SKIP" : "ON"} | Images: ${skipImages ? "SKIP" : "ON"} | TTS: ${skipTts ? "SKIP" : "ON"} | Render: ${skipRender ? "SKIP" : "ON"}`);
+  console.log(`Date: ${date}${publishDate ? ` | Pub: ${publishDate}` : ""} | Episode key: ${episodeKey} | Lang: ${lang} | Script: ${skipScript ? "SKIP" : "ON"} | Images: ${skipImages ? "SKIP" : "ON"} | TTS: ${skipTts ? "SKIP" : "ON"} | Render: ${skipRender ? "SKIP" : "ON"}`);
 
   // Create episode folder + clean stale public files
-  const epDir = createEpisodeDir(date);
+  const epDir = createEpisodeDir(episodeKey);
   cleanPublicForNewEpisode({ skipImages });
   console.log(`Episode folder: ${epDir}`);
 
@@ -160,7 +178,7 @@ async function main() {
   // ════════════════════════════════════════════════════════════
   const dataDir = path.resolve(__dirname, "..", "data");
   if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
-  const snapshotFilePath = path.join(dataDir, `snapshot-${date}.json`);
+  const snapshotFilePath = path.join(dataDir, `snapshot-${episodeKey}.json`);
 
   if (skipFetch && fs.existsSync(snapshotFilePath)) {
     console.log("\n═══ Step 1: Loading existing snapshot (--skip-fetch) ═══");
@@ -172,8 +190,9 @@ async function main() {
     // Sinon (daily) : fetch avec la date d'épisode (comportement historique).
     // snapshot.date est ensuite aligné sur la narrative (vendredi pour Monday, date pour daily).
     const fetchDate = publishDate ? publishDate : date;
-    if (publishDate && fetchDate !== date) {
-      console.log(`  Monday mode: fetch avec ${fetchDate} (today), narrative snap = ${date}`);
+    if (fetchDate !== date) {
+      const modeLabel = isMondayRecap ? 'Mode LUNDI' : 'Publication post-séance';
+      console.log(`  ${modeLabel}: fetch avec ${fetchDate} (today), narrative snap = ${date}`);
     }
     snapshot = await fetchMarketSnapshot(fetchDate);
     // Override narrative date: pipeline utilise snapshot.date pour temporal anchors
@@ -188,7 +207,7 @@ async function main() {
   }
 
   // Save snapshot to episode folder
-  saveToEpisode(date, "snapshot.json", snapshot);
+  saveToEpisode(episodeKey, "snapshot.json", snapshot);
 
   // 1a. News Memory (D2)
   console.log("\n── Step 1a: News Memory (D2) ──");
@@ -293,7 +312,7 @@ async function main() {
   const episodeNumber = getNextEpisodeNumber();
   const useLegacy = !!opts["legacy"];
 
-  const prevContext = loadPrevContextFromEpisodes(date);
+  const prevContext = loadPrevContextFromEpisodes(episodeKey);
   console.log(`  PrevContext: ${prevContext.entries.length} épisodes`);
 
   let pipelineResult: any = null;
@@ -307,7 +326,7 @@ async function main() {
     console.log(`  Stats: ${pipelineResult.stats.llmCalls} LLM, ${pipelineResult.stats.retries} retries, ${(pipelineResult.stats.totalDurationMs / 1000).toFixed(1)}s`);
   }
 
-  saveToEpisode(date, "script.json", script);
+  saveToEpisode(episodeKey, "script.json", script);
 
   // ════════════════════════════════════════════════════════════
   // STEP 3: BEAT PIPELINE (P7a → P7c)
@@ -364,7 +383,7 @@ async function main() {
     };
   });
 
-  saveToEpisode(date, "beats-raw.json", beats);
+  saveToEpisode(episodeKey, "beats-raw.json", beats);
   console.log(`  Beats assembled: ${beats.length}`);
 
   try { newsDb.close(); } catch {}
@@ -390,10 +409,10 @@ async function main() {
   }));
   const c7Compat = { directions, visualIdentity: {} } as any;
 
-  const imageMap = await runImageGeneration(allPrompts, c7Compat, date, { skipImages });
+  const imageMap = await runImageGeneration(allPrompts, c7Compat, episodeKey, { skipImages });
 
   // Sync images to episode folder + Remotion public/
-  const publicImagePaths = syncImagesToPublic(date, imageMap);
+  const publicImagePaths = syncImagesToPublic(episodeKey, imageMap);
 
   // Update beat imagePaths
   for (const beat of beats) {
@@ -484,7 +503,7 @@ async function main() {
       // Durations already set by alignment — no need to re-read MP3s
     } else {
       // Legacy mode: copy per-beat MP3s
-      syncAudioToPublic(date, beats.map(b => ({ id: b.id, audioPath: b.audioPath })));
+      syncAudioToPublic(episodeKey, beats.map(b => ({ id: b.id, audioPath: b.audioPath })));
 
       // Read real MP3 durations
       console.log("  Syncing audio durations...");
@@ -518,7 +537,7 @@ async function main() {
       }
     }
 
-    saveToEpisode(date, "audio-manifest.json", audioManifest);
+    saveToEpisode(episodeKey, "audio-manifest.json", audioManifest);
 
     // ── Step 5b: Generate owl audio (intro, transitions, closing) ──
     console.log("  Generating owl audio...");
@@ -568,7 +587,7 @@ async function main() {
     }
 
     // Store owl audio paths for props
-    saveToEpisode(date, "owl-audio-paths.json", generatedOwlPaths);
+    saveToEpisode(episodeKey, "owl-audio-paths.json", generatedOwlPaths);
 
   } else {
     console.log("\n═══ Step 5: TTS SKIPPED (--skip-tts) ═══");
@@ -589,7 +608,7 @@ async function main() {
   console.log("\n═══ Step 6: Save episode ═══");
 
   // Save final beats
-  saveToEpisode(date, "beats.json", beats);
+  saveToEpisode(episodeKey, "beats.json", beats);
 
   // Build and save Remotion props
   const owlTransitionAudios: Record<string, string> = {};
@@ -623,7 +642,7 @@ async function main() {
     segmentAudioDurations: segmentDurations ?? undefined,
     yieldsHistory: snapshot.yieldsHistory ?? undefined,
   };
-  const propsPath = saveRemotionProps(date, remotionProps);
+  const propsPath = saveRemotionProps(episodeKey, remotionProps);
   console.log(`  Props saved: ${propsPath}`);
 
   // Also save to Remotion fixture for studio preview (stripped — no heavy candle data)
@@ -662,7 +681,7 @@ async function main() {
   if (!skipScript) {
     const episodeNumber = script.episodeNumber ?? getNextEpisodeNumber();
     const manifestEntry: EpisodeManifestEntry = {
-      episodeNumber, date, type, lang,
+      episodeNumber, date: episodeKey, type, lang,
       title: script.title,
       filePath: epDir,
     };

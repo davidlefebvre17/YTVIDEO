@@ -116,10 +116,12 @@ function numberToFrench(n: string): string {
 function sanitizeForTTS(text: string): string {
   return text
     .replace(/\[long pause\]/g, '[pause]')
-    // Fin de phrase → saut de ligne pour forcer Fish Audio à marquer l'intonation descendante
-    .replace(/\.\s+/g, '.\n')
-    .replace(/\?\s+/g, '?\n')
-    .replace(/!\s+/g, '!\n')
+    // Fin de phrase → [pause] explicite pour forcer Fish à marquer l'intonation descendante
+    .replace(/\.\s+/g, '.\n[pause]\n')
+    .replace(/\?\s+/g, '?\n[pause]\n')
+    .replace(/!\s+/g, '!\n[pause]\n')
+    // Dédup si [pause] est déjà présent dans le texte original
+    .replace(/\[pause\]\s*\n\s*\[pause\]/g, '[pause]')
     .replace(/[ \t]+/g, ' ')
     .trim();
 }
@@ -154,7 +156,6 @@ async function generateBeatWithFish(
     speed: speed ?? p.speed,
     temperature: p.temperature,
     topP: p.topP,
-    repetitionPenalty: p.repetitionPenalty,
   });
 }
 
@@ -231,9 +232,7 @@ async function generateSegmentAudio(
     const sanitized = sanitizeForTTS(fullTTS);
 
     // 2. Generate 1 MP3 for the whole segment
-    //    Short segments (hook, thread) get a speed bump so Fish doesn't slow down
-    const isShortSeg = segId === 'hook' || segId === 'thread' || segId === 'closing';
-    const segSpeed = speed ?? (isShortSeg ? 1.05 : FISH_PRESETS.FOCUS.speed);
+    const segSpeed = speed ?? FISH_PRESETS.FOCUS.speed;
     try {
       if (provider === 'elevenlabs') {
         await elevenLabsTTS({
@@ -249,7 +248,6 @@ async function generateSegmentAudio(
           speed: segSpeed,
           temperature: FISH_PRESETS.FOCUS.temperature,
           topP: FISH_PRESETS.FOCUS.topP,
-          repetitionPenalty: FISH_PRESETS.FOCUS.repetitionPenalty,
         });
       }
     } catch (err) {

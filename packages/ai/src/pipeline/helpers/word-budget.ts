@@ -3,9 +3,9 @@ import type { EditorialPlan, WordBudget, SegmentDepth } from "../types";
 const WORDS_PER_SEC = 170 / 60; // ~2.83 words/sec (calibrated on Fish Audio 0.90-0.95 speed)
 
 const DEPTH_WORDS: Record<SegmentDepth, { min: number; target: number; max: number }> = {
-  DEEP:  { min: 280, target: 370, max: 460 },
-  FOCUS: { min: 150, target: 195, max: 250 },
-  FLASH: { min: 65,  target: 80,  max: 100 },
+  DEEP:  { min: 300, target: 400, max: 450 },   // Aligné sur C3 système (règle "1 concept + réel physique" demande plus d'air)
+  FOCUS: { min: 120, target: 170, max: 200 },   // Aligné sur C3 système (max 200)
+  FLASH: { min: 50,  target: 65,  max: 75 },    // Aligné sur C3 système (max 75)
   PANORAMA: { min: 200, target: 250, max: 320 },
 };
 
@@ -19,13 +19,17 @@ export function computeWordBudget(plan: EditorialPlan): WordBudget {
 
   const segTotal = segments.reduce((sum, s) => sum + s.targetWords, 0);
 
+  const hook = 20;      // Cold open max (C3 dit max 20 mots)
+  const thread = 40;    // Thread (C3 dit ~40 mots)
+  const closing = 70;   // Closing (C3 dit ~70 mots)
+
   return {
-    hook: 25,
+    hook,
     titleCard: 0 as const,
-    thread: 60,
+    thread,
     segments,
-    closing: 70,
-    totalTarget: 25 + 0 + 50 + segTotal + 60,
+    closing,
+    totalTarget: hook + 0 + thread + segTotal + closing,
   };
 }
 

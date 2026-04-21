@@ -38,7 +38,7 @@ const ANTHROPIC_BASE = "https://api.anthropic.com/v1/messages";
 const ANTHROPIC_MODELS: Record<LLMRole, string> = {
   fast: "claude-haiku-4-5-20251001",
   balanced: "claude-sonnet-4-6",
-  quality: "claude-opus-4-6",
+  quality: "claude-opus-4-7",
 };
 
 const ANTHROPIC_MAX_TOKENS_DEFAULT = 8192;

@@ -1,8 +1,57 @@
 import type { SnapshotFlagged } from "../types";
-import type { DailySnapshot } from "@yt-maker/core";
+import type { DailySnapshot, EconomicEvent } from "@yt-maker/core";
 import { readFileSync, readdirSync } from "fs";
 import { join } from "path";
 import { labelEventDate } from "./temporal-anchors";
+
+// ── Temporal classifier for economic events ──
+// Publication cutoff = 07:00 UTC (morning broadcast assumption)
+const PUB_CUTOFF_HOUR = 7;
+
+/**
+ * Classify an economic event relative to the covered session and publication time.
+ *
+ * - `session_day`        : event happened on session day — impacted the covered move
+ * - `pre_session`        : event happened before session — historical context
+ * - `pub_morning_before` : event on pub day, scheduled BEFORE pub cutoff (07:00 UTC) — already public at viewing
+ * - `pub_morning_after`  : event on pub day, scheduled AFTER pub cutoff — NOT YET PUBLIC for viewer, futur
+ * - `upcoming`           : event after pub day — future event in the coming week
+ */
+export type EventWhen =
+  | 'session_day'
+  | 'pre_session'
+  | 'pub_morning_before'
+  | 'pub_morning_after'
+  | 'upcoming';
+
+export function classifyEventTemporal(
+  event: EconomicEvent,
+  sessionDate: string,
+  pubDate: string,
+): EventWhen {
+  const evDate = event.date;
+  if (!evDate) return 'session_day';
+  if (evDate < sessionDate) return 'pre_session';
+  if (evDate === sessionDate) return 'session_day';
+  if (evDate === pubDate) {
+    // Extract hour from event.time (format HH:MM)
+    const h = parseInt((event.time || '00:00').slice(0, 2), 10) || 0;
+    return h < PUB_CUTOFF_HOUR ? 'pub_morning_before' : 'pub_morning_after';
+  }
+  return 'upcoming';
+}
+
+/**
+ * Format an event with its actuals for narration prompts.
+ * Includes actual/forecast/previous if present.
+ */
+export function formatEventWithContext(event: EconomicEvent): string {
+  let line = `${event.time ?? '?'} ${event.name} (${event.currency}, ${event.impact})`;
+  if (event.forecast) line += ` consensus:${event.forecast}`;
+  if (event.actual) line += ` résultat:${event.actual}`;
+  if (event.previous) line += ` précédent:${event.previous}`;
+  return line;
+}
 
 export interface PoliticalTrigger {
   actor: string;
@@ -59,8 +108,14 @@ export interface SentimentTrend {
 }
 
 export interface BriefingPack {
-  /** 15 most relevant news titles (highest buzz/relevance) */
-  topNewsTitles: string[];
+  /** 15 most relevant news with temporal tags */
+  topNewsTitles: Array<{
+    title: string;
+    /** ISO date (YYYY-MM-DD) of publication */
+    publishedDate: string;
+    /** Temporal tag relative to market session covered */
+    when: 'before_session' | 'during_session' | 'post_session' | 'pre_publication';
+  }>;
   /** Political actors detected in news (heads of state, central bank chairs, etc.) */
   politicalTriggers: PoliticalTrigger[];
   /** Top 10 movers from stock screening (outside 38-asset watchlist) */
@@ -277,14 +332,36 @@ export function buildBriefingPack(
     }
     // Boost: FR sources (more likely editorial)
     if (n.lang === 'fr') score += 2;
-    return { title: n.title, summary: n.summary, score };
+    return { title: n.title, summary: n.summary, score, publishedAt: n.publishedAt };
   });
 
   scoredNews.sort((a, b) => b.score - a.score);
+  // Tag helper: classify an economic event temporally relative to session vs publication
+  // Publication assumed at 07:00 UTC (morning broadcast)
+  // Tag chaque news avec sa position temporelle relative à la séance couverte
+  // snapshot.date = jour de séance (ex: vendredi), pubDate = lendemain matin (samedi) ou +3j en Monday mode
+  const sessionDate = snapshot.date;
+  const nextDay = (() => {
+    const d = new Date(sessionDate + 'T00:00:00Z');
+    d.setUTCDate(d.getUTCDate() + 1);
+    return d.toISOString().slice(0, 10);
+  })();
   const topNewsTitles = scoredNews
     .slice(0, 15)
     .filter(n => n.score > 0)
-    .map(n => n.title.slice(0, 120));
+    .map(n => {
+      const publishedDate = (n.publishedAt || '').slice(0, 10) || sessionDate;
+      let when: 'before_session' | 'during_session' | 'post_session' | 'pre_publication';
+      if (publishedDate < sessionDate) when = 'before_session';
+      else if (publishedDate === sessionDate) when = 'during_session';
+      else if (publishedDate === nextDay) when = 'post_session';
+      else when = 'pre_publication';
+      return {
+        title: n.title.slice(0, 120),
+        publishedDate,
+        when,
+      };
+    });
 
   // ── Political triggers ──
   const politicalTriggers = detectPoliticalTriggers(
@@ -588,8 +665,22 @@ export function formatBriefingPack(pack: BriefingPack): string {
 
   if (pack.topNewsTitles.length) {
     text += `## TITRES NEWS CLÉS (top ${pack.topNewsTitles.length})\n`;
-    for (const title of pack.topNewsTitles) {
-      text += `- ${title}\n`;
+    text += `ATTENTION causalité : seules les news \`before_session\` et \`during_session\` peuvent expliquer le move de la séance couverte. Les news \`post_session\` sont arrivées APRÈS la clôture et ne peuvent pas en être la cause — elles préparent la séance suivante. Les news \`pre_publication\` sont des événements qui n'ont pas encore eu lieu pour le spectateur, à présenter en "à venir".\n\n`;
+    // Group by temporal tag for clarity
+    const groups: Record<string, typeof pack.topNewsTitles> = {
+      before_session: [], during_session: [], post_session: [], pre_publication: [],
+    };
+    for (const n of pack.topNewsTitles) groups[n.when].push(n);
+    const labels = {
+      before_session: 'Avant la séance (contexte historique)',
+      during_session: 'Pendant la séance (cause possible du move du jour)',
+      post_session: 'Après clôture (ne peut PAS expliquer le move du jour)',
+      pre_publication: 'Événement futur / à venir (pour le spectateur)',
+    };
+    for (const [tag, items] of Object.entries(groups)) {
+      if (!items.length) continue;
+      text += `**${labels[tag as keyof typeof labels]}** :\n`;
+      for (const n of items) text += `- [${n.publishedDate}] ${n.title}\n`;
     }
     text += '\n';
   }

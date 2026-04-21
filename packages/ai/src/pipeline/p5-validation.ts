@@ -488,11 +488,13 @@ export function validateMechanical(
     for (const seg of draft.segments) {
       for (const { name, symbol } of companies) {
         // Escape regex special chars in name
-        const nameRe = new RegExp(`\\b${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'g');
+        const escName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const escSym = symbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const nameRe = new RegExp(`\\b${escName}\\b`, 'g');
         const matches = [...seg.narration.matchAll(nameRe)];
         if (matches.length === 0) continue;
         // If the ticker symbol also appears in quotes nearby, it's fine
-        const tickerQuoted = new RegExp(`"${symbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"`);
+        const tickerQuoted = new RegExp(`"${escSym}"`);
         if (tickerQuoted.test(seg.narration)) continue;
         issues.push({
           type: 'tone',
@@ -503,6 +505,72 @@ export function validateMechanical(
           source: 'code',
         });
         break; // Un blocker par segment pour cette règle suffit
+      }
+    }
+
+    // 15b. Redondance ticker + nom — pattern "SYMBOL", <NomComplet|PremierMot>, (,|.|space)
+    // Le ticker est déjà prononcé comme le nom. Ajouter le nom = double mention audio + sous-titre.
+    // On matche nom complet OU premier mot significatif (Opus raccourcit souvent : "SoftBank Group" → "SoftBank").
+    for (const seg of draft.segments) {
+      for (const { name, symbol } of companies) {
+        const escSym = symbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        // Candidats de nom : nom complet + premier mot (si > 3 lettres, pour éviter "A", "La", etc.)
+        const nameCandidates = new Set<string>();
+        nameCandidates.add(name);
+        const firstWord = name.split(/\s+/)[0];
+        if (firstWord && firstWord.length > 3) nameCandidates.add(firstWord);
+        // Deux premiers mots (pour "Stanley Black and Decker" → "Stanley Black")
+        const firstTwoWords = name.split(/\s+/).slice(0, 2).join(' ');
+        if (firstTwoWords && firstTwoWords !== firstWord && firstTwoWords.length > 6) {
+          nameCandidates.add(firstTwoWords);
+        }
+        let matched = false;
+        for (const candidate of nameCandidates) {
+          const escName = candidate.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const redundantRe = new RegExp(`"${escSym}"\\s*,\\s*${escName}\\s*(,|\\.|\\s+[a-zéèàùç])`, 'i');
+          if (redundantRe.test(seg.narration)) {
+            issues.push({
+              type: 'tone',
+              segmentId: seg.segmentId,
+              description: `Redondance "${symbol}" + "${candidate}" : le ticker prononce déjà le nom, ça sort deux fois en audio`,
+              severity: 'blocker',
+              suggestedFix: `Retirer "${candidate}, " après "${symbol}". Ajouter un rôle/secteur à la place si présentation nécessaire (ex: "${symbol}", le fabricant d'outillage, ...)`,
+              source: 'code',
+            });
+            matched = true;
+            break;
+          }
+        }
+        if (matched) continue; // continue avec la société suivante, on veut détecter toutes les redondances du segment
+      }
+    }
+
+    // 15c. Redondance paire FX / indice en clair + ticker quoted
+    // Pattern : "le dollar-yen USDJPY=X" → phonétique rend "le dollar-yen dollar yène" (double)
+    const fxPatterns = [
+      { re: /\b(le\s+)?dollar[\s-]yen\s+"([^"]+)"/i, name: 'dollar-yen', expectedTicker: /JPY/i },
+      { re: /\b(l'|l')?euro[\s-]dollar\s+"([^"]+)"/i, name: 'euro-dollar', expectedTicker: /EUR.*USD|USD.*EUR/i },
+      { re: /\b(la\s+)?livre[\s-]dollar\s+"([^"]+)"/i, name: 'livre-dollar', expectedTicker: /GBP.*USD/i },
+      { re: /\b(l'|l')?euro[\s-]livre\s+"([^"]+)"/i, name: 'euro-livre', expectedTicker: /EUR.*GBP/i },
+      { re: /\b(l'|l')?euro[\s-]yen\s+"([^"]+)"/i, name: 'euro-yen', expectedTicker: /EUR.*JPY/i },
+      { re: /\b(l')?indice\s+(allemand|français|anglais|britannique|européen|américain|japonais|chinois)\s+"(\^[A-Z]+)"/i, name: 'indice-pays', expectedTicker: /^\^/i },
+    ];
+    for (const seg of draft.segments) {
+      for (const { re, name, expectedTicker } of fxPatterns) {
+        const m = seg.narration.match(re);
+        if (m) {
+          const ticker = m[m.length - 1];
+          if (expectedTicker.test(ticker)) {
+            issues.push({
+              type: 'tone',
+              segmentId: seg.segmentId,
+              description: `Redondance "${name}" + "${ticker}" : le ticker prononce déjà le nom de la paire, ça sort deux fois en audio`,
+              severity: 'blocker',
+              suggestedFix: `Retirer "${name}" et garder uniquement "${ticker}" (ou "${ticker}", la paire qui reflète [contexte], si présentation nécessaire)`,
+              source: 'code',
+            });
+          }
+        }
       }
     }
 

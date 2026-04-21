@@ -46,10 +46,10 @@ export interface FishTTSResult {
 
 /** Presets par type de segment — uniforme, dynamique et percutant */
 export const FISH_PRESETS = {
-  DEEP: { speed: 0.98, temperature: 0.6, topP: 0.8, repetitionPenalty: 1.2 },
-  FOCUS: { speed: 0.98, temperature: 0.6, topP: 0.8, repetitionPenalty: 1.2 },
-  FLASH: { speed: 0.98, temperature: 0.6, topP: 0.8, repetitionPenalty: 1.2 },
-  COLD_OPEN: { speed: 0.98, temperature: 0.6, topP: 0.8, repetitionPenalty: 1.2 },
+  DEEP: { speed: 1.0, temperature: 0.5, topP: 0.7, repetitionPenalty: 1.2 },
+  FOCUS: { speed: 1.0, temperature: 0.5, topP: 0.7, repetitionPenalty: 1.2 },
+  FLASH: { speed: 1.0, temperature: 0.5, topP: 0.7, repetitionPenalty: 1.2 },
+  COLD_OPEN: { speed: 1.0, temperature: 0.5, topP: 0.7, repetitionPenalty: 1.2 },
 } as const;
 
 function getFishConfig() {
@@ -77,21 +77,19 @@ export async function fishTTS(opts: FishTTSOptions): Promise<FishTTSResult> {
   const dir = dirname(opts.outputPath);
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
 
+  const textWithSpeaker = opts.text.startsWith('<|speaker:')
+    ? opts.text
+    : `<|speaker:0|>${opts.text}`;
+
   const body: Record<string, unknown> = {
-    text: opts.text,
+    text: textWithSpeaker,
     format,
-    normalize: opts.normalize ?? true,
-    temperature: opts.temperature ?? 0.7,
-    top_p: opts.topP ?? 0.8,
-    repetition_penalty: opts.repetitionPenalty ?? 1.2,
+    latency: 'balanced',
   };
 
   if (voiceId) {
     body.reference_id = voiceId;
   }
-
-  const speed = opts.speed ?? 1.0;
-  body.prosody = { speed, volume: 0 };
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 180_000); // 3 min timeout (segment mode can be long)
