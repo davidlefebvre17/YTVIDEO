@@ -11,6 +11,13 @@ interface ProviderConfig {
 export interface LLMOptions {
   role?: LLMRole;
   maxTokens?: number;
+  /**
+   * Active le prompt caching Anthropic sur le system prompt (cache_control ephemeral, TTL 5min).
+   * Default true : Anthropic ignore silencieusement les blocs < 1024 tokens, donc safe à activer
+   * partout. Les gros system prompts (C1/C2/C3/C5, P7a.5, C6 TTS) bénéficient de ~90% discount
+   * sur les input tokens cachés lors des appels répétés dans la fenêtre TTL.
+   */
+  cacheSystem?: boolean;
 }
 
 // ─── OpenRouter config ───────────────────────────────────────────
@@ -137,9 +144,20 @@ async function callAnthropic(
   systemPrompt: string,
   userMessage: string,
   maxTokens: number = ANTHROPIC_MAX_TOKENS_DEFAULT,
+  cacheSystem: boolean = true,
 ): Promise<string> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 600_000); // 10 min timeout
+
+  // Prompt caching : système passé en array de blocs avec cache_control ephemeral
+  // si le prompt est assez gros pour que le cache ait du sens. Anthropic exige >= 1024
+  // tokens par bloc cacheable (≈ 4096 chars), sinon renvoie une erreur.
+  // Seuil sécurité à 5000 chars pour inclure une marge.
+  const useCache = cacheSystem && systemPrompt.length >= 5000;
+  const systemPayload = useCache
+    ? [{ type: "text" as const, text: systemPrompt, cache_control: { type: "ephemeral" as const } }]
+    : systemPrompt;
+
   const response = await fetch(ANTHROPIC_BASE, {
     method: "POST",
     headers: {
@@ -150,7 +168,7 @@ async function callAnthropic(
     body: JSON.stringify({
       model,
       max_tokens: maxTokens,
-      system: systemPrompt,
+      system: systemPayload,
       messages: [{ role: "user", content: userMessage }],
     }),
     signal: controller.signal,
@@ -163,6 +181,14 @@ async function callAnthropic(
 
   const data = await response.json();
   const block = data.content?.[0];
+  // Log cache usage when available (helps valider que le caching prend bien effet)
+  const u = data.usage;
+  if (u && (u.cache_creation_input_tokens || u.cache_read_input_tokens)) {
+    const write = u.cache_creation_input_tokens ?? 0;
+    const read = u.cache_read_input_tokens ?? 0;
+    const input = u.input_tokens ?? 0;
+    console.log(`    [cache] read=${read} write=${write} input=${input}`);
+  }
   return block?.text ?? "";
 }
 
@@ -239,6 +265,7 @@ export async function generateStructuredJSON<T>(
   const config = getProviderConfig();
   const role: LLMRole = options?.role ?? "quality";
   const maxTokens = options?.maxTokens ?? ANTHROPIC_MAX_TOKENS_DEFAULT;
+  const cacheSystem = options?.cacheSystem ?? true;
   let lastError: Error | null = null;
 
   if (config.provider === "anthropic") {
@@ -246,7 +273,7 @@ export async function generateStructuredJSON<T>(
     for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
       try {
         console.log(`  LLM: ${model} [${role}] (attempt ${attempt + 1}/${MAX_RETRIES})`);
-        const text = await callAnthropic(config.apiKey, model, systemPrompt, userMessage, maxTokens);
+        const text = await callAnthropic(config.apiKey, model, systemPrompt, userMessage, maxTokens, cacheSystem);
         const jsonStr = extractJSON(text);
         try {
           return JSON.parse(jsonStr) as T;

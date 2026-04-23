@@ -8,7 +8,7 @@ import type {
 } from "./types";
 import type { DailySnapshot, Language } from "@yt-maker/core";
 import type { BriefingPack } from "./helpers/briefing-pack";
-import { formatBriefingPack } from "./helpers/briefing-pack";
+import { formatBriefingPackMinimal } from "./helpers/briefing-pack";
 import { buildTemporalAnchors, labelEventDate } from "./helpers/temporal-anchors";
 
 const KNOWLEDGE_DIR = path.resolve(__dirname, "..", "knowledge");
@@ -279,9 +279,10 @@ function buildC2UserPrompt(
     prompt += `\n\nPour chaque segment, votre analyse DOIT explorer un angle ou mécanisme DIFFÉRENT de ceux ci-dessus. Utilisez le KNOWLEDGE pour trouver des angles fondamentaux plus profonds (saisonnalité, COT, yield spreads, carry trade, etc.).\n\n`;
   }
 
-  // Briefing Pack (raw editorial context for trigger/news citation)
+  // Briefing Pack minimal (triggers + CB speeches + COT divergences seulement).
+  // Version complète réservée à C1 — C2 a déjà l'editorial plan + asset data + analysis hint.
   if (briefingPack) {
-    prompt += formatBriefingPack(briefingPack);
+    prompt += formatBriefingPackMinimal(briefingPack);
   }
 
   // Asset data (only selected assets)

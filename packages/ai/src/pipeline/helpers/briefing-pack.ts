@@ -653,6 +653,40 @@ export async function enrichBriefingPackCBSpeeches(
 /**
  * Format BriefingPack as text sections for injection into LLM prompts.
  */
+/**
+ * Format minimal du briefing pack pour C2 (analyse).
+ * C1 (editorial) a déjà reçu la version complète — C2 n'a besoin que de :
+ * - Déclencheurs politiques (pour citer dans la causalChain)
+ * - Discours BC d'hier (contexte éditorial)
+ * - Divergences COT vs prix (signal contrarian)
+ * Les movers, news, earnings, sentiment sont déjà dans l'editorial plan + asset data.
+ * Gain : -4-6k chars sur le prompt C2 (environ -0.12€/épisode).
+ */
+export function formatBriefingPackMinimal(pack: BriefingPack): string {
+  let text = '';
+  if (pack.politicalTriggers.length) {
+    text += `## DÉCLENCHEURS POLITIQUES\n`;
+    for (const t of pack.politicalTriggers) {
+      text += `- ${t.actor} (${t.action}) — "${t.sourceTitle}" — assets liés: ${t.linkedAssets.join(', ')}\n`;
+    }
+    text += '\n';
+  }
+  if (pack.cbSpeechesYesterday.length) {
+    text += `## DISCOURS BANQUES CENTRALES HIER (contexte éditorial important)\n`;
+    for (const s of pack.cbSpeechesYesterday) text += `- ${s}\n`;
+    text += `→ Analyser : était-ce attendu ? Qu'est-ce que ça change pour la trajectoire future ? Le marché avait-il déjà pricé ?\n\n`;
+  }
+  if (pack.cotDivergences.length) {
+    const cotDaysOld = pack.cotHighlights[0]?.daysOld ?? 99;
+    text += `## DIVERGENCES COT vs PRIX (signal contrarian prospectif — positionnement J-${cotDaysOld} AVANT le move du jour)\n`;
+    for (const d of pack.cotDivergences) {
+      text += `- ${d.symbol} (${d.name}): ${d.note}\n`;
+    }
+    text += '\n';
+  }
+  return text;
+}
+
 export function formatBriefingPack(pack: BriefingPack): string {
   let text = '';
 

@@ -217,14 +217,37 @@ IMPORTANT: Retourne un JSON ARRAY directement, PAS un objet { "annotations": [..
 // ─── Input Builder ──────────────────────────────────────────────────────
 
 function buildHaikuInput(beats: RawBeat[], snapshot: DailySnapshot, analysis: AnalysisBundle): HaikuAnnotationRequest {
-  // Asset price table (compact)
-  const assets = snapshot.assets.map(a => ({
-    symbol: a.symbol,
-    name: a.name,
-    price: a.price,
-    changePct: a.changePct,
-    rsi: a.technicals?.rsi14,
-  }));
+  // Filter assets: ne garder que ceux pertinents pour les segments traités
+  // (assets C2 analysis + primaryAssets beats). Avant : injectait les 38-50 assets
+  // de la watchlist à CHAQUE appel (×10 segments) = ~3k chars × 10 gaspillés.
+  const relevantSymbols = new Set<string>();
+  const beatSegIds = new Set(beats.map(b => b.segmentId));
+  for (const seg of analysis.segments) {
+    if (beatSegIds.has(seg.segmentId)) {
+      // Derive assets from chartInstructions (contient `asset` par chart)
+      for (const inst of seg.chartInstructions ?? []) {
+        if (inst.asset) relevantSymbols.add(inst.asset);
+      }
+    }
+  }
+  for (const b of beats) {
+    if ((b as any).primaryAsset) relevantSymbols.add((b as any).primaryAsset);
+  }
+  // Fallback minimal si aucun asset identifié : garder les indices majeurs pour contexte
+  if (relevantSymbols.size === 0) {
+    ['^GSPC', '^VIX', 'GC=F', 'CL=F'].forEach(s => relevantSymbols.add(s));
+  }
+
+  // Asset price table (compact, filtered)
+  const assets = snapshot.assets
+    .filter(a => relevantSymbols.has(a.symbol))
+    .map(a => ({
+      symbol: a.symbol,
+      name: a.name,
+      price: a.price,
+      changePct: a.changePct,
+      rsi: a.technicals?.rsi14,
+    }));
 
   // Segments with C2 data
   const segments = analysis.segments.map(seg => ({

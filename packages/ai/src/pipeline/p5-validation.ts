@@ -883,7 +883,20 @@ export async function runValidation(
     };
   }
 
-  // Step 2: Semantic validation (Haiku C4) — issues only, no rewriting
+  // Step 2: Semantic validation (Haiku C4) — issues only, no rewriting.
+  // SKIP si validation mécanique 100% clean : aucun blocker ni warning.
+  // Dans ce cas le draft passe la grille "anglicismes/compliance/sigles/structure" côté code,
+  // et l'apport sémantique Haiku est marginal vs son coût (~0.03€/ép).
+  // Si warnings existent (ex : longueur +15-30%), on garde Haiku pour détecter les subtilités.
+  if (mechIssues.length === 0) {
+    console.log('  P5 C4 Haiku — SKIP (validation mécanique 100% clean)');
+    return {
+      status: 'pass',
+      issues: [],
+      validatedScript: draft,
+    };
+  }
+
   console.log('  P5 C4 Haiku — validation sémantique...');
 
   try {

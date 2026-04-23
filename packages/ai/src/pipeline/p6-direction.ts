@@ -199,9 +199,12 @@ export async function runC5Direction(input: {
   const systemPrompt = buildC5SystemPrompt();
   const userPrompt = buildC5UserPrompt(input.draft, input.editorial, input.analysis);
 
-  console.log('  P6 C5 Sonnet — direction globale...');
+  console.log('  P6 C5 Haiku — direction globale...');
   console.log(`  C5 prompt: ${systemPrompt.length + userPrompt.length} chars`);
 
+  // Downgrade Sonnet → Haiku : C5 = tâches déterministes (arc numérique, transitions,
+  // chartTimings mapping par wordIndex, moodMusic enum). Pas de raisonnement causal
+  // profond requis. Gain : ~-0.18€/épisode sans perte qualité.
   const c5Output = await generateStructuredJSON<{
     arc: ArcBeat[];
     transitions: Transition[];
@@ -212,7 +215,7 @@ export async function runC5Direction(input: {
   }>(
     systemPrompt,
     userPrompt,
-    { role: 'balanced' },
+    { role: 'fast' },
   );
 
   // ── Normalize LLM output field names ──

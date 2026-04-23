@@ -449,14 +449,25 @@ export async function runPipeline(
   const { getProfileContext } = await import("../company-profiles");
   const assetContext: Record<string, string> = {};
 
-  // Collect all symbols mentioned in editorial plan + stockScreen
+  // Collect ONLY symbols likely to appear in narration: assets from editorial plan
+  // + top 10 stock screen movers (safety net si Opus mentionne un mover hors plan).
+  // Avant : injectait 236 assets (toute watchlist + tout screen) = 3-8k chars gaspillés en C3.
   const allSymbols = new Set<string>();
   for (const seg of editorial.segments) {
     for (const sym of seg.assets) allSymbols.add(sym);
   }
-  for (const asset of snapshot.assets) allSymbols.add(asset.symbol);
+  // Top 10 screen movers par amplitude (C1 peut pointer l'un d'eux en panorama)
   if (snapshot.stockScreen) {
-    for (const stock of snapshot.stockScreen) allSymbols.add(stock.symbol);
+    const topMovers = [...snapshot.stockScreen]
+      .sort((a, b) => Math.abs(b.changePct ?? 0) - Math.abs(a.changePct ?? 0))
+      .slice(0, 10);
+    for (const stock of topMovers) allSymbols.add(stock.symbol);
+  }
+  // Watchlist macro essentielle (toujours accessible) : indices majeurs + or + pétrole + majors
+  const essentialMacro = ['^GSPC', '^IXIC', '^DJI', '^VIX', '^FCHI', '^GDAXI', '^N225',
+    'GC=F', 'CL=F', 'BZ=F', 'DX-Y.NYB', 'EURUSD=X', 'USDJPY=X', 'BTC-USD', 'ETH-USD'];
+  for (const sym of essentialMacro) {
+    if (snapshot.assets.find(a => a.symbol === sym)) allSymbols.add(sym);
   }
 
   // Build context: description + aliases for each symbol
