@@ -116,12 +116,10 @@ function numberToFrench(n: string): string {
 function sanitizeForTTS(text: string): string {
   return text
     .replace(/\[long pause\]/g, '[pause]')
-    // Fin de phrase → [pause] explicite pour forcer Fish à marquer l'intonation descendante
-    .replace(/\.\s+/g, '.\n[pause]\n')
-    .replace(/\?\s+/g, '?\n[pause]\n')
-    .replace(/!\s+/g, '!\n[pause]\n')
-    // Dédup si [pause] est déjà présent dans le texte original
-    .replace(/\[pause\]\s*\n\s*\[pause\]/g, '[pause]')
+    // Fin de phrase → double saut de ligne pour marquer la frontière prosodique
+    .replace(/\.\s+/g, '.\n\n')
+    .replace(/\?\s+/g, '?\n\n')
+    .replace(/!\s+/g, '!\n\n')
     .replace(/[ \t]+/g, ' ')
     .trim();
 }

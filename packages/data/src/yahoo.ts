@@ -240,11 +240,18 @@ export async function fetchDailyMaxCandles(
  * Max 20 symbols per call (free, no auth required).
  * Returns { symbol, changePct }[].
  */
-export async function fetchSparkChanges(symbols: string[]): Promise<Array<{ symbol: string; changePct: number }>> {
+export async function fetchSparkChanges(
+  symbols: string[],
+  pubDate?: string,
+): Promise<Array<{ symbol: string; changePct: number }>> {
   if (symbols.length === 0) return [];
 
   const BATCH = 20;
   const results: Array<{ symbol: string; changePct: number }> = [];
+  // Cutoff: any candle whose date (UTC) is >= pubDate is treated as "partial today" and skipped.
+  // Ensures changePct = bougie J-1 (vraie séance) même pour marchés Europe/Asia qui ont
+  // une close partielle d'aujourd'hui au moment du fetch.
+  const cutoff = pubDate || new Date().toISOString().slice(0, 10);
 
   for (let i = 0; i < symbols.length; i += BATCH) {
     const batch = symbols.slice(i, i + BATCH);
@@ -258,15 +265,24 @@ export async function fetchSparkChanges(symbols: string[]): Promise<Array<{ symb
       }
       const json = await res.json();
       for (const item of json.spark?.result ?? []) {
+        const ts: number[] = item.response?.[0]?.timestamp ?? [];
         const closes: (number | null)[] = item.response?.[0]?.indicators?.quote?.[0]?.close ?? [];
-        const validCloses = closes.filter((c): c is number => c !== null && c > 0);
-        if (validCloses.length >= 2) {
-          const prev = validCloses[validCloses.length - 2];
-          const last = validCloses[validCloses.length - 1];
+        // Pair timestamp with close + filter: keep only completed sessions (date < cutoff)
+        // AND valid close. Avoids counting today's partial intraday as a "session".
+        const completed: Array<{ ts: number; c: number; date: string }> = [];
+        for (let k = 0; k < closes.length; k++) {
+          const c = closes[k];
+          if (c == null || c <= 0) continue;
+          const d = new Date((ts[k] ?? 0) * 1000).toISOString().slice(0, 10);
+          if (d && d < cutoff) completed.push({ ts: ts[k], c, date: d });
+        }
+        if (completed.length >= 2) {
+          const prev = completed[completed.length - 2].c;
+          const last = completed[completed.length - 1].c;
           const changePct = ((last - prev) / prev) * 100;
           results.push({ symbol: item.symbol, changePct });
-        } else if (validCloses.length === 1) {
-          console.warn(`  [spark] ${item.symbol}: only 1 valid close, skipped`);
+        } else if (completed.length === 1) {
+          console.warn(`  [spark] ${item.symbol}: only 1 completed session before ${cutoff}, skipped`);
         }
       }
       // Small delay between batches to be respectful

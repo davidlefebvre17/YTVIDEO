@@ -84,6 +84,7 @@ export async function fishTTS(opts: FishTTSOptions): Promise<FishTTSResult> {
   const body: Record<string, unknown> = {
     text: textWithSpeaker,
     format,
+    normalize: opts.normalize ?? true,
     latency: 'balanced',
   };
 

@@ -70,12 +70,14 @@ function loadConstituents(indexName: IndexName): IndexConstituent[] {
 async function screenIndex(
   indexName: IndexName,
   constituents: IndexConstituent[],
+  pubDate?: string,
 ): Promise<StockScreenResult[]> {
   const symbols = constituents.map((c) => c.symbol);
   const nameMap = Object.fromEntries(constituents.map((c) => [c.symbol, c.name]));
 
   // Use spark endpoint (public, no auth): returns changePct only
-  const changes = await fetchSparkChanges(symbols);
+  // pubDate filter: ignore partial today candle so changePct = séance J-1 (la vraie bougie d'hier)
+  const changes = await fetchSparkChanges(symbols, pubDate);
 
   const results: StockScreenResult[] = [];
   for (const { symbol, changePct } of changes) {
@@ -153,7 +155,7 @@ async function enrichMovers(movers: StockScreenResult[]): Promise<void> {
  * Screen ~763 stocks across major indices.
  * Returns only flagged movers (|changePct| > 2% OR volume spike OR 52w hi/lo).
  */
-export async function screenStocks(): Promise<StockScreenResult[]> {
+export async function screenStocks(pubDate?: string): Promise<StockScreenResult[]> {
   const allConstituents: Array<{ indexName: IndexName; constituent: IndexConstituent }> = [];
 
   for (const [indexName, _] of Object.entries(INDEX_FILES) as [IndexName, string][]) {
@@ -182,7 +184,7 @@ export async function screenStocks(): Promise<StockScreenResult[]> {
 
   const allResults: StockScreenResult[] = [];
   for (const [indexName, constituents] of byIndex) {
-    const results = await screenIndex(indexName, constituents);
+    const results = await screenIndex(indexName, constituents, pubDate);
     allResults.push(...results);
     console.log(`  [screening] ${indexName}: ${results.length} movers flagged`);
   }

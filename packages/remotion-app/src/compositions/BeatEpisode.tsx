@@ -690,8 +690,6 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
               const effectiveFade = j === 0
                 ? Math.max(bt.fadeFrames, CROSSFADE_FRAMES)
                 : bt.fadeFrames;
-              const hasOverlay = beat.overlay && (beat.overlay.type as string) !== 'none';
-              const overlayType = beat.overlay?.type as string | undefined;
               return (
                 <Sequence
                   key={beat.id}
@@ -706,35 +704,13 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
                     fadeFrames={effectiveFade}
                     yieldsHistory={yieldsHistoryData}
                   />
-                  {/* Segment title overlay on first beat + letterpress stamp SFX */}
+                  {/* Segment title overlay on first beat (SFX removed — no bruitage pendant segments) */}
                   {j === 0 && section && (
-                    <>
-                      <TypewriterTitle
-                        text={section.title}
-                        durationInFrames={Math.min(60, Math.round(1.5 * fps))}
-                        accentColor={accentColor}
-                      />
-                      <Audio src={getSfxPath("stamp", i)} volume={SFX_VOLUME.stamp * 0.7} />
-                    </>
-                  )}
-                  {/* SFX: pen removed — too frequent on 80+ beats, sounds like wind */}
-                  {/* SFX: typewriter key when data overlay appears */}
-                  {hasOverlay && (overlayType === 'stat' || overlayType === 'gauge_rsi' || overlayType === 'gauge_fear_greed' || overlayType === 'multi_badge') && (
-                    <Sequence from={Math.round((beat.overlay?.enterDelayMs ?? 300) / 1000 * fps)} durationInFrames={Math.round(0.5 * fps)}>
-                      <Audio src={getSfxPath("sting", globalIdx)} volume={SFX_VOLUME.sting * 0.7} />
-                    </Sequence>
-                  )}
-                  {/* SFX: ticker ambient when causal chain displays */}
-                  {hasOverlay && overlayType === 'causal_chain' && (
-                    <Sequence from={Math.round((beat.overlay?.enterDelayMs ?? 300) / 1000 * fps)} durationInFrames={Math.round(2 * fps)}>
-                      <Audio src={getSfxPath("ticker", globalIdx)} volume={0.08} />
-                    </Sequence>
-                  )}
-                  {/* SFX: bell on scenario fork */}
-                  {hasOverlay && overlayType === 'scenario_fork' && (
-                    <Sequence from={Math.round((beat.overlay?.enterDelayMs ?? 300) / 1000 * fps)} durationInFrames={Math.round(1 * fps)}>
-                      <Audio src={getSfxPath("stingBell", globalIdx)} volume={SFX_VOLUME.stingBell * 0.7} />
-                    </Sequence>
+                    <TypewriterTitle
+                      text={section.title}
+                      durationInFrames={Math.min(60, Math.round(1.5 * fps))}
+                      accentColor={accentColor}
+                    />
                   )}
                 </Sequence>
               );

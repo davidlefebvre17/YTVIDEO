@@ -131,12 +131,38 @@ export interface MultiTimeframeAnalysis {
 export interface AssetSnapshot {
   symbol: string;
   name: string;
+  /** Live price at fetch time (intraday if market is open, last close otherwise). */
   price: number;
   change: number;
+  /**
+   * Variation de la SÉANCE J-1 (la vraie bougie d'hier, close J-1 vs close J-2).
+   * Calculé depuis les daily candles dans market-snapshot.ts Phase 2.
+   * Fallback sur la variation intraday si dailyCandles indisponibles.
+   */
   changePct: number;
   candles: Candle[];
   high24h: number;
   low24h: number;
+  // ── Session J-1 fields (computed from dailyCandles) ────────
+  /** Close de la séance J-1 (la "clôture d'hier"). */
+  sessionClose?: number;
+  /** Close de la séance J-2 (référence pour changePct). */
+  prevSessionClose?: number;
+  /** High de la séance J-1 (pour "a touché X en séance"). */
+  sessionHigh?: number;
+  /** Low de la séance J-1. */
+  sessionLow?: number;
+  /** Amplitude absolue (sessionHigh - sessionLow). */
+  sessionRange?: number;
+  /** Amplitude relative en % (sessionRange / prevSessionClose * 100). */
+  sessionRangePct?: number;
+  /** Date de la séance J-1 (YYYY-MM-DD) pour traçabilité. */
+  sessionDate?: string;
+  /**
+   * Variation intraday depuis la clôture J-1 : (price - sessionClose) / sessionClose.
+   * Utile pour coupler avec les news `post_session` / events `pub_morning_*`.
+   */
+  changePctNow?: number;
   // Enriched fields (populated by computeTechnicals)
   dailyCandles?: Candle[];
   technicals?: TechnicalIndicators;

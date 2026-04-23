@@ -2,7 +2,7 @@ import type { DailySnapshot, EarningsEvent, NewsItem } from "@yt-maker/core";
 import { fetchAllAssets, fetchDailyCandles, fetchWeeklyCandles, fetchDaily3yCandles, DEFAULT_ASSETS } from "./yahoo";
 import { fetchNews } from "./news";
 import { fetchEconomicCalendar } from "./calendar";
-import { computeTechnicals, computeMultiTFAnalysis, computePerf, getAssetGroup } from "./technicals";
+import { computeTechnicals, computeMultiTFAnalysis, computePerf, getAssetGroup, computeSessionFields } from "./technicals";
 import { fetchBondYields, fetchYieldsHistory } from "./fred";
 import { fetchMarketSentiment } from "./sentiment";
 import { fetchEarningsCalendar, fetchFinnhubNews, fetchFinnhubCompanyNews, fetchStockEarningsHistory } from "./finnhub";
@@ -127,6 +127,23 @@ export async function fetchMarketSnapshot(
       if (dailyCandles.length >= 10) {
         asset.dailyCandles = daily3yCandles.length > dailyCandles.length ? daily3yCandles : dailyCandles;
 
+        // ── Session J-1 fields (overwrite intraday changePct with true session value) ──
+        // pubDate = snapshotDate : filtre toute bougie dont date >= pubDate (partial intraday today).
+        const sessionFields = computeSessionFields(asset.dailyCandles, asset.price, snapshotDate);
+        if (sessionFields) {
+          asset.sessionClose = sessionFields.sessionClose;
+          asset.prevSessionClose = sessionFields.prevSessionClose;
+          asset.sessionHigh = sessionFields.sessionHigh;
+          asset.sessionLow = sessionFields.sessionLow;
+          asset.sessionRange = sessionFields.sessionRange;
+          asset.sessionRangePct = sessionFields.sessionRangePct;
+          asset.sessionDate = sessionFields.sessionDate;
+          asset.changePctNow = sessionFields.changePctNow;
+          // OVERWRITE changePct (intraday) with session J-1 change — the meaningful value for narration
+          asset.changePct = sessionFields.changePct;
+          asset.change = sessionFields.sessionClose - sessionFields.prevSessionClose;
+        }
+
         // Multi-TF FIRST (provides true 52w range + ATH + SMA200 for drama score)
         const multiTF = computeMultiTFAnalysis(weeklyCandles, daily3yCandles, asset.price);
         if (multiTF) {
@@ -134,7 +151,8 @@ export async function fetchMarketSnapshot(
         }
 
         // Multi-timeframe performance (rolling + calendaire + ATH / 52wLow)
-        const perf = computePerf(asset.dailyCandles, asset.price);
+        // pubDate filtering ensures perf is computed against session J-1 close, not intraday.
+        const perf = computePerf(asset.dailyCandles, asset.price, snapshotDate);
         if (perf) asset.perf = perf;
         // Asset group pour comparaisons narratives entre pairs
         asset.group = getAssetGroup(asset.symbol);
@@ -175,7 +193,7 @@ export async function fetchMarketSnapshot(
   let stockScreen = undefined;
   try {
     await new Promise((r) => setTimeout(r, 2000));
-    stockScreen = await screenStocks();
+    stockScreen = await screenStocks(snapshotDate);
   } catch (err) {
     console.warn(`  Stock screening failed: ${err}`);
   }

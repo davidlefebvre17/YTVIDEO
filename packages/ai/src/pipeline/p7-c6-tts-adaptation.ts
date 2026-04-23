@@ -127,12 +127,27 @@ export function preProcessForTTS(text: string): string {
   let result = text;
 
   // ── Tickers entre guillemets → nom phonétique ──
-  // "GS" → goldmane-sax, "AAPL" → apple, "CL=F" → pétrole-wti
+  // "GS" → goldmane-sax, "AAPL" → apple, "CL=F" → pétrole américain
+  // Dedup : si le phonétique répète un mot déjà prononcé juste avant
+  // (ex: l'or "GC=F" → "l'or or"), on drop le phonétique.
   const tickerMap = getTickerMap();
-  result = result.replace(/"([A-Z0-9^=.\-]{1,15})"/g, (match, ticker) => {
+  const TICKER_STOPWORDS = new Set(['de', 'du', 'des', 'la', 'le', 'les', 'et', 'à', 'au', 'aux', 'un', 'une', 'sur', 'en', 'dans']);
+  result = result.replace(/"([A-Z0-9^=.\-]{1,15})"/g, (match, ticker, offset, full) => {
     const phonetic = tickerMap.get(ticker);
-    return phonetic ?? match; // Si pas trouvé, laisser tel quel
+    if (!phonetic) return match;
+    const before = full.slice(Math.max(0, offset - 60), offset).toLowerCase();
+    const precedingWords = before
+      .replace(/[.,;:!?—–"«»()]/g, '')
+      .replace(/['']/g, ' ') // split sur apostrophe pour isoler "or" dans "l'or"
+      .split(/\s+/).filter(Boolean).slice(-3);
+    const phoneticWords = phonetic.toLowerCase().split(/\s+/).filter(Boolean);
+    const significantPhoneticWords = phoneticWords.filter(w => w.length >= 2 && !TICKER_STOPWORDS.has(w));
+    const overlap = significantPhoneticWords.some(pw => precedingWords.includes(pw));
+    if (overlap) return '';
+    return phonetic;
   });
+  // Nettoyer espaces doublés + ponctuation collée après dedup
+  result = result.replace(/\s{2,}/g, ' ').replace(/\s+([.,;:!?])/g, '$1');
 
   // ── Nettoyage markdown ──
   result = result.replace(/\*\*/g, '');
@@ -158,6 +173,28 @@ export function preProcessForTTS(text: string): string {
   for (const [pattern, replacement] of ALL_PRONUNCIATION_FIXES) {
     result = result.replace(pattern, replacement);
   }
+
+  // ── Élision automatique devant voyelle (post-substitution phonétique) ──
+  // "Le indice du dollar" → "L'indice du dollar" (DX-Y.NYB)
+  // "De or" → "D'or", "Que apple" → "Qu'apple"
+  // Gère les phonétiques commençant par voyelle que C3 ne pouvait pas prévoir.
+  //
+  // EXCLUSION : sigles épelés en français commencent phonétiquement par le NOM
+  // de la lettre ("èss", "èm", "èn", "èl", "èr", "èf", "essenne") — on dit
+  // "le S&P", pas "l'S&P" (la consonne suit dans l'épellation). Reconnu par :
+  //   - lettre initiale `è` (accent grave = nom de lettre : èm, èn, èl, èr, èf, èss)
+  //   - patterns "essenne", "ème", "ène", "èle", "ère" (sigles composés)
+  const VOWELS = '[aâäàeéèêëiîïoôöuûüyAÂÄÀEÉÈÊËIÎÏOÔÖUÛÜY]';
+  // Exclut les sigles épelés : le mot suivant ne doit PAS être le nom d'une lettre
+  // (é, èss, èm, èn, èl, èr, èf, ème, ène, èle, ère, em, ess, esse, en, el, er, ef)
+  // ni commencer par "essenne" ("S&P" épelé). Règle : en français, on dit "le S&P",
+  // pas "l'S&P" (l'épellation démarre phonétiquement par une consonne).
+  // Utilise lookahead négatif avec frontière-mot (\b) pour ne pas matcher "emballage" etc.
+  const SIGLE_NAMES = '(?!essenne|èm\\b|èn\\b|èl\\b|èr\\b|èf\\b|èss\\b|ème\\b|ène\\b|èle\\b|ère\\b|em\\s|en\\s|el\\s|er\\s|ef\\s|es\\s|ess\\s|esse\\s)';
+  const BEFORE_VOWEL = `${SIGLE_NAMES}${VOWELS}`;
+  result = result.replace(new RegExp(`\\b([Ll])e\\s+(?=${BEFORE_VOWEL})`, 'g'), "$1'");
+  result = result.replace(new RegExp(`\\b([Dd])e\\s+(?=${BEFORE_VOWEL})`, 'g'), "$1'");
+  result = result.replace(new RegExp(`\\b([Qq])ue\\s+(?=${BEFORE_VOWEL})`, 'g'), "$1u'");
 
   // ── Références visuelles ──
   result = result.replace(/comme (vous pouvez |on (peut )?)?le (voir|constater) (sur (le|ce) graphique)?/gi, '');

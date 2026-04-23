@@ -11,25 +11,41 @@ import type { Candle, TechnicalIndicators, MultiTimeframeAnalysis, AssetSnapshot
 export function computePerf(
   candles: Candle[],
   currentPrice: number,
+  pubDate?: string,
 ): AssetSnapshot["perf"] {
   if (!candles || candles.length === 0 || !currentPrice || !Number.isFinite(currentPrice)) {
     return undefined;
   }
 
+  // Filter out the partial "today" candle if pubDate provided (futures/FX 24h).
+  // Ensures all perf references are computed against the J-1 session, not intraday.
+  const completed = pubDate
+    ? candles.filter((c) => {
+        const d = (c.date || "").slice(0, 10);
+        return d && d < pubDate && c.c != null && Number.isFinite(c.c);
+      })
+    : candles.filter((c) => c.c != null && Number.isFinite(c.c));
+  if (completed.length === 0) return undefined;
+
+  // Reference price = session J-1 close (NOT current intraday price).
+  // This keeps week/month/YTD consistent with the session the video covers.
+  const referencePrice = completed[completed.length - 1].c;
+  if (!Number.isFinite(referencePrice) || referencePrice === 0) return undefined;
+
   const ref = (n: number): number | undefined => {
-    const idx = candles.length - 1 - n;
+    const idx = completed.length - 1 - n;
     if (idx < 0) return undefined;
-    return candles[idx].c;
+    return completed[idx].c;
   };
 
   const pctFrom = (past: number | undefined): number | undefined => {
     if (past === undefined || !Number.isFinite(past) || past === 0) return undefined;
-    return ((currentPrice - past) / past) * 100;
+    return ((referencePrice - past) / past) * 100;
   };
 
   const perf: AssetSnapshot["perf"] = {};
 
-  // ── ROLLING ──
+  // ── ROLLING (fenêtres glissantes, référence = sessionClose J-1) ──
   const w = pctFrom(ref(5));
   if (w !== undefined) perf.week = round2(w);
   const m = pctFrom(ref(22));
@@ -40,33 +56,33 @@ export function computePerf(
   if (y !== undefined) perf.year = round2(y);
 
   // ── CALENDAIRE — référence = dernière clôture AVANT le début de la période ──
-  const lastCandleDate = candles[candles.length - 1].date.slice(0, 10);
+  const lastCandleDate = completed[completed.length - 1].date.slice(0, 10);
 
-  const wtdRef = lastCloseBefore(candles, startOfWeek(lastCandleDate));
+  const wtdRef = lastCloseBefore(completed, startOfWeek(lastCandleDate));
   if (wtdRef !== undefined) perf.wtd = round2(pctFrom(wtdRef)!);
 
-  const mtdRef = lastCloseBefore(candles, startOfMonth(lastCandleDate));
+  const mtdRef = lastCloseBefore(completed, startOfMonth(lastCandleDate));
   if (mtdRef !== undefined) perf.mtd = round2(pctFrom(mtdRef)!);
 
-  const qtdRef = lastCloseBefore(candles, startOfQuarter(lastCandleDate));
+  const qtdRef = lastCloseBefore(completed, startOfQuarter(lastCandleDate));
   if (qtdRef !== undefined) perf.qtd = round2(pctFrom(qtdRef)!);
 
-  const ytdRef = lastCloseBefore(candles, startOfYear(lastCandleDate));
+  const ytdRef = lastCloseBefore(completed, startOfYear(lastCandleDate));
   if (ytdRef !== undefined) perf.ytd = round2(pctFrom(ytdRef)!);
 
-  // ── ATH & 52w low ──
+  // ── ATH & 52w low — calculés sur completed pour rester cohérent ──
   let ath = -Infinity;
-  for (const c of candles) if (c.h > ath) ath = c.h;
+  for (const c of completed) if (c.h > ath) ath = c.h;
   if (ath > 0 && Number.isFinite(ath)) {
-    perf.fromATH = round2(((currentPrice - ath) / ath) * 100);
+    perf.fromATH = round2(((referencePrice - ath) / ath) * 100);
   }
 
-  const last252 = candles.slice(-252);
+  const last252 = completed.slice(-252);
   if (last252.length > 0) {
     let low52w = Infinity;
     for (const c of last252) if (c.l < low52w) low52w = c.l;
     if (low52w > 0 && Number.isFinite(low52w)) {
-      perf.from52wLow = round2(((currentPrice - low52w) / low52w) * 100);
+      perf.from52wLow = round2(((referencePrice - low52w) / low52w) * 100);
     }
   }
 
@@ -108,6 +124,56 @@ function lastCloseBefore(candles: Candle[], cutoffDate: string): number | undefi
 
 function round2(n: number): number {
   return Math.round(n * 100) / 100;
+}
+
+/**
+ * Extract the J-1 session candle from dailyCandles, relative to `pubDate`.
+ * Returns the last candle strictly before pubDate (handles equity/FX/futures uniformly).
+ *
+ * Edge cases:
+ * - If Yahoo has a "partial today candle" (futures/FX 24h), it's filtered out.
+ * - For FX/commodities where Yahoo daily aggregation has gaps (e.g. missing Monday candle),
+ *   returns the most recent available candle (graceful degradation).
+ */
+export function computeSessionFields(
+  dailyCandles: Candle[],
+  currentPrice: number,
+  pubDate: string,
+): {
+  sessionClose: number;
+  prevSessionClose: number;
+  sessionHigh: number;
+  sessionLow: number;
+  sessionRange: number;
+  sessionRangePct: number;
+  sessionDate: string;
+  changePct: number;
+  changePctNow: number;
+} | undefined {
+  if (!dailyCandles || dailyCandles.length < 2) return undefined;
+  // Filter: keep only sessions STRICTLY before pubDate AND with a real close.
+  // Yahoo's daily endpoint sometimes returns candles with close=null (FX edge case,
+  // e.g. EURUSD 2026-04-21 had O=1.1744 but C=null). Skip these dégénérées.
+  const completed = dailyCandles.filter((c) => {
+    const d = (c.date || "").slice(0, 10);
+    return d && d < pubDate && c.c != null && Number.isFinite(c.c);
+  });
+  if (completed.length < 2) return undefined;
+  const sess = completed[completed.length - 1];
+  const prev = completed[completed.length - 2];
+  if (!sess.c || !prev.c || prev.c === 0) return undefined;
+  const sessionRange = (sess.h ?? sess.c) - (sess.l ?? sess.c);
+  return {
+    sessionClose: sess.c,
+    prevSessionClose: prev.c,
+    sessionHigh: sess.h ?? sess.c,
+    sessionLow: sess.l ?? sess.c,
+    sessionRange: round2(sessionRange),
+    sessionRangePct: round2((sessionRange / prev.c) * 100),
+    sessionDate: (sess.date || "").slice(0, 10),
+    changePct: round2(((sess.c - prev.c) / prev.c) * 100),
+    changePctNow: round2(((currentPrice - sess.c) / sess.c) * 100),
+  };
 }
 
 // ── Asset grouping (pour comparaisons narratives entre pairs) ──

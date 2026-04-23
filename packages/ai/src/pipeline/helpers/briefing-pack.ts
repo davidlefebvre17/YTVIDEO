@@ -346,22 +346,31 @@ export function buildBriefingPack(
     d.setUTCDate(d.getUTCDate() + 1);
     return d.toISOString().slice(0, 10);
   })();
-  const topNewsTitles = scoredNews
-    .slice(0, 15)
-    .filter(n => n.score > 0)
-    .map(n => {
-      const publishedDate = (n.publishedAt || '').slice(0, 10) || sessionDate;
-      let when: 'before_session' | 'during_session' | 'post_session' | 'pre_publication';
-      if (publishedDate < sessionDate) when = 'before_session';
-      else if (publishedDate === sessionDate) when = 'during_session';
-      else if (publishedDate === nextDay) when = 'post_session';
-      else when = 'pre_publication';
-      return {
-        title: n.title.slice(0, 120),
-        publishedDate,
-        when,
-      };
-    });
+  // Quota séparé par bucket temporel pour garantir qu'Opus ait assez de news
+  // pour EXPLIQUER le move (before+during) ET pour contextualiser "à venir" (post+pre).
+  // Sans ce quota, les news récentes (post_session) risquent de dominer en score et
+  // de laisser Opus sans matériau pour la séance couverte.
+  const classify = (publishedAt: string | undefined): 'before_session' | 'during_session' | 'post_session' | 'pre_publication' => {
+    const publishedDate = (publishedAt || '').slice(0, 10) || sessionDate;
+    if (publishedDate < sessionDate) return 'before_session';
+    if (publishedDate === sessionDate) return 'during_session';
+    if (publishedDate === nextDay) return 'post_session';
+    return 'pre_publication';
+  };
+  const relevant = scoredNews.filter(n => n.score > 0);
+  const newsExplain = relevant.filter(n => {
+    const w = classify(n.publishedAt);
+    return w === 'before_session' || w === 'during_session';
+  }).slice(0, 15);
+  const newsUpcoming = relevant.filter(n => {
+    const w = classify(n.publishedAt);
+    return w === 'post_session' || w === 'pre_publication';
+  }).slice(0, 5);
+  const topNewsTitles = [...newsExplain, ...newsUpcoming].map(n => ({
+    title: n.title.slice(0, 120),
+    publishedDate: (n.publishedAt || '').slice(0, 10) || sessionDate,
+    when: classify(n.publishedAt),
+  }));
 
   // ── Political triggers ──
   const politicalTriggers = detectPoliticalTriggers(
@@ -665,22 +674,17 @@ export function formatBriefingPack(pack: BriefingPack): string {
 
   if (pack.topNewsTitles.length) {
     text += `## TITRES NEWS CLÉS (top ${pack.topNewsTitles.length})\n`;
-    text += `ATTENTION causalité : seules les news \`before_session\` et \`during_session\` peuvent expliquer le move de la séance couverte. Les news \`post_session\` sont arrivées APRÈS la clôture et ne peuvent pas en être la cause — elles préparent la séance suivante. Les news \`pre_publication\` sont des événements qui n'ont pas encore eu lieu pour le spectateur, à présenter en "à venir".\n\n`;
-    // Group by temporal tag for clarity
-    const groups: Record<string, typeof pack.topNewsTitles> = {
-      before_session: [], during_session: [], post_session: [], pre_publication: [],
-    };
-    for (const n of pack.topNewsTitles) groups[n.when].push(n);
-    const labels = {
-      before_session: 'Avant la séance (contexte historique)',
-      during_session: 'Pendant la séance (cause possible du move du jour)',
-      post_session: 'Après clôture (ne peut PAS expliquer le move du jour)',
-      pre_publication: 'Événement futur / à venir (pour le spectateur)',
-    };
-    for (const [tag, items] of Object.entries(groups)) {
-      if (!items.length) continue;
-      text += `**${labels[tag as keyof typeof labels]}** :\n`;
-      for (const n of items) text += `- [${n.publishedDate}] ${n.title}\n`;
+    text += `ATTENTION causalité : seules les news du groupe **EXPLIQUENT LE MOVE** (before/during session) peuvent être citées comme cause du mouvement de la séance couverte. Les news du groupe **À VENIR** sont arrivées APRÈS la clôture (ou sont futures) — à présenter uniquement comme contexte pour la séance suivante, jamais comme driver du move d'hier.\n\n`;
+    // Deux groupes : expliquent le move vs à venir
+    const explainGroup = pack.topNewsTitles.filter(n => n.when === 'before_session' || n.when === 'during_session');
+    const upcomingGroup = pack.topNewsTitles.filter(n => n.when === 'post_session' || n.when === 'pre_publication');
+    if (explainGroup.length) {
+      text += `**EXPLIQUENT LE MOVE (avant/pendant la séance couverte)** :\n`;
+      for (const n of explainGroup) text += `- [${n.publishedDate}] ${n.title}\n`;
+    }
+    if (upcomingGroup.length) {
+      text += `**À VENIR (après clôture / futur — ne peut PAS expliquer le move d'hier)** :\n`;
+      for (const n of upcomingGroup) text += `- [${n.publishedDate}] ${n.title}\n`;
     }
     text += '\n';
   }

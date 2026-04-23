@@ -67,7 +67,7 @@
       "le DAX",
       "Francfort"
     ],
-    "phonetic": "daks"
+    "phonetic": "daxe"
   },
   {
     "symbol": "^GSPC",
@@ -208,7 +208,7 @@
       "le VIX",
       "le baromètre de la peur"
     ],
-    "phonetic": "vikss"
+    "phonetic": "vixe"
   },
   {
     "symbol": "000001.SS",
@@ -5365,7 +5365,7 @@
     "correlation": "Yields, ^GSPC",
     "index": "SP500",
     "description": "Index and analytics provider — tracks markets, manages ESG ratings and research",
-    "phonetic": "èm èsse ci i"
+    "phonetic": "em ess ci aï"
   },
   {
     "symbol": "MSFT",
