@@ -1,0 +1,338 @@
+[
+  {
+    "symbol": "FTV",
+    "name": "Fortive Corp"
+  },
+  {
+    "symbol": "GBPJPY=X",
+    "name": "GBP/JPY"
+  },
+  {
+    "symbol": "GBPUSD=X",
+    "name": "GBP/USD"
+  },
+  {
+    "symbol": "GC=F",
+    "name": "Or"
+  },
+  {
+    "symbol": "GD",
+    "name": "General Dynamics Corp"
+  },
+  {
+    "symbol": "GDDY",
+    "name": "GoDaddy"
+  },
+  {
+    "symbol": "GE",
+    "name": "General Electric Co"
+  },
+  {
+    "symbol": "GEHC",
+    "name": "GE HealthCare"
+  },
+  {
+    "symbol": "GEN",
+    "name": "Gen Digital"
+  },
+  {
+    "symbol": "GEV",
+    "name": "GE Vernova"
+  },
+  {
+    "symbol": "GILD",
+    "name": "Gilead Sciences Inc"
+  },
+  {
+    "symbol": "GIS",
+    "name": "General Mills"
+  },
+  {
+    "symbol": "GL",
+    "name": "Globe Life"
+  },
+  {
+    "symbol": "GLE.PA",
+    "name": "Société Générale"
+  },
+  {
+    "symbol": "GLEN.L",
+    "name": "Glencore"
+  },
+  {
+    "symbol": "GLW",
+    "name": "Corning Inc."
+  },
+  {
+    "symbol": "GM",
+    "name": "General Motors Co"
+  },
+  {
+    "symbol": "GNRC",
+    "name": "Generac"
+  },
+  {
+    "symbol": "GOOG",
+    "name": "Alphabet Inc"
+  },
+  {
+    "symbol": "GOOGL",
+    "name": "Alphabet Inc"
+  },
+  {
+    "symbol": "GPC",
+    "name": "Genuine Parts Company"
+  },
+  {
+    "symbol": "GPN",
+    "name": "Global Payments"
+  },
+  {
+    "symbol": "GRMN",
+    "name": "Garmin"
+  },
+  {
+    "symbol": "GS",
+    "name": "Goldman Sachs Group Inc"
+  },
+  {
+    "symbol": "GSK.L",
+    "name": "GSK"
+  },
+  {
+    "symbol": "GWW",
+    "name": "WW Grainger Inc"
+  },
+  {
+    "symbol": "H",
+    "name": "Hyatt Hotels Corp"
+  },
+  {
+    "symbol": "HAL",
+    "name": "Halliburton Co"
+  },
+  {
+    "symbol": "HAS",
+    "name": "Hasbro"
+  },
+  {
+    "symbol": "HBAN",
+    "name": "Huntington Bancshares"
+  },
+  {
+    "symbol": "HCA",
+    "name": "HCA Healthcare Inc"
+  },
+  {
+    "symbol": "HD",
+    "name": "Home Depot Inc"
+  },
+  {
+    "symbol": "HEI.DE",
+    "name": "HeidelbergMaterials"
+  },
+  {
+    "symbol": "HFG.DE",
+    "name": "HelloFresh"
+  },
+  {
+    "symbol": "HG=F",
+    "name": "Cuivre"
+  },
+  {
+    "symbol": "HIG",
+    "name": "Hartford (The)"
+  },
+  {
+    "symbol": "HII",
+    "name": "Huntington Ingalls Industries Inc"
+  },
+  {
+    "symbol": "HLN.L",
+    "name": "Haleon"
+  },
+  {
+    "symbol": "HLT",
+    "name": "Hilton Worldwide Holdings Inc"
+  },
+  {
+    "symbol": "HNR1.DE",
+    "name": "Hannover Re"
+  },
+  {
+    "symbol": "HO.PA",
+    "name": "Thales"
+  },
+  {
+    "symbol": "HOLX",
+    "name": "Hologic"
+  },
+  {
+    "symbol": "HON",
+    "name": "Honeywell International Inc"
+  },
+  {
+    "symbol": "HOOD",
+    "name": "Robinhood Markets"
+  },
+  {
+    "symbol": "HPE",
+    "name": "Hewlett Packard Enterprise Co"
+  },
+  {
+    "symbol": "HPQ",
+    "name": "HP Inc"
+  },
+  {
+    "symbol": "HRL",
+    "name": "Hormel Foods"
+  },
+  {
+    "symbol": "HSBA.L",
+    "name": "HSBC"
+  },
+  {
+    "symbol": "HSIC",
+    "name": "Henry Schein"
+  },
+  {
+    "symbol": "HST",
+    "name": "Host Hotels & Resorts"
+  },
+  {
+    "symbol": "HSY",
+    "name": "Hershey Company (The)"
+  },
+  {
+    "symbol": "HUBB",
+    "name": "Hubbell Incorporated"
+  },
+  {
+    "symbol": "HUM",
+    "name": "Humana Inc"
+  },
+  {
+    "symbol": "HWM",
+    "name": "Howmet Aerospace"
+  },
+  {
+    "symbol": "IAG.L",
+    "name": "IAG"
+  },
+  {
+    "symbol": "IBKR",
+    "name": "Interactive Brokers"
+  },
+  {
+    "symbol": "IBM",
+    "name": "International Business Machines Corp"
+  },
+  {
+    "symbol": "ICE",
+    "name": "Intercontinental Exchange Inc"
+  },
+  {
+    "symbol": "IDXX",
+    "name": "IDEXX Laboratories Inc"
+  },
+  {
+    "symbol": "IEX",
+    "name": "IDEX Corporation"
+  },
+  {
+    "symbol": "IFF",
+    "name": "International Flavors & Fragrances Inc"
+  },
+  {
+    "symbol": "IFX.DE",
+    "name": "Infineon Technologies"
+  },
+  {
+    "symbol": "IHG.L",
+    "name": "InterContinental Hotels"
+  },
+  {
+    "symbol": "III.L",
+    "name": "3i Group"
+  },
+  {
+    "symbol": "ILMN",
+    "name": "Illumina Inc"
+  },
+  {
+    "symbol": "IMB.L",
+    "name": "Imperial Brands"
+  },
+  {
+    "symbol": "INCY",
+    "name": "Incyte"
+  },
+  {
+    "symbol": "INTC",
+    "name": "Intel Corp"
+  },
+  {
+    "symbol": "INTU",
+    "name": "Intuit Inc"
+  },
+  {
+    "symbol": "INVH",
+    "name": "Invitation Homes"
+  },
+  {
+    "symbol": "IP",
+    "name": "International Paper Co"
+  },
+  {
+    "symbol": "IQV",
+    "name": "IQVIA Holdings Inc"
+  },
+  {
+    "symbol": "IR",
+    "name": "Ingersoll Rand Inc"
+  },
+  {
+    "symbol": "IRM",
+    "name": "Iron Mountain"
+  },
+  {
+    "symbol": "ISRG",
+    "name": "Intuitive Surgical Inc"
+  },
+  {
+    "symbol": "IT",
+    "name": "Gartner"
+  },
+  {
+    "symbol": "ITW",
+    "name": "Illinois Tool Works Inc"
+  },
+  {
+    "symbol": "IVZ",
+    "name": "Invesco"
+  },
+  {
+    "symbol": "J",
+    "name": "Jacobs Solutions"
+  },
+  {
+    "symbol": "JBHT",
+    "name": "J.B. Hunt"
+  },
+  {
+    "symbol": "JBL",
+    "name": "Jabil"
+  },
+  {
+    "symbol": "JCI",
+    "name": "Johnson Controls"
+  },
+  {
+    "symbol": "JKHY",
+    "name": "Jack Henry & Associates"
+  },
+  {
+    "symbol": "JNJ",
+    "name": "Johnson & Johnson"
+  }
+]

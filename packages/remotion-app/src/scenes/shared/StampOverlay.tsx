@@ -1,13 +1,13 @@
 /**
- * StampOverlay — Ink stamps on newspaper, crypto-bubble-map style.
+ * StampOverlay — Ink bubbles on newspaper, crypto-bubble-map style.
  *
  * Each asset = a round stamp with:
  * - Name written INSIDE the circular border (between outer and inner ring)
  * - Big % in the center
  * - Size proportional to |changePct|
  * - Green ink (up) / Red ink (down)
- * - Stamp slam animation (scale 2.5→1 in 3 frames)
- * - Stamps accumulate and stay visible
+ * - All bubbles appear simultaneously at frame 0, grow to proportional size
+ * - Continuous gentle float (sin/cos drift around collision-avoidance anchor)
  */
 
 import React, { useMemo } from "react";
@@ -136,26 +136,53 @@ const Stamp: React.FC<{
   x: number;
   y: number;
   rotation: number;
-  appearFrame: number;
-}> = ({ symbol, name, changePct, radius, x, y, rotation, appearFrame }) => {
+  /** Frame offset for grow stagger (±5 frames per bubble) */
+  growDelay: number;
+  /** Per-bubble float phase (seeded) */
+  floatSeed: number;
+  /** Total duration of the panorama segment (used for shrink-out) */
+  durationInFrames: number;
+  /** Frame offset for shrink stagger (≈ ±10f per bubble) */
+  shrinkDelay: number;
+}> = ({ symbol, name, changePct, radius, x, y, rotation, growDelay, floatSeed, durationInFrames, shrinkDelay }) => {
   const frame = useCurrentFrame();
-  const rel = frame - appearFrame;
-  if (rel < 0) return null;
 
-  // Stamp SLAM: instant big → clack to size
-  const slamScale = interpolate(rel, [0, 1, 3, 5], [2.8, 1.05, 0.97, 1.0], {
+  // ── Growth: all bubbles appear at frame 0, grow to scale 1 over ~45 frames ──
+  // Slight per-bubble stagger (growDelay ±5f) for organic feel, but all start visible
+  const growFrame = Math.max(0, frame - growDelay);
+  const growScale = interpolate(growFrame, [0, 15, 45], [0.1, 0.75, 1.0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.out(Easing.cubic),
+  });
+
+  // ── Shrink-out: last ~45 frames, bubbles shrink back to 0 with per-bubble stagger ──
+  const shrinkWindow = 45;
+  const shrinkStart = durationInFrames - shrinkWindow - shrinkDelay;
+  const shrinkScale = interpolate(frame, [shrinkStart, shrinkStart + shrinkWindow], [1.0, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.in(Easing.cubic),
+  });
+
+  const scale = Math.min(growScale, shrinkScale);
+
+  const opacity = interpolate(growFrame, [0, 10], [0, 1], {
+    extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  // Opacity: no transparency — solid ink
-  const opacity = interpolate(rel, [0, 1], [0, 1], {
-    extrapolateRight: "clamp",
-  });
+  // ── Continuous float: sinusoidal drift around anchor position ──
+  // Period ~6-9s per bubble (varied via floatSeed), amplitude ~18px x / 14px y
+  const floatPeriodX = 180 + (floatSeed % 90); // 6-9s @ 30fps
+  const floatPeriodY = 210 + ((floatSeed * 7) % 90); // 7-10s
+  const phaseX = (floatSeed * 13) % (Math.PI * 2);
+  const phaseY = (floatSeed * 17) % (Math.PI * 2);
+  const floatDx = Math.sin((frame / floatPeriodX) * Math.PI * 2 + phaseX) * 18;
+  const floatDy = Math.cos((frame / floatPeriodY) * Math.PI * 2 + phaseY) * 14;
 
-  // Impact blur
-  const blur = interpolate(rel, [0, 1, 3], [2, 0.5, 0], {
-    extrapolateRight: "clamp",
-  });
+  // ── Subtle rotation wobble (±1.5° around baseline) for "alive" feel ──
+  const rotWobble = Math.sin((frame / 240) * Math.PI * 2 + phaseX) * 1.5;
 
   const color = changePct > 0.05 ? COLOR_BULL : changePct < -0.05 ? COLOR_BEAR : COLOR_FLAT;
   const pctText = (changePct >= 0 ? "+" : "") + changePct.toFixed(1) + "%";
@@ -171,14 +198,13 @@ const Stamp: React.FC<{
     <div
       style={{
         position: "absolute",
-        left: x - radius,
-        top: y - radius,
+        left: x - radius + floatDx,
+        top: y - radius + floatDy,
         width: radius * 2,
         height: radius * 2,
-        transform: `scale(${slamScale}) rotate(${rotation}deg)`,
+        transform: `scale(${scale}) rotate(${rotation + rotWobble}deg)`,
         transformOrigin: "center center",
         opacity,
-        filter: blur > 0 ? `blur(${blur}px)` : undefined,
         pointerEvents: "none",
       }}
     >
@@ -317,9 +343,6 @@ export const StampOverlay: React.FC<StampOverlayProps> = ({
     [assets, names]
   );
 
-  const appearWindow = Math.round(durationInFrames * 0.85);
-  const interval = stamps.length > 1 ? appearWindow / (stamps.length - 1) : 0;
-
   return (
     <div
       style={{
@@ -329,19 +352,29 @@ export const StampOverlay: React.FC<StampOverlayProps> = ({
         overflow: "hidden",
       }}
     >
-      {stamps.map((stamp, i) => (
-        <Stamp
-          key={stamp.symbol}
-          symbol={stamp.symbol}
-          name={stamp.name}
-          changePct={stamp.changePct}
-          radius={stamp.radius}
-          x={stamp.x}
-          y={stamp.y}
-          rotation={stamp.rotation}
-          appearFrame={Math.round(i * interval)}
-        />
-      ))}
+      {stamps.map((stamp, i) => {
+        // Small organic stagger (0-10f) based on symbol hash
+        const symbolHash = stamp.symbol.split("").reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 0);
+        const growDelay = Math.abs(symbolHash) % 11;
+        const shrinkDelay = (Math.abs(symbolHash * 7) % 20);
+        const floatSeed = (Math.abs(symbolHash) % 1000) + i;
+        return (
+          <Stamp
+            key={stamp.symbol}
+            symbol={stamp.symbol}
+            name={stamp.name}
+            changePct={stamp.changePct}
+            radius={stamp.radius}
+            x={stamp.x}
+            y={stamp.y}
+            rotation={stamp.rotation}
+            growDelay={growDelay}
+            floatSeed={floatSeed}
+            durationInFrames={durationInFrames}
+            shrinkDelay={shrinkDelay}
+          />
+        );
+      })}
     </div>
   );
 };

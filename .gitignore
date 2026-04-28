@@ -33,3 +33,4 @@ c7-storyboard-view-*.html
 p7-production-parallele-*.html
 
 .mcp.json
+packages/remotion-app/src/fixtures/episode-index.json

@@ -73,7 +73,9 @@ export interface EarningsBucket {
   reported: string[];
   /** Earnings expected today (results not yet out) */
   pending: string[];
-  /** Notable upcoming earnings (J+1 to J+7) */
+  /** Watchlist tickers (snapshot.assets) reporting in the upcoming window — editorially priority */
+  upcomingWatchlist: string[];
+  /** Other notable upcoming earnings — context for narrative fit, not all need to be cited */
   upcoming: string[];
 }
 
@@ -432,14 +434,28 @@ export function buildBriefingPack(
   tomorrowDate.setDate(tomorrowDate.getDate() + 1);
   const tomorrowStr = tomorrowDate.toISOString().slice(0, 10);
 
-  const upcoming = (snapshot.earningsUpcoming ?? [])
-    .slice(0, 10)
-    .map(e => {
-      const dateLabel = labelEventDate(e.date, snapshot.date);
-      return `${e.symbol} ${dateLabel} [${e.hour}]`;
-    });
+  // Split upcoming earnings into two pools:
+  //   1. WATCHLIST: tickers tracked in snapshot.assets — guaranteed visibility for narrative integration
+  //   2. OTHER: remaining earnings sorted by date — context, the LLM cites if narrative-relevant
+  const trackedAssetSymbols = new Set(
+    (snapshot.assets ?? []).map(a => a.symbol.toUpperCase()),
+  );
+  const allUpcoming = snapshot.earningsUpcoming ?? [];
+  const fmtUpcoming = (e: typeof allUpcoming[number]): string => {
+    const dateLabel = labelEventDate(e.date, snapshot.date);
+    const tag = e.name ? `${e.symbol}/${e.name}` : e.symbol;
+    return `${tag} ${dateLabel} [${e.hour}]`;
+  };
+  const upcomingWatchlist = allUpcoming
+    .filter(e => trackedAssetSymbols.has(e.symbol.toUpperCase()))
+    .slice(0, 12)
+    .map(fmtUpcoming);
+  const upcoming = allUpcoming
+    .filter(e => !trackedAssetSymbols.has(e.symbol.toUpperCase()))
+    .slice(0, 12)
+    .map(fmtUpcoming);
 
-  const earningsBuckets: EarningsBucket = { reported, pending, upcoming };
+  const earningsBuckets: EarningsBucket = { reported, pending, upcomingWatchlist, upcoming };
 
   // ── COT highlights with age warning + flip detection ──
   const cotHighlights: COTHighlight[] = [];
@@ -684,6 +700,21 @@ export function formatBriefingPackMinimal(pack: BriefingPack): string {
     }
     text += '\n';
   }
+  if (pack.upcomingHighImpact.length) {
+    text += `## ÉVÉNEMENTS À VENIR (high impact, 7j)\n`;
+    for (const e of pack.upcomingHighImpact) text += `- ${e}\n`;
+    text += `→ Relie la data d'hier à la prochaine décision : la séance d'aujourd'hui pricé-t-elle déjà cet event ? Qu'est-ce qui confirmerait ou invaliderait le pricing actuel ?\n\n`;
+  }
+  if (pack.earningsBuckets.upcomingWatchlist.length || pack.earningsBuckets.upcoming.length) {
+    text += `## EARNINGS À VENIR (7j)\n`;
+    if (pack.earningsBuckets.upcomingWatchlist.length) {
+      text += `**Watchlist trackée** (priorité narrative — ces noms sont déjà suivis dans l'épisode) : ${pack.earningsBuckets.upcomingWatchlist.join(' | ')}\n`;
+    }
+    if (pack.earningsBuckets.upcoming.length) {
+      text += `**Autres notables** (contexte — cite uniquement si narrativement pertinent) : ${pack.earningsBuckets.upcoming.join(' | ')}\n`;
+    }
+    text += `→ Si un mouvement sectoriel aujourd'hui anticipe ces publications, flag-le explicitement (rotation pré-earnings, re-rating sur guidance attendue).\n\n`;
+  }
   return text;
 }
 
@@ -751,9 +782,15 @@ export function formatBriefingPack(pack: BriefingPack): string {
     text += '\n';
   }
 
-  if (pack.earningsBuckets.upcoming.length) {
+  if (pack.earningsBuckets.upcomingWatchlist.length || pack.earningsBuckets.upcoming.length) {
     text += `## EARNINGS À VENIR (7j)\n`;
-    text += pack.earningsBuckets.upcoming.join(' | ') + '\n\n';
+    if (pack.earningsBuckets.upcomingWatchlist.length) {
+      text += `**Watchlist trackée** (priorité narrative) : ${pack.earningsBuckets.upcomingWatchlist.join(' | ')}\n`;
+    }
+    if (pack.earningsBuckets.upcoming.length) {
+      text += `**Autres notables** : ${pack.earningsBuckets.upcoming.join(' | ')}\n`;
+    }
+    text += '\n';
   }
 
   if (pack.cotHighlights.length) {

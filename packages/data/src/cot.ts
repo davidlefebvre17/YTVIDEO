@@ -322,6 +322,70 @@ function countWeeksInDirection(data: COTContractData[]): number {
   return count;
 }
 
+// ── Multi-year history fetch (for percentile rank long lookback) ─────────────
+
+/**
+ * Fetch full weekly history per contract over multiple years.
+ * Used once (or weekly) to build a local history file for percentile rank
+ * computation on 156-260 weeks instead of 9.
+ */
+export async function fetchCOTHistoryFromArchives(
+  years: number[],
+): Promise<Record<string, COTContractData[]>> {
+  const tffContracts = COT_CONTRACTS.filter((c) => c.type === "tff");
+  const disaggContracts = COT_CONTRACTS.filter((c) => c.type === "disagg");
+  const perSymbol: Record<string, COTContractData[]> = {};
+
+  for (const year of years.slice().sort()) {
+    const tffUrl = `https://www.cftc.gov/files/dea/history/fut_fin_txt_${year}.zip`;
+    const disaggUrl = `https://www.cftc.gov/files/dea/history/fut_disagg_txt_${year}.zip`;
+    process.stdout.write(`  COT history ${year}: download... `);
+    let tffCSV = "";
+    let disaggCSV = "";
+    try {
+      [tffCSV, disaggCSV] = await Promise.all([
+        downloadAndUnzip(tffUrl),
+        downloadAndUnzip(disaggUrl),
+      ]);
+    } catch (e) {
+      console.log(`fail (${(e as Error).message.slice(0, 80)})`);
+      continue;
+    }
+    const tffRows = parseCSV(tffCSV).map(normalizeRow);
+    const disaggRows = parseCSV(disaggCSV).map(normalizeRow);
+
+    for (const contract of tffContracts) {
+      const parsed = tffRows
+        .filter((r) => (r.cftc_contract_market_code || r["cftc_contract_market_code"]) === contract.cftcCode)
+        .map((r) => parseTFF(r, contract.invert ?? false))
+        .filter(Boolean) as COTContractData[];
+      perSymbol[contract.symbol] = (perSymbol[contract.symbol] ?? []).concat(parsed);
+    }
+    for (const contract of disaggContracts) {
+      const parsed = disaggRows
+        .filter((r) => (r.cftc_contract_market_code || r["cftc_contract_market_code"]) === contract.cftcCode)
+        .map((r) => parseDisagg(r))
+        .filter(Boolean) as COTContractData[];
+      perSymbol[contract.symbol] = (perSymbol[contract.symbol] ?? []).concat(parsed);
+    }
+    console.log(`ok`);
+  }
+
+  // Sort desc by date and dedup
+  for (const sym of Object.keys(perSymbol)) {
+    const seen = new Set<string>();
+    perSymbol[sym] = perSymbol[sym]
+      .filter((d) => {
+        if (seen.has(d.reportDate)) return false;
+        seen.add(d.reportDate);
+        return true;
+      })
+      .sort((a, b) => b.reportDate.localeCompare(a.reportDate));
+  }
+
+  return perSymbol;
+}
+
 // ── Primary: Bulk CSV fetch ──────────────────────────────────────────────────
 
 async function fetchFromBulkCSV(): Promise<COTPositioning["contracts"]> {

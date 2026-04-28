@@ -108,20 +108,25 @@ function numberToFrench(n: string): string {
   return n;
 }
 
-/** Nettoyer le texte pour TTS — supprimer symboles non-prononçables */
 /**
- * Minimal sanitization — prononciation is already handled by preProcessForTTS().
- * This only does: unsupported tags cleanup + newlines after sentences for intonation.
+ * Sanitize TTS — preProcessForTTS gère déjà la prononciation.
+ * Format des pauses : `texte [pause].` (tag AVANT la ponctuation finale).
+ * Empiriquement Fish lit mieux le tag avant le point qu'après.
  */
 function sanitizeForTTS(text: string): string {
-  return text
-    .replace(/\[long pause\]/g, '[pause]')
-    // Fin de phrase → double saut de ligne pour marquer la frontière prosodique
-    .replace(/\.\s+/g, '.\n\n')
-    .replace(/\?\s+/g, '?\n\n')
-    .replace(/!\s+/g, '!\n\n')
+  let t = text
+    .replace(/\[long(?:ue)? pause\]/gi, '[pause]')
+    // Strip [pause] adjacent à .!? (sera réinjecté en position canonique avant le point)
+    .replace(/\[pause\]\s*([.!?])/g, '$1')
+    .replace(/([.!?])\s*\[pause\]/g, '$1')
+    // Insérer [pause] AVANT la ponctuation finale (sauf en bout de chaîne)
+    .replace(/(\S)([.!?])(\s)/g, '$1 [pause]$2$3')
+    // Espaces multiples
     .replace(/[ \t]+/g, ' ')
+    // Tirets cadratins orphelins en fin de phrase
+    .replace(/\s+—\s*$/g, '.')
     .trim();
+  return t;
 }
 
 /** Estimation de durée par mots (~150 mots/min en FR) */
@@ -153,7 +158,7 @@ async function generateBeatWithFish(
     format: 'mp3',
     speed: speed ?? p.speed,
     temperature: p.temperature,
-    topP: p.topP,
+    // top_p + repetition_penalty laissés aux defaults Fish (non envoyés)
   });
 }
 
@@ -245,7 +250,7 @@ async function generateSegmentAudio(
           format: 'mp3',
           speed: segSpeed,
           temperature: FISH_PRESETS.FOCUS.temperature,
-          topP: FISH_PRESETS.FOCUS.topP,
+          // top_p + repetition_penalty : defaults Fish (non envoyés)
         });
       }
     } catch (err) {

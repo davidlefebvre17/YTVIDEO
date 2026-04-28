@@ -496,6 +496,14 @@ export async function runPipeline(
   if (Object.keys(assetContext).length) {
     console.log(`  Asset context: ${Object.keys(assetContext).length} assets with descriptions`);
   }
+  // Slices du briefing pack à pousser directement à Opus (perdues via C2 sinon)
+  const briefingForC3 = {
+    upcomingHighImpact: briefingPack?.upcomingHighImpact,
+    earningsUpcomingWatchlist: briefingPack?.earningsBuckets?.upcomingWatchlist,
+    earningsUpcomingOther: briefingPack?.earningsBuckets?.upcoming,
+    cbSpeechesYesterday: briefingPack?.cbSpeechesYesterday,
+  };
+
   let draft = await runC3Writing({
     editorial,
     analysis,
@@ -506,6 +514,9 @@ export async function runPipeline(
     lang,
     assetContext,
     flagged,
+    cotPositioning: snapshot.cotPositioning,
+    assets: snapshot.assets,
+    briefing: briefingForC3,
   });
   stats.llmCalls++;
   saveIntermediate(snapshot.date, "episode_draft", draft);
@@ -540,6 +551,9 @@ export async function runPipeline(
       assetContext,
       flagged,
       previousDraft: draft,
+      cotPositioning: snapshot.cotPositioning,
+      assets: snapshot.assets,
+      briefing: briefingForC3,
     });
     stats.llmCalls++;
     stats.retries++;

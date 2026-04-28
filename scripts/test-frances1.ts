@@ -18,7 +18,7 @@ async function main() {
     const mp3 = join(dir, `compare_frances1_${label}.mp3`);
     process.stdout.write(`  frances1 [${label}]...`);
     try {
-      const r = await fishTTS({ text, outputPath: mp3, voiceId, format: 'mp3', speed: preset.speed, temperature: preset.temperature, topP: preset.topP, repetitionPenalty: preset.repetitionPenalty });
+      const r = await fishTTS({ text, outputPath: mp3, voiceId, format: 'mp3', speed: preset.speed, temperature: preset.temperature });
       console.log(` ✓ ${(r.bytes / 1024).toFixed(0)} KB`);
     } catch (e) {
       console.log(` ✗ ${(e as Error).message.slice(0, 100)}`);

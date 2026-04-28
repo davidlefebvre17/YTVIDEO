@@ -161,23 +161,34 @@ export const GaugeOverlay: React.FC<GaugeOverlayProps> = ({
         </span>
       </div>
 
-      {/* Label — typewriter */}
-      <div style={{ display: "flex" }}>
-        {label.split("").map((ch, i) => {
-          const charOp = interpolate(rel, [durationFrames * 0.7 + i, durationFrames * 0.7 + i + 1], [0, 1], {
+      {/* Label — typewriter substring (texte réel pour que letter-spacing fonctionne) */}
+      {(() => {
+        const totalChars = label.length;
+        const revealStart = durationFrames * 0.7;
+        const revealEnd = revealStart + Math.max(totalChars, 12);
+        const visibleChars = Math.round(
+          interpolate(rel, [revealStart, revealEnd], [0, totalChars], {
             extrapolateLeft: "clamp", extrapolateRight: "clamp",
-          });
-          return (
-            <span key={i} style={{
-              fontFamily: BRAND.fonts.mono, fontSize: 11,
-              letterSpacing: "0.12em", textTransform: "uppercase",
-              color: BRAND.colors.inkLight, opacity: charOp,
-            }}>
-              {ch}
-            </span>
-          );
-        })}
-      </div>
+          }),
+        );
+        return (
+          <div
+            style={{
+              fontFamily: BRAND.fonts.mono,
+              fontSize: 11,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: BRAND.colors.inkLight,
+              whiteSpace: "nowrap",
+              textAlign: "center",
+              maxWidth: 360,
+              overflow: "hidden",
+            }}
+          >
+            {label.slice(0, visibleChars)}
+          </div>
+        );
+      })()}
     </div>
   );
 };

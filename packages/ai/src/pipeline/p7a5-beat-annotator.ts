@@ -125,7 +125,9 @@ Pour CHAQUE beat:
 2. **overlayType** (enum): Classe le type d'overlay visuel. RESPECTE CET ORDRE DE PRIORITÉ — en cas de doute, choisis le type le plus haut dans la liste :
 
    **PRIORITÉ 1 — GRAPHIQUES (c'est une chaîne de FINANCE, le spectateur veut VOIR les courbes) :**
-   - 'chart': Dès qu'un PRIX, NIVEAU technique, support, résistance, SMA, moyenne mobile, ou seuil est mentionné → TOUJOURS chart. C'est le type par DÉFAUT pour une chaîne financière. Inclure levels dans overlaySpec. Si la narration parle d'un actif et de son prix, c'est un chart.
+   - 'chart': Deux déclencheurs équivalents — l'un ou l'autre suffit :
+     (a) **Niveau technique cité** : prix, support, résistance, moyenne mobile, ou seuil mentionné dans la narration → chart, inclure levels dans overlaySpec.
+     (b) **Forte variation individuelle** : le beat cite un actif non-indice avec |changePct| ≥ 3% dans la table des prix → chart. Le spectateur veut voir la courbe quand la performance est notable, même si la narration ne cite que le % et pas le prix.
    - 'spread_chart': Quand la narration parle d'un SPREAD ou ÉCART entre deux actifs. Affiche les deux courbes superposées.
    - 'gauge': RSI extrême (<30 ou >70), Fear&Greed, VIX → jauge circulaire
 
@@ -137,9 +139,10 @@ Pour CHAQUE beat:
    - 'causal_chain': UNIQUEMENT quand la narration explique un mécanisme cause→effet ET qu'aucun prix/niveau n'est mentionné dans le beat. Si un prix est cité dans le même beat, utiliser 'chart' à la place.
    - 'scenario_fork': Quand la narration présente des SCÉNARIOS haussier/baissier avec cibles
    - 'headline': Quand la narration cite une ACTUALITÉ spécifique ou déclaration politique
+   - 'countdown_event': Quand la narration évoque un RENDEZ-VOUS futur (réunion banque centrale, publication macro, earnings majeur) avec une date claire. Affiche J-N + event + asset impacté.
    - 'none': Transitions, contexte général, respiration — pas de données à afficher
 
-   RÈGLE CRITIQUE : dès que la narration cite un PRIX ou NIVEAU (ex: "à 6506", "SMA 200 à 6624", "résistance à 99", "RSI à 30", "clôture à 88 dollars"), c'est TOUJOURS un chart ou gauge, JAMAIS stat, causal_chain, ou none. Le CHART est le cœur visuel de la chaîne — vise minimum 25% de beats avec chart/spread_chart.
+   RÈGLE CRITIQUE : dès qu'un niveau technique est cité OU qu'un actif non-indice mentionné dans le beat affiche |changePct| ≥ 3% dans la table, c'est TOUJOURS un chart ou gauge, JAMAIS stat, causal_chain, ou none. Le CHART est le cœur visuel de la chaîne — vise minimum 25% de beats avec chart/spread_chart.
 
 3. **overlaySpec** (object|null): Données structurées type-spécifiques:
    - chart: { asset, levels: [support, resistance], type: "price_line"|"zone_highlight"|... }
@@ -150,6 +153,7 @@ Pour CHAQUE beat:
    - comparison: { assets: [symbol1, symbol2], values: [val1, val2] }
    - spread_chart: { asset1: "CL=F", asset2: "BZ=F", label: "Spread WTI-Brent" } pour des actifs du snapshot, OU { asset1: "DGS10", asset2: "DGS2", label: "Courbe des taux 10Y-2Y" } pour les yields FRED. NE PAS inventer de symboles — utiliser les symboles Yahoo existants ou DGS10/DGS2/T10Y2Y pour les yields.
    - headline: { text, actor?, source? }
+   - countdown_event: { eventLabel: "Fed / CPI / earnings AMAT", targetDate: "29 avril" ou "mercredi", daysUntil: 3, affectedAsset: "^GSPC" (optionnel), stake: "enjeu en une ligne" }
    - none: null
 
 4. **triggerWord** (string|null): Mot EXACT du narrationChunk qui déclenche l'overlay. Extrais du texte français (ex: "baisse", "pic", "rebond").
@@ -362,7 +366,7 @@ function normalizeEmotion(raw: string): BeatEmotion {
 }
 
 function isValidOverlayType(type: string): boolean {
-  const valid = ['chart', 'stat', 'causal_chain', 'scenario_fork', 'gauge', 'comparison', 'spread_chart', 'headline', 'none'];
+  const valid = ['chart', 'stat', 'causal_chain', 'scenario_fork', 'gauge', 'comparison', 'spread_chart', 'headline', 'countdown_event', 'none'];
   return valid.includes(type);
 }
 

@@ -79,8 +79,6 @@ async function main() {
         format: 'mp3',
         speed: preset.speed,
         temperature: preset.temperature,
-        topP: preset.topP,
-        repetitionPenalty: preset.repetitionPenalty,
       });
 
       console.log(`    ✓ ${(result.bytes / 1024).toFixed(0)} KB → ${mp3Path}\n`);

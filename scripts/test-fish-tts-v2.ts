@@ -106,7 +106,7 @@ async function main() {
     const mp3Path = join(FISH_AUDIO_DIR, `${tb.id}_v2.mp3`);
 
     console.log(`  ${tb.id} [${tb.label}]`);
-    console.log(`    speed=${preset.speed} temp=${preset.temperature} topP=${preset.topP}`);
+    console.log(`    speed=${preset.speed} temp=${preset.temperature}`);
     console.log(`    "${tb.text.slice(0, 80)}..."`);
 
     try {
@@ -117,8 +117,6 @@ async function main() {
         format: 'mp3',
         speed: preset.speed,
         temperature: preset.temperature,
-        topP: preset.topP,
-        repetitionPenalty: preset.repetitionPenalty,
       });
 
       console.log(`    ✓ ${(result.bytes / 1024).toFixed(0)} KB\n`);

@@ -1,0 +1,338 @@
+[
+  {
+    "symbol": "ACGL",
+    "name": "Arch Capital Group"
+  },
+  {
+    "symbol": "ACN",
+    "name": "Accenture PLC"
+  },
+  {
+    "symbol": "ADBE",
+    "name": "Adobe Inc."
+  },
+  {
+    "symbol": "ADI",
+    "name": "Analog Devices Inc"
+  },
+  {
+    "symbol": "ADM",
+    "name": "Archer Daniels Midland"
+  },
+  {
+    "symbol": "ADP",
+    "name": "Automatic Data Processing Inc"
+  },
+  {
+    "symbol": "ADS.DE",
+    "name": "Adidas"
+  },
+  {
+    "symbol": "ADSK",
+    "name": "Autodesk"
+  },
+  {
+    "symbol": "AEE",
+    "name": "Ameren"
+  },
+  {
+    "symbol": "AEP",
+    "name": "American Electric Power"
+  },
+  {
+    "symbol": "AES",
+    "name": "AES Corporation"
+  },
+  {
+    "symbol": "AFL",
+    "name": "Aflac Inc"
+  },
+  {
+    "symbol": "AI.PA",
+    "name": "Air Liquide"
+  },
+  {
+    "symbol": "AIG",
+    "name": "American International Group Inc"
+  },
+  {
+    "symbol": "AIR.DE",
+    "name": "Airbus"
+  },
+  {
+    "symbol": "AIR.PA",
+    "name": "Airbus"
+  },
+  {
+    "symbol": "AIZ",
+    "name": "Assurant"
+  },
+  {
+    "symbol": "AJG",
+    "name": "Arthur J. Gallagher & Co."
+  },
+  {
+    "symbol": "AKAM",
+    "name": "Akamai Technologies"
+  },
+  {
+    "symbol": "ALB",
+    "name": "Albemarle Corp"
+  },
+  {
+    "symbol": "ALGN",
+    "name": "Align Technology"
+  },
+  {
+    "symbol": "ALK",
+    "name": "Alaska Air Group Inc"
+  },
+  {
+    "symbol": "ALL",
+    "name": "Allstate Corp"
+  },
+  {
+    "symbol": "ALLE",
+    "name": "Allegion"
+  },
+  {
+    "symbol": "ALV.DE",
+    "name": "Allianz"
+  },
+  {
+    "symbol": "AMAT",
+    "name": "Applied Materials Inc"
+  },
+  {
+    "symbol": "AMCR",
+    "name": "Amcor"
+  },
+  {
+    "symbol": "AMD",
+    "name": "Advanced Micro Devices Inc"
+  },
+  {
+    "symbol": "AME",
+    "name": "AMETEK Inc"
+  },
+  {
+    "symbol": "AMGN",
+    "name": "Amgen Inc"
+  },
+  {
+    "symbol": "AMP",
+    "name": "Ameriprise Financial"
+  },
+  {
+    "symbol": "AMT",
+    "name": "American Tower Corp"
+  },
+  {
+    "symbol": "AMZN",
+    "name": "Amazon.com Inc"
+  },
+  {
+    "symbol": "ANET",
+    "name": "Arista Networks"
+  },
+  {
+    "symbol": "ANTO.L",
+    "name": "Antofagasta"
+  },
+  {
+    "symbol": "AON",
+    "name": "Aon plc"
+  },
+  {
+    "symbol": "AOS",
+    "name": "A. O. Smith"
+  },
+  {
+    "symbol": "APA",
+    "name": "APA Corporation"
+  },
+  {
+    "symbol": "APD",
+    "name": "Air Products and Chemicals Inc"
+  },
+  {
+    "symbol": "APH",
+    "name": "Amphenol"
+  },
+  {
+    "symbol": "APO",
+    "name": "Apollo Global Management"
+  },
+  {
+    "symbol": "APP",
+    "name": "Applovin Corp"
+  },
+  {
+    "symbol": "APTV",
+    "name": "Aptiv"
+  },
+  {
+    "symbol": "ARE",
+    "name": "Alexandria Real Estate Equities"
+  },
+  {
+    "symbol": "ARES",
+    "name": "Ares Management"
+  },
+  {
+    "symbol": "ARM",
+    "name": "Arm Holdings PLC"
+  },
+  {
+    "symbol": "ATO",
+    "name": "Atmos Energy"
+  },
+  {
+    "symbol": "AUDUSD=X",
+    "name": "AUD/USD"
+  },
+  {
+    "symbol": "AVB",
+    "name": "AvalonBay Communities"
+  },
+  {
+    "symbol": "AVGO",
+    "name": "Broadcom Inc"
+  },
+  {
+    "symbol": "AVY",
+    "name": "Avery Dennison Corp"
+  },
+  {
+    "symbol": "AWK",
+    "name": "American Water Works"
+  },
+  {
+    "symbol": "AXA.PA",
+    "name": "AXA"
+  },
+  {
+    "symbol": "AXON",
+    "name": "Axon Enterprise Inc"
+  },
+  {
+    "symbol": "AXP",
+    "name": "American Express Co"
+  },
+  {
+    "symbol": "AZN.L",
+    "name": "AstraZeneca"
+  },
+  {
+    "symbol": "AZO",
+    "name": "AutoZone"
+  },
+  {
+    "symbol": "BA",
+    "name": "Boeing Co"
+  },
+  {
+    "symbol": "BAC",
+    "name": "Bank of America Corp"
+  },
+  {
+    "symbol": "BALL",
+    "name": "Ball Corporation"
+  },
+  {
+    "symbol": "BAS.DE",
+    "name": "BASF"
+  },
+  {
+    "symbol": "BAT.L",
+    "name": "British American Tobacco"
+  },
+  {
+    "symbol": "BATS.L",
+    "name": "BAE Systems"
+  },
+  {
+    "symbol": "BAX",
+    "name": "Baxter International"
+  },
+  {
+    "symbol": "BAYN.DE",
+    "name": "Bayer"
+  },
+  {
+    "symbol": "BBY",
+    "name": "Best Buy"
+  },
+  {
+    "symbol": "BDX",
+    "name": "Becton Dickinson and Co"
+  },
+  {
+    "symbol": "BEI.DE",
+    "name": "Beiersdorf"
+  },
+  {
+    "symbol": "BEN",
+    "name": "Franklin Resources"
+  },
+  {
+    "symbol": "BF.B",
+    "name": "Brown���Forman"
+  },
+  {
+    "symbol": "BG",
+    "name": "Bunge Global"
+  },
+  {
+    "symbol": "BIIB",
+    "name": "Biogen"
+  },
+  {
+    "symbol": "BIO",
+    "name": "Bio Rad Laboratories Inc"
+  },
+  {
+    "symbol": "BK",
+    "name": "BNY Mellon"
+  },
+  {
+    "symbol": "BKNG",
+    "name": "Booking Holdings Inc"
+  },
+  {
+    "symbol": "BKR",
+    "name": "Baker Hughes Co"
+  },
+  {
+    "symbol": "BLDR",
+    "name": "Builders FirstSource"
+  },
+  {
+    "symbol": "BLK",
+    "name": "BlackRock Inc"
+  },
+  {
+    "symbol": "BMW.DE",
+    "name": "BMW"
+  },
+  {
+    "symbol": "BMY",
+    "name": "Bristol Myers Squibb"
+  },
+  {
+    "symbol": "BN.PA",
+    "name": "Danone"
+  },
+  {
+    "symbol": "BNP.PA",
+    "name": "BNP Paribas"
+  },
+  {
+    "symbol": "BNR.DE",
+    "name": "Brenntag"
+  },
+  {
+    "symbol": "BP.L",
+    "name": "BP"
+  }
+]

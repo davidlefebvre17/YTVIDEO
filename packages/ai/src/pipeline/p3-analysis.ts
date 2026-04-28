@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { generateStructuredJSON } from "../llm-client";
-import { loadMemory } from "@yt-maker/data";
+import { loadMemory, computeCotInsights, formatCotInsightsMarkdown } from "@yt-maker/data";
 import type {
   SnapshotFlagged, EditorialPlan, AnalysisBundle, CausalBrief,
   FlaggedAsset, EpisodeSummary,
@@ -236,6 +236,7 @@ function buildC2UserPrompt(
   knowledge: string,
   briefingPack?: BriefingPack,
   episodeSummaries?: EpisodeSummary[],
+  cotPositioning?: import("@yt-maker/core").COTPositioning,
 ): string {
   let prompt = '';
 
@@ -283,6 +284,36 @@ function buildC2UserPrompt(
   // Version complète réservée à C1 — C2 a déjà l'editorial plan + asset data + analysis hint.
   if (briefingPack) {
     prompt += formatBriefingPackMinimal(briefingPack);
+  }
+
+  // ── COT Insights (positionnement spéculatif vulgarisé) ──
+  // Filtre par les actifs sélectionnés dans l'editorial plan, max 4 signaux.
+  // Marqué "optionnel" dans le markdown : C2/C3 ne s'en servent que si pertinent.
+  if (cotPositioning) {
+    try {
+      const editorialSymbols = new Set(editorial.segments.flatMap(s => s.assets));
+      const pricesBySymbol: Record<string, Array<{ date: string; close: number }>> = {};
+      for (const a of flagged.assets) {
+        const snap = a.snapshot;
+        const candles = (snap as any)?.dailyCandles ?? snap?.candles;
+        if (Array.isArray(candles) && candles.length >= 28) {
+          pricesBySymbol[a.symbol] = candles.map((c: any) => ({ date: c.date, close: c.c }));
+        }
+      }
+      const insights = computeCotInsights({
+        currentCOT: cotPositioning,
+        scriptAssets: [...editorialSymbols],
+        pricesBySymbol,
+        publishDate: editorial.publishDate || editorial.date,
+        maxInsights: 4,
+      });
+      if (insights.length > 0) {
+        const md = formatCotInsightsMarkdown(insights, cotPositioning.reportDate, editorial.publishDate || editorial.date);
+        prompt += md;
+      }
+    } catch (e) {
+      console.log(`  [cot-insights] failed: ${(e as Error).message.slice(0, 80)}`);
+    }
   }
 
   // Asset data (only selected assets)
@@ -395,6 +426,7 @@ export async function runC2Analysis(input: {
     knowledge,
     input.briefingPack,
     input.episodeSummaries,
+    input.snapshot.cotPositioning,
   );
 
   console.log('  P3 C2 Sonnet — analyse approfondie...');

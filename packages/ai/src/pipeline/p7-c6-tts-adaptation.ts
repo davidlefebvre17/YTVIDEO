@@ -118,6 +118,65 @@ Placer des tags [pause] dans le texte pour guider le rythme et l'intonation de l
 // ÉTAPE 1 — PRÉ-TRAITEMENT CODE (déterministe, toute la prononciation)
 // ═══════════════════════════════════════════════════════════════
 
+// Déterminants FR non élidés (suivis d'un espace puis d'un mot)
+const FR_DET_SPACED = `(?:les|le|la|du|des|de|un|une|au|aux|cette|cet|ces|sa|son|ses|notre|nos|votre|vos|leur|leurs|mon|ma|mes|ton|ta|tes)`;
+// Déterminants élidés FR (l', d') — suivis directement d'un mot sans espace
+const FR_DET_ELIDED = `(?:l'|d')`;
+// Union pour contextes où le déterminant PRÉCÈDE un ticker (toujours suivi d'un espace)
+const FR_DETERMINER_RE = `(?:${FR_DET_ELIDED}|${FR_DET_SPACED})`;
+
+// Stopwords phonétiques : mots qu'on ignore pour le calcul d'overlap
+const PHONETIC_STOPWORDS = new Set([
+  'de','du','des','la','le','les','l','d',
+  'et','à','au','aux','un','une',
+  'sur','en','dans','par','pour','avec','sans','sous','chez','vers',
+]);
+
+/**
+ * Supprime le pattern redondant `"TICKER", <apposition>` quand l'apposition reprend
+ * un mot du phonétique du ticker.
+ *
+ * Exemples :
+ *   Le "CL=F", le brut américain     → Le brut américain   (overlap: américain)
+ *   Le "GC=F", l'or, recule          → L'or, recule        (overlap: or)
+ *   Le "SI=F", l'argent, -3%         → L'argent, -3%       (overlap: argent)
+ *
+ * Préserve :
+ *   Le "STMPA.PA", le franco-italien → inchangé  (aucun mot commun phonétique/apposition)
+ *
+ * Le ticker reste disponible pour les overlays visuels via `assets[]`.
+ */
+function suppressRedundantAppositions(text: string, tickerMap: Map<string, string>): string {
+  // Pattern : [déterminant optionnel + espace] "TICKER", <déterminant + contenu> (jusqu'à ,.;—)
+  //   - Le déterminant précédent est optionnel pour gérer "Hier, "XYZ", le truc"
+  //   - L'apposition accepte soit un élidé (l'or, d'or) soit un non-élidé + espace (le brut)
+  const apposContentRe = `(?:${FR_DET_ELIDED}[^,.;—\\n]+?|${FR_DET_SPACED}\\s+[^,.;—\\n]+?)`;
+  const re = new RegExp(
+    `(?:\\b(${FR_DETERMINER_RE})\\s+)?"([A-Z0-9^=.\\-]{1,15})",\\s+(${apposContentRe})(?=[,.;—])`,
+    'gi',
+  );
+
+  const tokenize = (s: string): string[] =>
+    s.toLowerCase().split(/[\s''"]+/).filter(w => w.length >= 2 && !PHONETIC_STOPWORDS.has(w));
+
+  return text.replace(re, (match, precDet: string | undefined, ticker: string, apposition: string) => {
+    const phonetic = tickerMap.get(ticker);
+    if (!phonetic) return match;
+
+    const phoneticWords = new Set(tokenize(phonetic));
+    const apposWords = tokenize(apposition);
+    const hasOverlap = apposWords.some(w => phoneticWords.has(w));
+    if (!hasOverlap) return match;
+
+    // Redondance confirmée : ne garder que l'apposition, en préservant la capitalisation
+    // du déterminant précédent (si début de phrase).
+    if (precDet && precDet[0] === precDet[0].toUpperCase()) {
+      return apposition.charAt(0).toUpperCase() + apposition.slice(1);
+    }
+    return apposition;
+  });
+}
+
 /**
  * Pipeline unique de pré-traitement : C3 text → texte prêt pour Fish Audio.
  * Fusionne chiffres, symboles, sigles, indices, anglicismes, noms propres.
@@ -125,24 +184,34 @@ Placer des tags [pause] dans le texte pour guider le rythme et l'intonation de l
  */
 export function preProcessForTTS(text: string): string {
   let result = text;
-
-  // ── Tickers entre guillemets → nom phonétique ──
-  // "GS" → goldmane-sax, "AAPL" → apple, "CL=F" → pétrole américain
-  // Dedup : si le phonétique répète un mot déjà prononcé juste avant
-  // (ex: l'or "GC=F" → "l'or or"), on drop le phonétique.
   const tickerMap = getTickerMap();
+
+  // ── Passe 1 : suppression des appositions redondantes ──
+  // C3 écrit souvent "TICKER", <apposition humaine> (ex: "CL=F", le brut américain).
+  // Le ticker sert au visuel (chart, overlay), l'apposition à l'audio.
+  // Si l'apposition reprend un mot du phonétique du ticker, on supprime le ticker :
+  // on n'entend que la forme orale voulue par l'auteur.
+  result = suppressRedundantAppositions(result, tickerMap);
+
+  // ── Passe 2 : Tickers entre guillemets → nom phonétique ──
+  // "GS" → goldmane-sax, "AAPL" → apple, "CL=F" → pétrole américain
+  // Safety net : si le phonétique répète un mot déjà prononcé 60 chars avant OU après,
+  // on drop le phonétique (passe 1 aurait dû l'attraper, mais filet de sécurité).
   const TICKER_STOPWORDS = new Set(['de', 'du', 'des', 'la', 'le', 'les', 'et', 'à', 'au', 'aux', 'un', 'une', 'sur', 'en', 'dans']);
   result = result.replace(/"([A-Z0-9^=.\-]{1,15})"/g, (match, ticker, offset, full) => {
     const phonetic = tickerMap.get(ticker);
     if (!phonetic) return match;
     const before = full.slice(Math.max(0, offset - 60), offset).toLowerCase();
-    const precedingWords = before
+    const after = full.slice(offset + match.length, offset + match.length + 60).toLowerCase();
+    const tokenize = (s: string) => s
       .replace(/[.,;:!?—–"«»()]/g, '')
-      .replace(/['']/g, ' ') // split sur apostrophe pour isoler "or" dans "l'or"
-      .split(/\s+/).filter(Boolean).slice(-3);
+      .replace(/['']/g, ' ')
+      .split(/\s+/).filter(Boolean);
+    const precedingWords = tokenize(before).slice(-3);
+    const followingWords = tokenize(after).slice(0, 5);
     const phoneticWords = phonetic.toLowerCase().split(/\s+/).filter(Boolean);
     const significantPhoneticWords = phoneticWords.filter(w => w.length >= 2 && !TICKER_STOPWORDS.has(w));
-    const overlap = significantPhoneticWords.some(pw => precedingWords.includes(pw));
+    const overlap = significantPhoneticWords.some(pw => precedingWords.includes(pw) || followingWords.includes(pw));
     if (overlap) return '';
     return phonetic;
   });
@@ -184,7 +253,11 @@ export function preProcessForTTS(text: string): string {
   // "le S&P", pas "l'S&P" (la consonne suit dans l'épellation). Reconnu par :
   //   - lettre initiale `è` (accent grave = nom de lettre : èm, èn, èl, èr, èf, èss)
   //   - patterns "essenne", "ème", "ène", "èle", "ère" (sigles composés)
-  const VOWELS = '[aâäàeéèêëiîïoôöuûüyAÂÄÀEÉÈÊËIÎÏOÔÖUÛÜY]';
+  //
+  // EXCLUSION : y semi-consonantique (yen, yaourt, yoga, York, Yémen) — en français
+  // ces mots prennent "le/la" sans élision. On retire `y` et `Y` de VOWELS pour
+  // éviter "Le yen" → "L'yen".
+  const VOWELS = '[aâäàeéèêëiîïoôöuûüAÂÄÀEÉÈÊËIÎÏOÔÖUÛÜ]';
   // Exclut les sigles épelés : le mot suivant ne doit PAS être le nom d'une lettre
   // (é, èss, èm, èn, èl, èr, èf, ème, ène, èle, ère, em, ess, esse, en, el, er, ef)
   // ni commencer par "essenne" ("S&P" épelé). Règle : en français, on dit "le S&P",
@@ -218,6 +291,9 @@ const ALL_PRONUNCIATION_FIXES: [RegExp, string][] = [
   [/\bvingt-onze\b/gi, 'vingt onze'],
   [/\bP\.P\.I\./g, 'pé-pé-i'],
   [/\bPPI\b/g, 'pé-pé-i'],
+  // Stablecoin / stablecoins → phonétisation FR (sinon Fish lit "stèïble-côwine")
+  [/\bstablecoins\b/gi, 'stébeul-connes'],
+  [/\bstablecoin\b/gi, 'stébeul-conne'],
 
   // ── Noms propres instables ──
   [/\bTesla\b/g, 'Tessla'],

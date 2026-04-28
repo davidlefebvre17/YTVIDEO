@@ -13,6 +13,7 @@ import { HeatmapGrid } from "../shared/HeatmapGrid";
 import { type InkLevel } from "../shared/InkChart";
 import { CandlestickChart } from "../shared/CandlestickChart";
 import { SpreadChart } from "../shared/SpreadChart";
+import { CountdownEvent } from "../shared/CountdownEvent";
 
 interface DataOverlayProps {
   overlay: BeatOverlay;
@@ -180,6 +181,159 @@ interface OverlayContentProps {
   yieldsHistory?: { us10y: any[]; us2y: any[]; spread10y2y: any[] };
 }
 
+/**
+ * Résout les alias de symbole produits par Haiku (ex: "JPY" → "USDJPY=X").
+ * Si le symbole exact existe dans assets, on le garde. Sinon on tente substring/alias.
+ */
+const SYMBOL_ALIASES: Record<string, string[]> = {
+  'JPY': ['USDJPY=X', 'JPY=X'],
+  'EUR': ['EURUSD=X', 'EUR=X'],
+  'GBP': ['GBPUSD=X', 'GBP=X'],
+  'CHF': ['USDCHF=X', 'CHF=X'],
+  'CAD': ['USDCAD=X', 'CAD=X'],
+  'AUD': ['AUDUSD=X'],
+  'NZD': ['NZDUSD=X'],
+  'CNY': ['USDCNY=X'],
+  'BTC': ['BTC-USD'],
+  'ETH': ['ETH-USD'],
+  'SOL': ['SOL-USD'],
+  'GOLD': ['GC=F'],
+  'SILVER': ['SI=F'],
+  'OIL': ['CL=F'],
+  'WTI': ['CL=F'],
+  'BRENT': ['BZ=F'],
+  'NASDAQ': ['^IXIC', '^NDX'],
+  'SPX': ['^GSPC'],
+  'DAX': ['^GDAXI'],
+  'NIKKEI': ['^N225'],
+  'CAC': ['^FCHI'],
+};
+function resolveAssetSymbol(sym: string, assets: AssetSnapshot[]): string {
+  if (!sym) return sym;
+  // 1. Match exact sur le symbole
+  if (assets.find(a => a.symbol === sym)) return sym;
+  const upper = sym.toUpperCase();
+  // 2. Alias map (JPY → USDJPY=X, etc.)
+  const aliases = SYMBOL_ALIASES[upper];
+  if (aliases) {
+    for (const alt of aliases) {
+      if (assets.find(a => a.symbol === alt)) return alt;
+    }
+  }
+  // 3. Match par nom (ex: "Keyence" → "6861.T") — Haiku envoie parfois le nom au lieu du ticker
+  const lower = sym.toLowerCase();
+  const byName = assets.find(a => a.name?.toLowerCase() === lower);
+  if (byName) return byName.symbol;
+  // 4. Match par nom partiel (ex: "Keyence Corp" → "Keyence" → "6861.T")
+  const byNamePartial = assets.find(a =>
+    a.name?.toLowerCase().includes(lower) || lower.includes((a.name || '').toLowerCase()),
+  );
+  if (byNamePartial && (byNamePartial.name || '').length >= 3) return byNamePartial.symbol;
+  // 5. Substring match sur le symbole (ex: "USDJPY" → "USDJPY=X")
+  const match = assets.find(a => a.symbol.startsWith(upper) || a.symbol.includes(upper));
+  return match ? match.symbol : sym;
+}
+
+/** Asset ticker card de fallback quand on n'a pas de candles : nom + prix + % */
+const AssetTickerCard: React.FC<{
+  name: string;
+  price: number;
+  changePct?: number;
+  accentColor: string;
+}> = ({ name, price, changePct, accentColor }) => {
+  const isUp = (changePct ?? 0) > 0;
+  const isDown = (changePct ?? 0) < 0;
+  const changeColor = isUp ? '#1a6b3a' : isDown ? '#8b1a1a' : '#4a4a4a';
+  const fmtPrice = price >= 1000 ? price.toLocaleString('fr-FR', { maximumFractionDigits: 0 })
+    : price.toLocaleString('fr-FR', { maximumFractionDigits: 2 });
+  return (
+    <div style={{
+      display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
+      gap: 6, minWidth: 280,
+    }}>
+      <div style={{
+        fontFamily: 'Playfair Display, Georgia, serif',
+        fontSize: 28, fontWeight: 800, fontStyle: 'italic',
+        color: '#1a1612', lineHeight: 1,
+      }}>{name}</div>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 14 }}>
+        <span style={{
+          fontFamily: 'Bebas Neue, Impact, sans-serif',
+          fontSize: 56, fontWeight: 900,
+          color: accentColor, lineHeight: 1,
+          fontVariantNumeric: 'tabular-nums',
+        }}>{fmtPrice}</span>
+        {changePct !== undefined && Number.isFinite(changePct) && (
+          <span style={{
+            fontFamily: 'JetBrains Mono, monospace',
+            fontSize: 22, fontWeight: 700,
+            color: changeColor,
+            fontVariantNumeric: 'tabular-nums',
+          }}>{changePct >= 0 ? '+' : ''}{changePct.toFixed(2)}%</span>
+        )}
+      </div>
+    </div>
+  );
+};
+
+/** Fallback comparaison côte-à-côte pour spread_chart sans candles */
+const ComparisonFallback: React.FC<{
+  title: string;
+  left: { name: string; price?: number; changePct?: number };
+  right: { name: string; price?: number; changePct?: number };
+  accentColor: string;
+}> = ({ title, left, right, accentColor }) => {
+  const renderSide = (s: { name: string; price?: number; changePct?: number }) => {
+    const isUp = (s.changePct ?? 0) > 0;
+    const isDown = (s.changePct ?? 0) < 0;
+    const c = isUp ? '#1a6b3a' : isDown ? '#8b1a1a' : '#4a4a4a';
+    const fmt = (p?: number) => p === undefined ? '—'
+      : p >= 1000 ? p.toLocaleString('fr-FR', { maximumFractionDigits: 0 })
+      : p.toLocaleString('fr-FR', { maximumFractionDigits: 2 });
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 220 }}>
+        <div style={{
+          fontFamily: 'Playfair Display, Georgia, serif',
+          fontSize: 22, fontWeight: 800, fontStyle: 'italic',
+          color: '#1a1612', lineHeight: 1,
+        }}>{s.name}</div>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+          <span style={{
+            fontFamily: 'Bebas Neue, Impact, sans-serif',
+            fontSize: 38, fontWeight: 900, color: c,
+            fontVariantNumeric: 'tabular-nums', lineHeight: 1,
+          }}>{fmt(s.price)}</span>
+          {s.changePct !== undefined && Number.isFinite(s.changePct) && (
+            <span style={{
+              fontFamily: 'JetBrains Mono, monospace',
+              fontSize: 16, fontWeight: 700, color: c,
+              fontVariantNumeric: 'tabular-nums',
+            }}>{s.changePct >= 0 ? '+' : ''}{s.changePct.toFixed(2)}%</span>
+          )}
+        </div>
+      </div>
+    );
+  };
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {title && (
+        <div style={{
+          fontFamily: 'JetBrains Mono, monospace',
+          fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase',
+          color: '#3d342a', fontWeight: 700,
+        }}>{title}</div>
+      )}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
+        {renderSide(left)}
+        <div style={{
+          width: 2, height: 60, backgroundColor: accentColor, opacity: 0.5,
+        }} />
+        {renderSide(right)}
+      </div>
+    </div>
+  );
+};
+
 /** Replace Yahoo symbols with human names.
  *  Symbols with special chars (^, =, -, .) → safe exact match.
  *  Plain tickers (AAPL, META) → word boundary to avoid "Or" → "Realty Incomer".
@@ -324,14 +478,12 @@ const OverlayContent: React.FC<OverlayContentProps> = ({ type, data, assets, acc
     case 'stat': {
       const rawValue = data.value;
       const numValue = typeof rawValue === 'number' ? rawValue : parseFloat(String(rawValue));
-      // If value is not a valid number, show just the label as a text card
-      if (isNaN(numValue)) {
-        return (
-          <TextCard
-            text={humanize((data.label as string) ?? '', assets)}
-            accentColor={accentColor}
-          />
-        );
+      // Si la value est invalide OU vaut exactement 0, on n'affiche pas un faux 0% :
+      // on bascule sur TextCard avec le label seul (souvent le label est éloquent).
+      if (isNaN(numValue) || numValue === 0) {
+        const label = humanize((data.label as string) ?? '', assets);
+        if (!label) return null;
+        return <TextCard text={label} accentColor={accentColor} />;
       }
       const rawSuffix = (data.suffix as string) ?? '%';
       const suffix = rawSuffix === 'text' || rawSuffix === 'string' ? '' : rawSuffix;
@@ -355,12 +507,23 @@ const OverlayContent: React.FC<OverlayContentProps> = ({ type, data, assets, acc
 
     case 'comparison': {
       const badges: AssetBadge[] = ((data.assets as any[]) ?? []).map(a => {
-        const sym = a.symbol ?? '';
+        const rawSym = a.symbol ?? '';
+        const sym = resolveAssetSymbol(rawSym, assets);
         const found = assets.find(x => x.symbol === sym);
+        // Prefer real snapshot data : si Haiku envoie changePct=0 ou label=symbole brut,
+        // on enrichit depuis la watchlist enrichie. `0 ?? x` reste 0, donc on teste
+        // explicitement (a.changePct truthy && != 0).
+        const enrichedChangePct =
+          (typeof a.changePct === 'number' && a.changePct !== 0)
+            ? a.changePct
+            : (found?.changePct ?? 0);
+        const enrichedLabel = (a.label && a.label !== rawSym)
+          ? a.label
+          : (found?.name ?? a.label ?? sym);
         return {
-          symbol: found?.name ?? a.label ?? sym,
-          name: a.label ?? found?.name ?? '',
-          changePct: a.changePct ?? found?.changePct ?? 0,
+          symbol: enrichedLabel,
+          name: enrichedLabel,
+          changePct: enrichedChangePct,
           price: a.value ?? a.price ?? found?.price,
         };
       });
@@ -422,19 +585,29 @@ const OverlayContent: React.FC<OverlayContentProps> = ({ type, data, assets, acc
 
     case 'chart':
     case 'chart_zone': {
-      const sym = (data.symbol as string) ?? '';
+      const rawSym = (data.symbol as string) ?? '';
+      const sym = resolveAssetSymbol(rawSym, assets);
       const asset = assets.find(a => a.symbol === sym);
       const allCandles = asset?.dailyCandles ?? asset?.candles ?? [];
 
       if (allCandles.length < 5) {
-        // No candle data — show stat if we have a price, otherwise skip entirely
-        const label = humanize((data.name as string) ?? (asset?.name as string) ?? sym, assets);
-        const price = (data.price as number);
-        if (price) {
-          return <AnimatedStat value={price} label={label} suffix="" accentColor={accentColor} size="md" />;
+        // Pas de candles : afficher un AssetTicker riche (nom + prix + %) plutôt
+        // qu'un simple label. Évite l'overlay "vide" pour les stockScreen movers
+        // (Keyence, Fanuc...) qui n'ont pas été fetchés avec leurs bougies.
+        const label = humanize((data.name as string) ?? asset?.name ?? sym, assets);
+        const price = asset?.price ?? (data.price as number | undefined);
+        const changePct = asset?.changePct ?? (data.changePct as number | undefined);
+        if (price !== undefined && Number.isFinite(price)) {
+          return (
+            <AssetTickerCard
+              name={label}
+              price={price}
+              changePct={changePct}
+              accentColor={accentColor}
+            />
+          );
         }
-        // Asset not in snapshot — don't show raw ticker symbol
-        if (!asset) return null;
+        if (!asset && !label) return null;
         return <TextCard text={label} accentColor={accentColor} />;
       }
 
@@ -468,8 +641,8 @@ const OverlayContent: React.FC<OverlayContentProps> = ({ type, data, assets, acc
     }
 
     case 'spread_chart': {
-      const sym1 = (data.asset1 as string) ?? '';
-      const sym2 = (data.asset2 as string) ?? '';
+      const sym1 = resolveAssetSymbol((data.asset1 as string) ?? '', assets);
+      const sym2 = resolveAssetSymbol((data.asset2 as string) ?? '', assets);
       const label = (data.label as string) ?? `${sym1} vs ${sym2}`;
 
       // For yield symbols (DGS10, DGS2, T10Y2Y), use yieldsHistory
@@ -499,7 +672,18 @@ const OverlayContent: React.FC<OverlayContentProps> = ({ type, data, assets, acc
       }
 
       if (candles1.length < 5 || candles2.length < 5) {
-        return <TextCard text={humanize(label, assets)} accentColor={accentColor} />;
+        // Pas de candles pour au moins un des deux : afficher une comparison
+        // côte-à-côte avec name + price + % au lieu d'un simple TextCard.
+        const a1 = assets.find(a => a.symbol === sym1);
+        const a2 = assets.find(a => a.symbol === sym2);
+        return (
+          <ComparisonFallback
+            title={humanize(label, assets)}
+            left={{ name: humanize(label1, assets), price: a1?.price, changePct: a1?.changePct }}
+            right={{ name: humanize(label2, assets), price: a2?.price, changePct: a2?.changePct }}
+            accentColor={accentColor}
+          />
+        );
       }
 
       return (
@@ -511,6 +695,35 @@ const OverlayContent: React.FC<OverlayContentProps> = ({ type, data, assets, acc
           width={1400}
           height={650}
           drawDuration={30}
+        />
+      );
+    }
+
+    case 'countdown_event': {
+      const eventLabel = humanize((data.eventLabel as string) ?? (data.label as string) ?? '', assets);
+      const targetDate = ((data.targetDate as string) ?? (data.date as string) ?? '').trim();
+      let daysUntil = typeof data.daysUntil === 'number' ? data.daysUntil : 0;
+
+      // Si daysUntil = 0 + targetDate ressemble à une date ISO, recalcule à partir d'aujourd'hui
+      if (daysUntil <= 0 && /^\d{4}-\d{2}-\d{2}/.test(targetDate)) {
+        const t = new Date(targetDate).getTime();
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        const diff = Math.round((t - today.getTime()) / 86400000);
+        if (Number.isFinite(diff) && diff >= 0) daysUntil = diff;
+      }
+
+      // Si après recalcul on a toujours 0 ET pas de targetDate clair, on suppress le countdown
+      // (sinon on afficherait juste "J" sans valeur de jours, sans intérêt narratif).
+      if (daysUntil <= 0 && !targetDate) return null;
+
+      return (
+        <CountdownEvent
+          eventLabel={eventLabel}
+          targetDate={targetDate}
+          daysUntil={daysUntil}
+          affectedAsset={humanize((data.affectedAsset as string) ?? (data.asset as string) ?? '', assets)}
+          stake={humanize((data.stake as string) ?? '', assets)}
+          accentColor={accentColor}
         />
       );
     }

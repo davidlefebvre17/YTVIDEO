@@ -30,6 +30,7 @@ import { BeatSequence } from "../scenes/beat/BeatSequence";
 import { InkSubtitle, type SubtitleLine } from "../scenes/shared/InkSubtitle";
 import { GrainOverlay } from "../scenes/shared/GrainOverlay";
 import { DisclaimerBar } from "../scenes/shared/DisclaimerBar";
+import { LikeSubscribePrompt } from "../scenes/shared/LikeSubscribePrompt";
 import { BeatAudioTrack } from "../audio/BeatAudioTrack";
 import { getSfxPath, SFX_VOLUME } from "../audio/sfx-library";
 import { DisclaimerScene } from "../scenes/shared/DisclaimerScene";
@@ -80,12 +81,19 @@ export interface BeatEpisodeProps {
 }
 
 // ── Owl video clips ──────────────────────────────────────────
-const OWL_INTRO_SRC = staticFile("owl-video/owl_intro_std_1080p.mp4");
-const OWL_DIVE_SRC = staticFile("owl-video/owl_clip2_kling.mp4");
-const OWL_INTRO_FRAMES = 240; // 8s @ 30fps
+const OWL_INTRO_SRC = staticFile("owl-video/owl_seg1_seedance.mp4");
+const OWL_DIVE_SRC = staticFile("owl-video/owl_seg2_seedance.mp4");
+const OWL_INTRO_FRAMES = 300; // 10s @ 30fps
 const OWL_DIVE_FRAMES = 300; // 10s @ 30fps
 const OWL_CROSSFADE = 20; // crossfade from dive video into NewspaperPage
 const OWL_CLIP_OVERLAP = 15; // overlap between intro and dive for smooth transition
+
+// ── First-transition pushups clip ──────────────────────────────
+const OWL_PUSHUPS_SRC = staticFile("owl-video/owl_pushups.mp4");
+const OWL_PUSHUPS_START_IMG = staticFile("owl-video/owl_pushups_start.png");
+const OWL_PUSHUPS_END_IMG = staticFile("owl-video/owl_pushups_end.png");
+const PUSHUPS_FRAMES = 150; // 5s @ 30fps
+const PUSHUPS_FADE = 30; // 1s crossfade image → newspaper after video ends
 
 /** Owl clip with fade-out at end */
 const OwlClipFade: React.FC<{
@@ -129,6 +137,67 @@ const OwlDiveWithCrossfade: React.FC<{
   );
 };
 
+/** First between-segment transition: layered crossfades to avoid white flashes.
+ *  Layer stack (bottom→top):
+ *    1) end-image (always full opacity — revealed cleanly when video unmounts)
+ *    2) video (plays frame 0 to PUSHUPS_FRAMES; last frame pixel-matches end-image)
+ *    3) start-image (opaque at frame 0, fades out → reveals video beneath, covers potential flash)
+ *    4) newspaper (fades in over END_CF frames after video ends)
+ */
+const START_CF = 12; // 0.4s crossfade start-image → video
+const FirstTransitionBlock: React.FC<{
+  durationInFrames: number;
+  npProps: React.ComponentProps<typeof NewspaperPage>;
+  activeSegmentIdx: number;
+}> = ({ durationInFrames, npProps, activeSegmentIdx }) => {
+  const frame = useCurrentFrame();
+
+  const startImgOpacity = interpolate(frame, [0, START_CF], [1, 0], {
+    extrapolateLeft: "clamp", extrapolateRight: "clamp",
+  });
+  const npOpacity = interpolate(
+    frame,
+    [PUSHUPS_FRAMES, PUSHUPS_FRAMES + PUSHUPS_FADE],
+    [0, 1],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+  );
+  const videoVisible = frame < PUSHUPS_FRAMES;
+  const imgStyle = { width: "100%", height: "100%", objectFit: "cover" } as const;
+
+  return (
+    <AbsoluteFill>
+      {/* 1. End image as stable base — prevents flash when video unmounts */}
+      <AbsoluteFill>
+        <img src={OWL_PUSHUPS_END_IMG} style={imgStyle} alt="" />
+      </AbsoluteFill>
+      {/* 2. Video plays above end image */}
+      {videoVisible && (
+        <AbsoluteFill>
+          <Video
+            src={OWL_PUSHUPS_SRC}
+            muted
+            volume={0}
+            style={imgStyle}
+            onError={() => {}}
+          />
+        </AbsoluteFill>
+      )}
+      {/* 3. Start image crossfades out to reveal video */}
+      {startImgOpacity > 0 && (
+        <AbsoluteFill style={{ opacity: startImgOpacity }}>
+          <img src={OWL_PUSHUPS_START_IMG} style={imgStyle} alt="" />
+        </AbsoluteFill>
+      )}
+      {/* 4. Newspaper crossfades in from end image at the end of the block */}
+      {npOpacity > 0 && (
+        <AbsoluteFill style={{ opacity: npOpacity }}>
+          <NewspaperPage {...npProps} activeSegmentIdx={activeSegmentIdx} showTypewriter={false} />
+        </AbsoluteFill>
+      )}
+    </AbsoluteFill>
+  );
+};
+
 // ── Constants ────────────────────────────────────────────────
 const DISCLAIMER_FRAMES = 90; // 3s
 const ZOOM_FRAMES = 45; // 1.5s
@@ -139,13 +208,27 @@ const MIN_CLOSING_FRAMES = 150; // 5s minimum closing
 
 const PRE_SEGMENT_IDS = ["hook", "thread"];
 
+/** Minimum frames required for the pushups-clip first-transition block:
+ *  video + crossfade to newspaper + 15f newspaper tail before zoom-in. */
+const FIRST_TRANSITION_MIN_FRAMES = PUSHUPS_FRAMES + PUSHUPS_FADE + 15;
+
 /** Get transition duration in frames for a given segment, using real owl audio duration if available. */
-function getBetweenFrames(segId: string, fps: number, owlAudioDurations?: Record<string, number>): number {
-  if (!owlAudioDurations) return BETWEEN_FRAMES_DEFAULT;
+function getBetweenFrames(
+  segId: string,
+  fps: number,
+  owlAudioDurations: Record<string, number> | undefined,
+  isFirstTransition: boolean,
+): number {
   const key = `owl_tr_${segId}`;
-  const dur = owlAudioDurations[key];
-  if (dur && dur > 0) return Math.round(dur * fps) + 15; // audio duration + 0.5s padding
-  return BETWEEN_FRAMES_DEFAULT;
+  const audioDur = owlAudioDurations?.[key];
+  const audioFrames = audioDur && audioDur > 0
+    ? Math.round(audioDur * fps) + 15
+    : BETWEEN_FRAMES_DEFAULT;
+  // First transition embeds the 5s pushups video, so ensure enough room.
+  if (isFirstTransition) {
+    return Math.max(FIRST_TRANSITION_MIN_FRAMES, audioFrames);
+  }
+  return audioFrames;
 }
 
 // ── Beat helpers ─────────────────────────────────────────────
@@ -267,7 +350,7 @@ export function computeNewspaperDuration(
       // CROSSFADE_FRAMES overlap means beats start earlier, reducing total
       segTotal += ZOOM_FRAMES + dur + ZOOM_FRAMES - CROSSFADE_FRAMES;
     }
-    if (i < segIds.length - 1) segTotal += getBetweenFrames(segIds[i], fps, owlAudioDurations);
+    if (i < segIds.length - 1) segTotal += getBetweenFrames(segIds[i], fps, owlAudioDurations, i === 0);
   }
 
   const closingBeatsDur = groups.has("closing")
@@ -442,7 +525,7 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
       if (isPanorama) {
         // PANORAMA: no zoom in/out — stays on newspaper page with StampOverlay + audio
         const beatsStart = segCum;
-        const betweenF = getBetweenFrames(segId, fps, owlAudioDurations as any);
+        const betweenF = getBetweenFrames(segId, fps, owlAudioDurations as any, i === 0);
         const end = beatsStart + dur + (isLast ? 0 : betweenF);
         sectionStarts.set(segId, beatsStart);
         segCum = end;
@@ -457,7 +540,7 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
         };
       }
 
-      const betweenF = getBetweenFrames(segId, fps, owlAudioDurations as any);
+      const betweenF = getBetweenFrames(segId, fps, owlAudioDurations as any, i === 0);
       const zoomInStart = segCum;
       // Beats start CROSSFADE_FRAMES before zoom ends (overlap for smooth transition)
       const beatsStart = zoomInStart + ZOOM_FRAMES - CROSSFADE_FRAMES;
@@ -514,26 +597,50 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
   }, [patchedBeats, beatGroups, segmentIds, fps, owlAudioDurations]);
 
   // ── Step 4: Subtitle lines ──
-  const subtitleLines = useMemo(
-    (): SubtitleLine[] =>
-      patchedBeats
-        .map((beat, i) => {
-          const t = timings.allBeatTimings[i];
-          if (
-            !t ||
-            !beat.narrationChunk ||
-            beat.narrationChunk.length < 3
-          )
-            return null;
-          return {
-            text: humanizeSubtitle(beat.narrationChunk, assets),
-            startFrame: t.start,
-            endFrame: t.start + t.duration,
-          };
-        })
-        .filter((l): l is SubtitleLine => l !== null),
-    [patchedBeats, timings.allBeatTimings],
-  );
+  const subtitleLines = useMemo((): SubtitleLine[] => {
+    const beatLines: SubtitleLine[] = patchedBeats
+      .map((beat, i) => {
+        const t = timings.allBeatTimings[i];
+        if (!t || !beat.narrationChunk || beat.narrationChunk.length < 3) return null;
+        return {
+          text: humanizeSubtitle(beat.narrationChunk, assets),
+          startFrame: t.start,
+          endFrame: t.start + t.duration,
+        };
+      })
+      .filter((l): l is SubtitleLine => l !== null);
+
+    // Transition subtitles: chunk owlTransition text over audio duration
+    const transitionLines: SubtitleLine[] = [];
+    for (let i = 1; i < timings.segTimings.length; i++) {
+      const prevSeg = timings.segTimings[i - 1];
+      const st = timings.segTimings[i];
+      const section = script.sections.find((s) => s.id === prevSeg.segId);
+      const text = section?.owlTransition?.trim();
+      if (!text) continue;
+      const audioDur = owlAudioDurations?.[`owl_tr_${prevSeg.segId}`];
+      if (!audioDur || audioDur <= 0) continue;
+      const audioFrames = Math.round(audioDur * fps);
+      const audioStart = st.zoomInStart - prevSeg.betweenFrames;
+
+      const words = humanizeSubtitle(text, assets).split(/\s+/);
+      const chunkSize = 11;
+      const chunks: string[] = [];
+      for (let k = 0; k < words.length; k += chunkSize) {
+        chunks.push(words.slice(k, k + chunkSize).join(" "));
+      }
+      const perChunk = audioFrames / chunks.length;
+      for (let k = 0; k < chunks.length; k++) {
+        transitionLines.push({
+          text: chunks[k],
+          startFrame: Math.round(audioStart + k * perChunk),
+          endFrame: Math.round(audioStart + (k + 1) * perChunk),
+        });
+      }
+    }
+
+    return [...beatLines, ...transitionLines];
+  }, [patchedBeats, timings.allBeatTimings, timings.segTimings, script.sections, owlAudioDurations, fps, assets]);
 
   // ── Shared newspaper props ──
   const npProps = {
@@ -609,14 +716,6 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
         });
       })()}
 
-      {/* ── SFX: Ticker ambient during newspaper intro (voice over newspaper) ── */}
-      <Sequence
-        from={OWL_INTRO_FRAMES + OWL_DIVE_FRAMES - OWL_CLIP_OVERLAP + Math.round(3 * fps)}
-        durationInFrames={Math.max(30, timings.newspaperIntroFrames - Math.round(3 * fps))}
-      >
-        <Audio src={getSfxPath("ticker", 0)} volume={0.06} loop />
-      </Sequence>
-
       {/* ── 3. Segment zoom loops ── */}
       {timings.segTimings.map((st, i) => {
         const segBeats = beatGroups.get(st.segId) ?? [];
@@ -686,21 +785,30 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
               const globalIdx = patchedBeats.indexOf(beat);
               const bt = timings.allBeatTimings[globalIdx];
               if (!bt) return null;
+              const isLastBeat = j === segBeats.length - 1;
               // First beat gets extra fade-in frames to blend with zoom
+              // Last beat gets extra fade-out frames to crossfade smoothly into the next content (pushups image or zoom-out)
               const effectiveFade = j === 0
                 ? Math.max(bt.fadeFrames, CROSSFADE_FRAMES)
-                : bt.fadeFrames;
+                : isLastBeat
+                  ? Math.max(bt.fadeFrames, CROSSFADE_FRAMES)
+                  : bt.fadeFrames;
+              // Last beat: extend its Sequence to fill any gap up to zoomOutStart
+              // PLUS CROSSFADE_FRAMES so its fade-out overlaps with the next content, creating a clean crossfade.
+              const seqDuration = isLastBeat
+                ? Math.max(bt.duration, st.zoomOutStart - bt.start) + CROSSFADE_FRAMES
+                : bt.duration;
               return (
                 <Sequence
                   key={beat.id}
                   from={bt.start}
-                  durationInFrames={bt.duration}
+                  durationInFrames={seqDuration}
                 >
                   <CrossfadeBeat
                     beat={beat}
                     assets={assets}
                     accentColor={accentColor}
-                    durationInFrames={bt.duration}
+                    durationInFrames={seqDuration}
                     fadeFrames={effectiveFade}
                     yieldsHistory={yieldsHistoryData}
                   />
@@ -716,24 +824,35 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
               );
             })}
 
-            {/* Zoom Out → back to newspaper */}
+            {/* Zoom Out → i===0: direct cut to pushups image (no zoom avoids zooming into random region);
+                otherwise zoom out onto newspaper card. */}
             <Sequence
               from={st.zoomOutStart}
               durationInFrames={ZOOM_FRAMES}
             >
-              <ZoomTransition
-                direction="out"
-                sourceRect={rect}
-                durationInFrames={ZOOM_FRAMES}
-              >
-                <NewspaperPage
-                  {...npProps}
-                  activeSegmentIdx={
-                    i < segmentIds.length - 1 ? i + 1 : -1
-                  }
-                  showTypewriter={false}
-                />
-              </ZoomTransition>
+              {i === 0 ? (
+                <AbsoluteFill>
+                  <img
+                    src={OWL_PUSHUPS_START_IMG}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    alt=""
+                  />
+                </AbsoluteFill>
+              ) : (
+                <ZoomTransition
+                  direction="out"
+                  sourceRect={rect}
+                  durationInFrames={ZOOM_FRAMES}
+                >
+                  <NewspaperPage
+                    {...npProps}
+                    activeSegmentIdx={
+                      i < segmentIds.length - 1 ? i + 1 : -1
+                    }
+                    showTypewriter={false}
+                  />
+                </ZoomTransition>
+              )}
             </Sequence>
 
             {/* SFX: Page flip on zoom out */}
@@ -743,7 +862,18 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
 
             {/* Brief pause on newspaper between segments */}
             {i < segmentIds.length - 1 && st.betweenFrames > 0 && (
-              <>
+              i === 0 ? (
+                <Sequence
+                  from={st.zoomOutStart + ZOOM_FRAMES}
+                  durationInFrames={st.betweenFrames}
+                >
+                  <FirstTransitionBlock
+                    durationInFrames={st.betweenFrames}
+                    npProps={npProps}
+                    activeSegmentIdx={i + 1}
+                  />
+                </Sequence>
+              ) : (
                 <Sequence
                   from={st.zoomOutStart + ZOOM_FRAMES}
                   durationInFrames={st.betweenFrames}
@@ -754,14 +884,7 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
                     showTypewriter={false}
                   />
                 </Sequence>
-                {/* SFX: subtle clock tick during pause */}
-                <Sequence
-                  from={st.zoomOutStart + ZOOM_FRAMES}
-                  durationInFrames={st.betweenFrames}
-                >
-                  <Audio src={getSfxPath("clock", i)} volume={SFX_VOLUME.clock * 0.4} />
-                </Sequence>
-              </>
+              )
             )}
           </React.Fragment>
         );
@@ -868,27 +991,30 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
         if (!firstT || !lastT) return null;
         const stampStart = firstT.start;
         const stampDur = lastT.start + lastT.duration - stampStart;
+        // Affiche l'ensemble des assets (watchlist enrichie avec les movers nommés
+        // dans le script via generate.ts). Les gros movers auront une grosse bulle,
+        // la watchlist remplit le contexte visuel.
+        const stampAssets = assets;
         return (
           <>
             <Sequence from={stampStart} durationInFrames={stampDur}>
               <StampOverlay
-                assets={assets}
+                assets={stampAssets}
                 durationInFrames={stampDur}
               />
             </Sequence>
-            {/* SFX: 1 stamp sound per asset, synced with StampOverlay appearance */}
+            {/* SFX: bubble bloom rush during the grow phase (~1.5s) — soft stagger */}
             {(() => {
-              // Mirror StampOverlay's appearance timing: 85% of duration, evenly spaced
-              const appearWindow = Math.round(stampDur * 0.85);
-              const count = assets.length;
-              const interval = count > 1 ? appearWindow / (count - 1) : 0;
-              return assets.map((_, j) => (
+              const bloomFrames = Math.min(45, stampDur);
+              const count = stampAssets.length;
+              const interval = count > 1 ? bloomFrames / count : 0;
+              return stampAssets.map((_, j) => (
                 <Sequence
                   key={`stamp-sfx-${j}`}
                   from={stampStart + Math.round(j * interval)}
                   durationInFrames={Math.round(0.8 * fps)}
                 >
-                  <Audio src={getSfxPath("stamp", j)} volume={SFX_VOLUME.stamp * 0.6} />
+                  <Audio src={getSfxPath("stamp", j)} volume={SFX_VOLUME.stamp * 0.15} />
                 </Sequence>
               ));
             })()}
@@ -900,6 +1026,26 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
       <InkSubtitle lines={subtitleLines} />
       <GrainOverlay opacity={0.04} />
       <DisclaimerBar lang={script.lang} />
+
+      {/* Like + Subscribe prompt à la seconde 12, top-left, ~5s */}
+      <Sequence from={12 * fps} durationInFrames={5 * fps}>
+        <LikeSubscribePrompt durationInFrames={5 * fps} />
+      </Sequence>
+
+      {/* Like + Subscribe prompt à la fin, pendant l'owl closing (CTA) */}
+      {(() => {
+        const owlF = getOwlClosingFrames(fps, owlAudioDurations as any);
+        if (owlF <= 0) return null;
+        const owlStart = timings.closingStart + timings.closingDur - owlF;
+        // Démarre le prompt 1s après le début de l'owl closing, dure toute la coda
+        const promptStart = owlStart + Math.round(fps);
+        const promptDur = Math.max(owlF - Math.round(fps), Math.round(3 * fps));
+        return (
+          <Sequence from={promptStart} durationInFrames={promptDur}>
+            <LikeSubscribePrompt durationInFrames={promptDur} />
+          </Sequence>
+        );
+      })()}
     </AbsoluteFill>
   );
 };

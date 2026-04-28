@@ -12,7 +12,9 @@ export { fetchMarketSentiment } from "./sentiment";
 export { screenStocks } from "./screening";
 export { fetchMarketauxNews } from "./marketaux";
 export { fetchPolymarketData } from "./polymarket";
-export { fetchCOTPositioning } from "./cot";
+export { fetchCOTPositioning, fetchCOTHistoryFromArchives } from "./cot";
+export { computeCotInsights, formatCotInsightsMarkdown } from "./cot-insights";
+export type { CotInsight, CotSignalKind } from "./cot-insights";
 // MarketMemory (D3)
 export {
   updateAllMarketMemory,

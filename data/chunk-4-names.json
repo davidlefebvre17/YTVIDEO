@@ -1,0 +1,390 @@
+[
+  {
+    "symbol": "ED",
+    "name": "Consolidated Edison"
+  },
+  {
+    "symbol": "EFX",
+    "name": "Equifax"
+  },
+  {
+    "symbol": "EG",
+    "name": "Everest Group"
+  },
+  {
+    "symbol": "EIX",
+    "name": "Edison International"
+  },
+  {
+    "symbol": "EL",
+    "name": "Estée Lauder Companies (The)"
+  },
+  {
+    "symbol": "EL.PA",
+    "name": "EssilorLuxottica"
+  },
+  {
+    "symbol": "ELV",
+    "name": "Elevance Health Inc"
+  },
+  {
+    "symbol": "EME",
+    "name": "Emcor"
+  },
+  {
+    "symbol": "EMR",
+    "name": "Emerson Electric Co"
+  },
+  {
+    "symbol": "EN.PA",
+    "name": "Bouygues"
+  },
+  {
+    "symbol": "ENGI.PA",
+    "name": "Engie"
+  },
+  {
+    "symbol": "ENR.DE",
+    "name": "Siemens Energy"
+  },
+  {
+    "symbol": "EOAN.DE",
+    "name": "E.ON"
+  },
+  {
+    "symbol": "EOG",
+    "name": "EOG Resources Inc"
+  },
+  {
+    "symbol": "EPAM",
+    "name": "EPAM Systems"
+  },
+  {
+    "symbol": "EQIX",
+    "name": "Equinix Inc"
+  },
+  {
+    "symbol": "EQR",
+    "name": "Equity Residential"
+  },
+  {
+    "symbol": "EQT",
+    "name": "EQT Corporation"
+  },
+  {
+    "symbol": "ERF.PA",
+    "name": "Eurofins Scientific"
+  },
+  {
+    "symbol": "ERIE",
+    "name": "Erie Indemnity"
+  },
+  {
+    "symbol": "ES",
+    "name": "Eversource Energy"
+  },
+  {
+    "symbol": "ESS",
+    "name": "Essex Property Trust"
+  },
+  {
+    "symbol": "ETH-USD",
+    "name": "Ethereum"
+  },
+  {
+    "symbol": "ETN",
+    "name": "Eaton Corporation PLC"
+  },
+  {
+    "symbol": "ETR",
+    "name": "Entergy"
+  },
+  {
+    "symbol": "EURGBP=X",
+    "name": "EUR/GBP"
+  },
+  {
+    "symbol": "EURJPY=X",
+    "name": "EUR/JPY"
+  },
+  {
+    "symbol": "EURUSD=X",
+    "name": "EUR/USD"
+  },
+  {
+    "symbol": "EVRG",
+    "name": "Evergy"
+  },
+  {
+    "symbol": "EW",
+    "name": "Edwards Lifesciences"
+  },
+  {
+    "symbol": "EXC",
+    "name": "Exelon Corp"
+  },
+  {
+    "symbol": "EXE",
+    "name": "Expand Energy"
+  },
+  {
+    "symbol": "EXPD",
+    "name": "Expeditors International"
+  },
+  {
+    "symbol": "EXPE",
+    "name": "Expedia Group"
+  },
+  {
+    "symbol": "EXPN.L",
+    "name": "Experian"
+  },
+  {
+    "symbol": "EXR",
+    "name": "Extra Space Storage"
+  },
+  {
+    "symbol": "EZJ.L",
+    "name": "easyJet"
+  },
+  {
+    "symbol": "F",
+    "name": "Ford Motor Co"
+  },
+  {
+    "symbol": "FANG",
+    "name": "Diamondback Energy Inc"
+  },
+  {
+    "symbol": "FAST",
+    "name": "Fastenal Co"
+  },
+  {
+    "symbol": "FCX",
+    "name": "Freeport-McMoRan Inc"
+  },
+  {
+    "symbol": "FDS",
+    "name": "Factset Research Systems Inc"
+  },
+  {
+    "symbol": "FDX",
+    "name": "FedEx Corp"
+  },
+  {
+    "symbol": "FE",
+    "name": "FirstEnergy"
+  },
+  {
+    "symbol": "FERG.L",
+    "name": "Ferguson"
+  },
+  {
+    "symbol": "FFIV",
+    "name": "\"F5"
+  },
+  {
+    "symbol": "FICO",
+    "name": "Fair Isaac"
+  },
+  {
+    "symbol": "FIS",
+    "name": "Fidelity National Information Services"
+  },
+  {
+    "symbol": "FISV",
+    "name": "Fiserv"
+  },
+  {
+    "symbol": "FITB",
+    "name": "Fifth Third Bancorp"
+  },
+  {
+    "symbol": "FIX",
+    "name": "Comfort Systems USA"
+  },
+  {
+    "symbol": "FLTR.L",
+    "name": "Flutter Entertainment"
+  },
+  {
+    "symbol": "FOX",
+    "name": "Fox Corporation (Class B)"
+  },
+  {
+    "symbol": "FOXA",
+    "name": "Fox Corporation (Class A)"
+  },
+  {
+    "symbol": "FRE.DE",
+    "name": "Fresenius"
+  },
+  {
+    "symbol": "FRT",
+    "name": "Federal Realty Investment Trust"
+  },
+  {
+    "symbol": "FSLR",
+    "name": "First Solar"
+  },
+  {
+    "symbol": "FTNT",
+    "name": "Fortinet"
+  },
+  {
+    "symbol": "FTV",
+    "name": "Fortive Corp"
+  },
+  {
+    "symbol": "GBPJPY=X",
+    "name": "GBP/JPY"
+  },
+  {
+    "symbol": "GBPUSD=X",
+    "name": "GBP/USD"
+  },
+  {
+    "symbol": "GC=F",
+    "name": "Or"
+  },
+  {
+    "symbol": "GD",
+    "name": "General Dynamics Corp"
+  },
+  {
+    "symbol": "GDDY",
+    "name": "GoDaddy"
+  },
+  {
+    "symbol": "GE",
+    "name": "General Electric Co"
+  },
+  {
+    "symbol": "GEHC",
+    "name": "GE HealthCare"
+  },
+  {
+    "symbol": "GEN",
+    "name": "Gen Digital"
+  },
+  {
+    "symbol": "GEV",
+    "name": "GE Vernova"
+  },
+  {
+    "symbol": "GILD",
+    "name": "Gilead Sciences Inc"
+  },
+  {
+    "symbol": "GIS",
+    "name": "General Mills"
+  },
+  {
+    "symbol": "GL",
+    "name": "Globe Life"
+  },
+  {
+    "symbol": "GLE.PA",
+    "name": "Société Générale"
+  },
+  {
+    "symbol": "GLEN.L",
+    "name": "Glencore"
+  },
+  {
+    "symbol": "GLW",
+    "name": "Corning Inc."
+  },
+  {
+    "symbol": "GM",
+    "name": "General Motors Co"
+  },
+  {
+    "symbol": "GNRC",
+    "name": "Generac"
+  },
+  {
+    "symbol": "GOOG",
+    "name": "Alphabet Inc"
+  },
+  {
+    "symbol": "GOOGL",
+    "name": "Alphabet Inc"
+  },
+  {
+    "symbol": "GPC",
+    "name": "Genuine Parts Company"
+  },
+  {
+    "symbol": "GPN",
+    "name": "Global Payments"
+  },
+  {
+    "symbol": "GRMN",
+    "name": "Garmin"
+  },
+  {
+    "symbol": "GS",
+    "name": "Goldman Sachs Group Inc"
+  },
+  {
+    "symbol": "GSK.L",
+    "name": "GSK"
+  },
+  {
+    "symbol": "GWW",
+    "name": "WW Grainger Inc"
+  },
+  {
+    "symbol": "H",
+    "name": "Hyatt Hotels Corp"
+  },
+  {
+    "symbol": "HAL",
+    "name": "Halliburton Co"
+  },
+  {
+    "symbol": "HAS",
+    "name": "Hasbro"
+  },
+  {
+    "symbol": "HBAN",
+    "name": "Huntington Bancshares"
+  },
+  {
+    "symbol": "HCA",
+    "name": "HCA Healthcare Inc"
+  },
+  {
+    "symbol": "HD",
+    "name": "Home Depot Inc"
+  },
+  {
+    "symbol": "HEI.DE",
+    "name": "HeidelbergMaterials"
+  },
+  {
+    "symbol": "HFG.DE",
+    "name": "HelloFresh"
+  },
+  {
+    "symbol": "HG=F",
+    "name": "Cuivre"
+  },
+  {
+    "symbol": "HIG",
+    "name": "Hartford (The)"
+  },
+  {
+    "symbol": "HII",
+    "name": "Huntington Ingalls Industries Inc"
+  },
+  {
+    "symbol": "HLN.L",
+    "name": "Haleon"
+  },
+  {
+    "symbol": "HLT",
+    "name": "Hilton Worldwide Holdings Inc"
+  }
+]

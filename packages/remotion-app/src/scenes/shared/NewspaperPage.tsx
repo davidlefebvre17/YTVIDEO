@@ -42,15 +42,14 @@ const KICKER_H = 20;
 const TITLE_H = 42;
 const ARTICLE_GAP = 14;
 
-// Image heights per depth
-const IMG_H_DEEP = 240;
-const IMG_H_FOCUS = 140;
-const IMG_H_FLASH = 100;
+// Image heights — uniformisé : même taille pour tous les articles quel que soit depth
+const IMG_H_UNIFORM = 240;
+const IMG_H_DEEP = IMG_H_UNIFORM;
+const IMG_H_FOCUS = IMG_H_UNIFORM;
+const IMG_H_FLASH = IMG_H_UNIFORM;
 
-function imgHeightForDepth(depth?: string): number {
-  if (depth === 'deep') return IMG_H_DEEP;
-  if (depth === 'flash' || depth === 'panorama') return IMG_H_FLASH;
-  return IMG_H_FOCUS;
+function imgHeightForDepth(_depth?: string): number {
+  return IMG_H_UNIFORM;
 }
 
 // ── Layout computation (shared between render + zoom rects) ──

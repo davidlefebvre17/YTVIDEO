@@ -1,0 +1,390 @@
+[
+  {
+    "symbol": "PTC",
+    "name": "PTC Inc."
+  },
+  {
+    "symbol": "PUB.PA",
+    "name": "Publicis Groupe"
+  },
+  {
+    "symbol": "PWR",
+    "name": "Quanta Services"
+  },
+  {
+    "symbol": "PXD",
+    "name": "Pioneer Natural Resources"
+  },
+  {
+    "symbol": "PYPL",
+    "name": "PayPal Holdings Inc"
+  },
+  {
+    "symbol": "Q",
+    "name": "Qnity Electronics"
+  },
+  {
+    "symbol": "QCOM",
+    "name": "Qualcomm Inc"
+  },
+  {
+    "symbol": "QGEN.DE",
+    "name": "Qiagen"
+  },
+  {
+    "symbol": "RCL",
+    "name": "Royal Caribbean Cruises Ltd"
+  },
+  {
+    "symbol": "REG",
+    "name": "Regency Centers"
+  },
+  {
+    "symbol": "REGN",
+    "name": "Regeneron Pharmaceuticals Inc"
+  },
+  {
+    "symbol": "REL.L",
+    "name": "RELX"
+  },
+  {
+    "symbol": "RF",
+    "name": "Regions Financial Corporation"
+  },
+  {
+    "symbol": "RHM.DE",
+    "name": "Rheinmetall"
+  },
+  {
+    "symbol": "RI.PA",
+    "name": "Pernod Ricard"
+  },
+  {
+    "symbol": "RIO.L",
+    "name": "Rio Tinto"
+  },
+  {
+    "symbol": "RJF",
+    "name": "Raymond James Financial"
+  },
+  {
+    "symbol": "RKT.L",
+    "name": "Reckitt"
+  },
+  {
+    "symbol": "RL",
+    "name": "Ralph Lauren Corporation"
+  },
+  {
+    "symbol": "RMD",
+    "name": "ResMed"
+  },
+  {
+    "symbol": "RMS.PA",
+    "name": "Hermès"
+  },
+  {
+    "symbol": "RNO.PA",
+    "name": "Renault"
+  },
+  {
+    "symbol": "ROK",
+    "name": "Rockwell Automation Inc"
+  },
+  {
+    "symbol": "ROL",
+    "name": "\"Rollins"
+  },
+  {
+    "symbol": "ROP",
+    "name": "Roper Technologies"
+  },
+  {
+    "symbol": "ROST",
+    "name": "Ross Stores"
+  },
+  {
+    "symbol": "RR.L",
+    "name": "Rolls-Royce"
+  },
+  {
+    "symbol": "RSG",
+    "name": "Republic Services Inc"
+  },
+  {
+    "symbol": "RTX",
+    "name": "RTX Corp"
+  },
+  {
+    "symbol": "RVTY",
+    "name": "Revvity"
+  },
+  {
+    "symbol": "RWE.DE",
+    "name": "RWE"
+  },
+  {
+    "symbol": "SAF.PA",
+    "name": "Safran"
+  },
+  {
+    "symbol": "SAIC",
+    "name": "Science Applications International Corp"
+  },
+  {
+    "symbol": "SAN.PA",
+    "name": "Sanofi"
+  },
+  {
+    "symbol": "SAP.DE",
+    "name": "SAP"
+  },
+  {
+    "symbol": "SBAC",
+    "name": "SBA Communications"
+  },
+  {
+    "symbol": "SBUX",
+    "name": "Starbucks Corp"
+  },
+  {
+    "symbol": "SCHW",
+    "name": "Charles Schwab Corp"
+  },
+  {
+    "symbol": "SDR.L",
+    "name": "Schroders"
+  },
+  {
+    "symbol": "SGE.L",
+    "name": "Sage Group"
+  },
+  {
+    "symbol": "SGO.PA",
+    "name": "Saint-Gobain"
+  },
+  {
+    "symbol": "SHEL.L",
+    "name": "Shell"
+  },
+  {
+    "symbol": "SHL.DE",
+    "name": "Siemens Healthineers"
+  },
+  {
+    "symbol": "SHOP",
+    "name": "Shopify Inc"
+  },
+  {
+    "symbol": "SHW",
+    "name": "Sherwin-Williams Co"
+  },
+  {
+    "symbol": "SI=F",
+    "name": "Argent"
+  },
+  {
+    "symbol": "SIE.DE",
+    "name": "Siemens"
+  },
+  {
+    "symbol": "SJM",
+    "name": "J.M. Smucker Company (The)"
+  },
+  {
+    "symbol": "SKG.L",
+    "name": "Smurfit Kappa"
+  },
+  {
+    "symbol": "SLB",
+    "name": "Slb NV"
+  },
+  {
+    "symbol": "SMCI",
+    "name": "Super Micro Computer Inc"
+  },
+  {
+    "symbol": "SNA",
+    "name": "Snap-on"
+  },
+  {
+    "symbol": "SNAP",
+    "name": "Snap Inc"
+  },
+  {
+    "symbol": "SNDK",
+    "name": "Sandisk"
+  },
+  {
+    "symbol": "SNOW",
+    "name": "Snowflake Inc"
+  },
+  {
+    "symbol": "SNPS",
+    "name": "Synopsys Inc"
+  },
+  {
+    "symbol": "SO",
+    "name": "Southern Co"
+  },
+  {
+    "symbol": "SOL-USD",
+    "name": "Solana"
+  },
+  {
+    "symbol": "SOLV",
+    "name": "Solventum"
+  },
+  {
+    "symbol": "SPG",
+    "name": "Simon Property Group Inc"
+  },
+  {
+    "symbol": "SPGI",
+    "name": "S&P Global Inc"
+  },
+  {
+    "symbol": "SQ",
+    "name": "Block (Square)"
+  },
+  {
+    "symbol": "SRE",
+    "name": "Sempra"
+  },
+  {
+    "symbol": "SRT3.DE",
+    "name": "Sartorius"
+  },
+  {
+    "symbol": "SSE.L",
+    "name": "SSE"
+  },
+  {
+    "symbol": "STAN.L",
+    "name": "Standard Chartered"
+  },
+  {
+    "symbol": "STE",
+    "name": "Steris"
+  },
+  {
+    "symbol": "STLAM.MI",
+    "name": "Stellantis"
+  },
+  {
+    "symbol": "STLD",
+    "name": "Steel Dynamics"
+  },
+  {
+    "symbol": "STMPA.PA",
+    "name": "STMicroelectronics"
+  },
+  {
+    "symbol": "STT",
+    "name": "State Street Corporation"
+  },
+  {
+    "symbol": "STX",
+    "name": "Seagate Technology"
+  },
+  {
+    "symbol": "STZ",
+    "name": "Constellation Brands"
+  },
+  {
+    "symbol": "SU.PA",
+    "name": "Schneider Electric"
+  },
+  {
+    "symbol": "SVNL.L",
+    "name": "Serco"
+  },
+  {
+    "symbol": "SVT.L",
+    "name": "Severn Trent"
+  },
+  {
+    "symbol": "SW",
+    "name": "Smurfit Westrock"
+  },
+  {
+    "symbol": "SW.PA",
+    "name": "Sodexo"
+  },
+  {
+    "symbol": "SWK",
+    "name": "Stanley Black & Decker"
+  },
+  {
+    "symbol": "SWKS",
+    "name": "Skyworks Solutions"
+  },
+  {
+    "symbol": "SY1.DE",
+    "name": "Symrise"
+  },
+  {
+    "symbol": "SYF",
+    "name": "Synchrony Financial"
+  },
+  {
+    "symbol": "SYK",
+    "name": "Stryker Corp"
+  },
+  {
+    "symbol": "SYY",
+    "name": "Sysco"
+  },
+  {
+    "symbol": "T",
+    "name": "AT&T Inc"
+  },
+  {
+    "symbol": "TAP",
+    "name": "Molson Coors Beverage Company"
+  },
+  {
+    "symbol": "TDG",
+    "name": "TransDigm Group Inc"
+  },
+  {
+    "symbol": "TDY",
+    "name": "Teledyne Technologies"
+  },
+  {
+    "symbol": "TECH",
+    "name": "Bio-Techne"
+  },
+  {
+    "symbol": "TEL",
+    "name": "TE Connectivity"
+  },
+  {
+    "symbol": "TEP.PA",
+    "name": "Teleperformance"
+  },
+  {
+    "symbol": "TER",
+    "name": "Teradyne"
+  },
+  {
+    "symbol": "TFC",
+    "name": "Truist Financial"
+  },
+  {
+    "symbol": "TGT",
+    "name": "Target Corp"
+  },
+  {
+    "symbol": "TJX",
+    "name": "TJX Companies Inc"
+  },
+  {
+    "symbol": "TKO",
+    "name": "TKO Group Holdings"
+  },
+  {
+    "symbol": "TMO",
+    "name": "Thermo Fisher Scientific Inc"
+  }
+]

@@ -1,0 +1,362 @@
+[
+  {
+    "symbol": "TMUS",
+    "name": "T-Mobile US Inc"
+  },
+  {
+    "symbol": "TOL",
+    "name": "Toll Brothers Inc"
+  },
+  {
+    "symbol": "TPL",
+    "name": "Texas Pacific Land Corporation"
+  },
+  {
+    "symbol": "TPR",
+    "name": "\"Tapestry"
+  },
+  {
+    "symbol": "TRGP",
+    "name": "Targa Resources"
+  },
+  {
+    "symbol": "TRMB",
+    "name": "Trimble Inc"
+  },
+  {
+    "symbol": "TROW",
+    "name": "T. Rowe Price"
+  },
+  {
+    "symbol": "TRV",
+    "name": "Travelers Companies Inc"
+  },
+  {
+    "symbol": "TSCO",
+    "name": "Tractor Supply"
+  },
+  {
+    "symbol": "TSCO.L",
+    "name": "Tesco"
+  },
+  {
+    "symbol": "TSLA",
+    "name": "Tesla Inc"
+  },
+  {
+    "symbol": "TSN",
+    "name": "Tyson Foods"
+  },
+  {
+    "symbol": "TT",
+    "name": "Trane Technologies"
+  },
+  {
+    "symbol": "TTD",
+    "name": "Trade Desk (The)"
+  },
+  {
+    "symbol": "TTE.PA",
+    "name": "TotalEnergies"
+  },
+  {
+    "symbol": "TTWO",
+    "name": "Take-Two Interactive"
+  },
+  {
+    "symbol": "TXN",
+    "name": "Texas Instruments Inc"
+  },
+  {
+    "symbol": "TXT",
+    "name": "Textron"
+  },
+  {
+    "symbol": "TYL",
+    "name": "Tyler Technologies"
+  },
+  {
+    "symbol": "UAL",
+    "name": "United Airlines Holdings Inc"
+  },
+  {
+    "symbol": "UBER",
+    "name": "Uber Technologies Inc"
+  },
+  {
+    "symbol": "UDR",
+    "name": "\"UDR"
+  },
+  {
+    "symbol": "UHS",
+    "name": "Universal Health Services"
+  },
+  {
+    "symbol": "ULTA",
+    "name": "Ulta Beauty"
+  },
+  {
+    "symbol": "ULVR.L",
+    "name": "Unilever"
+  },
+  {
+    "symbol": "UNH",
+    "name": "UnitedHealth Group Inc"
+  },
+  {
+    "symbol": "UNP",
+    "name": "Union Pacific Corp"
+  },
+  {
+    "symbol": "UPS",
+    "name": "United Parcel Service Inc"
+  },
+  {
+    "symbol": "URI",
+    "name": "United Rentals"
+  },
+  {
+    "symbol": "URW.AS",
+    "name": "Unibail-Rodamco-Westfield"
+  },
+  {
+    "symbol": "USB",
+    "name": "US Bancorp"
+  },
+  {
+    "symbol": "USDCAD=X",
+    "name": "USD/CAD"
+  },
+  {
+    "symbol": "USDCHF=X",
+    "name": "USD/CHF"
+  },
+  {
+    "symbol": "USDJPY=X",
+    "name": "USD/JPY"
+  },
+  {
+    "symbol": "UU.L",
+    "name": "United Utilities"
+  },
+  {
+    "symbol": "V",
+    "name": "Visa Inc"
+  },
+  {
+    "symbol": "VICI",
+    "name": "Vici Properties"
+  },
+  {
+    "symbol": "VIE.PA",
+    "name": "Veolia"
+  },
+  {
+    "symbol": "VIV.PA",
+    "name": "Vivendi"
+  },
+  {
+    "symbol": "VLO",
+    "name": "Valero Energy Corp"
+  },
+  {
+    "symbol": "VLTO",
+    "name": "Veralto"
+  },
+  {
+    "symbol": "VMC",
+    "name": "Vulcan Materials Company"
+  },
+  {
+    "symbol": "VNA.DE",
+    "name": "Vonovia"
+  },
+  {
+    "symbol": "VOD.L",
+    "name": "Vodafone"
+  },
+  {
+    "symbol": "VOW3.DE",
+    "name": "Volkswagen"
+  },
+  {
+    "symbol": "VRSK",
+    "name": "Verisk Analytics Inc"
+  },
+  {
+    "symbol": "VRSN",
+    "name": "Verisign"
+  },
+  {
+    "symbol": "VRTX",
+    "name": "Vertex Pharmaceuticals Inc"
+  },
+  {
+    "symbol": "VST",
+    "name": "Vistra Corp."
+  },
+  {
+    "symbol": "VTR",
+    "name": "Ventas"
+  },
+  {
+    "symbol": "VTRS",
+    "name": "Viatris"
+  },
+  {
+    "symbol": "VZ",
+    "name": "Verizon Communications Inc"
+  },
+  {
+    "symbol": "WAB",
+    "name": "Wabtec"
+  },
+  {
+    "symbol": "WAT",
+    "name": "Waters Corp"
+  },
+  {
+    "symbol": "WBA",
+    "name": "Walgreens Holding Co"
+  },
+  {
+    "symbol": "WBD",
+    "name": "Warner Bros. Discovery"
+  },
+  {
+    "symbol": "WDAY",
+    "name": "\"Workday"
+  },
+  {
+    "symbol": "WDC",
+    "name": "Western Digital"
+  },
+  {
+    "symbol": "WEC",
+    "name": "WEC Energy Group"
+  },
+  {
+    "symbol": "WEIR.L",
+    "name": "Weir Group"
+  },
+  {
+    "symbol": "WELL",
+    "name": "Welltower"
+  },
+  {
+    "symbol": "WFC",
+    "name": "Wells Fargo & Co"
+  },
+  {
+    "symbol": "WIZZ.L",
+    "name": "Wizz Air"
+  },
+  {
+    "symbol": "WLN.PA",
+    "name": "Worldline"
+  },
+  {
+    "symbol": "WM",
+    "name": "Waste Management Inc"
+  },
+  {
+    "symbol": "WMB",
+    "name": "Williams Companies"
+  },
+  {
+    "symbol": "WMT",
+    "name": "Walmart Inc"
+  },
+  {
+    "symbol": "WPP.L",
+    "name": "WPP"
+  },
+  {
+    "symbol": "WRB",
+    "name": "W. R. Berkley Corporation"
+  },
+  {
+    "symbol": "WSM",
+    "name": "\"Williams-Sonoma"
+  },
+  {
+    "symbol": "WST",
+    "name": "West Pharmaceutical Services"
+  },
+  {
+    "symbol": "WTW",
+    "name": "Willis Towers Watson"
+  },
+  {
+    "symbol": "WY",
+    "name": "Weyerhaeuser"
+  },
+  {
+    "symbol": "WYNN",
+    "name": "Wynn Resorts Ltd"
+  },
+  {
+    "symbol": "X",
+    "name": "United States Steel Corp"
+  },
+  {
+    "symbol": "XEL",
+    "name": "Xcel Energy"
+  },
+  {
+    "symbol": "XLE",
+    "name": "Energy ETF"
+  },
+  {
+    "symbol": "XLF",
+    "name": "Financials ETF"
+  },
+  {
+    "symbol": "XLK",
+    "name": "Tech ETF"
+  },
+  {
+    "symbol": "XOM",
+    "name": "Exxon Mobil Corp"
+  },
+  {
+    "symbol": "XRX.L",
+    "name": "Xaar"
+  },
+  {
+    "symbol": "XYL",
+    "name": "Xylem Inc."
+  },
+  {
+    "symbol": "XYZ",
+    "name": "Block Inc."
+  },
+  {
+    "symbol": "YUM",
+    "name": "Yum! Brands"
+  },
+  {
+    "symbol": "ZAL.DE",
+    "name": "Zalando"
+  },
+  {
+    "symbol": "ZBH",
+    "name": "Zimmer Biomet"
+  },
+  {
+    "symbol": "ZBRA",
+    "name": "Zebra Technologies"
+  },
+  {
+    "symbol": "ZS",
+    "name": "Zscaler Inc"
+  },
+  {
+    "symbol": "ZTS",
+    "name": "Zoetis Inc"
+  },
+  {
+    "symbol": "ZW=F",
+    "name": "Blé"
+  }
+]

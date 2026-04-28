@@ -123,7 +123,7 @@
       "le Nasdaq",
       "la tech américaine"
     ],
-    "phonetic": "nazdac composite"
+    "phonetic": "nazdak composite"
   },
   {
     "symbol": "^KS11",
@@ -151,7 +151,7 @@
       "le Nikkei",
       "Tokyo"
     ],
-    "phonetic": "nikkèï deux cent vingt cinq"
+    "phonetic": "nikèï deux cent vingt-cinq"
   },
   {
     "symbol": "^STOXX",
@@ -7985,7 +7985,7 @@
     "correlation": "Injection pharma packaging — West Pharma",
     "index": "SP500",
     "description": "West Pharmaceutical manufactures injectable drug delivery systems",
-    "phonetic": "west pharmaceutique"
+    "phonetic": "west pharmaceutical"
   },
   {
     "symbol": "WTW",
@@ -8049,7 +8049,7 @@
       "le secteur énergie",
       "l'ETF énergie"
     ],
-    "phonetic": "énergie eu té èf"
+    "phonetic": "secteur énergie"
   },
   {
     "symbol": "XLF",

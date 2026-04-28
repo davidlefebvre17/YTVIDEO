@@ -293,6 +293,17 @@ function normalizeOverlayData(
       };
     }
 
+    case 'countdown_event': {
+      // Haiku: { eventLabel, targetDate, daysUntil, affectedAsset?, stake? }
+      return {
+        eventLabel: spec.eventLabel ?? spec.label ?? spec.event ?? '',
+        targetDate: spec.targetDate ?? spec.date ?? '',
+        daysUntil: typeof spec.daysUntil === 'number' ? spec.daysUntil : 0,
+        affectedAsset: spec.affectedAsset ?? spec.asset ?? primaryAsset ?? '',
+        stake: spec.stake ?? spec.why ?? '',
+      };
+    }
+
     default:
       return spec;
   }
@@ -301,7 +312,7 @@ function normalizeOverlayData(
 // ── Overlay cap ─────────────────────────────────────────────
 
 const OVERLAY_PRIORITY: Record<string, number> = {
-  chart: 5, chart_zone: 5, scenario_fork: 4, causal_chain: 3,
+  chart: 5, chart_zone: 5, scenario_fork: 4, countdown_event: 4, causal_chain: 3,
   comparison: 3, stat: 2, gauge: 2, heatmap: 2, headline: 1, text_card: 1, ticker_strip: 1,
 };
 

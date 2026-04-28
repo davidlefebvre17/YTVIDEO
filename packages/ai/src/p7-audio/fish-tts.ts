@@ -44,12 +44,15 @@ export interface FishTTSResult {
   bytes: number;
 }
 
-/** Presets par type de segment — uniforme, dynamique et percutant */
+/**
+ * Presets par type de segment — uniforme.
+ * `top_p` et `repetition_penalty` non définis : laissés aux defaults Fish Audio.
+ */
 export const FISH_PRESETS = {
-  DEEP: { speed: 1.0, temperature: 0.5, topP: 0.7, repetitionPenalty: 1.2 },
-  FOCUS: { speed: 1.0, temperature: 0.5, topP: 0.7, repetitionPenalty: 1.2 },
-  FLASH: { speed: 1.0, temperature: 0.5, topP: 0.7, repetitionPenalty: 1.2 },
-  COLD_OPEN: { speed: 1.0, temperature: 0.5, topP: 0.7, repetitionPenalty: 1.2 },
+  DEEP: { speed: 1.1, temperature: 0.5 },
+  FOCUS: { speed: 1.1, temperature: 0.5 },
+  FLASH: { speed: 1.1, temperature: 0.5 },
+  COLD_OPEN: { speed: 1.1, temperature: 0.5 },
 } as const;
 
 function getFishConfig() {
@@ -87,6 +90,20 @@ export async function fishTTS(opts: FishTTSOptions): Promise<FishTTSResult> {
     normalize: opts.normalize ?? true,
     latency: 'balanced',
   };
+
+  // Prosody + sampling — auparavant ignorés (bug)
+  if (typeof opts.speed === 'number') {
+    body.prosody = { speed: opts.speed };
+  }
+  if (typeof opts.temperature === 'number') {
+    body.temperature = opts.temperature;
+  }
+  if (typeof opts.topP === 'number') {
+    body.top_p = opts.topP;
+  }
+  if (typeof opts.repetitionPenalty === 'number') {
+    body.repetition_penalty = opts.repetitionPenalty;
+  }
 
   if (voiceId) {
     body.reference_id = voiceId;

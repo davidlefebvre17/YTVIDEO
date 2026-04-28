@@ -486,6 +486,7 @@ export type OverlayType =
   | 'stat'
   | 'chart'
   | 'chart_zone'
+  | 'spread_chart'
   | 'causal_chain'
   | 'comparison'
   | 'headline'
@@ -493,7 +494,8 @@ export type OverlayType =
   | 'heatmap'
   | 'scenario_fork'
   | 'gauge'
-  | 'ticker_strip';
+  | 'ticker_strip'
+  | 'countdown_event';
 
 export interface BeatOverlay {
   type: OverlayType;

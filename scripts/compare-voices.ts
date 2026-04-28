@@ -30,8 +30,6 @@ async function main() {
           format: 'mp3',
           speed: preset.speed,
           temperature: preset.temperature,
-          topP: preset.topP,
-          repetitionPenalty: preset.repetitionPenalty,
         });
         console.log(` ✓ ${(r.bytes / 1024).toFixed(0)} KB`);
       } catch (e) {

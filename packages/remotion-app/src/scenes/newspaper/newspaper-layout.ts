@@ -39,11 +39,13 @@ export const NP = {
   splitGap:    12,
   splitBottom: { h: 402 },     // bottom article (797 - 383 - 12)
 
-  // ── Image frame dimensions per depth ────────────
+  // ── Image frame dimensions per depth — uniformisé ────────────
+  // Même taille pour tous les articles, indépendamment du depth, pour un rendu
+  // éditorial cohérent (plus de hiérarchie visuelle par la taille).
   imageFrame: {
-    deep:  { w: 380, h: 200 },
-    focus: { w: 330, h: 180 },
-    flash: { w: 300, h: 140 },
+    deep:  { w: 340, h: 180 },
+    focus: { w: 340, h: 180 },
+    flash: { w: 340, h: 180 },
   },
 
   // ── Typography ──────────────────────────────────

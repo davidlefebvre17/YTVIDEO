@@ -1,0 +1,390 @@
+[
+  {
+    "symbol": "HNR1.DE",
+    "name": "Hannover Re"
+  },
+  {
+    "symbol": "HO.PA",
+    "name": "Thales"
+  },
+  {
+    "symbol": "HOLX",
+    "name": "Hologic"
+  },
+  {
+    "symbol": "HON",
+    "name": "Honeywell International Inc"
+  },
+  {
+    "symbol": "HOOD",
+    "name": "Robinhood Markets"
+  },
+  {
+    "symbol": "HPE",
+    "name": "Hewlett Packard Enterprise Co"
+  },
+  {
+    "symbol": "HPQ",
+    "name": "HP Inc"
+  },
+  {
+    "symbol": "HRL",
+    "name": "Hormel Foods"
+  },
+  {
+    "symbol": "HSBA.L",
+    "name": "HSBC"
+  },
+  {
+    "symbol": "HSIC",
+    "name": "Henry Schein"
+  },
+  {
+    "symbol": "HST",
+    "name": "Host Hotels & Resorts"
+  },
+  {
+    "symbol": "HSY",
+    "name": "Hershey Company (The)"
+  },
+  {
+    "symbol": "HUBB",
+    "name": "Hubbell Incorporated"
+  },
+  {
+    "symbol": "HUM",
+    "name": "Humana Inc"
+  },
+  {
+    "symbol": "HWM",
+    "name": "Howmet Aerospace"
+  },
+  {
+    "symbol": "IAG.L",
+    "name": "IAG"
+  },
+  {
+    "symbol": "IBKR",
+    "name": "Interactive Brokers"
+  },
+  {
+    "symbol": "IBM",
+    "name": "International Business Machines Corp"
+  },
+  {
+    "symbol": "ICE",
+    "name": "Intercontinental Exchange Inc"
+  },
+  {
+    "symbol": "IDXX",
+    "name": "IDEXX Laboratories Inc"
+  },
+  {
+    "symbol": "IEX",
+    "name": "IDEX Corporation"
+  },
+  {
+    "symbol": "IFF",
+    "name": "International Flavors & Fragrances Inc"
+  },
+  {
+    "symbol": "IFX.DE",
+    "name": "Infineon Technologies"
+  },
+  {
+    "symbol": "IHG.L",
+    "name": "InterContinental Hotels"
+  },
+  {
+    "symbol": "III.L",
+    "name": "3i Group"
+  },
+  {
+    "symbol": "ILMN",
+    "name": "Illumina Inc"
+  },
+  {
+    "symbol": "IMB.L",
+    "name": "Imperial Brands"
+  },
+  {
+    "symbol": "INCY",
+    "name": "Incyte"
+  },
+  {
+    "symbol": "INTC",
+    "name": "Intel Corp"
+  },
+  {
+    "symbol": "INTU",
+    "name": "Intuit Inc"
+  },
+  {
+    "symbol": "INVH",
+    "name": "Invitation Homes"
+  },
+  {
+    "symbol": "IP",
+    "name": "International Paper Co"
+  },
+  {
+    "symbol": "IQV",
+    "name": "IQVIA Holdings Inc"
+  },
+  {
+    "symbol": "IR",
+    "name": "Ingersoll Rand Inc"
+  },
+  {
+    "symbol": "IRM",
+    "name": "Iron Mountain"
+  },
+  {
+    "symbol": "ISRG",
+    "name": "Intuitive Surgical Inc"
+  },
+  {
+    "symbol": "IT",
+    "name": "Gartner"
+  },
+  {
+    "symbol": "ITW",
+    "name": "Illinois Tool Works Inc"
+  },
+  {
+    "symbol": "IVZ",
+    "name": "Invesco"
+  },
+  {
+    "symbol": "J",
+    "name": "Jacobs Solutions"
+  },
+  {
+    "symbol": "JBHT",
+    "name": "J.B. Hunt"
+  },
+  {
+    "symbol": "JBL",
+    "name": "Jabil"
+  },
+  {
+    "symbol": "JCI",
+    "name": "Johnson Controls"
+  },
+  {
+    "symbol": "JKHY",
+    "name": "Jack Henry & Associates"
+  },
+  {
+    "symbol": "JNJ",
+    "name": "Johnson & Johnson"
+  },
+  {
+    "symbol": "JPM",
+    "name": "JPMorgan Chase & Co"
+  },
+  {
+    "symbol": "KDP",
+    "name": "Keurig Dr Pepper"
+  },
+  {
+    "symbol": "KER.PA",
+    "name": "Kering"
+  },
+  {
+    "symbol": "KEY",
+    "name": "KeyCorp"
+  },
+  {
+    "symbol": "KEYS",
+    "name": "Keysight Technologies Inc"
+  },
+  {
+    "symbol": "KHC",
+    "name": "Kraft Heinz"
+  },
+  {
+    "symbol": "KIM",
+    "name": "Kimco Realty"
+  },
+  {
+    "symbol": "KKR",
+    "name": "KKR & Co Inc"
+  },
+  {
+    "symbol": "KLAC",
+    "name": "KLA Corp"
+  },
+  {
+    "symbol": "KMB",
+    "name": "Kimberly-Clark"
+  },
+  {
+    "symbol": "KMI",
+    "name": "Kinder Morgan"
+  },
+  {
+    "symbol": "KO",
+    "name": "Coca-Cola Co"
+  },
+  {
+    "symbol": "KR",
+    "name": "Kroger"
+  },
+  {
+    "symbol": "KVUE",
+    "name": "Kenvue"
+  },
+  {
+    "symbol": "L",
+    "name": "Loews Corporation"
+  },
+  {
+    "symbol": "LDOS",
+    "name": "Leidos Holdings Inc"
+  },
+  {
+    "symbol": "LEN",
+    "name": "Lennar Corp"
+  },
+  {
+    "symbol": "LGEN.L",
+    "name": "Legal & General"
+  },
+  {
+    "symbol": "LH",
+    "name": "Labcorp"
+  },
+  {
+    "symbol": "LHX",
+    "name": "L3Harris Technologies Inc"
+  },
+  {
+    "symbol": "LII",
+    "name": "Lennox International"
+  },
+  {
+    "symbol": "LIN",
+    "name": "Linde PLC"
+  },
+  {
+    "symbol": "LLOY.L",
+    "name": "Lloyds Banking Group"
+  },
+  {
+    "symbol": "LLY",
+    "name": "Eli Lilly and Co"
+  },
+  {
+    "symbol": "LMT",
+    "name": "Lockheed Martin Corp"
+  },
+  {
+    "symbol": "LNT",
+    "name": "Alliant Energy"
+  },
+  {
+    "symbol": "LOW",
+    "name": "Lowe's Companies Inc"
+  },
+  {
+    "symbol": "LR.PA",
+    "name": "Legrand"
+  },
+  {
+    "symbol": "LRCX",
+    "name": "Lam Research Corp"
+  },
+  {
+    "symbol": "LULU",
+    "name": "Lululemon Athletica"
+  },
+  {
+    "symbol": "LUV",
+    "name": "Southwest Airlines Co"
+  },
+  {
+    "symbol": "LVS",
+    "name": "Las Vegas Sands Corp"
+  },
+  {
+    "symbol": "LW",
+    "name": "Lamb Weston"
+  },
+  {
+    "symbol": "LYB",
+    "name": "LyondellBasell Industries NV"
+  },
+  {
+    "symbol": "LYFT",
+    "name": "Lyft Inc"
+  },
+  {
+    "symbol": "LYV",
+    "name": "Live Nation Entertainment"
+  },
+  {
+    "symbol": "MA",
+    "name": "Mastercard Inc"
+  },
+  {
+    "symbol": "MAA",
+    "name": "Mid-America Apartment Communities"
+  },
+  {
+    "symbol": "MAR",
+    "name": "Marriott International Inc"
+  },
+  {
+    "symbol": "MAS",
+    "name": "Masco"
+  },
+  {
+    "symbol": "MBG.DE",
+    "name": "Mercedes-Benz"
+  },
+  {
+    "symbol": "MC.PA",
+    "name": "LVMH"
+  },
+  {
+    "symbol": "MCD",
+    "name": "McDonald's Corp"
+  },
+  {
+    "symbol": "MCHP",
+    "name": "Microchip Technology"
+  },
+  {
+    "symbol": "MCK",
+    "name": "McKesson Corporation"
+  },
+  {
+    "symbol": "MCO",
+    "name": "Moody's Corp"
+  },
+  {
+    "symbol": "MDLZ",
+    "name": "Mondelez International"
+  },
+  {
+    "symbol": "MDT",
+    "name": "Medtronic PLC"
+  },
+  {
+    "symbol": "MET",
+    "name": "MetLife Inc"
+  },
+  {
+    "symbol": "META",
+    "name": "Meta Platforms Inc"
+  },
+  {
+    "symbol": "MGM",
+    "name": "MGM Resorts International"
+  },
+  {
+    "symbol": "MKC",
+    "name": "McCormick & Company"
+  }
+]

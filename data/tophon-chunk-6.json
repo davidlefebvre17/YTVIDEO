@@ -1,0 +1,338 @@
+[
+  {
+    "symbol": "NET",
+    "name": "Cloudflare Inc"
+  },
+  {
+    "symbol": "NFLX",
+    "name": "Netflix Inc"
+  },
+  {
+    "symbol": "NG.L",
+    "name": "National Grid"
+  },
+  {
+    "symbol": "NG=F",
+    "name": "Gaz naturel"
+  },
+  {
+    "symbol": "NI",
+    "name": "NiSource"
+  },
+  {
+    "symbol": "NKE",
+    "name": "Nike Inc"
+  },
+  {
+    "symbol": "NOC",
+    "name": "Northrop Grumman Corp"
+  },
+  {
+    "symbol": "NOW",
+    "name": "ServiceNow Inc"
+  },
+  {
+    "symbol": "NRG",
+    "name": "NRG Energy"
+  },
+  {
+    "symbol": "NSC",
+    "name": "Norfolk Southern Corp"
+  },
+  {
+    "symbol": "NTAP",
+    "name": "NetApp"
+  },
+  {
+    "symbol": "NTRS",
+    "name": "Northern Trust"
+  },
+  {
+    "symbol": "NUE",
+    "name": "Nucor Corp"
+  },
+  {
+    "symbol": "NVDA",
+    "name": "NVIDIA Corp"
+  },
+  {
+    "symbol": "NVR",
+    "name": "NVR Inc"
+  },
+  {
+    "symbol": "NWG.L",
+    "name": "NatWest Group"
+  },
+  {
+    "symbol": "NWS",
+    "name": "News Corp (Class B)"
+  },
+  {
+    "symbol": "NWSA",
+    "name": "News Corp (Class A)"
+  },
+  {
+    "symbol": "NXPI",
+    "name": "NXP Semiconductors"
+  },
+  {
+    "symbol": "NZDUSD=X",
+    "name": "NZD/USD"
+  },
+  {
+    "symbol": "O",
+    "name": "Realty Income"
+  },
+  {
+    "symbol": "ODFL",
+    "name": "Old Dominion"
+  },
+  {
+    "symbol": "OKE",
+    "name": "ONEOK Inc"
+  },
+  {
+    "symbol": "OKTA",
+    "name": "Okta Inc"
+  },
+  {
+    "symbol": "OMC",
+    "name": "Omnicom Group"
+  },
+  {
+    "symbol": "ON",
+    "name": "ON Semiconductor"
+  },
+  {
+    "symbol": "OR.PA",
+    "name": "L'Oréal"
+  },
+  {
+    "symbol": "ORA.PA",
+    "name": "Orange"
+  },
+  {
+    "symbol": "ORCL",
+    "name": "Oracle Corp"
+  },
+  {
+    "symbol": "ORLY",
+    "name": "O’Reilly Automotive"
+  },
+  {
+    "symbol": "OTIS",
+    "name": "Otis Worldwide"
+  },
+  {
+    "symbol": "OXY",
+    "name": "Occidental Petroleum"
+  },
+  {
+    "symbol": "P911.DE",
+    "name": "Porsche AG"
+  },
+  {
+    "symbol": "PAH3.DE",
+    "name": "Porsche SE"
+  },
+  {
+    "symbol": "PANW",
+    "name": "Palo Alto Networks Inc"
+  },
+  {
+    "symbol": "PAYC",
+    "name": "Paycom"
+  },
+  {
+    "symbol": "PAYX",
+    "name": "Paychex"
+  },
+  {
+    "symbol": "PCAR",
+    "name": "Paccar"
+  },
+  {
+    "symbol": "PCG",
+    "name": "PG&E Corporation"
+  },
+  {
+    "symbol": "PEG",
+    "name": "Public Service Enterprise Group"
+  },
+  {
+    "symbol": "PEP",
+    "name": "PepsiCo Inc"
+  },
+  {
+    "symbol": "PFE",
+    "name": "Pfizer"
+  },
+  {
+    "symbol": "PFG",
+    "name": "Principal Financial Group"
+  },
+  {
+    "symbol": "PG",
+    "name": "Procter & Gamble Co"
+  },
+  {
+    "symbol": "PGR",
+    "name": "Progressive Corp"
+  },
+  {
+    "symbol": "PH",
+    "name": "Parker-Hannifin Corp"
+  },
+  {
+    "symbol": "PHM",
+    "name": "Pultegroup Inc"
+  },
+  {
+    "symbol": "PKG",
+    "name": "Packaging Corp of America"
+  },
+  {
+    "symbol": "PL=F",
+    "name": "Platine"
+  },
+  {
+    "symbol": "PLD",
+    "name": "Prologis Inc"
+  },
+  {
+    "symbol": "PLTR",
+    "name": "Palantir Technologies Inc"
+  },
+  {
+    "symbol": "PM",
+    "name": "Philip Morris International Inc"
+  },
+  {
+    "symbol": "PNC",
+    "name": "PNC Financial Services Group Inc"
+  },
+  {
+    "symbol": "PNR",
+    "name": "Pentair"
+  },
+  {
+    "symbol": "PNW",
+    "name": "Pinnacle West Capital"
+  },
+  {
+    "symbol": "PODD",
+    "name": "Insulet Corporation"
+  },
+  {
+    "symbol": "POOL",
+    "name": "Pool Corporation"
+  },
+  {
+    "symbol": "PPG",
+    "name": "PPG Industries"
+  },
+  {
+    "symbol": "PPL",
+    "name": "PPL Corporation"
+  },
+  {
+    "symbol": "PRU",
+    "name": "Prudential Financial Inc"
+  },
+  {
+    "symbol": "PRU.L",
+    "name": "Prudential"
+  },
+  {
+    "symbol": "PSA",
+    "name": "Public Storage"
+  },
+  {
+    "symbol": "PSKY",
+    "name": "Paramount Skydance Corporation"
+  },
+  {
+    "symbol": "PSON.L",
+    "name": "Pearson"
+  },
+  {
+    "symbol": "PSX",
+    "name": "Phillips 66"
+  },
+  {
+    "symbol": "PTC",
+    "name": "PTC Inc."
+  },
+  {
+    "symbol": "PUB.PA",
+    "name": "Publicis Groupe"
+  },
+  {
+    "symbol": "PWR",
+    "name": "Quanta Services"
+  },
+  {
+    "symbol": "PXD",
+    "name": "Pioneer Natural Resources"
+  },
+  {
+    "symbol": "PYPL",
+    "name": "PayPal Holdings Inc"
+  },
+  {
+    "symbol": "Q",
+    "name": "Qnity Electronics"
+  },
+  {
+    "symbol": "QCOM",
+    "name": "Qualcomm Inc"
+  },
+  {
+    "symbol": "QGEN.DE",
+    "name": "Qiagen"
+  },
+  {
+    "symbol": "RCL",
+    "name": "Royal Caribbean Cruises Ltd"
+  },
+  {
+    "symbol": "REG",
+    "name": "Regency Centers"
+  },
+  {
+    "symbol": "REGN",
+    "name": "Regeneron Pharmaceuticals Inc"
+  },
+  {
+    "symbol": "REL.L",
+    "name": "RELX"
+  },
+  {
+    "symbol": "RF",
+    "name": "Regions Financial Corporation"
+  },
+  {
+    "symbol": "RHM.DE",
+    "name": "Rheinmetall"
+  },
+  {
+    "symbol": "RI.PA",
+    "name": "Pernod Ricard"
+  },
+  {
+    "symbol": "RIO.L",
+    "name": "Rio Tinto"
+  },
+  {
+    "symbol": "RJF",
+    "name": "Raymond James Financial"
+  },
+  {
+    "symbol": "RKT.L",
+    "name": "Reckitt"
+  },
+  {
+    "symbol": "RL",
+    "name": "Ralph Lauren Corporation"
+  }
+]

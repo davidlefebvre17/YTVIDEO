@@ -1,0 +1,338 @@
+[
+  {
+    "symbol": "BR",
+    "name": "Broadridge Financial Solutions"
+  },
+  {
+    "symbol": "BRK-B",
+    "name": "Berkshire Hathaway Inc"
+  },
+  {
+    "symbol": "BRK.B",
+    "name": "Berkshire Hathaway"
+  },
+  {
+    "symbol": "BRO",
+    "name": "Brown & Brown"
+  },
+  {
+    "symbol": "BSX",
+    "name": "Boston Scientific Corp"
+  },
+  {
+    "symbol": "BT-A.L",
+    "name": "BT Group"
+  },
+  {
+    "symbol": "BTC-USD",
+    "name": "Bitcoin"
+  },
+  {
+    "symbol": "BX",
+    "name": "Blackstone Inc."
+  },
+  {
+    "symbol": "BXP",
+    "name": "\"BXP"
+  },
+  {
+    "symbol": "BZ=F",
+    "name": "Brent"
+  },
+  {
+    "symbol": "C",
+    "name": "Citigroup Inc"
+  },
+  {
+    "symbol": "CA.PA",
+    "name": "Carrefour"
+  },
+  {
+    "symbol": "CAG",
+    "name": "Conagra Brands"
+  },
+  {
+    "symbol": "CAH",
+    "name": "Cardinal Health"
+  },
+  {
+    "symbol": "CAP.PA",
+    "name": "Capgemini"
+  },
+  {
+    "symbol": "CARR",
+    "name": "Carrier Global"
+  },
+  {
+    "symbol": "CAT",
+    "name": "Caterpillar Inc"
+  },
+  {
+    "symbol": "CB",
+    "name": "Chubb Ltd"
+  },
+  {
+    "symbol": "CBK.DE",
+    "name": "Commerzbank"
+  },
+  {
+    "symbol": "CBOE",
+    "name": "Cboe Global Markets"
+  },
+  {
+    "symbol": "CBRE",
+    "name": "CBRE Group"
+  },
+  {
+    "symbol": "CCI",
+    "name": "Crown Castle"
+  },
+  {
+    "symbol": "CCL",
+    "name": "Carnival Corp"
+  },
+  {
+    "symbol": "CDNS",
+    "name": "Cadence Design Systems"
+  },
+  {
+    "symbol": "CDW",
+    "name": "CDW Corporation"
+  },
+  {
+    "symbol": "CE",
+    "name": "Celanese Corp"
+  },
+  {
+    "symbol": "CEG",
+    "name": "Constellation Energy"
+  },
+  {
+    "symbol": "CF",
+    "name": "CF Industries Holdings Inc"
+  },
+  {
+    "symbol": "CFG",
+    "name": "Citizens Financial Group"
+  },
+  {
+    "symbol": "CHD",
+    "name": "Church & Dwight"
+  },
+  {
+    "symbol": "CHRW",
+    "name": "C.H. Robinson"
+  },
+  {
+    "symbol": "CHTR",
+    "name": "Charter Communications Inc"
+  },
+  {
+    "symbol": "CI",
+    "name": "Cigna Group"
+  },
+  {
+    "symbol": "CIEN",
+    "name": "Ciena"
+  },
+  {
+    "symbol": "CINF",
+    "name": "Cincinnati Financial"
+  },
+  {
+    "symbol": "CL",
+    "name": "Colgate-Palmolive"
+  },
+  {
+    "symbol": "CL=F",
+    "name": "Pétrole WTI"
+  },
+  {
+    "symbol": "CLF",
+    "name": "Cleveland-Cliffs Inc"
+  },
+  {
+    "symbol": "CLX",
+    "name": "Clorox"
+  },
+  {
+    "symbol": "CMCSA",
+    "name": "Comcast Corp"
+  },
+  {
+    "symbol": "CME",
+    "name": "CME Group Inc"
+  },
+  {
+    "symbol": "CMG",
+    "name": "Chipotle Mexican Grill Inc"
+  },
+  {
+    "symbol": "CMI",
+    "name": "Cummins"
+  },
+  {
+    "symbol": "CMS",
+    "name": "CMS Energy"
+  },
+  {
+    "symbol": "CNA.L",
+    "name": "Centrica"
+  },
+  {
+    "symbol": "CNC",
+    "name": "Centene Corp"
+  },
+  {
+    "symbol": "CNP",
+    "name": "CenterPoint Energy"
+  },
+  {
+    "symbol": "COF",
+    "name": "Capital One Financial Corp"
+  },
+  {
+    "symbol": "COIN",
+    "name": "Coinbase Global Inc"
+  },
+  {
+    "symbol": "CON.DE",
+    "name": "Continental"
+  },
+  {
+    "symbol": "COO",
+    "name": "Cooper Companies (The)"
+  },
+  {
+    "symbol": "COP",
+    "name": "ConocoPhillips"
+  },
+  {
+    "symbol": "COR",
+    "name": "Cencora"
+  },
+  {
+    "symbol": "COST",
+    "name": "Costco Wholesale Corp"
+  },
+  {
+    "symbol": "CPAY",
+    "name": "Corpay"
+  },
+  {
+    "symbol": "CPB",
+    "name": "Campbell's Company (The)"
+  },
+  {
+    "symbol": "CPG.L",
+    "name": "Compass Group"
+  },
+  {
+    "symbol": "CPRT",
+    "name": "Copart"
+  },
+  {
+    "symbol": "CPT",
+    "name": "Camden Property Trust"
+  },
+  {
+    "symbol": "CRH",
+    "name": "CRH plc"
+  },
+  {
+    "symbol": "CRL",
+    "name": "Charles River Laboratories"
+  },
+  {
+    "symbol": "CRM",
+    "name": "Salesforce Inc"
+  },
+  {
+    "symbol": "CRWD",
+    "name": "CrowdStrike Holdings Inc"
+  },
+  {
+    "symbol": "CSCO",
+    "name": "Cisco Systems Inc"
+  },
+  {
+    "symbol": "CSGP",
+    "name": "CoStar Group"
+  },
+  {
+    "symbol": "CSX",
+    "name": "CSX Corporation"
+  },
+  {
+    "symbol": "CTAS",
+    "name": "Cintas Corp"
+  },
+  {
+    "symbol": "CTRA",
+    "name": "Coterra"
+  },
+  {
+    "symbol": "CTSH",
+    "name": "Cognizant"
+  },
+  {
+    "symbol": "CTVA",
+    "name": "Corteva"
+  },
+  {
+    "symbol": "CVNA",
+    "name": "Carvana"
+  },
+  {
+    "symbol": "CVS",
+    "name": "CVS Health"
+  },
+  {
+    "symbol": "CVX",
+    "name": "Chevron Corp"
+  },
+  {
+    "symbol": "D",
+    "name": "Dominion Energy Inc"
+  },
+  {
+    "symbol": "DAL",
+    "name": "Delta Air Lines Inc"
+  },
+  {
+    "symbol": "DASH",
+    "name": "DoorDash Inc"
+  },
+  {
+    "symbol": "DB1.DE",
+    "name": "Deutsche Börse"
+  },
+  {
+    "symbol": "DBK.DE",
+    "name": "Deutsche Bank"
+  },
+  {
+    "symbol": "DD",
+    "name": "Dupont De Nemours Inc"
+  },
+  {
+    "symbol": "DDOG",
+    "name": "Datadog Inc"
+  },
+  {
+    "symbol": "DE",
+    "name": "Deere & Co"
+  },
+  {
+    "symbol": "DECK",
+    "name": "Deckers Brands"
+  },
+  {
+    "symbol": "DELL",
+    "name": "Dell Technologies Inc"
+  },
+  {
+    "symbol": "DG",
+    "name": "Dollar General"
+  }
+]

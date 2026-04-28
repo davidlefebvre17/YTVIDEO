@@ -1,0 +1,338 @@
+[
+  {
+    "symbol": "JPM",
+    "name": "JPMorgan Chase & Co"
+  },
+  {
+    "symbol": "KDP",
+    "name": "Keurig Dr Pepper"
+  },
+  {
+    "symbol": "KER.PA",
+    "name": "Kering"
+  },
+  {
+    "symbol": "KEY",
+    "name": "KeyCorp"
+  },
+  {
+    "symbol": "KEYS",
+    "name": "Keysight Technologies Inc"
+  },
+  {
+    "symbol": "KHC",
+    "name": "Kraft Heinz"
+  },
+  {
+    "symbol": "KIM",
+    "name": "Kimco Realty"
+  },
+  {
+    "symbol": "KKR",
+    "name": "KKR & Co Inc"
+  },
+  {
+    "symbol": "KLAC",
+    "name": "KLA Corp"
+  },
+  {
+    "symbol": "KMB",
+    "name": "Kimberly-Clark"
+  },
+  {
+    "symbol": "KMI",
+    "name": "Kinder Morgan"
+  },
+  {
+    "symbol": "KO",
+    "name": "Coca-Cola Co"
+  },
+  {
+    "symbol": "KR",
+    "name": "Kroger"
+  },
+  {
+    "symbol": "KVUE",
+    "name": "Kenvue"
+  },
+  {
+    "symbol": "L",
+    "name": "Loews Corporation"
+  },
+  {
+    "symbol": "LDOS",
+    "name": "Leidos Holdings Inc"
+  },
+  {
+    "symbol": "LEN",
+    "name": "Lennar Corp"
+  },
+  {
+    "symbol": "LGEN.L",
+    "name": "Legal & General"
+  },
+  {
+    "symbol": "LH",
+    "name": "Labcorp"
+  },
+  {
+    "symbol": "LHX",
+    "name": "L3Harris Technologies Inc"
+  },
+  {
+    "symbol": "LII",
+    "name": "Lennox International"
+  },
+  {
+    "symbol": "LIN",
+    "name": "Linde PLC"
+  },
+  {
+    "symbol": "LLOY.L",
+    "name": "Lloyds Banking Group"
+  },
+  {
+    "symbol": "LLY",
+    "name": "Eli Lilly and Co"
+  },
+  {
+    "symbol": "LMT",
+    "name": "Lockheed Martin Corp"
+  },
+  {
+    "symbol": "LNT",
+    "name": "Alliant Energy"
+  },
+  {
+    "symbol": "LOW",
+    "name": "Lowe's Companies Inc"
+  },
+  {
+    "symbol": "LR.PA",
+    "name": "Legrand"
+  },
+  {
+    "symbol": "LRCX",
+    "name": "Lam Research Corp"
+  },
+  {
+    "symbol": "LULU",
+    "name": "Lululemon Athletica"
+  },
+  {
+    "symbol": "LUV",
+    "name": "Southwest Airlines Co"
+  },
+  {
+    "symbol": "LVS",
+    "name": "Las Vegas Sands Corp"
+  },
+  {
+    "symbol": "LW",
+    "name": "Lamb Weston"
+  },
+  {
+    "symbol": "LYB",
+    "name": "LyondellBasell Industries NV"
+  },
+  {
+    "symbol": "LYFT",
+    "name": "Lyft Inc"
+  },
+  {
+    "symbol": "LYV",
+    "name": "Live Nation Entertainment"
+  },
+  {
+    "symbol": "MA",
+    "name": "Mastercard Inc"
+  },
+  {
+    "symbol": "MAA",
+    "name": "Mid-America Apartment Communities"
+  },
+  {
+    "symbol": "MAR",
+    "name": "Marriott International Inc"
+  },
+  {
+    "symbol": "MAS",
+    "name": "Masco"
+  },
+  {
+    "symbol": "MBG.DE",
+    "name": "Mercedes-Benz"
+  },
+  {
+    "symbol": "MC.PA",
+    "name": "LVMH"
+  },
+  {
+    "symbol": "MCD",
+    "name": "McDonald's Corp"
+  },
+  {
+    "symbol": "MCHP",
+    "name": "Microchip Technology"
+  },
+  {
+    "symbol": "MCK",
+    "name": "McKesson Corporation"
+  },
+  {
+    "symbol": "MCO",
+    "name": "Moody's Corp"
+  },
+  {
+    "symbol": "MDLZ",
+    "name": "Mondelez International"
+  },
+  {
+    "symbol": "MDT",
+    "name": "Medtronic PLC"
+  },
+  {
+    "symbol": "MET",
+    "name": "MetLife Inc"
+  },
+  {
+    "symbol": "META",
+    "name": "Meta Platforms Inc"
+  },
+  {
+    "symbol": "MGM",
+    "name": "MGM Resorts International"
+  },
+  {
+    "symbol": "MKC",
+    "name": "McCormick & Company"
+  },
+  {
+    "symbol": "ML.PA",
+    "name": "Michelin"
+  },
+  {
+    "symbol": "MLM",
+    "name": "Martin Marietta Materials"
+  },
+  {
+    "symbol": "MMC",
+    "name": "Marsh & McLennan"
+  },
+  {
+    "symbol": "MMM",
+    "name": "3M Co"
+  },
+  {
+    "symbol": "MNDI.L",
+    "name": "Mondi"
+  },
+  {
+    "symbol": "MNG.L",
+    "name": "M&G"
+  },
+  {
+    "symbol": "MNST",
+    "name": "Monster Beverage"
+  },
+  {
+    "symbol": "MO",
+    "name": "Altria Group Inc"
+  },
+  {
+    "symbol": "MOH",
+    "name": "Molina Healthcare"
+  },
+  {
+    "symbol": "MOS",
+    "name": "Mosaic Co"
+  },
+  {
+    "symbol": "MPC",
+    "name": "Marathon Petroleum Corp"
+  },
+  {
+    "symbol": "MPWR",
+    "name": "Monolithic Power Systems"
+  },
+  {
+    "symbol": "MRK",
+    "name": "Merck & Co Inc"
+  },
+  {
+    "symbol": "MRK.DE",
+    "name": "Merck KGaA"
+  },
+  {
+    "symbol": "MRNA",
+    "name": "Moderna"
+  },
+  {
+    "symbol": "MRSH",
+    "name": "Marsh McLennan"
+  },
+  {
+    "symbol": "MS",
+    "name": "Morgan Stanley"
+  },
+  {
+    "symbol": "MSCI",
+    "name": "MSCI Inc"
+  },
+  {
+    "symbol": "MSFT",
+    "name": "Microsoft Corp"
+  },
+  {
+    "symbol": "MSI",
+    "name": "Motorola Solutions"
+  },
+  {
+    "symbol": "MT.AS",
+    "name": "ArcelorMittal"
+  },
+  {
+    "symbol": "MTB",
+    "name": "M&T Bank"
+  },
+  {
+    "symbol": "MTCH",
+    "name": "Match Group"
+  },
+  {
+    "symbol": "MTD",
+    "name": "Mettler-Toledo International Inc"
+  },
+  {
+    "symbol": "MTX.DE",
+    "name": "MTU Aero Engines"
+  },
+  {
+    "symbol": "MU",
+    "name": "Micron Technology Inc"
+  },
+  {
+    "symbol": "MUV2.DE",
+    "name": "Munich Re"
+  },
+  {
+    "symbol": "NCLH",
+    "name": "Norwegian Cruise Line Holdings Ltd"
+  },
+  {
+    "symbol": "NDAQ",
+    "name": "\"Nasdaq"
+  },
+  {
+    "symbol": "NDSN",
+    "name": "Nordson Corporation"
+  },
+  {
+    "symbol": "NEE",
+    "name": "Nextera Energy Inc"
+  },
+  {
+    "symbol": "NEM",
+    "name": "Newmont Corporation"
+  }
+]

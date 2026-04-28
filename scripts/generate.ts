@@ -11,7 +11,7 @@ import "dotenv/config";
 import * as fs from "fs";
 import * as path from "path";
 import { execSync } from "child_process";
-import { fetchMarketSnapshot, updateAllMarketMemory, isWeeklyJobDay, applyHaikuEnrichment, loadMemory, enrichNewsSummaries } from "@yt-maker/data";
+import { fetchMarketSnapshot, updateAllMarketMemory, isWeeklyJobDay, applyHaikuEnrichment, loadMemory, enrichNewsSummaries, fetchAssetSnapshot, fetchDaily3yCandles } from "@yt-maker/data";
 import type { ZoneEvent, HaikuEnrichmentResult } from "@yt-maker/data";
 import {
   generateScript, getNextEpisodeNumber, appendToManifest,
@@ -630,10 +630,63 @@ async function main() {
     }
   } catch {}
 
+  // Enrichir les assets avec les stockScreen movers cités dans le script
+  // (ex: URI, TXN, STMPA, WST — absents de la watchlist mais nommés en narration).
+  // On fetche AUSSI les bougies (intraday + dailyCandles 3y) pour que les charts
+  // Remotion s'affichent réellement, pas juste un fallback ticker card.
+  const scriptSymbols = new Set<string>();
+  for (const sec of script.sections) {
+    for (const sym of (sec as any).assets ?? []) scriptSymbols.add(sym);
+  }
+  const watchlistSymbols = new Set(snapshot.assets.map(a => a.symbol));
+  const stockScreen = Array.isArray((snapshot as any).stockScreen)
+    ? ((snapshot as any).stockScreen as Array<{ symbol: string; name: string; price: number; changePct: number; volume?: number; high52w?: number; low52w?: number; sector?: string }>)
+    : [];
+
+  const moversToFetch = stockScreen.filter(m => scriptSymbols.has(m.symbol) && !watchlistSymbols.has(m.symbol));
+  const extraAssets: any[] = [];
+  if (moversToFetch.length > 0) {
+    console.log(`  Fetching candles for ${moversToFetch.length} stockScreen movers cited in script: ${moversToFetch.map(m => m.symbol).join(', ')}`);
+    // Sequential pour respecter le rate-limit Yahoo (comme la watchlist en Phase 2)
+    for (const m of moversToFetch) {
+      try {
+        const [snap, dailyCandles] = await Promise.all([
+          fetchAssetSnapshot(m.symbol, m.name),
+          fetchDaily3yCandles(m.symbol),
+        ]);
+        // Override changePct/price avec ceux du stockScreen (J-1 session, plus fiable que intraday)
+        snap.changePct = m.changePct;
+        snap.price = m.price;
+        if (dailyCandles.length > 10) {
+          (snap as any).dailyCandles = dailyCandles;
+        }
+        extraAssets.push(snap);
+        watchlistSymbols.add(m.symbol);
+      } catch (e) {
+        // Fallback : push entry sans candles, comme avant
+        console.log(`    [warn] candles fetch failed for ${m.symbol}: ${(e as Error).message.slice(0, 80)}`);
+        extraAssets.push({
+          symbol: m.symbol,
+          name: m.name,
+          price: m.price,
+          change: 0,
+          changePct: m.changePct,
+          candles: [],
+          high24h: m.high52w ?? m.price,
+          low24h: m.low52w ?? m.price,
+        });
+        watchlistSymbols.add(m.symbol);
+      }
+    }
+    const withCandles = extraAssets.filter(a => (a.dailyCandles?.length ?? 0) > 10).length;
+    console.log(`  Enrichment done: ${withCandles}/${extraAssets.length} with full candles`);
+  }
+  const enrichedAssets = [...snapshot.assets, ...extraAssets];
+
   const remotionProps = {
     script,
     beats,
-    assets: snapshot.assets,
+    assets: enrichedAssets,
     news: snapshot.news,
     owlIntroAudio: owlAudioPaths["owl_intro"] || undefined,
     owlClosingAudio: owlAudioPaths["owl_closing"] || undefined,

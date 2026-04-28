@@ -1,0 +1,338 @@
+[
+  {
+    "symbol": "DG.PA",
+    "name": "Vinci"
+  },
+  {
+    "symbol": "DGE.L",
+    "name": "Diageo"
+  },
+  {
+    "symbol": "DGX",
+    "name": "Quest Diagnostics"
+  },
+  {
+    "symbol": "DHER.DE",
+    "name": "Delivery Hero"
+  },
+  {
+    "symbol": "DHI",
+    "name": "D.R. Horton Inc"
+  },
+  {
+    "symbol": "DHL.DE",
+    "name": "DHL Group"
+  },
+  {
+    "symbol": "DHR",
+    "name": "Danaher Corp"
+  },
+  {
+    "symbol": "DIS",
+    "name": "Walt Disney Co"
+  },
+  {
+    "symbol": "DLR",
+    "name": "Digital Realty"
+  },
+  {
+    "symbol": "DLTR",
+    "name": "Dollar Tree"
+  },
+  {
+    "symbol": "DOC",
+    "name": "Healthpeak Properties"
+  },
+  {
+    "symbol": "DOV",
+    "name": "Dover Corporation"
+  },
+  {
+    "symbol": "DOW",
+    "name": "Dow Inc"
+  },
+  {
+    "symbol": "DPZ",
+    "name": "Domino's"
+  },
+  {
+    "symbol": "DRI",
+    "name": "Darden Restaurants"
+  },
+  {
+    "symbol": "DSY.PA",
+    "name": "Dassault Systèmes"
+  },
+  {
+    "symbol": "DTE",
+    "name": "DTE Energy"
+  },
+  {
+    "symbol": "DTE.DE",
+    "name": "Deutsche Telekom"
+  },
+  {
+    "symbol": "DUK",
+    "name": "Duke Energy Corp"
+  },
+  {
+    "symbol": "DVA",
+    "name": "DaVita"
+  },
+  {
+    "symbol": "DVN",
+    "name": "Devon Energy Corp"
+  },
+  {
+    "symbol": "DX-Y.NYB",
+    "name": "Dollar Index"
+  },
+  {
+    "symbol": "DXCM",
+    "name": "Dexcom"
+  },
+  {
+    "symbol": "EA",
+    "name": "Electronic Arts"
+  },
+  {
+    "symbol": "EBAY",
+    "name": "eBay Inc."
+  },
+  {
+    "symbol": "ECL",
+    "name": "Ecolab Inc"
+  },
+  {
+    "symbol": "ED",
+    "name": "Consolidated Edison"
+  },
+  {
+    "symbol": "EFX",
+    "name": "Equifax"
+  },
+  {
+    "symbol": "EG",
+    "name": "Everest Group"
+  },
+  {
+    "symbol": "EIX",
+    "name": "Edison International"
+  },
+  {
+    "symbol": "EL",
+    "name": "Estée Lauder Companies (The)"
+  },
+  {
+    "symbol": "EL.PA",
+    "name": "EssilorLuxottica"
+  },
+  {
+    "symbol": "ELV",
+    "name": "Elevance Health Inc"
+  },
+  {
+    "symbol": "EME",
+    "name": "Emcor"
+  },
+  {
+    "symbol": "EMR",
+    "name": "Emerson Electric Co"
+  },
+  {
+    "symbol": "EN.PA",
+    "name": "Bouygues"
+  },
+  {
+    "symbol": "ENGI.PA",
+    "name": "Engie"
+  },
+  {
+    "symbol": "ENR.DE",
+    "name": "Siemens Energy"
+  },
+  {
+    "symbol": "EOAN.DE",
+    "name": "E.ON"
+  },
+  {
+    "symbol": "EOG",
+    "name": "EOG Resources Inc"
+  },
+  {
+    "symbol": "EPAM",
+    "name": "EPAM Systems"
+  },
+  {
+    "symbol": "EQIX",
+    "name": "Equinix Inc"
+  },
+  {
+    "symbol": "EQR",
+    "name": "Equity Residential"
+  },
+  {
+    "symbol": "EQT",
+    "name": "EQT Corporation"
+  },
+  {
+    "symbol": "ERF.PA",
+    "name": "Eurofins Scientific"
+  },
+  {
+    "symbol": "ERIE",
+    "name": "Erie Indemnity"
+  },
+  {
+    "symbol": "ES",
+    "name": "Eversource Energy"
+  },
+  {
+    "symbol": "ESS",
+    "name": "Essex Property Trust"
+  },
+  {
+    "symbol": "ETH-USD",
+    "name": "Ethereum"
+  },
+  {
+    "symbol": "ETN",
+    "name": "Eaton Corporation PLC"
+  },
+  {
+    "symbol": "ETR",
+    "name": "Entergy"
+  },
+  {
+    "symbol": "EURGBP=X",
+    "name": "EUR/GBP"
+  },
+  {
+    "symbol": "EURJPY=X",
+    "name": "EUR/JPY"
+  },
+  {
+    "symbol": "EURUSD=X",
+    "name": "EUR/USD"
+  },
+  {
+    "symbol": "EVRG",
+    "name": "Evergy"
+  },
+  {
+    "symbol": "EW",
+    "name": "Edwards Lifesciences"
+  },
+  {
+    "symbol": "EXC",
+    "name": "Exelon Corp"
+  },
+  {
+    "symbol": "EXE",
+    "name": "Expand Energy"
+  },
+  {
+    "symbol": "EXPD",
+    "name": "Expeditors International"
+  },
+  {
+    "symbol": "EXPE",
+    "name": "Expedia Group"
+  },
+  {
+    "symbol": "EXPN.L",
+    "name": "Experian"
+  },
+  {
+    "symbol": "EXR",
+    "name": "Extra Space Storage"
+  },
+  {
+    "symbol": "EZJ.L",
+    "name": "easyJet"
+  },
+  {
+    "symbol": "F",
+    "name": "Ford Motor Co"
+  },
+  {
+    "symbol": "FANG",
+    "name": "Diamondback Energy Inc"
+  },
+  {
+    "symbol": "FAST",
+    "name": "Fastenal Co"
+  },
+  {
+    "symbol": "FCX",
+    "name": "Freeport-McMoRan Inc"
+  },
+  {
+    "symbol": "FDS",
+    "name": "Factset Research Systems Inc"
+  },
+  {
+    "symbol": "FDX",
+    "name": "FedEx Corp"
+  },
+  {
+    "symbol": "FE",
+    "name": "FirstEnergy"
+  },
+  {
+    "symbol": "FERG.L",
+    "name": "Ferguson"
+  },
+  {
+    "symbol": "FFIV",
+    "name": "\"F5"
+  },
+  {
+    "symbol": "FICO",
+    "name": "Fair Isaac"
+  },
+  {
+    "symbol": "FIS",
+    "name": "Fidelity National Information Services"
+  },
+  {
+    "symbol": "FISV",
+    "name": "Fiserv"
+  },
+  {
+    "symbol": "FITB",
+    "name": "Fifth Third Bancorp"
+  },
+  {
+    "symbol": "FIX",
+    "name": "Comfort Systems USA"
+  },
+  {
+    "symbol": "FLTR.L",
+    "name": "Flutter Entertainment"
+  },
+  {
+    "symbol": "FOX",
+    "name": "Fox Corporation (Class B)"
+  },
+  {
+    "symbol": "FOXA",
+    "name": "Fox Corporation (Class A)"
+  },
+  {
+    "symbol": "FRE.DE",
+    "name": "Fresenius"
+  },
+  {
+    "symbol": "FRT",
+    "name": "Federal Realty Investment Trust"
+  },
+  {
+    "symbol": "FSLR",
+    "name": "First Solar"
+  },
+  {
+    "symbol": "FTNT",
+    "name": "Fortinet"
+  }
+]

@@ -92,26 +92,34 @@ function mapCountryToCurrency(country: string): string {
   return MAP[c] || c || "USD";
 }
 
-export async function fetchEarningsCalendar(
+/** Finnhub /calendar/earnings caps responses at ~1500 events per call.
+ *  During earnings season a 21-day window blows past this and silently truncates
+ *  the earliest dates — exactly the dates we care most about editorially. */
+const FINNHUB_EARNINGS_CAP = 1500;
+
+function addDaysISO(iso: string, days: number): string {
+  const d = new Date(iso + "T12:00:00Z");
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+function diffDaysISO(from: string, to: string): number {
+  const a = new Date(from + "T12:00:00Z").getTime();
+  const b = new Date(to + "T12:00:00Z").getTime();
+  return Math.round((b - a) / (1000 * 60 * 60 * 24));
+}
+
+async function fetchEarningsChunk(
   from: string,
-  to?: string,
-): Promise<EarningsEvent[]> {
-  const apiKey = getApiKey();
-  if (!apiKey) {
-    console.log("  Finnhub earnings: skipped (no FINNHUB_API_KEY)");
-    return [];
-  }
-
-  const toDate = to || from;
-  const url = `${FINNHUB_BASE}/calendar/earnings?from=${from}&to=${toDate}&token=${apiKey}`;
-  console.log("  Fetching earnings calendar from Finnhub...");
-
+  to: string,
+  apiKey: string,
+): Promise<EarningsEvent[] | null> {
+  const url = `${FINNHUB_BASE}/calendar/earnings?from=${from}&to=${to}&token=${apiKey}`;
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`Finnhub earnings: ${res.status}`);
     const data = await res.json();
-
-    const earnings: EarningsEvent[] = (data.earningsCalendar || []).map(
+    return (data.earningsCalendar || []).map(
       (e: {
         symbol: string;
         date: string;
@@ -131,13 +139,84 @@ export async function fetchEarningsCalendar(
         reported: e.epsActual != null,
       }),
     );
-
-    console.log(`  Finnhub: ${earnings.length} earnings events`);
-    return earnings;
   } catch (err) {
-    console.warn(`  Finnhub earnings calendar error: ${err}`);
+    console.warn(`  Finnhub earnings chunk ${from}..${to} error: ${err}`);
+    return null;
+  }
+}
+
+export async function fetchEarningsCalendar(
+  from: string,
+  to?: string,
+): Promise<EarningsEvent[]> {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    console.log("  Finnhub earnings: skipped (no FINNHUB_API_KEY)");
     return [];
   }
+
+  const toDate = to || from;
+  const totalDays = diffDaysISO(from, toDate);
+  console.log(`  Fetching earnings calendar from Finnhub (${from} → ${toDate}, ${totalDays + 1}d)...`);
+
+  // ≤ 7-day window: single call (no truncation risk)
+  if (totalDays <= 6) {
+    const events = await fetchEarningsChunk(from, toDate, apiKey);
+    if (events === null) return [];
+    if (events.length >= FINNHUB_EARNINGS_CAP) {
+      console.warn(`  ⚠ Finnhub returned ${events.length} (cap) — split needed`);
+    }
+    console.log(`  Finnhub: ${events.length} earnings events`);
+    return events;
+  }
+
+  // > 7 days: split into 7-day chunks, fetch in parallel, fallback to 3-day chunks if any chunk hits cap.
+  const chunks: Array<[string, string]> = [];
+  for (let offset = 0; offset <= totalDays; offset += 7) {
+    const chunkFrom = addDaysISO(from, offset);
+    const chunkTo = addDaysISO(from, Math.min(offset + 6, totalDays));
+    chunks.push([chunkFrom, chunkTo]);
+  }
+
+  const chunkResults = await Promise.all(
+    chunks.map(([f, t]) => fetchEarningsChunk(f, t, apiKey).then((r) => ({ from: f, to: t, events: r }))),
+  );
+
+  // Detect any chunk that hit the cap and re-fetch as 3-day sub-chunks.
+  const finalChunks: EarningsEvent[][] = [];
+  for (const cr of chunkResults) {
+    if (cr.events === null) continue;
+    if (cr.events.length >= FINNHUB_EARNINGS_CAP) {
+      console.warn(`  ⚠ chunk ${cr.from}..${cr.to} hit cap (${cr.events.length}) — re-splitting into 3-day windows`);
+      const chunkSpan = diffDaysISO(cr.from, cr.to);
+      const subChunks: Array<[string, string]> = [];
+      for (let off = 0; off <= chunkSpan; off += 3) {
+        const sf = addDaysISO(cr.from, off);
+        const st = addDaysISO(cr.from, Math.min(off + 2, chunkSpan));
+        subChunks.push([sf, st]);
+      }
+      const subResults = await Promise.all(subChunks.map(([f, t]) => fetchEarningsChunk(f, t, apiKey)));
+      for (const sr of subResults) if (sr) finalChunks.push(sr);
+    } else {
+      finalChunks.push(cr.events);
+    }
+  }
+
+  // Dedupe by symbol+date (a chunk boundary day belongs to one chunk only — safe but cheap insurance).
+  const seen = new Set<string>();
+  const merged: EarningsEvent[] = [];
+  for (const list of finalChunks) {
+    for (const e of list) {
+      const key = `${e.symbol}_${e.date}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      merged.push(e);
+    }
+  }
+  merged.sort((a, b) => a.date.localeCompare(b.date) || a.symbol.localeCompare(b.symbol));
+
+  console.log(`  Finnhub: ${merged.length} earnings events (across ${chunks.length} chunks)`);
+  return merged;
 }
 
 export async function fetchFinnhubNews(targetDate?: string): Promise<NewsItem[]> {
