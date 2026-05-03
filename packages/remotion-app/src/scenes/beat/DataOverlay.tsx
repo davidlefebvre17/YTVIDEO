@@ -14,6 +14,17 @@ import { type InkLevel } from "../shared/InkChart";
 import { CandlestickChart } from "../shared/CandlestickChart";
 import { SpreadChart } from "../shared/SpreadChart";
 import { CountdownEvent } from "../shared/CountdownEvent";
+// Variants (handoff overlays)
+import { StatStampPress } from "../shared/variants/StatStampPress";
+import { NumberAvalanche } from "../shared/variants/NumberAvalanche";
+import { CausalDomino } from "../shared/variants/CausalDomino";
+import { GaugeStrip } from "../shared/variants/GaugeStrip";
+import { GaugeLiquid } from "../shared/variants/GaugeLiquid";
+import { HeatmapTreemap } from "../shared/variants/HeatmapTreemap";
+import { MultiSparklines } from "../shared/variants/MultiSparklines";
+import { MultiLaneRace } from "../shared/variants/MultiLaneRace";
+import { HeadlineTabloid } from "../shared/variants/HeadlineTabloid";
+import { ScenarioBattle } from "../shared/variants/ScenarioBattle";
 
 interface DataOverlayProps {
   overlay: BeatOverlay;
@@ -208,7 +219,14 @@ const SYMBOL_ALIASES: Record<string, string[]> = {
   'NIKKEI': ['^N225'],
   'CAC': ['^FCHI'],
 };
-function resolveAssetSymbol(sym: string, assets: AssetSnapshot[]): string {
+function resolveAssetSymbol(sym: any, assets: AssetSnapshot[]): string {
+  // Defensive: occasionally `data.assets[i].symbol` is an object/array/number
+  // when Haiku misformats the overlay payload. Coerce to string instead of
+  // crashing the whole frame on `.toUpperCase()`.
+  if (sym == null) return '';
+  if (typeof sym !== 'string') {
+    try { sym = String(sym); } catch { return ''; }
+  }
   if (!sym) return sym;
   // 1. Match exact sur le symbole
   if (assets.find(a => a.symbol === sym)) return sym;
@@ -487,73 +505,111 @@ const OverlayContent: React.FC<OverlayContentProps> = ({ type, data, assets, acc
       }
       const rawSuffix = (data.suffix as string) ?? '%';
       const suffix = rawSuffix === 'text' || rawSuffix === 'string' ? '' : rawSuffix;
-      return (
-        <AnimatedStat
-          value={numValue}
-          label={humanize((data.label as string) ?? '', assets)}
-          prefix={(data.prefix as string) ?? ''}
-          suffix={suffix}
-          decimals={Math.abs(numValue) < 10 ? 1 : 0}
-          accentColor={accentColor}
-          size="md"
-        />
-      );
+      const statProps = {
+        value: numValue,
+        label: humanize((data.label as string) ?? '', assets),
+        prefix: (data.prefix as string) ?? '',
+        suffix,
+        accentColor,
+      };
+      const variant = (data.variant as string) ?? 'default';
+      if (variant === 'stamp-press') return <StatStampPress {...statProps} />;
+      if (variant === 'avalanche') return <NumberAvalanche {...statProps} />;
+      return <AnimatedStat {...statProps} size="md" />;
     }
 
     case 'causal_chain': {
       const steps: CausalStep[] = ((data.steps as string[]) ?? []).map(s => ({ label: humanize(s, assets) }));
+      const variant = (data.variant as string) ?? 'default';
+      if (variant === 'domino') return <CausalDomino steps={steps} accentColor={accentColor} />;
       return <CausalChain steps={steps} accentColor={accentColor} />;
     }
 
     case 'comparison': {
-      const badges: AssetBadge[] = ((data.assets as any[]) ?? []).map(a => {
+      const badges: AssetBadge[] = ((data.assets as any[]) ?? []).map(rawA => {
+        // Defensive unwrap : Haiku produces malformed payloads like
+        //   { symbol: { symbol: '^STOXX', label: 'STOXX 600' }, label: { ... }, changePct: 0 }
+        // both `symbol` and `label` end up as nested objects. Coerce every
+        // field that React will render to a primitive.
+        const unwrapStr = (v: any, fallback?: any): any => {
+          if (v == null) return fallback ?? '';
+          if (typeof v === 'string') return v;
+          if (typeof v === 'object') {
+            // pull most likely string-bearing inner key
+            return v.symbol ?? v.label ?? v.name ?? fallback ?? '';
+          }
+          return String(v);
+        };
+        const a = {
+          ...rawA,
+          symbol: unwrapStr(rawA?.symbol),
+          label: unwrapStr(rawA?.label, unwrapStr(rawA?.symbol)),
+          changePct: typeof rawA?.changePct === 'number' ? rawA.changePct : (Number(rawA?.changePct) || 0),
+        };
         const rawSym = a.symbol ?? '';
         const sym = resolveAssetSymbol(rawSym, assets);
         const found = assets.find(x => x.symbol === sym);
-        // Prefer real snapshot data : si Haiku envoie changePct=0 ou label=symbole brut,
-        // on enrichit depuis la watchlist enrichie. `0 ?? x` reste 0, donc on teste
-        // explicitement (a.changePct truthy && != 0).
-        const enrichedChangePct =
-          (typeof a.changePct === 'number' && a.changePct !== 0)
-            ? a.changePct
-            : (found?.changePct ?? 0);
+        // Toujours préférer le changePct du snapshot quand il existe — Haiku écrit
+        // parfois le prix dans changePct par erreur (424.82 pour MSFT, etc.)
+        // Heuristique de détection : valeur >50 absolue suspecte pour un % daily
+        const haikuVal = a.changePct;
+        const haikuSuspect = typeof haikuVal === 'number' && Math.abs(haikuVal) > 50;
+        const enrichedChangePct = (found?.changePct !== undefined)
+          ? found.changePct
+          : (haikuSuspect ? 0 : (haikuVal ?? 0));
         const enrichedLabel = (a.label && a.label !== rawSym)
           ? a.label
           : (found?.name ?? a.label ?? sym);
+        // Trajectoire de prix réelle pour sparklines : 30-40 dernières closes
+        const candles = (found as any)?.dailyCandles ?? found?.candles ?? [];
+        const recent = candles.slice(-40);
+        const pricePath = recent.length >= 2
+          ? recent.map((c: any) => c.c).filter((v: any) => typeof v === 'number')
+          : undefined;
         return {
           symbol: enrichedLabel,
           name: enrichedLabel,
           changePct: enrichedChangePct,
           price: a.value ?? a.price ?? found?.price,
+          pricePath,
         };
       });
+      const variant = (data.variant as string) ?? 'default';
+      if (variant === 'sparklines') return <MultiSparklines assets={badges} accentColor={accentColor} />;
+      if (variant === 'lane-race') return <MultiLaneRace assets={badges} accentColor={accentColor} />;
       return <MultiAssetBadge assets={badges} accentColor={accentColor} />;
     }
 
-    case 'scenario_fork':
-      return (
-        <ScenarioFork
-          trunk={humanize((data.trunk as string) ?? '', assets)}
-          bullish={{
-            condition: humanize((data.bullCondition as string) ?? (data.bull as string) ?? '', assets),
-            target: humanize((data.bullTarget as string) ?? '', assets),
-          }}
-          bearish={{
-            condition: humanize((data.bearCondition as string) ?? (data.bear as string) ?? '', assets),
-            target: humanize((data.bearTarget as string) ?? '', assets),
-          }}
-          accentColor={accentColor}
-        />
-      );
+    case 'scenario_fork': {
+      const sfProps = {
+        trunk: humanize((data.trunk as string) ?? '', assets),
+        bullish: {
+          condition: humanize((data.bullCondition as string) ?? (data.bull as string) ?? '', assets),
+          target: humanize((data.bullTarget as string) ?? '', assets),
+          prob: typeof data.bullProb === 'number' ? data.bullProb : undefined,
+        },
+        bearish: {
+          condition: humanize((data.bearCondition as string) ?? (data.bear as string) ?? '', assets),
+          target: humanize((data.bearTarget as string) ?? '', assets),
+          prob: typeof data.bearProb === 'number' ? data.bearProb : undefined,
+        },
+        accentColor,
+      };
+      const variant = (data.variant as string) ?? 'default';
+      if (variant === 'battle') return <ScenarioBattle {...sfProps} />;
+      return <ScenarioFork {...sfProps} />;
+    }
 
-    case 'headline':
-      return (
-        <HeadlineCard
-          title={humanize((data.title as string) ?? '', assets)}
-          source={(data.source as string) ?? undefined}
-          accentColor={accentColor}
-        />
-      );
+    case 'headline': {
+      const hProps = {
+        title: humanize((data.title as string) ?? '', assets),
+        source: (data.source as string) ?? undefined,
+        accentColor,
+      };
+      const variant = (data.variant as string) ?? 'default';
+      if (variant === 'tabloid') return <HeadlineTabloid {...hProps} />;
+      return <HeadlineCard {...hProps} />;
+    }
 
     case 'text_card':
       return (
@@ -564,22 +620,28 @@ const OverlayContent: React.FC<OverlayContentProps> = ({ type, data, assets, acc
         />
       );
 
-    case 'gauge':
-      return (
-        <GaugeOverlay
-          label={humanize((data.label as string) ?? '', assets)}
-          value={(data.value as number) ?? 0}
-          min={(data.min as number) ?? 0}
-          max={(data.max as number) ?? 100}
-          accentColor={accentColor}
-        />
-      );
+    case 'gauge': {
+      const gProps = {
+        label: humanize((data.label as string) ?? '', assets),
+        value: (data.value as number) ?? 0,
+        min: (data.min as number) ?? 0,
+        max: (data.max as number) ?? 100,
+        accentColor,
+      };
+      const variant = (data.variant as string) ?? 'default';
+      if (variant === 'strip') return <GaugeStrip {...gProps} />;
+      if (variant === 'liquid') return <GaugeLiquid {...gProps} />;
+      return <GaugeOverlay {...gProps} />;
+    }
 
     case 'heatmap': {
       const sectors = ((data.sectors as any[]) ?? []).map(s => ({
         name: s.sector ?? s.name ?? '',
+        ticker: s.ticker,
         change: s.changePct ?? s.change ?? 0,
       }));
+      const variant = (data.variant as string) ?? 'default';
+      if (variant === 'treemap') return <HeatmapTreemap sectors={sectors} title="Secteurs" />;
       return <HeatmapGrid sectors={sectors} title="Secteurs" />;
     }
 
@@ -588,15 +650,36 @@ const OverlayContent: React.FC<OverlayContentProps> = ({ type, data, assets, acc
       const rawSym = (data.symbol as string) ?? '';
       const sym = resolveAssetSymbol(rawSym, assets);
       const asset = assets.find(a => a.symbol === sym);
-      const allCandles = asset?.dailyCandles ?? asset?.candles ?? [];
+      // Yield/spread symbols don't appear in `assets` — pull candles from yieldsHistory.
+      const yieldMap: Record<string, string> = { 'DGS10': 'us10y', 'DGS2': 'us2y', 'T10Y2Y': 'spread10y2y' };
+      const yieldLabel: Record<string, string> = {
+        'DGS10': 'Taux 10 ans',
+        'DGS2': 'Taux 2 ans',
+        'T10Y2Y': 'Spread 10A - 2A',
+      };
+      const isYield = !!(yieldMap[sym] && yieldsHistory);
+      const allCandles = isYield
+        ? ((yieldsHistory as any)[yieldMap[sym]] ?? [])
+        : (asset?.dailyCandles ?? asset?.candles ?? []);
+      // For yields, derive price + changePct from candles (no entry in `assets`).
+      const yieldPrice = isYield && allCandles.length >= 1 ? allCandles[allCandles.length - 1].c : undefined;
+      const yieldChangePct = (() => {
+        if (!isYield || allCandles.length < 2) return undefined;
+        const last = allCandles[allCandles.length - 1].c;
+        const prev = allCandles[allCandles.length - 2].c;
+        return prev !== 0 ? ((last - prev) / Math.abs(prev)) * 100 : 0;
+      })();
+      const displayName = isYield ? (yieldLabel[sym] ?? sym) : (asset?.name ?? sym);
+      const displayPrice = isYield ? yieldPrice : asset?.price;
+      const displayChangePct = isYield ? (yieldChangePct ?? 0) : (asset?.changePct ?? 0);
 
       if (allCandles.length < 5) {
         // Pas de candles : afficher un AssetTicker riche (nom + prix + %) plutôt
         // qu'un simple label. Évite l'overlay "vide" pour les stockScreen movers
         // (Keyence, Fanuc...) qui n'ont pas été fetchés avec leurs bougies.
-        const label = humanize((data.name as string) ?? asset?.name ?? sym, assets);
-        const price = asset?.price ?? (data.price as number | undefined);
-        const changePct = asset?.changePct ?? (data.changePct as number | undefined);
+        const label = humanize((data.name as string) ?? displayName, assets);
+        const price = displayPrice ?? (data.price as number | undefined);
+        const changePct = displayChangePct !== 0 ? displayChangePct : (data.changePct as number | undefined);
         if (price !== undefined && Number.isFinite(price)) {
           return (
             <AssetTickerCard
@@ -633,9 +716,9 @@ const OverlayContent: React.FC<OverlayContentProps> = ({ type, data, assets, acc
         accentColor={accentColor}
         chartW={chartW}
         chartH={chartH}
-        assetName={asset?.name ?? sym}
-        price={asset?.price}
-        changePct={asset?.changePct ?? 0}
+        assetName={displayName}
+        price={displayPrice}
+        changePct={displayChangePct}
         durationInFrames={durationInFrames}
       />;
     }

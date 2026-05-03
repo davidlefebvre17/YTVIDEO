@@ -12,10 +12,11 @@ export interface SectorData {
   change: number;
 }
 
-interface HeatmapGridProps {
+export interface HeatmapGridProps {
   sectors: SectorData[];
   title?: string;
   cellDelay?: number;
+  variant?: 'default' | 'treemap';
 }
 
 function changeToAccent(change: number): string {

@@ -5,6 +5,7 @@
   "main": "src/index.ts",
   "types": "src/index.ts",
   "dependencies": {
-    "@yt-maker/core": "*"
+    "@yt-maker/core": "*",
+    "zod": "^3.22.0"
   }
 }

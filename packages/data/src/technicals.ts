@@ -1,4 +1,5 @@
 import type { Candle, TechnicalIndicators, MultiTimeframeAnalysis, AssetSnapshot, AssetGroup } from "@yt-maker/core";
+import { findSignificantPivots } from "./market-memory/zone-detector";
 
 /**
  * Compute multi-timeframe performance from daily candles + current price.
@@ -412,18 +413,51 @@ export function computeTechnicals(
     volumeAnomaly = (avgVolume > 0 && latestVolume > 0) ? latestVolume / avgVolume : 1;
   }
 
-  // Support/Resistance: 20d low/high + round numbers
+  // Support/Resistance: combine three sources of evidence ordered by reliability
+  //   1. Significant pivots from full history (multi-scale, multi-touch swing
+  //      lows/highs identified by zone-detector). These are the "real" S/R.
+  //   2. 20-day extremes (recent local pivots, useful as short-term context).
+  //   3. Round numbers — but only those at least 1.5% away from current price,
+  //      since a round level adjacent to price is just the rounded current
+  //      price, not a support (e.g. price=6.21 → "support 6.20" is meaningless).
   const last20 = dailyCandles.slice(-20);
   const high20d = Math.max(...last20.map((c) => c.h));
   const low20d = Math.min(...last20.map((c) => c.l));
-  const roundLevels = findRoundNumbers(price);
+  const roundLevels = findRoundNumbers(price).filter(
+    (l) => Math.abs(l - price) / price >= 0.015,
+  );
 
-  const supports = [low20d, ...roundLevels.filter((l) => l < price)].sort(
-    (a, b) => b - a,
-  );
-  const resistances = [high20d, ...roundLevels.filter((l) => l > price)].sort(
-    (a, b) => a - b,
-  );
+  // Significant pivots from full daily history (3y when available).
+  // These capture multi-month / multi-year swing lows that low20d misses.
+  const pivots = dailyCandles.length >= 50
+    ? findSignificantPivots(dailyCandles, 8)
+    : [];
+  const pivotSupports = pivots
+    .filter((p) => p.type === "support" && p.level < price * 0.99)
+    .map((p) => p.level);
+  const pivotResistances = pivots
+    .filter((p) => p.type === "resistance" && p.level > price * 1.01)
+    .map((p) => p.level);
+
+  // Dedup levels within ±1.5% (cluster proximate values, prefer first seen).
+  const dedupLevels = (levels: number[]): number[] => {
+    const out: number[] = [];
+    for (const l of levels) {
+      if (!out.some((x) => Math.abs(x - l) / x < 0.015)) out.push(l);
+    }
+    return out;
+  };
+
+  const supports = dedupLevels([
+    ...pivotSupports,
+    low20d,
+    ...roundLevels.filter((l) => l < price),
+  ]).sort((a, b) => b - a);
+  const resistances = dedupLevels([
+    ...pivotResistances,
+    high20d,
+    ...roundLevels.filter((l) => l > price),
+  ]).sort((a, b) => a - b);
 
   // 52-week proximity: use true 52w range from multiTF if available, else return false (no fallback)
   const true52wHigh = multiTF?.daily1y.high52w;

@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-03-27",
-  "totalChunks": 133,
+  "generatedAt": "2026-05-03",
+  "totalChunks": 134,
   "taxonomy": {
     "themes": [
       "analyse-technique",
@@ -19,6 +19,7 @@
       "fed",
       "geopolitique",
       "inflation",
+      "leadership",
       "liquidite",
       "m2",
       "mean-reversion",
@@ -64,7 +65,6 @@
     "actors": [
       "bce",
       "biden",
-      "boe",
       "boj",
       "fed",
       "lagarde",
@@ -72,6 +72,7 @@
       "powell",
       "trump",
       "ueda",
+      "warsh",
       "xi-jinping"
     ],
     "regimes": [
@@ -1383,6 +1384,55 @@
       "file": "cb-fed-fedwatch.md"
     },
     {
+      "id": "cb-fed-leadership-warsh",
+      "title": "Fed — Leadership 2025+ : Kevin Warsh president",
+      "source": "central-banks.md",
+      "symbols": [
+        "DX-Y.NYB",
+        "GC=F",
+        "^GSPC",
+        "^VIX",
+        "TLT"
+      ],
+      "themes": [
+        "banque-centrale",
+        "fed",
+        "taux",
+        "leadership",
+        "pivot"
+      ],
+      "conditions": {
+        "flags": [
+          "MACRO_SURPRISE",
+          "POLITICAL_TRIGGER"
+        ],
+        "actors": [
+          "warsh",
+          "powell",
+          "fed",
+          "trump"
+        ],
+        "regimes": [
+          "risk-off",
+          "risk-on",
+          "incertain"
+        ],
+        "vix_above": null,
+        "any_symbol_move": false,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": true,
+      "priority": "critical",
+      "related_chunks": [
+        "cb-fed-dual-mandate",
+        "cb-fed-fedwatch",
+        "cb-fed-pivot-signals"
+      ],
+      "wordCount": 260,
+      "file": "cb-fed-leadership-warsh.md"
+    },
+    {
       "id": "cb-fed-money-supply",
       "title": "Fed — Masses monetaires M1, M2, M3",
       "source": "central-banks.md",
@@ -2048,6 +2098,47 @@
       "file": "geo-coupe-circuits.md"
     },
     {
+      "id": "geo-crise-bancaire-cas",
+      "title": "Crises bancaires — Cas historiques (SVB, CS, Lehman)",
+      "source": "geopolitics.md",
+      "symbols": [
+        "XLF",
+        "GC=F",
+        "BTC-USD",
+        "^GSPC"
+      ],
+      "themes": [
+        "risk-off",
+        "taux",
+        "liquidite"
+      ],
+      "conditions": {
+        "flags": [
+          "NEWS_CLUSTER",
+          "EXTREME_MOVE"
+        ],
+        "actors": [
+          "fed"
+        ],
+        "regimes": [
+          "choc-exogene",
+          "risk-off"
+        ],
+        "vix_above": 25,
+        "any_symbol_move": true,
+        "seasonality_months": []
+      },
+      "always_if_symbol": false,
+      "always_if_theme": false,
+      "priority": "medium",
+      "related_chunks": [
+        "geo-crise-bancaire",
+        "geo-krachs-patterns"
+      ],
+      "wordCount": 186,
+      "file": "geo-crise-bancaire-cas.md"
+    },
+    {
       "id": "geo-crise-bancaire",
       "title": "Crises bancaires — Mécanique et chaîne causale",
       "source": "geopolitics.md",
@@ -2091,47 +2182,6 @@
       ],
       "wordCount": 221,
       "file": "geo-crise-bancaire.md"
-    },
-    {
-      "id": "geo-crise-bancaire-cas",
-      "title": "Crises bancaires — Cas historiques (SVB, CS, Lehman)",
-      "source": "geopolitics.md",
-      "symbols": [
-        "XLF",
-        "GC=F",
-        "BTC-USD",
-        "^GSPC"
-      ],
-      "themes": [
-        "risk-off",
-        "taux",
-        "liquidite"
-      ],
-      "conditions": {
-        "flags": [
-          "NEWS_CLUSTER",
-          "EXTREME_MOVE"
-        ],
-        "actors": [
-          "fed"
-        ],
-        "regimes": [
-          "choc-exogene",
-          "risk-off"
-        ],
-        "vix_above": 25,
-        "any_symbol_move": true,
-        "seasonality_months": []
-      },
-      "always_if_symbol": false,
-      "always_if_theme": false,
-      "priority": "medium",
-      "related_chunks": [
-        "geo-crise-bancaire",
-        "geo-krachs-patterns"
-      ],
-      "wordCount": 186,
-      "file": "geo-crise-bancaire-cas.md"
     },
     {
       "id": "geo-flash-crash",
@@ -4040,7 +4090,7 @@
         "macro-treasury-yields",
         "cb-fed-fedwatch"
       ],
-      "wordCount": 200,
+      "wordCount": 205,
       "file": "macro-fed-decisions.md"
     },
     {

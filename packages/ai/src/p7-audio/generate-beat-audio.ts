@@ -18,17 +18,48 @@ import { join } from 'path';
 import type { Beat, Language } from '@yt-maker/core';
 import { fishTTS, FISH_PRESETS } from './fish-tts';
 import { elevenLabsTTS } from './elevenlabs-tts';
+import { openaiTTS, type OpenAIVoice } from './openai-tts';
+import { replaceTickersInQuotes } from './phonetic-tickers';
 import { alignSegmentAudio } from './align-segment-audio';
 
 // ─── TTS Provider ───────────────────────────────────────────────
 
-type TTSProvider = 'edge' | 'fish' | 'elevenlabs';
+type TTSProvider = 'edge' | 'fish' | 'elevenlabs' | 'openai';
 
 function getTTSProvider(): TTSProvider {
   const provider = process.env.TTS_PROVIDER || 'edge';
   if (provider === 'fish' || provider === 'fish-audio') return 'fish';
   if (provider === 'elevenlabs' || provider === '11labs') return 'elevenlabs';
+  if (provider === 'openai' || provider === 'gpt') return 'openai';
   return 'edge';
+}
+
+// ─── OpenAI TTS — preset (vitesse + instructions) pour gpt-4o-mini-tts ─────
+/** Vitesse par défaut OpenAI verse — calée sur les tests A/B (1.15). */
+const OPENAI_DEFAULT_SPEED = 1.15;
+
+const OPENAI_INSTRUCTIONS_FR = `
+Voice: A young French male voice, late twenties, sharp and visibly engaged. Think of an energetic French YouTuber explaining markets to other young people — Hugo Décrypte or Heu?reka style, applied to finance. Smart, fast, alive.
+
+Audience: Young viewers, 20 to 35 years old. They are intelligent but they will mentally check out the second the voice goes flat. Energy is non-negotiable.
+
+Tone: Direct, conversational, modern. Like you are explaining something genuinely fascinating to a friend at a bar. There are real stakes in what you are saying — let that show in your voice. Never lecture, never preach.
+
+Pacing: BRISK. Around 180 to 200 words per minute. Snap forward through setup sentences. Slow down briefly only to land a punch line, an irony, or a key revelation. Then accelerate again. Never drag.
+
+Energy and dynamics: WIDE pitch and volume range. Hit key words — proper nouns, numbers, surprising verbs — with clear emphasis. Make the listener feel the contrast between calm fact-stating and dramatic reveals. No flat stretch longer than one sentence is allowed.
+
+Accent: Modern neutral metropolitan French (Paris). Urban, contemporary, no regional marker. Absolutely no English or anglo-saxon accent on French words. Nasal vowels (an, on, in, un) must sound native.
+
+Forbidden: News-anchor monotone, formal radio gravitas, robotic delivery, sing-song rhythm, droning, any flat passage. The single worst sin here is being boring.
+`.trim();
+
+/** Pour OpenAI : retire les tags [pause] (lus littéralement par le modèle)
+ *  et substitue les tickers entre guillemets par leur phonétique FR. */
+function prepareForOpenAI(text: string): string {
+  const stripped = text.replace(/\[long(?:ue)? pause\]/gi, '').replace(/\[pause\]/gi, '');
+  const { output } = replaceTickersInQuotes(stripped);
+  return output.replace(/\s{2,}/g, ' ').replace(/\s+([,.;:!?])/g, '$1').trim();
 }
 
 // ─── Edge TTS (lazy import) ─────────────────────────────────────
@@ -121,6 +152,11 @@ function sanitizeForTTS(text: string): string {
     .replace(/([.!?])\s*\[pause\]/g, '$1')
     // Insérer [pause] AVANT la ponctuation finale (sauf en bout de chaîne)
     .replace(/(\S)([.!?])(\s)/g, '$1 [pause]$2$3')
+    // Phonétisation des mots anglais du nom de marque — Fish/OpenAI les lirait
+    // mal sinon ("Owl" → "o-vle"). "Aul" commence par voyelle, donc l'élision
+    // "l'Aul" se prononce naturellement "l-aul".
+    .replace(/\bowl\b/gi, 'Aul')
+    .replace(/\bstreet\b/gi, 'Street')
     // Espaces multiples
     .replace(/[ \t]+/g, ' ')
     // Tirets cadratins orphelins en fin de phrase
@@ -174,6 +210,25 @@ async function generateBeatWithElevenLabs(
   });
 }
 
+async function generateBeatWithOpenAI(
+  sanitized: string,
+  mp3Path: string,
+  speed?: number,
+): Promise<void> {
+  const text = prepareForOpenAI(sanitized);
+  const voice = (process.env.OPENAI_TTS_VOICE as OpenAIVoice) || 'verse';
+  const model = process.env.OPENAI_TTS_MODEL || 'gpt-4o-mini-tts';
+  await openaiTTS({
+    text,
+    outputPath: mp3Path,
+    voice,
+    model,
+    instructions: OPENAI_INSTRUCTIONS_FR,
+    format: 'mp3',
+    speed: speed ?? OPENAI_DEFAULT_SPEED,
+  });
+}
+
 // ─── Segment-level TTS generation ───────────────────────────────
 
 /** Group beats by segmentId, preserving order */
@@ -195,7 +250,7 @@ async function generateSegmentAudio(
   outputDir: string,
   publicRelativePrefix: string,
   speed?: number,
-  provider: 'fish' | 'elevenlabs' = 'fish',
+  provider: 'fish' | 'elevenlabs' | 'openai' = 'fish',
 ): Promise<{ successSegments: number; segmentDurations: Record<string, number> }> {
   const segmentsDir = join(outputDir, 'segments');
   if (!existsSync(segmentsDir)) mkdirSync(segmentsDir, { recursive: true });
@@ -217,21 +272,54 @@ async function generateSegmentAudio(
 
     console.log(`    Segment ${segId}: ${narrativeBeats.length} beats, generating...`);
 
-    // 1. Concatenate all narrationTTS for this segment
-    //    Then fix hallucinated abbreviations by cross-checking with narrationChunk
-    const fullTTS = narrativeBeats
-      .map(b => {
-        let tts = (b as any).narrationTTS || b.narrationChunk;
-        // Fix Haiku hallucinations by cross-checking with narrationChunk
-        if (b.narrationChunk?.match(/\bBoJ\b/i) && /B\.C\.E\./.test(tts)) {
-          tts = tts.replace(/B\.C\.E\./g, 'BoJ');
+    // 1. Resolve TTS text for each beat (with hallucination fixes)
+    const ttsTexts: string[] = narrativeBeats.map(b => {
+      let tts = (b as any).narrationTTS || b.narrationChunk;
+      if (b.narrationChunk?.match(/\bBoJ\b/i) && /B\.C\.E\./.test(tts)) {
+        tts = tts.replace(/B\.C\.E\./g, 'BoJ');
+      }
+      if (b.narrationChunk?.includes('Terafab') && /Téradaïne/i.test(tts)) {
+        tts = tts.replace(/Téradaïne/gi, 'Térafab');
+      }
+      return String(tts ?? '').trim();
+    });
+
+    // 1b. Deduplicate inter-beat overlaps. P7a sometimes splits a sentence
+    //     into 2 beats: the sentence is included in beat[N]'s tail AND is the
+    //     entire beat[N+1] (typically when a stat-overlay beat is carved out).
+    //     Without dedup, Fish concatenates and reads the sentence twice.
+    //     Strategy: for each consecutive pair, if beat[N] ends with the full
+    //     text of beat[N+1] (modulo punctuation/pauses), trim that tail off N.
+    const stripForCompare = (s: string) => s
+      .replace(/\[(?:long(?:ue)? )?pause\]/gi, '')
+      .replace(/\s+/g, ' ')
+      .replace(/[.,;:!?…—\-"«»'']/g, '')
+      .toLowerCase()
+      .trim();
+    for (let i = 0; i < ttsTexts.length - 1; i++) {
+      const cur = ttsTexts[i];
+      const next = ttsTexts[i + 1];
+      if (!cur || !next) continue;
+      const curNorm = stripForCompare(cur);
+      const nextNorm = stripForCompare(next);
+      // Only consider non-trivial overlaps (≥ 20 chars on the smaller side)
+      if (nextNorm.length < 20) continue;
+      if (curNorm.endsWith(nextNorm)) {
+        // Trim cur by (roughly) the length of next from the right.
+        // Use word-by-word reverse pop to keep punctuation and pause tags intact
+        // wherever possible.
+        const nextWordCount = next.trim().split(/\s+/).length;
+        const curWords = cur.trim().split(/\s+/);
+        if (curWords.length > nextWordCount) {
+          ttsTexts[i] = curWords.slice(0, curWords.length - nextWordCount).join(' ').replace(/[\s,;:—\-]+$/, '').trim();
+          if (ttsTexts[i] && !/[.!?…]$/.test(ttsTexts[i])) ttsTexts[i] += '.';
+          console.log(`    Segment ${segId}: dedup overlap between ${narrativeBeats[i].id} → ${narrativeBeats[i+1].id} (-${nextWordCount} words)`);
         }
-        if (b.narrationChunk?.includes('Terafab') && /Téradaïne/i.test(tts)) {
-          tts = tts.replace(/Téradaïne/gi, 'Térafab');
-        }
-        return tts;
-      })
-      .join(' ');
+      }
+    }
+
+    // 2. Concatenate
+    const fullTTS = ttsTexts.join(' ');
     const sanitized = sanitizeForTTS(fullTTS);
 
     // 2. Generate 1 MP3 for the whole segment
@@ -242,6 +330,22 @@ async function generateSegmentAudio(
           text: sanitized,
           outputPath: segMp3,
           speed: segSpeed,
+        });
+      } else if (provider === 'openai') {
+        const openaiText = prepareForOpenAI(sanitized);
+        const openaiVoice = (process.env.OPENAI_TTS_VOICE as OpenAIVoice) || 'verse';
+        const openaiModel = process.env.OPENAI_TTS_MODEL || 'gpt-4o-mini-tts';
+        // OpenAI a sa propre vitesse cible (1.15) — ne pas hériter du Fish preset (1.1).
+        // L'override CLI `speed` reste prioritaire si fourni explicitement.
+        const openaiSpeed = speed ?? OPENAI_DEFAULT_SPEED;
+        await openaiTTS({
+          text: openaiText,
+          outputPath: segMp3,
+          voice: openaiVoice,
+          model: openaiModel,
+          instructions: OPENAI_INSTRUCTIONS_FR,
+          format: 'mp3',
+          speed: openaiSpeed,
         });
       } else {
         await fishTTS({
@@ -349,8 +453,8 @@ export async function generateBeatAudio(
 
   if (!existsSync(outputDir)) mkdirSync(outputDir, { recursive: true });
 
-  // ── Segment mode: Fish/ElevenLabs + Echogarden alignment ──
-  if ((provider === 'fish' || provider === 'elevenlabs') && !options?.legacyMode) {
+  // ── Segment mode: Fish/ElevenLabs/OpenAI + Echogarden alignment ──
+  if ((provider === 'fish' || provider === 'elevenlabs' || provider === 'openai') && !options?.legacyMode) {
     console.log(`\n  Generating TTS per SEGMENT (${provider}, segment mode)...`);
     const { successSegments, segmentDurations } = await generateSegmentAudio(
       beats, outputDir, publicRelativePrefix, options?.speed, provider,
@@ -376,7 +480,9 @@ export async function generateBeatAudio(
         durationSec: b.durationSec,
         voice: provider === 'elevenlabs'
           ? (process.env.ELEVENLABS_VOICE_ID ?? 'elevenlabs')
-          : (process.env.FISH_VOICE_ID ?? 'fish-s2-pro'),
+          : provider === 'openai'
+            ? (process.env.OPENAI_TTS_VOICE ?? 'verse')
+            : (process.env.FISH_VOICE_ID ?? 'fish-s2-pro'),
       })),
     };
     const manifestPath = join(outputDir, 'beat-audio-manifest.json');
@@ -402,6 +508,8 @@ export async function generateBeatAudio(
     await edgeTts.setMetadata(voice, OUTPUT_FORMAT.AUDIO_24KHZ_96KBITRATE_MONO_MP3);
   } else if (provider === 'elevenlabs') {
     voice = process.env.ELEVENLABS_VOICE_ID ?? 'elevenlabs';
+  } else if (provider === 'openai') {
+    voice = process.env.OPENAI_TTS_VOICE ?? 'verse';
   } else {
     voice = process.env.FISH_VOICE_ID ?? 'fish-s2-pro';
   }
@@ -450,6 +558,8 @@ export async function generateBeatAudio(
         await generateBeatWithFish(sanitized, mp3Path, undefined, options?.speed);
       } else if (provider === 'elevenlabs') {
         await generateBeatWithElevenLabs(sanitized, mp3Path, options?.speed);
+      } else if (provider === 'openai') {
+        await generateBeatWithOpenAI(sanitized, mp3Path, options?.speed);
       } else {
         await generateBeatWithEdge(edgeTts, sanitized, mp3Path);
       }

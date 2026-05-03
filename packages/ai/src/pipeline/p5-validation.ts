@@ -1,4 +1,5 @@
 import { generateStructuredJSON } from "../llm-client";
+import { ValidationResponseSchema, zodValidator } from "./schemas";
 import type {
   DraftScript, EditorialPlan, AnalysisBundle, WordBudget,
   SnapshotFlagged, ValidationResult, ValidationIssue,
@@ -852,6 +853,261 @@ function buildC4UserPrompt(draft: DraftScript, plan: EditorialPlan, analysis: An
  * sans aucune modification. Haiku ne réécrit jamais. Si des blockers sont signalés,
  * la correction passera par un nouvel appel Opus depuis le pipeline (boucle de retry).
  */
+/** Strip diacritics + lowercase for keyword matching. */
+function norm(s: string): string {
+  return (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+}
+
+/** Extract distinctive keywords from a segment for mismatch detection. */
+function segmentKeywords(seg: { title?: string; topic?: string; assets?: string[]; narration: string }): string[] {
+  const out = new Set<string>();
+  // Title words ≥4 chars
+  for (const w of (seg.title ?? '').split(/[\s—,'\-]+/)) {
+    const n = norm(w);
+    if (n.length >= 4) out.add(n);
+  }
+  // Topic slug
+  if (seg.topic) {
+    for (const w of seg.topic.split(/[-_\s]+/)) {
+      const n = norm(w);
+      if (n.length >= 4) out.add(n);
+    }
+  }
+  // Assets (raw + humanized)
+  for (const a of seg.assets ?? []) {
+    out.add(norm(a));
+    // strip ticker suffixes
+    out.add(norm(a.replace(/[=^.][\w]+$/, '')));
+  }
+  // First proper nouns from narration (capitalized words after the first sentence)
+  const firstWords = (seg.narration || '').slice(0, 280).split(/[\s,;.—]+/);
+  for (const w of firstWords) {
+    if (/^[A-Z][a-zA-ZéèàâêûôîçœùÉÈÀÂÊÛÔÎÇŒÙ]{3,}$/.test(w)) {
+      out.add(norm(w));
+    }
+  }
+  return Array.from(out).filter((s) => s.length > 0);
+}
+
+interface OwlMismatch {
+  fromSegmentId: string;
+  toSegmentId: string;
+  toTitle: string;
+  toKeywords: string[];
+  currentTransition: string;
+}
+
+function detectOwlTransitionMismatches(draft: DraftScript): OwlMismatch[] {
+  const segs = draft.segments ?? [];
+  const mismatches: OwlMismatch[] = [];
+  for (let i = 0; i < segs.length - 1; i++) {
+    const cur = segs[i];
+    const next = segs[i + 1];
+    const tr = (cur.owlTransition ?? '').trim();
+    if (!tr) continue;  // no transition = nothing to check
+    const trNorm = norm(tr);
+    const keywords = segmentKeywords(next);
+    const matched = keywords.some((k) => k.length >= 3 && trNorm.includes(k));
+    if (!matched) {
+      mismatches.push({
+        fromSegmentId: cur.segmentId,
+        toSegmentId: next.segmentId,
+        toTitle: next.title ?? next.segmentId,
+        toKeywords: keywords,
+        currentTransition: tr,
+      });
+    }
+  }
+  return mismatches;
+}
+
+interface RewriteOutput {
+  fromSegmentId: string;
+  owlTransition: string;
+}
+
+async function rewriteOwlTransitions(
+  draft: DraftScript,
+  mismatches: OwlMismatch[],
+): Promise<void> {
+  const segs = draft.segments ?? [];
+  // Build context : the LLM needs to see the full chain even when only a few
+  // pairs are off, so transitions chain coherently.
+  const system = `You are an editorial transition writer for a French daily market video. You will rewrite the OWL TRANSITION of certain segments so each one truly introduces the NEXT segment.
+
+═══ HARD RULES ═══
+
+- Each transition MUST refer to the actual content of the NEXT segment — name a protagonist / asset / event from the next segment's narration.
+- 15–35 words. Spoken French, conversational. End with a hook to keep watching.
+- Use a connector ("mais", "et pendant ce temps", "or", "passons à", "maintenant", "à côté de ça") — vary across pairs.
+- Don't restate next segment's conclusion — TEASE it.
+
+═══ OUTPUT STRICT JSON ARRAY ═══
+[ { "fromSegmentId": "<id>", "owlTransition": "<15-35 words>" } ]
+One entry per pair to rewrite.`;
+
+  const pairBlocks = mismatches.map((m) => {
+    const fromSeg = segs.find((s) => s.segmentId === m.fromSegmentId);
+    const toSeg = segs.find((s) => s.segmentId === m.toSegmentId);
+    return `=== PAIR ${m.fromSegmentId} → ${m.toSegmentId} ===
+FROM segment "${fromSeg?.title ?? '?'}" — narration tail: "...${(fromSeg?.narration ?? '').slice(-200)}"
+TO segment "${toSeg?.title ?? '?'}" — topic: ${toSeg?.topic ?? '?'} — assets: ${(toSeg?.assets ?? []).join('|')}
+TO narration head: "${(toSeg?.narration ?? '').slice(0, 400)}"
+CURRENT transition (incorrect, doesn't match next segment): "${m.currentTransition}"`;
+  }).join('\n\n');
+
+  const user = `${pairBlocks}
+
+Rewrite ${mismatches.length} owl transition(s). Each must concretely evoke the NEXT segment's content. Output the JSON array.`;
+
+  let result: RewriteOutput[];
+  try {
+    result = await generateStructuredJSON<RewriteOutput[]>(system, user, { role: 'fast' });
+  } catch (err) {
+    console.warn(`    P5 owl rewrite failed (${(err as Error).message.slice(0, 100)}) — keeping originals`);
+    return;
+  }
+
+  if (!Array.isArray(result)) return;
+  const byId = new Map(result.map((r) => [r.fromSegmentId, r.owlTransition]));
+  let updated = 0;
+  for (const seg of segs) {
+    const t = byId.get(seg.segmentId);
+    if (t && t.trim().length > 5) {
+      seg.owlTransition = t.trim();
+      updated++;
+    }
+  }
+  console.log(`    P5: ${updated}/${mismatches.length} owl transitions rewritten for coherence`);
+}
+
+// ── Numerical fact-check for narrated values vs snapshot ──────────
+
+interface NumericalFix {
+  segmentId: string;
+  oldSentence: string;
+  newSentence: string;
+  reason: string;
+}
+
+interface SnapshotAsset {
+  symbol: string;
+  name?: string;
+  sessionClose?: number;
+  changePct?: number;
+  price?: number;
+}
+
+/**
+ * Detect numerical mismatches in segment narrations vs snapshot truth.
+ * Uses Haiku because numbers can be written in digits ("157,03") OR in
+ * spelled-out French ("cent cinquante-sept"), with rounding variations
+ * ("autour de 159"). Pure regex would miss too many cases.
+ *
+ * Input : draft + array of asset truth cards.
+ * Output : list of { segmentId, oldSentence, newSentence, reason }.
+ * Empty array if everything checks out.
+ */
+async function detectNumericalMismatches(
+  draft: DraftScript,
+  snapshotAssets: SnapshotAsset[],
+): Promise<NumericalFix[]> {
+  const segments = draft.segments ?? [];
+  if (segments.length === 0 || snapshotAssets.length === 0) return [];
+
+  // Build asset truth cards keyed by symbol (only assets actually cited in
+  // segments — saves tokens).
+  const citedSymbols = new Set<string>();
+  for (const seg of segments) {
+    for (const a of seg.assets ?? []) citedSymbols.add(a);
+  }
+  const truthCards = snapshotAssets
+    .filter((a) => citedSymbols.has(a.symbol))
+    .map((a) => {
+      const close = a.sessionClose ?? a.price;
+      const change = a.changePct;
+      const closeStr = close != null ? close.toFixed(close > 100 ? 2 : 4) : 'n/a';
+      const changeStr = change != null ? `${change >= 0 ? '+' : ''}${change.toFixed(2)}%` : 'n/a';
+      return `- ${a.symbol}${a.name ? ` (${a.name})` : ''} : sessionClose=${closeStr}  changePct=${changeStr}`;
+    });
+
+  if (truthCards.length === 0) return [];
+
+  const system = `You audit a French financial-video script for numerical accuracy. For each segment narration, identify any phrase that quotes a NUMBER (price, percentage, change) about a specific asset where the quoted value DIVERGES from the truth provided.
+
+Numbers can be written :
+- In digits : "157,03", "+3.24%", "108 dollars"
+- In words FR : "cent cinquante-sept", "trois virgule deux pour cent", "moins cinq pour cent"
+- Rounded : "autour de 159", "près de 108", "sous les 160"
+
+Tolerances :
+- Price : flag if quoted value differs by > 1.5% from truth (rounding OK)
+- Percentage : flag if quoted differs by > 0.5 absolute points from truth
+- Asset name in the same sentence — required to flag (don't flag generic numbers)
+
+For each mismatch, output the EXACT problematic sentence (verbatim, copy-paste from narration) AND a corrected sentence keeping tone, length, French spelled-out style if applicable.
+
+Output STRICT JSON ARRAY, empty if everything checks out :
+[
+  {
+    "segmentId": "<id>",
+    "oldSentence": "<exact problematic sentence from narration>",
+    "newSentence": "<corrected sentence>",
+    "reason": "<short reason : asset, quoted value, true value>"
+  }
+]
+
+Do NOT flag :
+- Sentences without a specific asset name
+- Sentences quoting trends (e.g. "le cours grimpe") without a number
+- Sentences citing past values (yesterday, last week) — only flag if quoting current/J-1 value
+- Style choices like "around 100" when truth is 99.7 (within tolerance)`;
+
+  const user = `=== ASSET TRUTH (J-1 close + var) ===
+${truthCards.join('\n')}
+
+=== SEGMENTS TO AUDIT ===
+${segments.map((s) => `--- segmentId=${s.segmentId} title="${s.title}" assets=${(s.assets ?? []).join('|')} ---\n${s.narration}`).join('\n\n')}
+
+Output the JSON array of mismatches.`;
+
+  try {
+    const result = await generateStructuredJSON<NumericalFix[]>(system, user, { role: 'fast' });
+    return Array.isArray(result) ? result : [];
+  } catch (err) {
+    console.warn(`  P5 numerical fact-check failed (${(err as Error).message.slice(0, 100)}) — skipping`);
+    return [];
+  }
+}
+
+/**
+ * Apply numerical fixes by string-replacing each oldSentence with newSentence
+ * in the matching segment's narration. Mutates draft.segments[*].narration.
+ */
+function applyNumericalFixes(draft: DraftScript, fixes: NumericalFix[]): number {
+  let applied = 0;
+  for (const fix of fixes) {
+    const seg = draft.segments?.find((s) => s.segmentId === fix.segmentId);
+    if (!seg) continue;
+    if (!fix.oldSentence || !fix.newSentence) continue;
+    if (!seg.narration.includes(fix.oldSentence)) {
+      // sentence boundary mismatch — try to be more lenient (Haiku may have
+      // trimmed punctuation). Try without trailing punct.
+      const trimmed = fix.oldSentence.replace(/[.,;:!?…]$/, '');
+      if (seg.narration.includes(trimmed)) {
+        seg.narration = seg.narration.replace(trimmed, fix.newSentence);
+        applied++;
+        continue;
+      }
+      console.warn(`    P5 numerical: sentence not found verbatim in ${fix.segmentId} — skipped`);
+      continue;
+    }
+    seg.narration = seg.narration.replace(fix.oldSentence, fix.newSentence);
+    applied++;
+  }
+  return applied;
+}
+
 export async function runValidation(
   draft: DraftScript,
   plan: EditorialPlan,
@@ -859,6 +1115,34 @@ export async function runValidation(
   budget: WordBudget,
   flagged?: SnapshotFlagged,
 ): Promise<ValidationResult> {
+  // Step 0: Inter-segment owl-transition coherence check (code-only detection,
+  // Haiku rewrite only when mismatches found). Mutates draft.segments[*].owlTransition.
+  const owlMismatches = detectOwlTransitionMismatches(draft);
+  if (owlMismatches.length > 0) {
+    console.log(`  P5 owl transitions: ${owlMismatches.length} mismatch(es) detected (rewriting)`);
+    await rewriteOwlTransitions(draft, owlMismatches);
+  }
+
+  // Step 0.5: Numerical fact-check vs snapshot. Catches LLM hallucinations on
+  // prices and percentages (e.g. "USDJPY autour de 159" when truth is 157).
+  // Like owl transitions: Haiku detects + suggests fix, code applies in-place,
+  // no full C3 retry.
+  if (flagged?.assets && flagged.assets.length > 0) {
+    const snapAssets: SnapshotAsset[] = flagged.assets.map((a) => ({
+      symbol: a.symbol,
+      name: a.name,
+      sessionClose: (a.snapshot as any)?.sessionClose,
+      changePct: a.changePct,
+      price: a.price,
+    }));
+    const numFixes = await detectNumericalMismatches(draft, snapAssets);
+    if (numFixes.length > 0) {
+      console.log(`  P5 numerical: ${numFixes.length} mismatch(es) detected (rewriting)`);
+      const applied = applyNumericalFixes(draft, numFixes);
+      console.log(`    P5 numerical: ${applied}/${numFixes.length} sentences corrected`);
+    }
+  }
+
   // Step 1: Mechanical validation (with hallucination checks if flagged data available)
   const mechIssues = validateMechanical(draft, plan, budget, flagged);
   const mechBlockers = mechIssues.filter(i => i.severity === 'blocker');
@@ -906,7 +1190,7 @@ export async function runValidation(
     const result = await generateStructuredJSON<{ issues?: ValidationIssue[] }>(
       systemPrompt,
       userPrompt,
-      { role: 'fast' },
+      { role: 'fast', validate: zodValidator(ValidationResponseSchema) as any },
     );
 
     const allIssues = [

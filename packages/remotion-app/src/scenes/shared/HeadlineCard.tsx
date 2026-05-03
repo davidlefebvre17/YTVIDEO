@@ -8,11 +8,12 @@ import React from "react";
 import { useCurrentFrame, interpolate } from "remotion";
 import { BRAND } from "@yt-maker/core";
 
-interface HeadlineCardProps {
+export interface HeadlineCardProps {
   title: string;
   source?: string;
   accentColor?: string;
   startFrame?: number;
+  variant?: 'default' | 'tabloid';
 }
 
 export const HeadlineCard: React.FC<HeadlineCardProps> = ({

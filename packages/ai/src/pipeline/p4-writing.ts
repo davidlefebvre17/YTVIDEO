@@ -5,6 +5,7 @@ import type {
 import type { Language, COTPositioning, AssetSnapshot } from "@yt-maker/core";
 import { buildTemporalAnchors } from "./helpers/temporal-anchors";
 import { loadWeeklyBrief, computeCotInsights, formatCotInsightsMarkdown } from "@yt-maker/data";
+import { DraftScriptSchema, zodValidator } from "./schemas";
 
 function buildC3SystemPrompt(lang: Language, knowledgeBriefing: string): string {
   return `Tu es la voix UNIQUE de toute la vidéo Owl Street Journal. Du premier au dernier mot, c'est toi qui parles. Il n'y a pas d'autre voix. Tu tutoies le spectateur. JAMAIS de vouvoiement, nulle part.
@@ -252,6 +253,14 @@ Chaque asset a des perfs ROLLING (1S/1M/3M/1A = fenêtres glissantes) et CALENDA
 - "depuis [janvier / le début du mois]" → CALENDAIRE — "plus trente pour cent depuis le début de l'année" = YTD.
 - **UN SEUL timeframe par mention d'asset**, jamais d'empilage. Le timeframe non dit contextualise : "vingt pour cent sur l'année" = le move du jour est du bruit dans un trend long.
 
+TENDANCE COURTE (5 dernières séances) : si l'analyse C2 mentionne une trajectoire ou un cumul multi-jours dans les keyFacts ou la causalChain, calque ton vocabulaire sur le pattern. Une variation du jour s'évalue TOUJOURS dans la tendance des séances précédentes — un +3% n'est pas une explosion si la veille était déjà à +8%. Vocabulaire à privilégier selon le pattern :
+- ↑ tendance haussière continue → "la hausse continue", "Ne jour de gains", "le rally s'étend", "la dynamique se prolonge"
+- ↓ tendance baissière continue → "la chute s'aggrave", "le repli s'accélère", "Ne jour de pertes", "la pression vendeuse persiste"
+- ↕ retournement (direction opposée à la veille) → "renversement", "reprise après N jours de baisse", "premier vrai recul", "rebond technique"
+- ~ volatile → "marché indécis", "alternance", "ni l'un ni l'autre ne tranche"
+- 1er jour de mouvement → "explose", "s'effondre", "bondit", "plonge" (réservés aux moves isolés)
+**Interdit** : "explose" / "s'effondre" / "bondit" / "plonge" si la séance s'inscrit dans une tendance ≥3 jours même direction.
+
 MAGNITUDE PAR CLASSE (champ "group" fourni par asset) — un chiffre sans contexte ne dit rien :
 - Indices actions (US_INDEX, EU_INDEX) : ~8% annuel = normal, ±20% = exceptionnel
 - Or / safe metals : ~5% annuel = normal, >15% = signal stress
@@ -312,7 +321,9 @@ Ces termes sont français mais OPAQUES pour un novice. Ils sont autorisés UNIQU
 
 Règle pratique : si ta mère ne comprendrait pas le terme dit sec, installe-le par une scène. Le terme devient alors une étiquette posée sur quelque chose que le spectateur vient de VOIR.
 
-ZÉRO SIGLE TECHNIQUE — TOUJOURS le nom complet en français. Le spectateur ne connaît pas les acronymes. RSI→indice de force relative, VIX→indice de volatilité, WTI→brut américain, DXY→indice du dollar, PPI→indice des prix à la production, SMA→moyenne mobile, ETF→fonds indiciel, Fed→Réserve fédérale (ou "banque centrale américaine"), BCE→Banque centrale européenne, BoJ→banque centrale du Japon, BoE→Banque d'Angleterre, USD→dollar, EUR→euro, JPY→yen. Cette liste N'EST PAS exhaustive — AUCUN sigle technique ni aucune abréviation de banque centrale ou devise, JAMAIS. Les seuls noms propres à garder tels quels : S&P 500, Nasdaq, Dow Jones, Bitcoin, Ethereum.
+ZÉRO SIGLE TECHNIQUE — pour les indicateurs, banques centrales et devises, TOUJOURS le nom complet en français. Le spectateur ne connaît pas ces acronymes. RSI→indice de force relative, VIX→indice de volatilité, WTI→brut américain, DXY→indice du dollar, PPI→indice des prix à la production, SMA→moyenne mobile, ETF→fonds indiciel, Fed→Réserve fédérale (ou "banque centrale américaine"), BCE→Banque centrale européenne, BoJ→banque centrale du Japon, BoE→Banque d'Angleterre, USD→dollar, EUR→euro, JPY→yen.
+
+EN REVANCHE, les **sigles de sociétés** (KLM, BMW, IBM, AMD, ASML, ON, NXP, GE, GM, P&G, BNY, JPM, etc.) restent **inchangés** — ne traduis JAMAIS leur expansion (KLM ≠ "Compagnie Royale Néerlandaise" ; BMW ≠ "Bayerische Motoren Werke"). Le pipeline TTS s'occupe de leur prononciation. Les noms propres à garder tels quels incluent aussi : S&P 500, Nasdaq, Dow Jones, Bitcoin, Ethereum.
 
 ## GARDE-FOUS
 
@@ -422,6 +433,7 @@ interface BriefingExtract {
   earningsUpcomingWatchlist?: string[];
   earningsUpcomingOther?: string[];
   cbSpeechesYesterday?: string[];
+  obligatoryMacroStats?: string[];
 }
 
 function buildC3UserPrompt(
@@ -526,6 +538,15 @@ function buildC3UserPrompt(
     if (briefing.earningsUpcomingOther?.length) {
       prompt += `**Earnings — autres notables** (contexte, à citer si pertinent) : ${briefing.earningsUpcomingOther.slice(0, 12).join(' | ')}\n\n`;
     }
+  }
+
+  // Stats macro OBLIGATOIRES — sortes hier ou en cours, doivent être citées
+  // au moins une fois (intégrées dans un segment existant, pas un segment dédié).
+  if (briefing?.obligatoryMacroStats?.length) {
+    prompt += `## ⚠ STATS MACRO OBLIGATOIRES À CITER\n`;
+    prompt += `Ces statistiques économiques (consensus tier-1) sont sorties ou attendues sur la session couverte. Elles DOIVENT apparaître au moins une fois dans la narration — intégrées dans un segment existant pertinent (banques centrales, devise concernée, indice impacté). PAS de segment dédié juste pour ça : la mention est une ligne ou deux dans un segment qui parle déjà du sujet. Si aucun segment ne porte naturellement le sujet, l'inclure en transition ou en contexte d'un autre point.\n`;
+    for (const s of briefing.obligatoryMacroStats) prompt += `- ${s}\n`;
+    prompt += '\n';
   }
 
   // Discours banques centrales d'hier — souvent un déclencheur que C2 a peut-être mentionné,
@@ -714,7 +735,7 @@ export async function runC3Writing(input: {
   const draft = await generateStructuredJSON<DraftScript>(
     systemPrompt,
     userPrompt,
-    { role: 'quality', maxTokens: 16384 },
+    { role: 'quality', maxTokens: 16384, validate: zodValidator(DraftScriptSchema) as any },
   );
 
   // Guard against malformed response

@@ -19,8 +19,9 @@ export type MaterialityFlag =
   | 'SMA200_CROSS'         // price crosses SMA200
   | 'ZONE_EVENT'           // MarketMemory zone touched
   // ── Narratif (~40%) ──
-  | 'EARNINGS_SURPRISE'    // beat/miss >10%
+  | 'EARNINGS_SURPRISE'    // beat/miss >10% EPS or >3% revenue
   | 'EARNINGS_TODAY'       // publishes today, results pending (suspense)
+  | 'EARNINGS_RECENT'      // results published ≤ J-2 with actuals (still hot)
   | 'NEWS_LINKED'          // ≥1 article linked via tagger
   | 'NEWS_CLUSTER'         // ≥3 articles linked (concentrated buzz)
   | 'POLITICAL_TRIGGER'    // political actor + action keyword in news
@@ -355,6 +356,28 @@ export interface DirectedEpisode {
   totalEstimatedDuration: number;
 }
 
+// ── P10 C10 SEO ─────────────────────────────────────────
+
+export interface SEOChapter {
+  /** Format MM:SS or HH:MM:SS — first MUST be "00:00" */
+  time: string;
+  /** Hybrid label: asset + micro-narrative, 25-45 chars */
+  label: string;
+}
+
+export interface SEOMetadata {
+  /** YouTube title — 35-70 chars, sentence case, no clickbait */
+  title: string;
+  /** YouTube description — 200-400 words, structured blocks */
+  description: string;
+  /** 5-8 chapters — first must be 00:00 */
+  chapters: SEOChapter[];
+  /** 8-12 tags — first = exact title keyword */
+  tags: string[];
+  /** Exactly 3 hashtags, without # prefix */
+  hashtags: string[];
+}
+
 // ── Helpers ─────────────────────────────────────────────
 
 export interface EpisodeSummary {
@@ -413,7 +436,7 @@ export interface CausalBrief {
 
 // ── Pipeline orchestrator ───────────────────────────────
 
-export type PipelineStage = 'p1' | 'p2' | 'p3' | 'p4' | 'p5' | 'p6';
+export type PipelineStage = 'p1' | 'p2' | 'p3' | 'p4' | 'p5' | 'p6' | 'p10';
 
 export interface PipelineOptions {
   snapshot: DailySnapshot;
@@ -438,6 +461,7 @@ export interface PipelineResult {
     analysis: AnalysisBundle;
     draft: DraftScript;
     validation: ValidationResult;
+    seo?: SEOMetadata;
   };
   stats: PipelineStats;
 }

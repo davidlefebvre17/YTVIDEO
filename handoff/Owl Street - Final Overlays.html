@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Owl Street Journal — Final Overlays</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,800;1,400;1,700;1,800&family=Source+Serif+4:ital,wght@0,400;0,700;1,400;1,700&family=JetBrains+Mono:wght@400;500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  html, body {
+    margin: 0; padding: 0; height: 100%; background: #0a0806; color: #f5f0e8;
+    font-family: 'Source Serif 4', Georgia, serif;
+  }
+  deck-stage { display: block; width: 100vw; height: 100vh; }
+
+  .stage {
+    position: relative; width: 1920px; height: 1080px;
+    background: #0a0806;
+    overflow: hidden;
+    color: #1a1612;
+  }
+  .stage-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background-size: cover; background-position: center;
+  }
+  .stage-grain {
+    position: absolute; inset: 0; pointer-events: none; z-index: 1;
+    background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.6' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.10  0 0 0 0 0.08  0 0 0 0 0.06  0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    opacity: 0.18;
+    mix-blend-mode: overlay;
+  }
+  /* Light cream "paper card" wrapper that hosts the original overlay
+     unchanged. Sits centered on the dark photo background so the overlays
+     keep their existing ink-on-cream design exactly as before. */
+  .paper-card {
+    position: absolute;
+    inset: 60px 80px 100px;
+    background: rgba(245,240,232,0.30);
+    backdrop-filter: blur(2px);
+    box-shadow: 0 24px 80px rgba(0,0,0,0.55), 0 4px 12px rgba(0,0,0,0.4);
+    overflow: hidden;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .paper-card-grain {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.6' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.10  0 0 0 0 0.08  0 0 0 0 0.06  0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    opacity: 0.06;
+    mix-blend-mode: multiply;
+  }
+  .paper-card-inner {
+    position: relative; width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .paper-card-tag {
+    position: absolute; top: 24px; left: 32px;
+    font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0.22em;
+    color: #7a6e62;
+    z-index: 3;
+  }
+  .stage-chrome {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 44px; padding: 0 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(10,8,6,0.85);
+    backdrop-filter: blur(8px);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; letter-spacing: 0.2em;
+    color: #c8bfb0;
+    z-index: 5;
+    border-top: 1px solid rgba(245,240,232,0.15);
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.4); }
+  }
+</style>
+
+<template id="__bundler_thumbnail">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+    <rect width="100" height="100" fill="#0a0806"/>
+    <text x="50" y="58" font-family="Georgia,serif" font-style="italic" font-weight="700" font-size="42" fill="#f5f0e8" text-anchor="middle">OSJ</text>
+    <line x1="20" y1="68" x2="80" y2="68" stroke="#c0392b" stroke-width="2"/>
+  </svg>
+</template>
+
+<script type="application/json" id="speaker-notes">
+[
+  "Sélection finale — 10 overlays retenus de l'exploration. Chaque overlay est posé tel quel (composant non modifié) sur l'image d'épisode, dans une carte papier crème pour préserver son design ink-on-cream original.",
+  "Stat — Stamp Press (V1) : tampon imprimerie monumental, halo d'encre, ligne d'encre qui se trace, label en typewriter.",
+  "Causal — Domino Diagram (V2) : vrais blocs façon dominos avec ombres dures, flèches courbes, annotation finale en couleur.",
+  "Gauge — Strip Gauge (V2) : barre stripée 50 cellules avec aiguille qui glisse. Lecture instantanée.",
+  "Multi-Asset — Sparklines (V2) : 6 mini-graphes ink-drawn qui se tracent un par un, prix qui s'incrémentent.",
+  "Headline — Tabloid Slam (V2) : 'LA BCE / BAISSE' en 280px qui slamme par le haut, flash blanc, indicateur live qui pulse.",
+  "Scenario — Battle Diptych (V1) : la fourche bull/bear avec gros chiffres cible 120px et barres de probabilité.",
+  "Gauge — Liquid Manometer : tube vertical qui se remplit d'encre verte, vague animée, bulles, ticks à droite.",
+  "Heatmap — Treemap Morph : vraies cellules dimensionnées par poids, scale-up en cascade, fill par clip-path vertical.",
+  "Multi-Asset — Lane Race : course de chevaux, axe central 0%, chaque actif court vers la droite (bull) ou la gauche (bear) avec traînée de points.",
+  "Bonus — Number Avalanche : pluie de chiffres rotatifs, chiffre clé qui se fige au centre en monumental."
+]
+</script>
+</head>
+<body>
+
+<deck-stage>
+
+  <!-- 0. INTRO -->
+  <section>
+    <div class="stage" data-screen-label="00 Intro">
+      <div class="stage-bg" id="bg-intro"></div>
+      <div class="stage-grain"></div>
+      <div style="position:absolute; inset:0; z-index:2; display:flex; align-items:center; justify-content:center;">
+        <div style="padding: 0 140px; max-width:100%;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:18px; letter-spacing:0.32em; color:#f5f0e8; text-shadow: 0 2px 4px rgba(0,0,0,0.7);">
+            OWL STREET JOURNAL  ·  SÉLECTION FINALE  ·  AVRIL 2026
+          </div>
+          <div style="margin-top:32px; font-family:'Playfair Display',serif; font-style:italic; font-weight:800; font-size:140px; line-height:1.0; color:#f5f0e8; text-shadow: 0 4px 16px rgba(0,0,0,0.6);">
+            Dix overlays.<br>Sur les images.
+          </div>
+          <div style="margin-top:32px; width:520px; height:4px; background:#c0392b; box-shadow: 0 0 16px #c0392b;"></div>
+          <div style="margin-top:32px; font-family:'Source Serif 4',Georgia,serif; font-style:italic; font-size:30px; line-height:1.45; color:#f5f0e8; max-width: 1100px; text-shadow: 0 2px 8px rgba(0,0,0,0.6);">
+            Les composants retenus de l'exploration, posés tels quels sur les fonds d'épisode.
+            Aucune recréation, aucune dérive — chaque overlay garde son design original.
+          </div>
+        </div>
+      </div>
+      <div class="stage-chrome">
+        <span>OWL STREET JOURNAL · SÉLECTION FINALE</span>
+        <span>00 INTRO</span>
+      </div>
+    </div>
+  </section>
+
+  <section><div id="f1"  class="slide-mount" data-screen-label="01 Stat — Stamp Press"            data-bg="oil"      data-tag="ANIMATEDSTAT · V1 STAMP PRESS"></div></section>
+  <section><div id="f2"  class="slide-mount" data-screen-label="02 Causal — Domino Diagram"       data-bg="fed"      data-tag="CAUSALCHAIN · V2 DOMINO DIAGRAM"></div></section>
+  <section><div id="f3"  class="slide-mount" data-screen-label="03 Gauge — Strip Gauge"           data-bg="chart"    data-tag="GAUGEOVERLAY · V2 STRIP GAUGE"></div></section>
+  <section><div id="f4"  class="slide-mount" data-screen-label="04 Multi-Asset — Sparklines"      data-bg="trading"  data-tag="MULTIASSETBADGE · V2 SPARKLINES"></div></section>
+  <section><div id="f5"  class="slide-mount" data-screen-label="05 Headline — Tabloid Slam"       data-bg="newsroom" data-tag="HEADLINECARD · V2 TABLOID SLAM"></div></section>
+  <section><div id="f6"  class="slide-mount" data-screen-label="06 Scenario — Battle Diptych"     data-bg="bullbear" data-tag="SCENARIOFORK · V1 BATTLE DIPTYCH"></div></section>
+  <section><div id="f7"  class="slide-mount" data-screen-label="07 Gauge — Liquid Manometer"      data-bg="red"      data-tag="GAUGEOVERLAY · LIQUID MANOMETER"></div></section>
+  <section><div id="f8"  class="slide-mount" data-screen-label="08 Heatmap — Treemap Morph"       data-bg="trading"  data-tag="HEATMAPGRID · TREEMAP MORPH"></div></section>
+  <section><div id="f9"  class="slide-mount" data-screen-label="09 Multi-Asset — Lane Race"       data-bg="bullbear" data-tag="MULTIASSETBADGE · LANE RACE"></div></section>
+  <section><div id="f10" class="slide-mount" data-screen-label="10 Bonus — Number Avalanche"      data-bg="red"      data-tag="BONUS · NUMBER AVALANCHE"></div></section>
+
+</deck-stage>
+
+<script src="deck-stage.js"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="overlays/brand.jsx"></script>
+<script type="text/babel" src="overlays/backgrounds.jsx"></script>
+<script type="text/babel" src="overlays/stat.jsx"></script>
+<script type="text/babel" src="overlays/causal.jsx"></script>
+<script type="text/babel" src="overlays/gauge-heatmap-multi.jsx"></script>
+<script type="text/babel" src="overlays/headline-scenario.jsx"></script>
+<script type="text/babel" src="overlays/animation-forward.jsx"></script>
+
+<script type="text/babel">
+  function mount() {
+    const { useFrame } = window;
+    const BGS = window.OSJ_BACKGROUNDS;
+
+    // Set intro bg
+    const introEl = document.getElementById('bg-intro');
+    if (introEl) introEl.style.backgroundImage = `url("${BGS.trading}")`;
+
+    const slides = [
+      { id: 'f1',  Comp: window.StatStampPress,    label: '01 Stat — Stamp Press' },
+      { id: 'f2',  Comp: window.CausalDomino,      label: '02 Causal — Domino Diagram' },
+      { id: 'f3',  Comp: window.GaugeStrip,        label: '03 Gauge — Strip Gauge' },
+      { id: 'f4',  Comp: window.MultiSparklines,   label: '04 Multi-Asset — Sparklines' },
+      { id: 'f5',  Comp: window.HeadlineTabloid,   label: '05 Headline — Tabloid Slam' },
+      { id: 'f6',  Comp: window.ScenarioBattle,    label: '06 Scenario — Battle Diptych' },
+      { id: 'f7',  Comp: window.GaugeLiquid,       label: '07 Gauge — Liquid Manometer' },
+      { id: 'f8',  Comp: window.HeatmapTreemap,    label: '08 Heatmap — Treemap Morph' },
+      { id: 'f9',  Comp: window.MultiLaneRace,     label: '09 Multi-Asset — Lane Race' },
+      { id: 'f10', Comp: window.BonusAvalanche,    label: '10 Bonus — Number Avalanche' },
+    ];
+
+    function SlideHost({ Comp, label, mountEl }) {
+      const frame = useFrame(180);
+      const bgKey = mountEl.dataset.bg || 'trading';
+      const bgUrl = BGS[bgKey] || BGS.trading;
+      const tag = mountEl.dataset.tag || '';
+      return (
+        <div className="stage" data-screen-label={label}>
+          <div className="stage-bg" style={{ backgroundImage: `url("${bgUrl}")` }} />
+          <div className="stage-grain" />
+          <div className="paper-card">
+            <div className="paper-card-grain" />
+            <div className="paper-card-tag">{tag}</div>
+            <div className="paper-card-inner">
+              <Comp frame={frame} />
+            </div>
+          </div>
+          <div className="stage-chrome">
+            <span>OWL STREET JOURNAL · {label}</span>
+            <span>F{String(Math.round(frame)).padStart(3, '0')}</span>
+          </div>
+        </div>
+      );
+    }
+
+    for (const s of slides) {
+      const el = document.getElementById(s.id);
+      if (!el || !s.Comp) {
+        console.warn('Missing mount or comp for', s.id, s.label, !!s.Comp);
+        continue;
+      }
+      const root = ReactDOM.createRoot(el);
+      root.render(<SlideHost Comp={s.Comp} label={s.label} mountEl={el} />);
+    }
+  }
+
+  setTimeout(mount, 250);
+</script>
+
+</body>
+</html>

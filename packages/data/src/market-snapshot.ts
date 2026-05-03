@@ -6,6 +6,7 @@ import { computeTechnicals, computeMultiTFAnalysis, computePerf, getAssetGroup, 
 import { fetchBondYields, fetchYieldsHistory } from "./fred";
 import { fetchMarketSentiment } from "./sentiment";
 import { fetchEarningsCalendar, fetchFinnhubNews, fetchFinnhubCompanyNews, fetchStockEarningsHistory } from "./finnhub";
+import { fetchYahooEarnings, isEuropeanTicker } from "./yahoo-earnings";
 import { fetchMarketauxNews } from "./marketaux";
 import { screenStocks } from "./screening";
 import { fetchPolymarketData } from "./polymarket";
@@ -114,18 +115,73 @@ export async function fetchMarketSnapshot(
 
   // Phase 2 — per-asset enrichment (sequential with throttle to avoid Yahoo rate-limit)
   console.log(`\nEnriching ${assets.length} assets (technicals + multi-TF)...`);
+
+  // Strip today's partial intraday candle. The cutoff is strict (`< snapshotDate`)
+  // so that the J candle — which has live OHLC and renders as a degenerate thin
+  // line in the chart — is always excluded. Last kept candle is J-1.
+  const stripPartial = <T extends { date?: string; c?: number | null }>(arr: T[], narrativeDate: string): T[] =>
+    arr.filter((c) => {
+      const d = (c.date || "").slice(0, 10);
+      return d && d < narrativeDate;
+    });
+
+  /** Tail validity check : last kept candle must be on snapDate (or close to it,
+   *  ≤ 3 calendar days back to allow weekends) AND have a non-null close. */
+  const isTailValid = (candles: Array<{ date?: string; c?: number | null }>, narrativeDate: string): boolean => {
+    if (candles.length === 0) return false;
+    const last = candles[candles.length - 1];
+    if (last.c == null || !Number.isFinite(last.c)) return false;
+    const d = (last.date || "").slice(0, 10);
+    if (!d) return false;
+    const lag = (new Date(narrativeDate + "T12:00:00Z").getTime() - new Date(d + "T12:00:00Z").getTime()) / 86400000;
+    return lag >= 0 && lag <= 3;
+  };
+
   for (let ai = 0; ai < assets.length; ai++) {
     const asset = assets[ai];
     try {
       // Fetch all candle series in parallel for this asset
-      const [dailyCandles, weeklyCandles, daily3yCandles] = await Promise.all([
+      let [dailyCandles, weeklyCandles, daily3yCandles] = await Promise.all([
         fetchDailyCandles(asset.symbol),       // 1d, 1mo  → technicals
         fetchWeeklyCandles(asset.symbol),      // 1wk, 10y → multi-TF macro
         fetchDaily3yCandles(asset.symbol),     // 1d, 3y   → multi-TF medium/short
       ]);
 
-      if (dailyCandles.length >= 10) {
-        asset.dailyCandles = daily3yCandles.length > dailyCandles.length ? daily3yCandles : dailyCandles;
+      // ── Retry on data gap : Yahoo sometimes returns the J-1 candle late
+      // (missing entirely OR with c=null) when fetched too soon after close.
+      // If the post-strip tail isn't valid (last candle older than 3 days OR
+      // close is null), retry once with a short delay.
+      let cleanDaily = stripPartial(dailyCandles, snapshotDate);
+      let cleanDaily3y = stripPartial(daily3yCandles, snapshotDate);
+      const tailValid = isTailValid(cleanDaily, snapshotDate) && isTailValid(cleanDaily3y, snapshotDate);
+      if (!tailValid) {
+        console.log(`  ${asset.name}: tail gap detected (last candle stale or null) — retrying after 5s...`);
+        await new Promise((r) => setTimeout(r, 5000));
+        try {
+          const [retryDaily, retryDaily3y] = await Promise.all([
+            fetchDailyCandles(asset.symbol),
+            fetchDaily3yCandles(asset.symbol),
+          ]);
+          const retryClean = stripPartial(retryDaily, snapshotDate);
+          const retryClean3y = stripPartial(retryDaily3y, snapshotDate);
+          if (isTailValid(retryClean, snapshotDate) && isTailValid(retryClean3y, snapshotDate)) {
+            cleanDaily = retryClean;
+            cleanDaily3y = retryClean3y;
+            dailyCandles = retryDaily;
+            daily3yCandles = retryDaily3y;
+            console.log(`  ${asset.name}: retry succeeded — fresh candles obtained`);
+          } else {
+            console.warn(`  ${asset.name}: retry still incomplete — narrative will use latest valid candle`);
+            (asset as any).dataStale = true;
+          }
+        } catch (err) {
+          console.warn(`  ${asset.name}: retry failed (${(err as Error).message.slice(0, 60)})`);
+          (asset as any).dataStale = true;
+        }
+      }
+
+      if (cleanDaily.length >= 10) {
+        asset.dailyCandles = cleanDaily3y.length > cleanDaily.length ? cleanDaily3y : cleanDaily;
 
         // ── Session J-1 fields (overwrite intraday changePct with true session value) ──
         // pubDate = snapshotDate : filtre toute bougie dont date >= pubDate (partial intraday today).
@@ -145,7 +201,7 @@ export async function fetchMarketSnapshot(
         }
 
         // Multi-TF FIRST (provides true 52w range + ATH + SMA200 for drama score)
-        const multiTF = computeMultiTFAnalysis(weeklyCandles, daily3yCandles, asset.price);
+        const multiTF = computeMultiTFAnalysis(weeklyCandles, cleanDaily3y, asset.price);
         if (multiTF) {
           asset.multiTF = multiTF;
         }
@@ -164,7 +220,7 @@ export async function fetchMarketSnapshot(
         ).length;
 
         // Use 3y candles for robust EMA/RSI (750+ candles), fallback to 1-month
-        const candlesForTechnicals = daily3yCandles.length >= 50 ? daily3yCandles : dailyCandles;
+        const candlesForTechnicals = cleanDaily3y.length >= 50 ? cleanDaily3y : cleanDaily;
         asset.technicals = computeTechnicals(
           candlesForTechnicals,
           asset.price,
@@ -196,6 +252,32 @@ export async function fetchMarketSnapshot(
     stockScreen = await screenStocks(snapshotDate);
   } catch (err) {
     console.warn(`  Stock screening failed: ${err}`);
+  }
+
+  // Phase 3a — Yahoo earnings (EU complement to Finnhub which is US-only)
+  // Query Yahoo for European movers in stockScreen so we capture earnings publications
+  // that Finnhub misses (Air Liquide, BNP, Airbus, BP, Shell, SAP, Siemens, etc.).
+  // Output is merged into the same `earnings` array — same shape, P1 reads one unified source.
+  if (stockScreen && stockScreen.length > 0) {
+    const euMoverSymbols = stockScreen
+      .map((s) => s.symbol)
+      .filter(isEuropeanTicker);
+    if (euMoverSymbols.length > 0) {
+      try {
+        const yahooEvents = await fetchYahooEarnings(euMoverSymbols, snapshotDate);
+        // Dedup by symbol+date — Yahoo overrides Finnhub for EU symbols (Finnhub returned nothing for them anyway).
+        const seenKeys = new Set(earnings.map((e) => `${e.symbol}_${e.date}`));
+        for (const evt of yahooEvents) {
+          const key = `${evt.symbol}_${evt.date}`;
+          if (!seenKeys.has(key)) {
+            earnings.push(evt);
+            seenKeys.add(key);
+          }
+        }
+      } catch (err) {
+        console.warn(`  Yahoo earnings fetch failed: ${err}`);
+      }
+    }
   }
 
   // Phase 3b — earnings detail enrichment

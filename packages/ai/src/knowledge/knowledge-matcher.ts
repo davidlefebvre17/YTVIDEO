@@ -202,7 +202,7 @@ export function detectActiveThemes(
 
   if (allFlags.has("SMA200_CROSS")) themes.add("analyse-technique");
 
-  if (allFlags.has("EARNINGS_SURPRISE") || allFlags.has("EARNINGS_TODAY")) {
+  if (allFlags.has("EARNINGS_SURPRISE") || allFlags.has("EARNINGS_TODAY") || allFlags.has("EARNINGS_RECENT")) {
     themes.add("earnings");
   }
 

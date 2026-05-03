@@ -114,6 +114,77 @@ export function buildEpisodeSummaries(
 }
 
 /**
+ * Build a single inline trajectory line for one asset across recent sessions.
+ * Returns "" if no usable history (the caller can append unconditionally).
+ *
+ * Format: "5j: J-5 +1,2% → J-4 +2,1% → J-3 +5,2% → J-2 +3,1% → J-1 +10,2%
+ *          [↑ 4 hausses sur 5, cumul +21,8% — couvert J-1]"
+ *
+ * The pattern label (↑ hausse continue / ↓ baisse continue / ↕ retournement /
+ * ~ volatile) is computed deterministically so C2/C3 can lean on it without
+ * re-deriving the trend.
+ */
+export function buildAssetTrajectoryLine(
+  symbol: string,
+  prevContext: PrevContext | undefined,
+  windowDays = 5,
+): string {
+  if (!prevContext?.entries?.length) return "";
+
+  const entries = prevContext.entries.slice(-windowDays);
+  const points: Array<{ label: string; pct: number; covered: boolean }> = [];
+  const total = entries.length;
+
+  for (let i = 0; i < entries.length; i++) {
+    const entry = entries[i];
+    const a = entry.snapshot?.assets?.find((x) => x.symbol === symbol);
+    if (!a) continue;
+    const coveredSymbols = new Set(
+      entry.script?.sections
+        ?.filter((s) => s.type === "segment")
+        .flatMap((s) => s.assets ?? []) ?? [],
+    );
+    points.push({
+      label: `J-${total - i}`,
+      pct: a.changePct ?? 0,
+      covered: coveredSymbols.has(symbol),
+    });
+  }
+
+  if (points.length < 2) return "";
+
+  const cumul = points.reduce((s, p) => s + p.pct, 0);
+  const allUp = points.every((p) => p.pct > 0);
+  const allDown = points.every((p) => p.pct < 0);
+  const lastTwoFlip =
+    points.length >= 2 &&
+    Math.sign(points[points.length - 1].pct) !==
+      Math.sign(points[points.length - 2].pct);
+
+  const upCount = points.filter((p) => p.pct > 0).length;
+  const downCount = points.filter((p) => p.pct < 0).length;
+
+  const pattern = allUp
+    ? `↑ ${points.length} hausses consécutives`
+    : allDown
+      ? `↓ ${points.length} baisses consécutives`
+      : lastTwoFlip
+        ? `↕ retournement vs J-2`
+        : upCount > downCount
+          ? `↑ majoritairement haussier (${upCount}/${points.length})`
+          : downCount > upCount
+            ? `↓ majoritairement baissier (${downCount}/${points.length})`
+            : `~ volatile, alternance`;
+
+  const fmtPct = (p: number) => `${p > 0 ? "+" : ""}${p.toFixed(1)}%`;
+  const trail = points
+    .map((p) => `${p.label} ${fmtPct(p.pct)}${p.covered ? "★" : ""}`)
+    .join(" → ");
+
+  return `${windowDays}j: ${trail} [${pattern}, cumul ${fmtPct(cumul)}]`;
+}
+
+/**
  * Format recent scripts for C3 (writing style reference).
  * Returns full narration of last `count` episodes.
  */

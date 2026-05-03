@@ -130,7 +130,12 @@ export async function generateBeats(
   if (analysis) {
     console.log(`  P7a.5: Annotating ${beats.length} beats via Haiku...`);
     const annotations = await annotateBeats(beats, snapshot, analysis);
-    mergeAnnotations(beats, annotations, analysis);
+    // Reference date for countdown_event: snapshot.date + 1 day = publishDate.
+    // Falls back to today if snapshot.date missing.
+    const refIso = snapshot.date
+      ? new Date(new Date(snapshot.date + 'T12:00:00Z').getTime() + 86400000).toISOString().slice(0, 10)
+      : new Date().toISOString().slice(0, 10);
+    mergeAnnotations(beats, annotations, analysis, refIso);
 
     const overlayCount = beats.filter(b => b.overlayHint !== 'none').length;
     console.log(`  P7a.5: ${overlayCount} overlays (${Math.round(overlayCount / beats.length * 100)}%), ${annotations.filter(a => a.isKeyMoment).length} key moments`);
@@ -144,7 +149,7 @@ export async function generateBeats(
 
 // ── Merge annotations into beats ────────────────────────────
 
-function mergeAnnotations(beats: RawBeat[], annotations: BeatAnnotation[], analysis?: AnalysisBundle): void {
+function mergeAnnotations(beats: RawBeat[], annotations: BeatAnnotation[], analysis?: AnalysisBundle, referenceDate?: string): void {
   const annMap = new Map(annotations.map(a => [a.beatId, a]));
   // Index C2 scenarios by segmentId for fallback enrichment
   const segScenarios = new Map<string, { bullish: { target: string; condition: string }; bearish: { target: string; condition: string } }>();
@@ -159,7 +164,11 @@ function mergeAnnotations(beats: RawBeat[], annotations: BeatAnnotation[], analy
     if (!ann || ann.overlayType === 'none') continue;
 
     beat.overlayHint = ann.overlayType;
-    beat.overlayData = normalizeOverlayData(ann.overlayType, ann.overlaySpec, ann.primaryAsset);
+    beat.overlayData = normalizeOverlayData(ann.overlayType, ann.overlaySpec, ann.primaryAsset, referenceDate);
+    // Propagate variant (validé côté p7a5) vers overlayData pour que DataOverlay le route
+    if (beat.overlayData && ann.variant) {
+      beat.overlayData.variant = ann.variant;
+    }
 
     // Enrich scenario_fork with C2 data when Haiku left fields empty
     if (ann.overlayType === 'scenario_fork' && beat.overlayData) {
@@ -189,10 +198,47 @@ function mergeAnnotations(beats: RawBeat[], annotations: BeatAnnotation[], analy
 /**
  * Normalize Haiku overlay data to the format expected by Remotion DataOverlay.
  */
+// French month → 0-indexed month number, with and without diacritics.
+const FR_MONTHS: Record<string, number> = {
+  janvier: 0, fevrier: 1, février: 1, mars: 2, avril: 3, mai: 4, juin: 5,
+  juillet: 6, aout: 7, août: 7, septembre: 8, octobre: 9, novembre: 10,
+  decembre: 11, décembre: 11,
+};
+
+/** Parse "20 mai", "29 avril 2026", "2026-05-20" → Date or null. */
+function parseTargetDate(s: string, refIso: string): Date | null {
+  if (!s) return null;
+  // ISO (2026-05-20 or 2026/05/20)
+  const iso = s.match(/^(\d{4})[\-/](\d{1,2})[\-/](\d{1,2})/);
+  if (iso) return new Date(Date.UTC(+iso[1], +iso[2] - 1, +iso[3], 12));
+  // "<jour> <mois>" with optional year
+  const m = s.toLowerCase().match(/(\d{1,2})\s+([a-zéûôîç]+)(?:\s+(\d{4}))?/);
+  if (!m) return null;
+  const day = parseInt(m[1], 10);
+  const monthIdx = FR_MONTHS[m[2]];
+  if (monthIdx === undefined) return null;
+  const ref = new Date(refIso + 'T12:00:00Z');
+  let year = m[3] ? parseInt(m[3], 10) : ref.getUTCFullYear();
+  let candidate = new Date(Date.UTC(year, monthIdx, day, 12));
+  // If the candidate falls more than 30 days in the past, assume next year (rollover Dec→Jan).
+  if (!m[3] && (candidate.getTime() - ref.getTime()) / 86400000 < -30) {
+    candidate = new Date(Date.UTC(year + 1, monthIdx, day, 12));
+  }
+  return candidate;
+}
+
+function computeDaysUntil(targetStr: string, refIso: string, fallback: number): number {
+  const target = parseTargetDate(targetStr, refIso);
+  if (!target) return fallback;
+  const ref = new Date(refIso + 'T12:00:00Z');
+  return Math.round((target.getTime() - ref.getTime()) / 86400000);
+}
+
 function normalizeOverlayData(
   type: string,
   spec: Record<string, unknown> | null,
   primaryAsset: string | null,
+  referenceDate?: string,
 ): Record<string, unknown> | undefined {
   if (!spec) return undefined;
 
@@ -295,10 +341,17 @@ function normalizeOverlayData(
 
     case 'countdown_event': {
       // Haiku: { eventLabel, targetDate, daysUntil, affectedAsset?, stake? }
+      // CRITICAL: the LLM cannot reliably compute daysUntil — recompute from
+      // targetDate ourselves when a referenceDate (publishDate) is available.
+      const targetDate = (spec.targetDate ?? spec.date ?? '') as string;
+      const llmDays = typeof spec.daysUntil === 'number' ? spec.daysUntil : 0;
+      const daysUntil = referenceDate
+        ? computeDaysUntil(targetDate, referenceDate, llmDays)
+        : llmDays;
       return {
         eventLabel: spec.eventLabel ?? spec.label ?? spec.event ?? '',
-        targetDate: spec.targetDate ?? spec.date ?? '',
-        daysUntil: typeof spec.daysUntil === 'number' ? spec.daysUntil : 0,
+        targetDate,
+        daysUntil,
         affectedAsset: spec.affectedAsset ?? spec.asset ?? primaryAsset ?? '',
         stake: spec.stake ?? spec.why ?? '',
       };

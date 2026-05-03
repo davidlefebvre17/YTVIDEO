@@ -20,7 +20,8 @@
     "weekly-job": "npx tsx packages/ai/src/market-memory-weekly-job.ts",
     "init-market-memory": "npx tsx scripts/init-market-memory.ts",
     "typecheck": "tsc --build tsconfig.json",
-    "dashboard": "npx tsx scripts/dashboard.ts"
+    "dashboard": "npx tsx scripts/dashboard.ts",
+    "publish": "npx tsx scripts/upload-youtube.ts"
   },
   "keywords": [
     "remotion",
@@ -47,6 +48,7 @@
     "dotenv": "^17.3.1",
     "echogarden": "^2.10.1",
     "edge-tts-node": "^1.5.7",
+    "googleapis": "^171.4.0",
     "msedge-tts": "^2.0.4",
     "music-metadata": "^11.12.3"
   }

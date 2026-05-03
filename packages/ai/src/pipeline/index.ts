@@ -10,6 +10,7 @@ import { runC2Analysis } from "./p3-analysis";
 import { runC3Writing } from "./p4-writing";
 import { runValidation } from "./p5-validation";
 import { runC5Direction } from "./p6-direction";
+import { runC10SEO, validateSEOMetadata } from "./p10-seo";
 import { computeWordBudget } from "./helpers/word-budget";
 import { buildTemporalAnchors } from "./helpers/temporal-anchors";
 import { buildEpisodeSummaries, formatRecentScriptsForC3 } from "./helpers/episode-summary";
@@ -29,6 +30,7 @@ import type {
   SnapshotFlagged,
   EditorialPlan,
   AnalysisBundle,
+  SEOMetadata,
 } from "./types";
 
 // Re-export everything
@@ -39,6 +41,8 @@ export { runC2Analysis } from "./p3-analysis";
 export { runC3Writing } from "./p4-writing";
 export { runValidation, validateMechanical } from "./p5-validation";
 export { runC5Direction } from "./p6-direction";
+export { runC10SEO, validateSEOMetadata, computeChapterTimestamps } from "./p10-seo";
+export type { SEOValidationIssue } from "./p10-seo";
 export { computeWordBudget, durationFromWords } from "./helpers/word-budget";
 export { buildEpisodeSummaries, formatRecentScriptsForC3 } from "./helpers/episode-summary";
 export { buildCausalBrief } from "./helpers/causal-brief";
@@ -96,7 +100,8 @@ function saveIntermediate(date: string, name: string, data: unknown): void {
 export function toEpisodeScript(
   directed: DirectedEpisode,
   episodeNumber: number,
-  lang: Language = "fr"
+  lang: Language = "fr",
+  seo?: SEOMetadata,
 ): EpisodeScript {
   const { script } = directed;
 
@@ -148,8 +153,8 @@ export function toEpisodeScript(
     date: script.date,
     type: "daily_recap",
     lang,
-    title: script.title,
-    description: script.description,
+    title: seo?.title ?? script.title,
+    description: seo?.description ?? script.description,
     sections,
     totalDurationSec: script.metadata.totalDurationSec,
     threadSummary: script.metadata.threadSummary,
@@ -165,6 +170,13 @@ export function toEpisodeScript(
     },
     owlIntro: script.owlIntro,
     owlClosing: script.owlClosing,
+    seo: seo ? {
+      title: seo.title,
+      description: seo.description,
+      chapters: seo.chapters,
+      tags: seo.tags,
+      hashtags: seo.hashtags,
+    } : undefined,
   };
 }
 
@@ -183,7 +195,7 @@ export async function runPipeline(
   };
   const t0 = Date.now();
 
-  const STAGE_ORDER: PipelineStage[] = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6'];
+  const STAGE_ORDER: PipelineStage[] = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p10'];
   const startIdx = options.startFrom ? STAGE_ORDER.indexOf(options.startFrom) : 0;
   const shouldRun = (stage: PipelineStage) => STAGE_ORDER.indexOf(stage) >= startIdx;
 
@@ -421,6 +433,7 @@ export async function runPipeline(
       briefingPack,
       knowledgeBriefing,
       episodeSummaries,
+      prevContext,
       lang,
     });
     stats.llmCalls++;
@@ -502,6 +515,7 @@ export async function runPipeline(
     earningsUpcomingWatchlist: briefingPack?.earningsBuckets?.upcomingWatchlist,
     earningsUpcomingOther: briefingPack?.earningsBuckets?.upcoming,
     cbSpeechesYesterday: briefingPack?.cbSpeechesYesterday,
+    obligatoryMacroStats: briefingPack?.obligatoryMacroStats,
   };
 
   let draft = await runC3Writing({
@@ -576,6 +590,7 @@ export async function runPipeline(
   console.log(
     `  Validation: ${validation.status} (${validation.issues.length} issues)`
   );
+
   saveIntermediate(snapshot.date, "episode_validated", validatedScript);
 
   if (options.stopAt === "p5") {
@@ -605,6 +620,30 @@ export async function runPipeline(
   );
   saveIntermediate(snapshot.date, "episode_directed", directed);
 
+  // ── P10: C10 Sonnet — SEO YouTube ──────────────────────
+  let seo: SEOMetadata | undefined;
+  if (shouldRun('p10')) {
+    console.log("\nP10 — C10 Sonnet (SEO YouTube)...");
+    try {
+      seo = await runC10SEO({
+        script: validatedScript,
+        editorial,
+        arc: directed.arc,
+        thumbnailMoment: directed.thumbnailMoment,
+        topAssets: flagged.assets.slice(0, 10),
+        lang,
+      });
+      stats.llmCalls++;
+      const issues = validateSEOMetadata(seo);
+      const blockers = issues.filter(i => i.severity === 'blocker').length;
+      const warnings = issues.filter(i => i.severity === 'warning').length;
+      console.log(`  SEO: titre "${seo.title}" (${seo.title.length} chars) | ${seo.chapters.length} chapitres | ${seo.tags.length} tags | ${blockers} blockers, ${warnings} warnings`);
+      saveIntermediate(snapshot.date, "episode_seo", seo);
+    } catch (err) {
+      console.warn(`  ⚠ C10 SEO failed: ${(err as Error).message.slice(0, 120)} — continuing without SEO`);
+    }
+  }
+
   // ── Stats ──────────────────────────────────────────────
   stats.totalDurationMs = Date.now() - t0;
   // Cost estimation (rough)
@@ -616,7 +655,7 @@ export async function runPipeline(
 
   return {
     directedEpisode: directed,
-    intermediates: { flagged, editorial, analysis, draft, validation },
+    intermediates: { flagged, editorial, analysis, draft, validation, seo },
     stats,
   };
 }

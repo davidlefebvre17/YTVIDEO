@@ -11,6 +11,8 @@ export type {
   VisualCue,
   ScriptSection,
   EpisodeScript,
+  EpisodeSEO,
+  EpisodeSEOChapter,
   EpisodeDirection,
   AssetSnapshot,
   AssetGroup,
@@ -67,3 +69,6 @@ export {
   animateNumber,
   staggerDelay,
 } from "./animations";
+
+export { compactStatValue, formatCounterFr } from "./format";
+export type { CompactedStat } from "./format";

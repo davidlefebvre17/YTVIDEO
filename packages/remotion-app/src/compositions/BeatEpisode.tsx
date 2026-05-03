@@ -44,6 +44,71 @@ import { ZoomTransition } from "../scenes/shared/ZoomTransition";
 import { ScrollingTicker } from "../scenes/shared/ScrollingTicker";
 import { NewsRollBanner } from "../scenes/shared/NewsRollBanner";
 import { StampOverlay } from "../scenes/shared/StampOverlay";
+import { ColdOpenPunch, getColdOpenPunchStampFrames } from "../scenes/shared/ColdOpenPunch";
+
+/**
+ * Rule-based fallback to derive 3 punch-card fragments from the hook
+ * narration when `script.coldOpenPunch` is absent. Replaced in P4 by an
+ * Opus-generated version that crafts a real teaser.
+ */
+function derivePunchFragments(hook: string | undefined): string[] {
+  const HARDCODE_FALLBACK = ["LE MARCHÉ", "BOUGE.", "VOICI POURQUOI."];
+  if (!hook) return HARDCODE_FALLBACK;
+
+  // Pick the first NON-DATE sentence. Date sentences match patterns like
+  // "Mardi 28 avril 2026" / "Mardi vingt-huit avril deux mille vingt-six"
+  // and may be the entire first sentence — in that case, skip to the next.
+  const sentences = hook
+    .replace(/[*_]/g, "")
+    .replace(/—/g, ",")
+    .split(/[.!?]+/)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+
+  const isDateOnlySentence = (s: string): boolean => {
+    if (s.length > 80) return false;
+    return /\b(deux mille|\d{4})\b/i.test(s) &&
+      /\b(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre|lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)\b/i.test(s);
+  };
+
+  const editorial = sentences.find((s) => !isDateOnlySentence(s)) ?? sentences[0];
+  if (!editorial) return HARDCODE_FALLBACK;
+
+  // 1) Prefer comma-separated clauses if there are 2-4 of them — gives natural editorial cuts.
+  // Strip leading lowercase conjunctions ("et", "mais", "puis", "alors") — but NOT "or"
+  // because in market context "or" usually means gold, not the conjunction.
+  const clauses = editorial
+    .split(/,\s*/)
+    .map((c) => c.replace(/^(et|mais|puis|alors)\s+/i, "").trim())
+    .filter((c) => c.length > 0);
+
+  const fragments = clauses.length >= 2 && clauses.length <= 4
+    ? clauses
+    : (() => {
+        // 2) Otherwise, three-way split on word count
+        const words = editorial.split(/\s+/).filter(Boolean);
+        if (words.length < 4) return [editorial];
+        const third = Math.max(2, Math.floor(words.length / 3));
+        return [
+          words.slice(0, third).join(" "),
+          words.slice(third, 2 * third).join(" "),
+          words.slice(2 * third).join(" "),
+        ];
+      })();
+
+  // 3) Cap each fragment to 9 words max — the ColdOpenPunch component shrinks
+  // its font size automatically for longer text (168/140/110px tiers).
+  const capped = fragments
+    .slice(0, 3)
+    .map((f) => {
+      const ws = f.split(/\s+/).filter(Boolean);
+      return ws.slice(0, 9).join(" ");
+    })
+    .map((s) => s.toUpperCase().replace(/[,;:]$/, "").trim())
+    .filter((s) => s.length > 0);
+
+  return capped.length > 0 ? capped : HARDCODE_FALLBACK;
+}
 
 /**
  * Humanize subtitles : "CL=F" → Pétrole WTI (sans guillemets).
@@ -205,6 +270,7 @@ const BETWEEN_FRAMES_DEFAULT = 90; // 3s fallback for owl transition voice betwe
 const CROSSFADE_FRAMES = 25; // overlap between zoom end and first beat
 const MIN_NEWSPAPER_FRAMES = 600; // 20s minimum newspaper intro
 const MIN_CLOSING_FRAMES = 150; // 5s minimum closing
+const PUNCH_CARD_FRAMES = 180; // 6s cold-open punch card (~2s per fragment for readable pace)
 
 const PRE_SEGMENT_IDS = ["hook", "thread"];
 
@@ -359,7 +425,7 @@ export function computeNewspaperDuration(
   const closingDur = closingBeatsDur + getOwlClosingFrames(fps, owlAudioDurations);
 
   const owlTotal = OWL_INTRO_FRAMES + OWL_DIVE_FRAMES - OWL_CLIP_OVERLAP;
-  return owlTotal + newspaperIntro + segTotal + closingDur;
+  return PUNCH_CARD_FRAMES + owlTotal + newspaperIntro + segTotal + closingDur;
 }
 
 // ── CrossfadeBeat ────────────────────────────────────────────
@@ -489,10 +555,10 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
     );
 
     // Section start times (absolute frames)
-    // Owl intro + dive replaces disclaimer; newspaper intro follows
+    // Cold-open punch card → owl intro + dive → newspaper intro
     const owlTotalFrames = OWL_INTRO_FRAMES + OWL_DIVE_FRAMES - OWL_CLIP_OVERLAP;
     const sectionStarts = new Map<string, number>();
-    let preCum = owlTotalFrames;
+    let preCum = PUNCH_CARD_FRAMES + owlTotalFrames;
     for (const id of PRE_SEGMENT_IDS) {
       if (beatGroups.has(id)) {
         sectionStarts.set(id, preCum);
@@ -510,7 +576,7 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
       zoomOutStart: number;
       end: number;
     }
-    let segCum = owlTotalFrames + newspaperIntroFrames;
+    let segCum = PUNCH_CARD_FRAMES + owlTotalFrames + newspaperIntroFrames;
     const segs: SegTiming[] = segmentIds.map((segId, i) => {
       const crossfadeDur = groupDurationFrames(
         beatGroups.get(segId) ?? [],
@@ -650,47 +716,75 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
     threadSummary: script.threadSummary ?? "",
   };
 
+  // ── Cold-open punch card content (LLM-provided or rule-based fallback) ──
+  const hookSection = script.sections.find((s) => s.type === "hook" || s.id === "hook");
+  const punchFragments =
+    script.coldOpenPunch?.fragments && script.coldOpenPunch.fragments.length > 0
+      ? script.coldOpenPunch.fragments.slice(0, 3)
+      : derivePunchFragments(hookSection?.narration);
+
   // ── Render ──
   return (
     <AbsoluteFill style={{ backgroundColor: BRAND.colors.cream }}>
+      {/* ── 0. Cold-open punch card (3s) — silent except per-fragment SFX strike ── */}
+      <Sequence from={0} durationInFrames={PUNCH_CARD_FRAMES}>
+        <ColdOpenPunch
+          fragments={punchFragments}
+          durationInFrames={PUNCH_CARD_FRAMES}
+        />
+      </Sequence>
+
+      {/* ── SFX: typewriter strike per punch-card fragment ── */}
+      {getColdOpenPunchStampFrames(punchFragments.length, PUNCH_CARD_FRAMES).map((startF, k) => (
+        <Sequence
+          key={`punch-strike-${k}`}
+          from={startF}
+          durationInFrames={Math.round(0.4 * fps)}
+        >
+          <Audio src={getSfxPath("sting", k)} volume={SFX_VOLUME.sting * 1.6} />
+        </Sequence>
+      ))}
+
       {/* ── 1. Owl Intro clip (8s) — fades out at end ── */}
-      <Sequence from={0} durationInFrames={OWL_INTRO_FRAMES}>
+      <Sequence from={PUNCH_CARD_FRAMES} durationInFrames={OWL_INTRO_FRAMES}>
         <OwlClipFade durationInFrames={OWL_INTRO_FRAMES} fadeOutFrames={OWL_CLIP_OVERLAP}>
           <Video src={OWL_INTRO_SRC} style={{ width: "100%", height: "100%" }} volume={0} muted onError={() => {}} />
         </OwlClipFade>
       </Sequence>
 
       {/* ── 2. Owl Dive clip (10s) — fades in at start, crossfades to newspaper at end ── */}
-      <Sequence from={OWL_INTRO_FRAMES - OWL_CLIP_OVERLAP} durationInFrames={OWL_DIVE_FRAMES}>
+      <Sequence from={PUNCH_CARD_FRAMES + OWL_INTRO_FRAMES - OWL_CLIP_OVERLAP} durationInFrames={OWL_DIVE_FRAMES}>
         <OwlDiveWithCrossfade durationInFrames={OWL_DIVE_FRAMES}>
           <NewspaperPage
             {...npProps}
             activeSegmentIdx={0}
             showTypewriter
+            cardRevealSpread={timings.newspaperIntroFrames}
           />
         </OwlDiveWithCrossfade>
       </Sequence>
 
       {/* ── 3. Newspaper intro (pre-segment audio plays over this) ── */}
       <Sequence
-        from={OWL_INTRO_FRAMES + OWL_DIVE_FRAMES - OWL_CLIP_OVERLAP}
+        from={PUNCH_CARD_FRAMES + OWL_INTRO_FRAMES + OWL_DIVE_FRAMES - OWL_CLIP_OVERLAP}
         durationInFrames={timings.newspaperIntroFrames}
       >
         <NewspaperPage
           {...npProps}
           activeSegmentIdx={0}
           showTypewriter
+          cardRevealSpread={timings.newspaperIntroFrames}
         />
       </Sequence>
 
-      {/* ── SFX: Newspaper unfold at episode start ── */}
-      <Sequence from={0} durationInFrames={Math.round(2 * fps)}>
+      {/* ── SFX: Newspaper unfold when newspaper first appears (after owl intro) ── */}
+      <Sequence from={PUNCH_CARD_FRAMES} durationInFrames={Math.round(2 * fps)}>
         <Audio src={getSfxPath("unfold", 0)} volume={SFX_VOLUME.unfold} />
       </Sequence>
 
       {/* ── SFX: Individual key strikes during headline typewriter ── */}
       {(() => {
-        const typeStart = OWL_INTRO_FRAMES + OWL_DIVE_FRAMES - OWL_CLIP_OVERLAP;
+        const typeStart = PUNCH_CARD_FRAMES + OWL_INTRO_FRAMES + OWL_DIVE_FRAMES - OWL_CLIP_OVERLAP;
         const titleLen = script.title?.length ?? 40;
         const charsPerFrame = 1.2;
         // One strike every ~4 chars (not every char — too dense)
@@ -912,7 +1006,7 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
 
       {/* ── Owl audio: intro over video clips (plays before beats — no overlap) ── */}
       {owlIntroAudio && (
-        <Sequence from={0} durationInFrames={OWL_INTRO_FRAMES + OWL_DIVE_FRAMES}>
+        <Sequence from={PUNCH_CARD_FRAMES} durationInFrames={OWL_INTRO_FRAMES + OWL_DIVE_FRAMES}>
           <Audio src={staticFile(owlIntroAudio)} volume={1} />
         </Sequence>
       )}
@@ -1027,8 +1121,8 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
       <GrainOverlay opacity={0.04} />
       <DisclaimerBar lang={script.lang} />
 
-      {/* Like + Subscribe prompt à la seconde 12, top-left, ~5s */}
-      <Sequence from={12 * fps} durationInFrames={5 * fps}>
+      {/* Like + Subscribe prompt à la seconde 12 du flux principal (post punch-card) */}
+      <Sequence from={PUNCH_CARD_FRAMES + 12 * fps} durationInFrames={5 * fps}>
         <LikeSubscribePrompt durationInFrames={5 * fps} />
       </Sequence>
 

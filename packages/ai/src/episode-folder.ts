@@ -115,27 +115,40 @@ function cleanDir(dir: string, ext?: string): number {
 }
 
 /**
- * Clean all Remotion public directories to avoid stale files from previous episodes.
- * Call ONCE at the start of a new generate run.
+ * Clean ONLY the current episode's public directory tree to avoid stale files
+ * from a previous run of THIS episode. Other episodes' files are preserved so
+ * Remotion Studio can switch between episodes and load each one's own assets.
  */
-export function cleanPublicForNewEpisode(opts?: { skipImages?: boolean }): void {
-  const beatsAudioDir = join(REMOTION_PUBLIC, "audio", "beats");
-  const owlAudioDir = join(REMOTION_PUBLIC, "audio", "owl");
-  const editorialDir = join(REMOTION_PUBLIC, "editorial");
+export function cleanPublicForNewEpisode(date?: string, opts?: { skipImages?: boolean }): void {
+  if (!date) {
+    // Legacy fallback (no date): used to wipe everything. Now a no-op since
+    // per-episode folders are isolated. Call cleanPublicForNewEpisode(date)
+    // instead.
+    return;
+  }
+  const epAudioDir = join(REMOTION_PUBLIC, "audio", `ep-${date}`);
+  const epEditorialDir = join(REMOTION_PUBLIC, "editorial", `ep-${date}`);
 
-  const segmentsAudioDir = join(beatsAudioDir, "segments");
-  const a = cleanDir(beatsAudioDir, ".mp3") + cleanDir(segmentsAudioDir, ".mp3");
-  const b = cleanDir(owlAudioDir, ".mp3");
-  const c = opts?.skipImages ? 0 : cleanDir(editorialDir, ".png");
+  const beatsDir = join(epAudioDir, "beats");
+  const segmentsDir = join(beatsDir, "segments");
+  const owlDir = join(epAudioDir, "owl");
+
+  const a = cleanDir(beatsDir, ".mp3") + cleanDir(segmentsDir, ".mp3");
+  const b = cleanDir(owlDir, ".mp3");
+  const c = opts?.skipImages ? 0 : cleanDir(epEditorialDir, ".png");
 
   if (a + b + c > 0) {
-    console.log(`  Cleaned public/: ${a} beat audio, ${b} owl audio, ${c} images`);
+    console.log(`  Cleaned public/ep-${date}: ${a} beat audio, ${b} owl audio, ${c} images`);
   }
 }
 
 /**
- * Copy image files to episode images/ AND remotion public/editorial/ for render
- * Returns updated map with paths relative to remotion public/ (for beat.imagePath)
+ * Copy image files to episode images/ AND remotion public/editorial/ep-{date}/
+ * for render. Per-episode subdir prevents files of one episode from
+ * overwriting another's when Studio switches between dates.
+ *
+ * Returns updated map with paths relative to remotion public/
+ * (e.g. "editorial/ep-2026-05-02/beat_001.png").
  */
 export function syncImagesToPublic(
   date: string,
@@ -143,7 +156,7 @@ export function syncImagesToPublic(
 ): Map<string, string> {
   const dir = episodeDir(date);
   const imagesDir = join(dir, "images");
-  const editorialPublicDir = join(REMOTION_PUBLIC, "editorial");
+  const editorialPublicDir = join(REMOTION_PUBLIC, "editorial", `ep-${date}`);
 
   try {
     mkdirSync(imagesDir, { recursive: true });
@@ -169,7 +182,7 @@ export function syncImagesToPublic(
       copyFileSync(sourcePath, episodeImagePath);
       copyFileSync(sourcePath, publicImagePath);
       // Return path relative to public/ for Remotion — always forward slashes (web URLs)
-      updatedMap.set(key, `editorial/${filename}`);
+      updatedMap.set(key, `editorial/ep-${date}/${filename}`);
     } catch (err) {
       console.warn(
         `Failed to sync image ${filename}: ${(err as Error).message}`
@@ -190,7 +203,7 @@ export function syncAudioToPublic(
 ): void {
   const dir = episodeDir(date);
   const audioDir = join(dir, "audio");
-  const beatsPublicDir = join(REMOTION_PUBLIC, "audio", "beats");
+  const beatsPublicDir = join(REMOTION_PUBLIC, "audio", `ep-${date}`, "beats");
 
   try {
     mkdirSync(audioDir, { recursive: true });

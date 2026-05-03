@@ -49,10 +49,10 @@ export interface FishTTSResult {
  * `top_p` et `repetition_penalty` non définis : laissés aux defaults Fish Audio.
  */
 export const FISH_PRESETS = {
-  DEEP: { speed: 1.1, temperature: 0.5 },
-  FOCUS: { speed: 1.1, temperature: 0.5 },
-  FLASH: { speed: 1.1, temperature: 0.5 },
-  COLD_OPEN: { speed: 1.1, temperature: 0.5 },
+  DEEP: { speed: 1.0, temperature: 0.5 },
+  FOCUS: { speed: 1.0, temperature: 0.5 },
+  FLASH: { speed: 1.0, temperature: 0.5 },
+  COLD_OPEN: { speed: 1.0, temperature: 0.5 },
 } as const;
 
 function getFishConfig() {

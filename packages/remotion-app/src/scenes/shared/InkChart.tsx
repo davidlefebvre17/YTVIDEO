@@ -146,8 +146,7 @@ export const InkChart: React.FC<InkChartProps> = ({
         style={{ display: 'block' }}
         viewBox={`0 0 ${width} ${height}`}
       >
-        {/* Fond crème */}
-        <rect width={width} height={chartH} fill={BRAND.colors.cream} />
+        {/* Fond transparent (laisse passer l'image d'épisode) */}
 
         {/* Grid lines horizontales */}
         {gridLines.map(({ y, price }, i) => (
@@ -295,6 +294,7 @@ export const InkChart: React.FC<InkChartProps> = ({
               x={0} y={chartH}
               width={width} height={volH}
               fill={BRAND.colors.creamDark}
+              fillOpacity={0.3}
             />
             <line
               x1={0} y1={chartH} x2={width} y2={chartH}

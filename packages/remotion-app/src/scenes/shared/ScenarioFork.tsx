@@ -17,12 +17,13 @@ import {
 import { evolvePath, getPointAtLength, getLength } from "@remotion/paths";
 import { BRAND } from "@yt-maker/core";
 
-interface ScenarioForkProps {
+export interface ScenarioForkProps {
   trunk: string;
   bullish: { condition: string; target: string; prob?: number };
   bearish: { condition: string; target: string; prob?: number };
   startFrame?: number;
   accentColor?: string;
+  variant?: 'default' | 'battle';
 }
 
 // Chart dimensions — sized for 1920x1080 overlay

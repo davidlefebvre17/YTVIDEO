@@ -19,24 +19,51 @@ import type { BeatAnnotation } from './p7a5-beat-annotator';
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 
-// ─── Ticker → Phonetic map (loaded once from company-profiles.json) ──
+// ─── Ticker / Name → Phonetic maps (loaded once from company-profiles.json) ──
 
 let _tickerMap: Map<string, string> | null = null;
+let _nameRules: Array<[RegExp, string]> | null = null;
+
+function loadProfiles(): void {
+  if (_tickerMap) return;
+  _tickerMap = new Map();
+  _nameRules = [];
+  const filePath = join(process.cwd(), 'data', 'company-profiles.json');
+  if (!existsSync(filePath)) return;
+  try {
+    const profiles: Array<{ symbol: string; name: string; phonetic?: string; aliases?: string[] }> =
+      JSON.parse(readFileSync(filePath, 'utf-8'));
+    // Collect name → phonetic pairs. Sort by name length DESC so longer names
+    // (e.g. "Goldman Sachs") match before substrings (e.g. "Goldman").
+    const namePairs: Array<[string, string]> = [];
+    for (const p of profiles) {
+      if (!p.phonetic) continue;
+      _tickerMap.set(p.symbol, p.phonetic);
+      // Plain name : skip if too short (≤2 chars, matches too aggressively).
+      // Keep all-caps sigles (KLM, ASML, BMW, GE, GM) — we want those phonetized
+      // when they appear unquoted in narration.
+      if (p.name && p.name.length >= 3) {
+        namePairs.push([p.name, p.phonetic]);
+      }
+    }
+    namePairs.sort((a, b) => b[0].length - a[0].length);
+    // Build regex for each name with word boundary. Escape special regex chars.
+    const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    for (const [name, phonetic] of namePairs) {
+      _nameRules.push([new RegExp(`\\b${escape(name)}\\b`, 'g'), phonetic]);
+    }
+    console.log(`  [TTS] Loaded ${_tickerMap.size} ticker / ${_nameRules.length} name phonetics`);
+  } catch { /* non-critical */ }
+}
 
 function getTickerMap(): Map<string, string> {
-  if (_tickerMap) return _tickerMap;
-  _tickerMap = new Map();
-  const filePath = join(process.cwd(), 'data', 'company-profiles.json');
-  if (!existsSync(filePath)) return _tickerMap;
-  try {
-    const profiles: Array<{ symbol: string; name: string; phonetic?: string }> =
-      JSON.parse(readFileSync(filePath, 'utf-8'));
-    for (const p of profiles) {
-      if (p.phonetic) _tickerMap.set(p.symbol, p.phonetic);
-    }
-    console.log(`  [TTS] Loaded ${_tickerMap.size} ticker pronunciations`);
-  } catch { /* non-critical */ }
-  return _tickerMap;
+  loadProfiles();
+  return _tickerMap!;
+}
+
+function getNameRules(): Array<[RegExp, string]> {
+  loadProfiles();
+  return _nameRules!;
 }
 
 // ─── Types ──────────────────────────────────────────────────────
@@ -197,7 +224,21 @@ export function preProcessForTTS(text: string): string {
   // "GS" → goldmane-sax, "AAPL" → apple, "CL=F" → pétrole américain
   // Safety net : si le phonétique répète un mot déjà prononcé 60 chars avant OU après,
   // on drop le phonétique (passe 1 aurait dû l'attraper, mais filet de sécurité).
-  const TICKER_STOPWORDS = new Set(['de', 'du', 'des', 'la', 'le', 'les', 'et', 'à', 'au', 'aux', 'un', 'une', 'sur', 'en', 'dans']);
+  // Stopwords généraux + mots-nombres français : ces derniers apparaissent dans
+  // les phonétiques d'indices ("Nikkei deux cent vingt-cinq", "S&P cinq cents",
+  // "essenne pi dix ans") MAIS aussi dans le texte courant ("pour cent",
+  // "vingt heures") — d'où des faux positifs d'overlap qui dropraient à tort
+  // le nom de l'indice. On les exclut du matching.
+  const TICKER_STOPWORDS = new Set([
+    'de', 'du', 'des', 'la', 'le', 'les', 'et', 'à', 'au', 'aux', 'un', 'une',
+    'sur', 'en', 'dans',
+    // Mots-nombres FR
+    'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf',
+    'dix', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize',
+    'vingt', 'trente', 'quarante', 'cinquante', 'soixante',
+    'cent', 'cents', 'mille', 'million', 'milliards', 'milliard',
+    'pour',
+  ]);
   result = result.replace(/"([A-Z0-9^=.\-]{1,15})"/g, (match, ticker, offset, full) => {
     const phonetic = tickerMap.get(ticker);
     if (!phonetic) return match;
@@ -238,7 +279,19 @@ export function preProcessForTTS(text: string): string {
   result = result.replace(/\$/g, ' dollars');
   result = result.replace(/€/g, ' euros');
 
+  // ── Phonétique des noms en texte clair (depuis company-profiles.json) ──
+  // Applique automatiquement les phonetics aux noms d'entités quand C3 les
+  // écrit en texte normal (ex: "Bitcoin", "KLM", "Goldman Sachs"). Les tickers
+  // entre guillemets sont déjà gérés par la passe précédente.
+  for (const [pattern, replacement] of getNameRules()) {
+    result = result.replace(pattern, replacement);
+  }
+
   // ── Prononciation unifiée (un seul passage, ordre déterministe) ──
+  // Cette table couvre les cas non-profilés : anglicismes (pricing, bullish),
+  // sigles macro/CB (RSI, VIX, Fed, BCE), bugs Fish Audio (grimpe), etc.
+  // Les overrides ici ont priorité sur les profiles (au cas où une règle
+  // spécifique soit nécessaire).
   for (const [pattern, replacement] of ALL_PRONUNCIATION_FIXES) {
     result = result.replace(pattern, replacement);
   }
@@ -413,6 +466,12 @@ const ALL_PRONUNCIATION_FIXES: [RegExp, string][] = [
 
   // ── Prononciation française ──
   [/\bquarante\b/g, 'karante'],
+  // Yen est invariable en français oral — Fish Audio prononce le "s" final
+  // de "yens" comme une consonne audible (yensse). Force le singulier en TTS.
+  [/\byens\b/gi, 'yen'],
+  // ── Anglicismes courants en finance/marché ──
+  [/\btankers\b/gi, 'tankeurs'],
+  [/\btanker\b/gi, 'tankeur'],
 ];
 
 // ═══════════════════════════════════════════════════════════════

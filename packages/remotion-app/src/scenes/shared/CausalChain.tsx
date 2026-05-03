@@ -7,11 +7,12 @@ export interface CausalStep {
   sublabel?: string;
 }
 
-interface CausalChainProps {
+export interface CausalChainProps {
   steps: CausalStep[];
   accentColor?: string;
   startFrame?: number;
   stepDelay?: number;
+  variant?: 'default' | 'domino';
 }
 
 export const CausalChain: React.FC<CausalChainProps> = ({

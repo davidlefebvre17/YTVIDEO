@@ -1,4 +1,5 @@
 import { generateStructuredJSON } from "../llm-client";
+import { EditorialPlanSchema, zodValidator } from "./schemas";
 import type {
   SnapshotFlagged, EditorialPlan, EpisodeSummary, PlannedSegment,
 } from "./types";
@@ -364,6 +365,10 @@ function buildC1UserPrompt(
   }
 
   prompt += `${formatEpisodeSummariesCompact(episodeSummaries)}\n\n`;
+  // Trajectoires multi-jours agrégées par asset — permet de détecter
+  // tendance continue, retournement, accélération avant de choisir l'angle.
+  const trajectories = buildAssetTrajectories(episodeSummaries);
+  if (trajectories) prompt += trajectories;
 
   if (researchContext) {
     prompt += `## CONTEXTE HISTORIQUE (NewsMemory — articles ANTÉRIEURS au ${flagged.date})\n`;
@@ -527,7 +532,7 @@ export async function runC1Editorial(input: {
     const plan = await generateStructuredJSON<EditorialPlan>(
       systemPrompt,
       userPrompt,
-      { role: 'balanced' },
+      { role: 'balanced', validate: zodValidator(EditorialPlanSchema) as any },
     );
 
     // Ensure counts are correct

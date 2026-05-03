@@ -58,6 +58,13 @@ export const CountdownEvent: React.FC<CountdownEventProps> = ({
 
   const countdownText = daysUntil <= 0 ? "J" : `J−${daysUntil}`;
 
+  // Adaptive font sizes : long values (J−123, J−20+) and long event labels
+  // would otherwise overflow the 780px max-width. Scale down progressively.
+  const countdownFontSize = countdownText.length <= 3 ? 84 : countdownText.length <= 5 ? 68 : 52;
+  const countdownMinWidth = countdownText.length <= 3 ? 140 : countdownText.length <= 5 ? 170 : 200;
+  const labelLen = (eventLabel ?? '').length;
+  const eventFontSize = labelLen <= 18 ? 36 : labelLen <= 28 ? 28 : 22;
+
   return (
     <div style={{
       display: "flex", flexDirection: "column",
@@ -77,12 +84,13 @@ export const CountdownEvent: React.FC<CountdownEventProps> = ({
           opacity: countOp,
           transform: `translateY(${countY}px)`,
           fontFamily: BRAND.fonts.display,
-          fontSize: 84, fontWeight: 700,
+          fontSize: countdownFontSize, fontWeight: 700,
           color: accentColor,
           lineHeight: 1,
           fontVariantNumeric: "tabular-nums",
           letterSpacing: "-0.02em",
-          minWidth: 140,
+          minWidth: countdownMinWidth,
+          flexShrink: 0,
         }}>
           {countdownText}
         </div>
@@ -92,6 +100,8 @@ export const CountdownEvent: React.FC<CountdownEventProps> = ({
           display: "flex", flexDirection: "column", gap: 6,
           opacity: labelOp,
           transform: `translateY(${labelY}px)`,
+          minWidth: 0,
+          flex: 1,
         }}>
           <div style={{
             fontFamily: BRAND.fonts.mono, fontSize: 12,
@@ -102,9 +112,11 @@ export const CountdownEvent: React.FC<CountdownEventProps> = ({
           </div>
           <div style={{
             fontFamily: BRAND.fonts.display,
-            fontSize: 36, fontWeight: 700,
+            fontSize: eventFontSize, fontWeight: 700,
             color: BRAND.colors.ink,
-            lineHeight: 1.1,
+            lineHeight: 1.15,
+            wordBreak: "break-word",
+            overflowWrap: "break-word",
           }}>
             {eventLabel}
           </div>

@@ -1,4 +1,5 @@
 import { generateStructuredJSON } from "../llm-client";
+import { DirectionSchema, zodValidator } from "./schemas";
 import type {
   DraftScript, EditorialPlan, AnalysisBundle, DirectedEpisode,
   ArcBeat, Transition, ChartTiming, ThumbnailMoment, MoodTag, AudioBreakpoint,
@@ -215,7 +216,7 @@ export async function runC5Direction(input: {
   }>(
     systemPrompt,
     userPrompt,
-    { role: 'fast' },
+    { role: 'fast', validate: zodValidator(DirectionSchema) as any },
   );
 
   // ── Normalize LLM output field names ──

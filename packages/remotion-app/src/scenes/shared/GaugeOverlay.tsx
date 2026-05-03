@@ -6,7 +6,7 @@ import React from "react";
 import { useCurrentFrame, interpolate } from "remotion";
 import { BRAND } from "@yt-maker/core";
 
-interface GaugeOverlayProps {
+export interface GaugeOverlayProps {
   label: string;
   value: number;
   min?: number;
@@ -14,6 +14,7 @@ interface GaugeOverlayProps {
   accentColor?: string;
   startFrame?: number;
   durationFrames?: number;
+  variant?: 'default' | 'strip' | 'liquid';
 }
 
 export const GaugeOverlay: React.FC<GaugeOverlayProps> = ({

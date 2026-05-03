@@ -8,7 +8,7 @@ interface ProviderConfig {
   apiKey: string;
 }
 
-export interface LLMOptions {
+export interface LLMOptions<T = unknown> {
   role?: LLMRole;
   maxTokens?: number;
   /**
@@ -18,6 +18,11 @@ export interface LLMOptions {
    * sur les input tokens cachés lors des appels répétés dans la fenêtre TTL.
    */
   cacheSystem?: boolean;
+  /**
+   * Validateur optionnel appelé sur le JSON parsé. Si throws → comme un parse fail,
+   * retry. Permet de plugger un schema Zod (ex: `validate: (raw) => MySchema.parse(raw)`).
+   */
+  validate?: (parsed: unknown) => T;
 }
 
 // ─── OpenRouter config ───────────────────────────────────────────
@@ -70,6 +75,38 @@ const RETRY_DELAY_MS = 5_000;
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Décide si une erreur LLM est retry-able.
+ * Couvre :
+ *   - rate limits (429)
+ *   - overload upstream (529, 503)
+ *   - bad gateway / gateway timeout (502, 504, 522, 524)
+ *   - erreurs réseau (ECONNRESET, ETIMEDOUT, ECONNREFUSED, fetch failed, socket hang up)
+ */
+export function isRetryableError(msg: string): boolean {
+  const lower = msg.toLowerCase();
+  return (
+    lower.includes('429') || lower.includes('rate') || lower.includes('rate-limit') ||
+    lower.includes('rate_limit') || lower.includes('resource_exhausted') ||
+    lower.includes('529') || lower.includes('overload') ||
+    lower.includes('502') || lower.includes('bad gateway') ||
+    lower.includes('503') || lower.includes('service unavailable') ||
+    lower.includes('504') || lower.includes('gateway timeout') ||
+    lower.includes('522') || lower.includes('524') ||
+    lower.includes('econnreset') || lower.includes('etimedout') ||
+    lower.includes('econnrefused') || lower.includes('eai_again') ||
+    lower.includes('fetch failed') || lower.includes('socket hang up') ||
+    lower.includes('network') || lower.includes('timeout')
+  );
+}
+
+/** Backoff exponentiel : 2s, 5s, 12s, 25s — randomisé ±20% pour éviter thundering herd */
+export function backoffMs(attempt: number): number {
+  const base = [2000, 5000, 12000, 25000][Math.min(attempt, 3)];
+  const jitter = base * (0.8 + Math.random() * 0.4);
+  return Math.round(jitter);
 }
 
 function getProviderConfig(): ProviderConfig {
@@ -275,29 +312,38 @@ export async function generateStructuredJSON<T>(
         console.log(`  LLM: ${model} [${role}] (attempt ${attempt + 1}/${MAX_RETRIES})`);
         const text = await callAnthropic(config.apiKey, model, systemPrompt, userMessage, maxTokens, cacheSystem);
         const jsonStr = extractJSON(text);
+        let parsed: unknown;
         try {
-          return JSON.parse(jsonStr) as T;
+          parsed = JSON.parse(jsonStr);
         } catch {
           console.warn(`  Malformed JSON (attempt ${attempt + 1}), retrying... Preview: ${jsonStr.slice(0, 200)}`);
           lastError = new Error(`JSON parse failed on attempt ${attempt + 1}`);
-          await sleep(RETRY_DELAY_MS);
+          await sleep(backoffMs(attempt));
           continue;
         }
+        if (options?.validate) {
+          try {
+            return options.validate(parsed) as T;
+          } catch (err) {
+            const msg = (err as Error).message.slice(0, 200);
+            console.warn(`  Schema validation failed (attempt ${attempt + 1}): ${msg}`);
+            lastError = err as Error;
+            await sleep(backoffMs(attempt));
+            continue;
+          }
+        }
+        return parsed as T;
       } catch (err) {
         lastError = err as Error;
         const msg = lastError.message;
 
-        if (msg.includes("429") || msg.includes("rate")) {
-          console.warn(`  Rate-limited, waiting ${RETRY_DELAY_MS / 1000}s...`);
-          await sleep(RETRY_DELAY_MS);
+        if (isRetryableError(msg)) {
+          const wait = backoffMs(attempt);
+          console.warn(`  Retry-able error (${msg.slice(0, 80)}), backoff ${wait / 1000}s...`);
+          await sleep(wait);
           continue;
         }
-        if (msg.includes("529") || msg.includes("overloaded")) {
-          console.warn(`  Anthropic overloaded, waiting ${RETRY_DELAY_MS / 1000}s...`);
-          await sleep(RETRY_DELAY_MS);
-          continue;
-        }
-        // Non-retryable
+        // Non-retryable (auth, validation, etc.)
         break;
       }
     }
@@ -311,26 +357,35 @@ export async function generateStructuredJSON<T>(
         console.log(`  LLM: ${model} [${role}] (attempt ${attempt + 1}/${MAX_RETRIES})`);
         const text = await callGemini(config.apiKey, model, systemPrompt, userMessage, maxTokens);
         const jsonStr = extractJSON(text);
+        let parsed: unknown;
         try {
-          return JSON.parse(jsonStr) as T;
+          parsed = JSON.parse(jsonStr);
         } catch {
           console.warn(`  Malformed JSON (attempt ${attempt + 1}), retrying... Preview: ${jsonStr.slice(0, 200)}`);
           lastError = new Error(`JSON parse failed on attempt ${attempt + 1}`);
-          await sleep(RETRY_DELAY_MS);
+          await sleep(backoffMs(attempt));
           continue;
         }
+        if (options?.validate) {
+          try {
+            return options.validate(parsed) as T;
+          } catch (err) {
+            const msg = (err as Error).message.slice(0, 200);
+            console.warn(`  Schema validation failed (attempt ${attempt + 1}): ${msg}`);
+            lastError = err as Error;
+            await sleep(backoffMs(attempt));
+            continue;
+          }
+        }
+        return parsed as T;
       } catch (err) {
         lastError = err as Error;
         const msg = lastError.message;
 
-        if (msg.includes("429") || msg.includes("RATE") || msg.includes("RESOURCE_EXHAUSTED")) {
-          console.warn(`  Rate-limited, waiting ${RETRY_DELAY_MS / 1000}s...`);
-          await sleep(RETRY_DELAY_MS);
-          continue;
-        }
-        if (msg.includes("503") || msg.includes("overloaded")) {
-          console.warn(`  Gemini overloaded, waiting ${RETRY_DELAY_MS / 1000}s...`);
-          await sleep(RETRY_DELAY_MS);
+        if (isRetryableError(msg)) {
+          const wait = backoffMs(attempt);
+          console.warn(`  Retry-able error (${msg.slice(0, 80)}), backoff ${wait / 1000}s...`);
+          await sleep(wait);
           continue;
         }
         // Non-retryable
@@ -348,21 +403,34 @@ export async function generateStructuredJSON<T>(
         console.log(`  LLM: ${model} [${role}] (attempt ${attempt + 1}/${MAX_RETRIES})`);
         const text = await callOpenRouter(config.apiKey, model, systemPrompt, userMessage);
         const jsonStr = extractJSON(text);
+        let parsed: unknown;
         try {
-          return JSON.parse(jsonStr) as T;
+          parsed = JSON.parse(jsonStr);
         } catch {
           console.warn(`  Malformed JSON from ${model} (attempt ${attempt + 1}), retrying... Preview: ${jsonStr.slice(0, 200)}`);
           lastError = new Error(`JSON parse failed on ${model} attempt ${attempt + 1}`);
-          await sleep(RETRY_DELAY_MS);
+          await sleep(backoffMs(attempt));
           continue;
         }
+        if (options?.validate) {
+          try {
+            return options.validate(parsed) as T;
+          } catch (err) {
+            console.warn(`  Schema validation failed on ${model} (attempt ${attempt + 1}): ${(err as Error).message.slice(0, 200)}`);
+            lastError = err as Error;
+            await sleep(backoffMs(attempt));
+            continue;
+          }
+        }
+        return parsed as T;
       } catch (err) {
         lastError = err as Error;
         const msg = lastError.message;
 
-        if (msg.includes("429") || msg.includes("rate-limit")) {
-          console.warn(`  Rate-limited on ${model}, waiting ${RETRY_DELAY_MS / 1000}s...`);
-          await sleep(RETRY_DELAY_MS);
+        if (isRetryableError(msg)) {
+          const wait = backoffMs(attempt);
+          console.warn(`  Retry-able error on ${model} (${msg.slice(0, 80)}), backoff ${wait / 1000}s...`);
+          await sleep(wait);
           continue;
         }
 

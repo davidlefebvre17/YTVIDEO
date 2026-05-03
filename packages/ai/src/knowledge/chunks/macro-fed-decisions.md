@@ -23,7 +23,7 @@ related_chunks: ["macro-inflation-cpi", "macro-treasury-yields", "cb-fed-fedwatc
 "Le marche price [X]% de probabilite de [hausse/baisse/maintien]" (source: CME FedWatch). Ne pas regarder que la prochaine reunion — les reunions a 3, 6, 9 mois sont souvent plus revelateurs.
 
 ### Apres la decision
-Ce qui compte c'est le DOT PLOT et la conference de presse, pas juste le taux. Le marche peut reagir a l'INVERSE de la decision si le discours change les anticipations futures. Exemple : la Fed monte les taux mais Powell dit "c'etait la derniere hausse" -> dollar CHUTE.
+Ce qui compte c'est le DOT PLOT et la conference de presse, pas juste le taux. Le marche peut reagir a l'INVERSE de la decision si le discours change les anticipations futures. Exemple : la Fed monte les taux mais le president (Warsh depuis mars 2025) dit "c'etait la derniere hausse" -> dollar CHUTE.
 
 "La Fed maintient ses taux — mais le ton du president de la Fed est [plus/moins] hawkish qu'attendu."
 

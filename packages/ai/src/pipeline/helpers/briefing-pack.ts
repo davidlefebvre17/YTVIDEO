@@ -115,6 +115,10 @@ export interface BriefingPack {
     title: string;
     /** ISO date (YYYY-MM-DD) of publication */
     publishedDate: string;
+    /** Human-readable label relative to viewer's day (e.g. "hier (jeudi 30 avril)",
+     *  "aujourd'hui vendredi 1 mai"). Lets the LLM pick the right relative
+     *  marker without inferring weekdays from raw dates. */
+    whenLabel: string;
     /** Temporal tag relative to market session covered */
     when: 'before_session' | 'during_session' | 'post_session' | 'pre_publication';
   }>;
@@ -132,10 +136,46 @@ export interface BriefingPack {
   cotDivergences: COTDivergence[];
   /** Upcoming high-impact events (J+1 to J+7) */
   upcomingHighImpact: string[];
+  /** OBLIGATORY macro stats released today/yesterday (curated list — must be
+   *  mentioned at least once in some segment, not as a dedicated segment) */
+  obligatoryMacroStats: string[];
   /** Central bank speeches from yesterday that deserve editorial attention */
   cbSpeechesYesterday: string[];
   /** Fear & Greed trend over last 7 days */
   sentimentTrend?: SentimentTrend;
+}
+
+// ── OBLIGATORY macro stats — patterns that MUST be mentioned ──
+// Keyed by currency, value = regex matching the event name. When such an
+// event lands in today/yesterday with `actual` value populated, it is
+// pulled out and surfaced as a non-skippable bullet in the prompt.
+const OBLIGATORY_MACRO_PATTERNS: Record<string, RegExp> = {
+  USD: /\b(FOMC|Fed Interest Rate Decision|Fed Decision|Non[\s-]?Farm Payrolls|NFP|Initial Jobless Claims|(Core )?CPI(?! ratio)|(Core )?PCE Price Index|GDP Growth|GDP Annualized)\b/i,
+  EUR: /\b(ECB Interest Rate Decision|ECB Decision|Deposit Facility Rate|HICP|Inflation Rate (YoY|MoM) Flash|GDP Growth Rate (QoQ|YoY)( Adv)?|HCOB.*Composite PMI|PMI Composite)\b/i,
+  GBP: /\b(BoE Interest Rate Decision|BoE Decision|Bank of England.*(Rate|Decision)|CPI(?! ratio)|GDP Growth Rate)\b/i,
+  JPY: /\b(BoJ Interest Rate Decision|BoJ Decision|Bank of Japan.*(Rate|Decision)|CPI(?! ratio)|GDP Growth Rate|Tankan)\b/i,
+};
+
+/** Format a single macro stat into a one-liner with actual / forecast / surprise. */
+function formatObligatoryStat(e: { name: string; currency: string; impact?: string; time?: string; actual?: string; forecast?: string; previous?: string; date?: string }, snapshotDate: string): string | null {
+  // Compute surprise pct when both present
+  let surpriseStr = '';
+  const a = e.actual ? parseFloat(e.actual) : NaN;
+  const f = e.forecast ? parseFloat(e.forecast) : NaN;
+  if (!isNaN(a) && !isNaN(f) && f !== 0) {
+    const pct = ((a - f) / Math.abs(f)) * 100;
+    const sign = pct >= 0 ? '+' : '';
+    surpriseStr = ` (surprise ${sign}${pct.toFixed(1)}%)`;
+  }
+  const dateLabel = e.date && e.date !== snapshotDate ? `${e.date} ` : '';
+  const parts = [
+    `[${e.currency}]`,
+    dateLabel + (e.name ?? '?'),
+    e.actual ? `actual=${e.actual}` : null,
+    e.forecast ? `forecast=${e.forecast}` : null,
+    e.previous ? `prev=${e.previous}` : null,
+  ].filter(Boolean);
+  return parts.join(' ') + surpriseStr;
 }
 
 // Known political actors and their domains
@@ -368,11 +408,15 @@ export function buildBriefingPack(
     const w = classify(n.publishedAt);
     return w === 'post_session' || w === 'pre_publication';
   }).slice(0, 5);
-  const topNewsTitles = [...newsExplain, ...newsUpcoming].map(n => ({
-    title: n.title.slice(0, 120),
-    publishedDate: (n.publishedAt || '').slice(0, 10) || sessionDate,
-    when: classify(n.publishedAt),
-  }));
+  const topNewsTitles = [...newsExplain, ...newsUpcoming].map(n => {
+    const publishedDate = (n.publishedAt || '').slice(0, 10) || sessionDate;
+    return {
+      title: n.title.slice(0, 120),
+      publishedDate,
+      whenLabel: labelEventDate(publishedDate, sessionDate),
+      when: classify(n.publishedAt),
+    };
+  });
 
   // ── Political triggers ──
   const politicalTriggers = detectPoliticalTriggers(
@@ -546,6 +590,28 @@ export function buildBriefingPack(
   // ── Sentiment trend (F&G over last 7 days from previous snapshots) ──
   const sentimentTrend = buildSentimentTrend(snapshot);
 
+  // ── Obligatory macro stats — curated list, must be cited in narration ──
+  // Pull from today + yesterday events: high-impact OR matching the curated
+  // pattern for the currency. Only keep events with `actual` populated
+  // (already released — there's something to comment on).
+  const allMacroEvents = [
+    ...(flagged.events ?? []).map(e => ({ ...e, _bucket: 'today' })),
+    ...(flagged.yesterdayEvents ?? []).map(e => ({ ...e, _bucket: 'yesterday' })),
+  ];
+  const obligatoryMacroStats: string[] = [];
+  const seenStatKeys = new Set<string>();
+  for (const e of allMacroEvents) {
+    const pattern = OBLIGATORY_MACRO_PATTERNS[e.currency];
+    if (!pattern) continue;
+    if (!pattern.test(e.name ?? '')) continue;
+    if (!e.actual && !(e.name ?? '').match(/Decision|Rate/i)) continue;  // need a value or it's a CB decision
+    const key = `${e.currency}|${e.name}|${e.date}`;
+    if (seenStatKeys.has(key)) continue;
+    seenStatKeys.add(key);
+    const formatted = formatObligatoryStat(e, snapshot.date);
+    if (formatted) obligatoryMacroStats.push(formatted);
+  }
+
   return {
     topNewsTitles,
     politicalTriggers,
@@ -556,6 +622,7 @@ export function buildBriefingPack(
     cotDivergences,
     upcomingHighImpact,
     cbSpeechesYesterday,
+    obligatoryMacroStats,
     sentimentTrend,
   };
 }
@@ -745,11 +812,11 @@ export function formatBriefingPack(pack: BriefingPack): string {
     const upcomingGroup = pack.topNewsTitles.filter(n => n.when === 'post_session' || n.when === 'pre_publication');
     if (explainGroup.length) {
       text += `**EXPLIQUENT LE MOVE (avant/pendant la séance couverte)** :\n`;
-      for (const n of explainGroup) text += `- [${n.publishedDate}] ${n.title}\n`;
+      for (const n of explainGroup) text += `- [${n.whenLabel}] ${n.title}\n`;
     }
     if (upcomingGroup.length) {
       text += `**À VENIR (après clôture / futur — ne peut PAS expliquer le move d'hier)** :\n`;
-      for (const n of upcomingGroup) text += `- [${n.publishedDate}] ${n.title}\n`;
+      for (const n of upcomingGroup) text += `- [${n.whenLabel}] ${n.title}\n`;
     }
     text += '\n';
   }
@@ -767,6 +834,15 @@ export function formatBriefingPack(pack: BriefingPack): string {
     text += `## CALENDAR HIGHLIGHTS\n`;
     for (const h of pack.calendarHighlights) {
       text += `- ${h}\n`;
+    }
+    text += '\n';
+  }
+
+  if (pack.obligatoryMacroStats?.length) {
+    text += `## ⚠ STATS MACRO OBLIGATOIRES À MENTIONNER\n`;
+    text += `Ces stats sont sorties (ou attendues) sur la session couverte. Elles doivent OBLIGATOIREMENT être citées au moins une fois dans la narration — intégrées dans un segment existant pertinent (banques centrales, devise concernée, indice impacté), JAMAIS un segment dédié juste pour les évoquer. Si leur lien narratif n'est pas évident, citer en transition ou en contexte d'un autre point.\n`;
+    for (const s of pack.obligatoryMacroStats) {
+      text += `- ${s}\n`;
     }
     text += '\n';
   }

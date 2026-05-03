@@ -78,6 +78,7 @@ async function main() {
   const lang = (opts.lang as Language) || "fr";
   const skipTts = !!opts["skip-tts"];
   const skipImages = !!opts["skip-images"];
+  const reuseImages = !!opts["reuse-images"];
   const skipRender = !!opts["no-render"];
   const skipFetch = !!opts["skip-fetch"];
   const skipScript = !!opts["skip-script"];
@@ -135,7 +136,7 @@ async function main() {
 
   // Create episode folder + clean stale public files
   const epDir = createEpisodeDir(episodeKey);
-  cleanPublicForNewEpisode({ skipImages });
+  cleanPublicForNewEpisode(episodeKey, { skipImages: skipImages || reuseImages });
   console.log(`Episode folder: ${epDir}`);
 
   let snapshot: DailySnapshot;
@@ -322,7 +323,7 @@ async function main() {
   } else {
     console.log("  Mode: PIPELINE C1→C5");
     pipelineResult = await runPipeline({ snapshot, lang, episodeNumber, newsDb, prevContext, startFrom: startFrom as any, publishDate });
-    script = toEpisodeScript(pipelineResult.directedEpisode, episodeNumber, lang);
+    script = toEpisodeScript(pipelineResult.directedEpisode, episodeNumber, lang, pipelineResult.intermediates.seo);
     console.log(`  Stats: ${pipelineResult.stats.llmCalls} LLM, ${pipelineResult.stats.retries} retries, ${(pipelineResult.stats.totalDurationMs / 1000).toFixed(1)}s`);
   }
 
@@ -354,9 +355,30 @@ async function main() {
   const c7Result = await runC7Direction(rawBeats as any, direction, snapshot.assets, { lang, editorialVisuals });
   console.log(`  ${c7Result.directions.length} directions, ${c7Result.directions.filter(d => d.imageReuse).length} reuse`);
 
-  // P7c: C8 Image Prompts (Haiku)
-  console.log("  P7c: C8 Image Prompts...");
-  const imagePrompts = await runC8ImagePrompts(c7Result, direction.moodMusic ?? "neutre_analytique", { lang });
+  // P7c: C8 Image Prompts (Haiku) — narrative 2-pass (multi-subject + staging)
+  console.log("  P7c: C8 Image Prompts (narrative 2-pass)...");
+  const narrativeContext = {
+    beats: (rawBeats as any[]).map((b) => ({
+      id: b.id,
+      segmentId: b.segmentId,
+      narrationChunk: b.narrationChunk ?? '',
+      emotion: b.emotion,
+    })),
+    sections: script.sections.map((s: any) => ({
+      id: s.id,
+      type: s.type,
+      title: s.title,
+      narration: s.narration ?? '',
+      topic: s.topic,
+      assets: s.assets,
+    })),
+  };
+  const imagePrompts = await runC8ImagePrompts(
+    c7Result,
+    direction.moodMusic ?? "neutre_analytique",
+    { lang },
+    narrativeContext,
+  );
   const uniquePrompts = imagePrompts.filter(p => !p.skip).length;
   console.log(`  ${imagePrompts.length} prompts (${uniquePrompts} unique)`);
 
@@ -409,10 +431,40 @@ async function main() {
   }));
   const c7Compat = { directions, visualIdentity: {} } as any;
 
-  const imageMap = await runImageGeneration(allPrompts, c7Compat, episodeKey, { skipImages });
-
-  // Sync images to episode folder + Remotion public/
-  const publicImagePaths = syncImagesToPublic(episodeKey, imageMap);
+  // ── REUSE-IMAGES MODE ────────────────────────────────────────
+  // Reuse existing real images from episodes/{date}/images/ instead of regenerating
+  // or assigning placeholders. Bypass runImageGeneration AND syncImagesToPublic
+  // (which would self-copy). Just copy the existing PNGs to public/editorial/
+  // and build the relative-path map directly.
+  let publicImagePaths: Map<string, string>;
+  if (reuseImages) {
+    const epImagesDir = path.join(epDir, "images");
+    const editorialPubDir = path.resolve(__dirname, "..", "packages", "remotion-app", "public", "editorial", `ep-${episodeKey}`);
+    if (!fs.existsSync(epImagesDir)) {
+      console.error(`  --reuse-images: directory not found: ${epImagesDir}`);
+      process.exit(1);
+    }
+    if (!fs.existsSync(editorialPubDir)) fs.mkdirSync(editorialPubDir, { recursive: true });
+    publicImagePaths = new Map<string, string>();
+    let reused = 0;
+    for (const beat of beats) {
+      const candidate = path.join(epImagesDir, `${beat.id}.png`);
+      if (fs.existsSync(candidate) && fs.statSync(candidate).size > 1024) {
+        const destPath = path.join(editorialPubDir, `${beat.id}.png`);
+        try {
+          fs.copyFileSync(candidate, destPath);
+          publicImagePaths.set(beat.id, `editorial/ep-${episodeKey}/${beat.id}.png`);
+          reused++;
+        } catch (err) {
+          console.warn(`  reuse-images copy failed for ${beat.id}: ${(err as Error).message.slice(0, 80)}`);
+        }
+      }
+    }
+    console.log(`  P7d: reuse-images mode → ${reused}/${beats.length} existing PNGs reused from ${epImagesDir}`);
+  } else {
+    const imageMap = await runImageGeneration(allPrompts, c7Compat, episodeKey, { skipImages });
+    publicImagePaths = syncImagesToPublic(episodeKey, imageMap);
+  }
 
   // Update beat imagePaths
   for (const beat of beats) {
@@ -480,8 +532,10 @@ async function main() {
     // Generate audio
     console.log("  Generating audio...");
     const audioDir = path.join(epDir, "audio");
+    // Per-episode public path so old episodes don't get overwritten on regen.
+    const audioPublicPrefix = `audio/ep-${episodeKey}/beats`;
     const { manifest: audioManifest, segmentDurations: segDur } = await generateBeatAudio(
-      beats as any, lang, audioDir, "audio/beats",
+      beats as any, lang, audioDir, audioPublicPrefix,
       { skipExisting: false },
     );
     segmentDurations = segDur;
@@ -490,9 +544,9 @@ async function main() {
     const isSegmentMode = beats.some((b: any) => b.audioSegmentPath);
 
     if (isSegmentMode) {
-      // Segment mode: copy segment MP3s to public
+      // Segment mode: copy segment MP3s to public/audio/ep-{date}/beats/segments
       const segSrcDir = path.join(audioDir, "segments");
-      const segPubDir = path.resolve(__dirname, "..", "packages", "remotion-app", "public", "audio", "beats", "segments");
+      const segPubDir = path.resolve(__dirname, "..", "packages", "remotion-app", "public", "audio", `ep-${episodeKey}`, "beats", "segments");
       if (!fs.existsSync(segPubDir)) fs.mkdirSync(segPubDir, { recursive: true });
       if (fs.existsSync(segSrcDir)) {
         for (const f of fs.readdirSync(segSrcDir).filter(f => f.endsWith('.mp3'))) {
@@ -543,8 +597,9 @@ async function main() {
     console.log("  Generating owl audio...");
     const owlAudioDir = path.join(epDir, "audio", "owl");
     if (!fs.existsSync(owlAudioDir)) fs.mkdirSync(owlAudioDir, { recursive: true });
-    const owlPublicDir = path.resolve(__dirname, "..", "packages", "remotion-app", "public", "audio", "owl");
+    const owlPublicDir = path.resolve(__dirname, "..", "packages", "remotion-app", "public", "audio", `ep-${episodeKey}`, "owl");
     if (!fs.existsSync(owlPublicDir)) fs.mkdirSync(owlPublicDir, { recursive: true });
+    const owlPublicPrefix = `audio/ep-${episodeKey}/owl`;
 
     const owlTexts: Array<{ id: string; text: string }> = [];
 
@@ -570,7 +625,7 @@ async function main() {
         transitionOut: "fade" as any, emotion: "contexte" as any, overlay: null,
       }));
       const { manifest: owlManifest } = await generateBeatAudio(
-        owlBeats as any, lang, owlAudioDir, "audio/owl",
+        owlBeats as any, lang, owlAudioDir, owlPublicPrefix,
         { skipExisting: false, legacyMode: true },
       );
       // Copy to public + track paths
@@ -581,7 +636,7 @@ async function main() {
         const src = fs.existsSync(ob.audioPath) ? ob.audioPath : path.join(owlAudioDir, filename);
         const dst = path.join(owlPublicDir, filename);
         if (fs.existsSync(src)) fs.copyFileSync(src, dst);
-        generatedOwlPaths[ob.id] = `audio/owl/${filename}`;
+        generatedOwlPaths[ob.id] = `${owlPublicPrefix}/${filename}`;
       }
       console.log(`  ${owlTexts.length} owl audio clips generated`);
     }

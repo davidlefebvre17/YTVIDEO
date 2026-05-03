@@ -24,6 +24,11 @@ interface NewspaperPageProps {
   threadSummary: string;
   activeSegmentIdx?: number;
   showTypewriter?: boolean;
+  /** Total frame budget over which segment cards stamp in one by one.
+   *  When provided (and showTypewriter=true), overrides the default tight
+   *  stagger (60 frames) so cards reveal across the full intro duration —
+   *  the page builds itself while the hook+thread audio plays. */
+  cardRevealSpread?: number;
 }
 
 // ── Layout constants ─────────────────────────────────────────
@@ -224,11 +229,21 @@ const Article: React.FC<{
   const label = DEPTH_LABELS[seg.depth ?? "focus"] ?? "FOCUS";
   const paragraphs = (seg.narration ?? "").split("\n\n").filter(Boolean);
 
+  // Stamp-style reveal: brief scale overshoot + fade-in
   const cardOp = showTypewriter
     ? interpolate(frame, [staggerDelay, staggerDelay + 15], [0, 1], {
         extrapolateLeft: "clamp",
         extrapolateRight: "clamp",
       })
+    : 1;
+
+  const stampScale = showTypewriter
+    ? interpolate(
+        frame,
+        [staggerDelay, staggerDelay + 8, staggerDelay + 18],
+        [1.06, 1.02, 1.0],
+        { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+      )
     : 1;
 
   const pulse = isActive
@@ -250,6 +265,8 @@ const Article: React.FC<{
         display: "flex",
         flexDirection: "column",
         opacity: cardOp,
+        transform: `scale(${stampScale})`,
+        transformOrigin: "top left",
       }}
     >
       {/* Kicker — fixed KICKER_H */}
@@ -399,11 +416,25 @@ export const NewspaperPage: React.FC<NewspaperPageProps> = ({
   threadSummary,
   activeSegmentIdx = -1,
   showTypewriter = true,
+  cardRevealSpread,
 }) => {
   const frame = useCurrentFrame();
   const dateStr = formatDateFR(date);
   const accentColor = BRAND.colors.accentDefault;
   const placements = computeLayout(segments);
+
+  // Visible cards govern the stagger interval when a spread is provided.
+  const visibleCount = placements.filter(
+    (p) => (segments[p.segIdx]?.depth ?? "focus") !== "panorama",
+  ).length;
+  const baseStaggerDelay = 30; // wait for typewriter title to start
+  const staggerInterval =
+    cardRevealSpread && visibleCount > 1
+      ? Math.max(
+          18,
+          Math.floor((cardRevealSpread - baseStaggerDelay - 30) / visibleCount),
+        )
+      : 10;
 
   const charsToShow = showTypewriter
     ? Math.min(title.length, Math.round(frame * 1.2))
@@ -582,7 +613,7 @@ export const NewspaperPage: React.FC<NewspaperPageProps> = ({
               accentColor={accentColor}
               frame={frame}
               showTypewriter={showTypewriter}
-              staggerDelay={30 + p.segIdx * 10}
+              staggerDelay={baseStaggerDelay + p.segIdx * staggerInterval}
             />
           </div>
         );

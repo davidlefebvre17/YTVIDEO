@@ -8206,5 +8206,29 @@
     "index": "SP500",
     "description": "World largest chip foundry, manufactures for Apple, Nvidia, AMD, Qualcomm",
     "phonetic": "té èsse èm ci"
+  },
+  {
+    "symbol": "AF.PA",
+    "name": "Air France-KLM",
+    "finnhubIndustry": "Airlines",
+    "sector": "Airlines",
+    "correlation": "Crude oil inverse, EU consumer demand",
+    "index": "OTHER",
+    "description": "French-Dutch airline group",
+    "aliases": [
+      "Air France",
+      "KLM"
+    ],
+    "phonetic": "Air France K.L.M."
+  },
+  {
+    "symbol": "KLM",
+    "name": "KLM",
+    "finnhubIndustry": "Airlines",
+    "sector": "Airlines",
+    "correlation": "subsidiary of Air France-KLM",
+    "index": "OTHER",
+    "description": "Dutch arm of Air France-KLM",
+    "phonetic": "K.L.M."
   }
 ]

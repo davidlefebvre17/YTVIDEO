@@ -3,6 +3,11 @@ import type { BeatDirection, C7DirectionResult, ImagePromptResult } from "./type
 import type { MoodTag } from "./types";
 import { buildC8Prompt } from "../prompts/c8-image-prompts";
 import { generateStructuredJSON } from "../llm-client";
+import {
+  generateNarrativePromptsForSegment,
+  type BeatLite,
+  type SectionLite,
+} from "./p7c-narrative";
 
 // ── Mood → style suffix (appended by code, NOT by LLM) ─────
 
@@ -86,12 +91,27 @@ export function buildStyleSuffix(_identity: EpisodeVisualIdentity, mood: string)
 
 // ── Main function ───────────────────────────────────────────
 
+/** Optional input to enable the new narrative 2-pass prompter (P7c v5d).
+ *  When `beats` and `sections` are provided, uses the multi-subject + staging
+ *  pipeline. Otherwise falls back to the legacy per-beat C8 Haiku prompter.
+ */
+export interface NarrativeContext {
+  beats: BeatLite[];
+  sections: SectionLite[];
+}
+
 export async function runC8ImagePrompts(
   c7Result: C7DirectionResult,
   mood: string,
   _options: { lang: Language },
+  narrativeContext?: NarrativeContext,
 ): Promise<ImagePromptResult[]> {
   const { visualIdentity, directions } = c7Result;
+
+  // ── Narrative 2-pass path (when context provided) ────────────────
+  if (narrativeContext) {
+    return runNarrativePath(directions, mood, visualIdentity, narrativeContext);
+  }
 
   const toGenerate = directions.filter(d => !d.imageReuse);
   const skipped = directions.filter(d => d.imageReuse);
@@ -173,6 +193,88 @@ export async function runC8ImagePrompts(
     const bIdx = directions.findIndex(d => d.beatId === b.beatId);
     return aIdx - bIdx;
   });
+
+  return results;
+}
+
+// ── Narrative 2-pass path (v5d) ──────────────────────────────────
+
+async function runNarrativePath(
+  directions: BeatDirection[],
+  mood: string,
+  visualIdentity: EpisodeVisualIdentity,
+  ctx: NarrativeContext,
+): Promise<ImagePromptResult[]> {
+  const suffix = buildStyleSuffix(visualIdentity, mood);
+  const beatById = new Map(ctx.beats.map((b) => [b.id, b]));
+  const sectionById = new Map(ctx.sections.map((s) => [s.id, s]));
+
+  const reuseDirections = directions.filter((d) => d.imageReuse);
+  const generateDirections = directions.filter((d) => !d.imageReuse);
+
+  const results: ImagePromptResult[] = reuseDirections.map((d) => ({
+    beatId: d.beatId,
+    imagePrompt: '',
+    skip: true,
+  }));
+
+  // Group beats-to-generate by segment
+  const beatsBySegment = new Map<string, BeatLite[]>();
+  for (const dir of generateDirections) {
+    const beat = beatById.get(dir.beatId);
+    if (!beat) continue;
+    const segId = beat.segmentId;
+    if (!beatsBySegment.has(segId)) beatsBySegment.set(segId, []);
+    beatsBySegment.get(segId)!.push(beat);
+  }
+
+  console.log(`  C8 narrative: ${generateDirections.length} beats across ${beatsBySegment.size} segments`);
+
+  // Generate per-segment (Pass 1 batch + Pass 2 parallel)
+  const promptByBeat = new Map<string, string>();
+  let segmentIdx = 0;
+  for (const [segId, segmentBeats] of beatsBySegment) {
+    segmentIdx++;
+    const section = sectionById.get(segId);
+    if (!section) {
+      console.warn(`  C8 narrative: section "${segId}" not found, skipping ${segmentBeats.length} beats`);
+      continue;
+    }
+    console.log(`    [${segmentIdx}/${beatsBySegment.size}] ${segId}: ${segmentBeats.length} beats...`);
+    try {
+      const segPrompts = await generateNarrativePromptsForSegment(segmentBeats, section);
+      for (const [beatId, prompt] of segPrompts) {
+        promptByBeat.set(beatId, prompt);
+      }
+    } catch (err) {
+      console.warn(`    C8 narrative segment "${segId}" failed: ${(err as Error).message.slice(0, 100)}`);
+    }
+  }
+
+  // Build final results — wrap with style prefix + mood suffix
+  for (const dir of generateDirections) {
+    const raw = promptByBeat.get(dir.beatId);
+    let prompt: string;
+    if (raw) {
+      prompt = STYLE_PREFIX + sanitizePrompt(raw) + suffix;
+    } else {
+      // Fallback per-emotion if narrative pipeline failed for this beat
+      const fallbackArr = EMOTION_FALLBACK[dir.emotion] ?? EMOTION_FALLBACK.contexte;
+      const fb = fallbackArr[Math.floor(Math.random() * fallbackArr.length)];
+      prompt = STYLE_PREFIX + sanitizePrompt(fb) + suffix;
+    }
+    results.push({ beatId: dir.beatId, imagePrompt: prompt, skip: false });
+  }
+
+  results.sort((a, b) => {
+    const aIdx = directions.findIndex((d) => d.beatId === a.beatId);
+    const bIdx = directions.findIndex((d) => d.beatId === b.beatId);
+    return aIdx - bIdx;
+  });
+
+  const generatedCount = results.filter((r) => !r.skip).length;
+  const filledCount = generateDirections.filter((d) => promptByBeat.has(d.beatId)).length;
+  console.log(`  C8 narrative: ${filledCount}/${generateDirections.length} prompts via 2-pass, ${reuseDirections.length} skipped (reuse)`);
 
   return results;
 }

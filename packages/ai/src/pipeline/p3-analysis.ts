@@ -2,14 +2,16 @@ import * as fs from "fs";
 import * as path from "path";
 import { generateStructuredJSON } from "../llm-client";
 import { loadMemory, computeCotInsights, formatCotInsightsMarkdown } from "@yt-maker/data";
+import { AnalysisBundleSchema, zodValidator } from "./schemas";
 import type {
   SnapshotFlagged, EditorialPlan, AnalysisBundle, CausalBrief,
-  FlaggedAsset, EpisodeSummary,
+  FlaggedAsset, EpisodeSummary, PrevContext,
 } from "./types";
 import type { DailySnapshot, Language } from "@yt-maker/core";
 import type { BriefingPack } from "./helpers/briefing-pack";
 import { formatBriefingPackMinimal } from "./helpers/briefing-pack";
 import { buildTemporalAnchors, labelEventDate } from "./helpers/temporal-anchors";
+import { buildAssetTrajectoryLine } from "./helpers/episode-summary";
 
 const KNOWLEDGE_DIR = path.resolve(__dirname, "..", "knowledge");
 
@@ -83,13 +85,21 @@ function loadKnowledgeForC2(snapshot: DailySnapshot, selectedSymbols: string[]):
  * Format asset data for C2 prompt.
  * DEEP/FOCUS get full data, FLASH gets minimal.
  */
-function formatAssetForC2(asset: FlaggedAsset, depth: 'DEEP' | 'FOCUS' | 'FLASH' | 'PANORAMA', snapshotDate?: string): string {
-  const fmt = (n: number) => n.toFixed(asset.price > 100 ? 2 : 4);
+function formatAssetForC2(asset: FlaggedAsset, depth: 'DEEP' | 'FOCUS' | 'FLASH' | 'PANORAMA', snapshotDate?: string, prevContext?: PrevContext): string {
+  // Use sessionClose (J-1 close) when available — `asset.price` is the live
+  // intraday tick, which mismatches the "Prix (clôture)" label and pollutes
+  // narration with a number that may move during the day.
+  const closePrice = (asset.snapshot as any).sessionClose ?? asset.price;
+  const fmt = (n: number) => n.toFixed(closePrice > 100 ? 2 : 4);
   const hi = asset.snapshot.high24h;
   const lo = asset.snapshot.low24h;
   const groupTag = asset.snapshot.group ? ` [${asset.snapshot.group}]` : '';
   let text = `### ${asset.name} (${asset.symbol})${groupTag} — ${depth}\n`;
-  text += `Prix (clôture): ${fmt(asset.price)} | Var jour: ${asset.changePct >= 0 ? '+' : ''}${asset.changePct.toFixed(2)}%`;
+  text += `Prix (clôture): ${fmt(closePrice)} | Var jour: ${asset.changePct >= 0 ? '+' : ''}${asset.changePct.toFixed(2)}%`;
+  // Inline multi-day trajectory — sits next to "Var jour" so the LLM reads
+  // today's % in the context of the trend, not in isolation.
+  const trajectory = buildAssetTrajectoryLine(asset.symbol, prevContext, 5);
+  if (trajectory) text += ` | Trajectoire ${trajectory}`;
   const perf = asset.snapshot.perf;
   if (perf) {
     const p = (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(1)}%`;
@@ -237,6 +247,7 @@ function buildC2UserPrompt(
   briefingPack?: BriefingPack,
   episodeSummaries?: EpisodeSummary[],
   cotPositioning?: import("@yt-maker/core").COTPositioning,
+  prevContext?: PrevContext,
 ): string {
   let prompt = '';
 
@@ -318,12 +329,13 @@ function buildC2UserPrompt(
 
   // Asset data (only selected assets)
   prompt += `## DONNÉES ASSETS\n`;
+  prompt += `Le champ "Trajectoire 5j" donne les variations jour par jour sur les 5 dernières séances chargées (★ = couvert dans un segment précédent). Lis le % du jour à travers ce contexte : un +3% est très différent au 1er jour qu'au 5e jour d'une tendance — la magnitude du move s'évalue toujours dans la trajectoire, pas en isolation. Si tu cites un mouvement saillant (continuité, retournement, accélération, essoufflement), inscris-le dans keyFacts ou causalChain — ce signal narratif sera repris par le rédacteur en aval.\n\n`;
   const allSelectedSymbols = new Set(editorial.segments.flatMap(s => s.assets));
   for (const seg of editorial.segments) {
     for (const symbol of seg.assets) {
       const asset = flagged.assets.find(a => a.symbol === symbol);
       if (asset) {
-        prompt += formatAssetForC2(asset, seg.depth as 'DEEP' | 'FOCUS' | 'FLASH' | 'PANORAMA', editorial.date);
+        prompt += formatAssetForC2(asset, seg.depth as 'DEEP' | 'FOCUS' | 'FLASH' | 'PANORAMA', editorial.date, prevContext);
       }
     }
   }
@@ -409,6 +421,7 @@ export async function runC2Analysis(input: {
   briefingPack?: BriefingPack;
   knowledgeBriefing?: string;
   episodeSummaries?: EpisodeSummary[];
+  prevContext?: PrevContext;
   lang: Language;
 }): Promise<AnalysisBundle> {
   // Load only Tier 2/3 knowledge for selected assets (NOT full 119K)
@@ -427,6 +440,7 @@ export async function runC2Analysis(input: {
     input.briefingPack,
     input.episodeSummaries,
     input.snapshot.cotPositioning,
+    input.prevContext,
   );
 
   console.log('  P3 C2 Sonnet — analyse approfondie...');
@@ -435,7 +449,7 @@ export async function runC2Analysis(input: {
   const analysis = await generateStructuredJSON<AnalysisBundle>(
     systemPrompt,
     userPrompt,
-    { role: 'balanced', maxTokens: 16384 },
+    { role: 'balanced', maxTokens: 16384, validate: zodValidator(AnalysisBundleSchema) as any },
   );
 
   // Ensure all segments from editorial are present

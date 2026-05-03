@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import type { DailySnapshot, AssetSnapshot, EconomicEvent } from "@yt-maker/core";
+import type { DailySnapshot, AssetSnapshot, EconomicEvent, EarningsEvent } from "@yt-maker/core";
 import { loadMemory } from "@yt-maker/data";
 import { initTagger, tagArticleAuto } from "../memory/news-tagger";
 import type { SnapshotFlagged, FlaggedAsset, MaterialityFlag, NewsCluster } from "./types";
@@ -15,8 +15,9 @@ const FLAG_WEIGHT: Record<MaterialityFlag, number> = {
   // ── Narratif (~40%) — histoires, surprises, acteurs ──
   'POLITICAL_TRIGGER':  3.0,  // head of state / central bank + action keyword
   'MACRO_SURPRISE':     3.0,  // high-impact event, actual ≠ forecast >10%
-  'EARNINGS_SURPRISE':  3.0,  // beat/miss >10%
+  'EARNINGS_SURPRISE':  3.0,  // beat/miss >10% EPS or >3% revenue
   'NEWS_CLUSTER':       2.0,  // ≥3 articles concentrated on same asset
+  'EARNINGS_RECENT':    1.5,  // results published ≤ J-2 with actuals (still hot)
   'EARNINGS_TODAY':     1.5,  // publishes today, results pending (suspense)
   'NEWS_LINKED':        1.0,  // ≥1 article linked via tagger
   // ── Mouvement (~25%) — preuve que quelque chose s'est passé ──
@@ -34,6 +35,43 @@ const FLAG_WEIGHT: Record<MaterialityFlag, number> = {
   'COT_DIVERGENCE':     1.5,  // COT bias contradicts price direction
   'SENTIMENT_EXTREME':  1.0,  // F&G <20 or >80
 };
+
+/** True if `target` is the day after `ref` (covers AMC publications counted as "today" in publishDate timezone). */
+function isWithinNextDay(target: string | undefined, ref: string | undefined): boolean {
+  if (!target || !ref) return false;
+  try {
+    const t = new Date(target + 'T12:00:00Z').getTime();
+    const r = new Date(ref + 'T12:00:00Z').getTime();
+    const diffDays = (t - r) / 86400000;
+    return diffDays >= -1 && diffDays <= 1;
+  } catch { return false; }
+}
+
+/**
+ * Earnings surprise detection.
+ *  - EPS surprise > 10% → flag
+ *  - Revenue surprise > 3% → flag (lower threshold: industrial/EU groups rarely surprise >5% on revenue,
+ *    but a 1-3% revenue miss/beat already moves the stock significantly)
+ */
+function hasEarningsSurprise(earning: EarningsEvent): boolean {
+  if (
+    earning.epsActual != null &&
+    earning.epsEstimate != null &&
+    earning.epsEstimate !== 0 &&
+    Math.abs((earning.epsActual - earning.epsEstimate) / earning.epsEstimate) > 0.1
+  ) {
+    return true;
+  }
+  if (
+    earning.revenueActual != null &&
+    earning.revenueEstimate != null &&
+    earning.revenueEstimate !== 0 &&
+    Math.abs((earning.revenueActual - earning.revenueEstimate) / earning.revenueEstimate) > 0.03
+  ) {
+    return true;
+  }
+  return false;
+}
 
 /**
  * Extract previous close price.
@@ -248,10 +286,24 @@ export function flagAssets(snapshot: DailySnapshot): SnapshotFlagged {
     }
   }
 
-  // ── EARNINGS_TODAY: assets publishing earnings today (results pending = suspense) ──
+  // ── EARNINGS_TODAY / EARNINGS_RECENT computed once per snapshot ──
+  // TODAY: results not yet published (epsActual + revenueActual both null) AND date is today/tomorrow
+  // RECENT: results published ≤ 2 days ago with at least one actual value (still editorially hot)
   const earningsTodaySymbols = new Set<string>();
+  const earningsRecentSymbols = new Set<string>();
+  const todayDate = new Date(snapshot.date + 'T12:00:00Z');
   for (const earning of snapshot.earnings ?? []) {
-    if (earning.epsActual == null) earningsTodaySymbols.add(earning.symbol);
+    const hasActual = earning.epsActual != null || earning.revenueActual != null;
+    if (!hasActual) {
+      earningsTodaySymbols.add(earning.symbol);
+      continue;
+    }
+    // Has actuals → check how recent
+    const earningDate = new Date(earning.date + 'T12:00:00Z');
+    const daysSince = Math.round((todayDate.getTime() - earningDate.getTime()) / 86400000);
+    if (daysSince >= 0 && daysSince <= 2) {
+      earningsRecentSymbols.add(earning.symbol);
+    }
   }
 
   // ── CAUSAL_CHAIN: detect active intermarket correlations ──
@@ -389,12 +441,10 @@ export function flagAssets(snapshot: DailySnapshot): SnapshotFlagged {
     // ── Narratif ──
     if (snapshot.earnings) {
       const earning = snapshot.earnings.find(e => e.symbol === asset.symbol);
-      if (earning?.epsActual !== undefined && earning?.epsEstimate !== undefined && earning.epsEstimate !== 0) {
-        if (Math.abs((earning.epsActual - earning.epsEstimate) / earning.epsEstimate) > 0.1)
-          flags.push('EARNINGS_SURPRISE');
-      }
+      if (earning && hasEarningsSurprise(earning)) flags.push('EARNINGS_SURPRISE');
     }
     if (earningsTodaySymbols.has(asset.symbol)) flags.push('EARNINGS_TODAY');
+    if (earningsRecentSymbols.has(asset.symbol)) flags.push('EARNINGS_RECENT');
     if (newsLinkedSymbols.has(asset.symbol)) flags.push('NEWS_LINKED');
     if ((newsCountBySymbol.get(asset.symbol) ?? 0) >= 3) flags.push('NEWS_CLUSTER');
     if (politicalLinkedAssets.has(asset.symbol)) flags.push('POLITICAL_TRIGGER');
@@ -458,17 +508,17 @@ export function flagAssets(snapshot: DailySnapshot): SnapshotFlagged {
 
     let ps = 0;
 
-    // Earnings surprise >10% (today's results)
+    // Earnings surprise (EPS >10% or revenue >3%, today's results)
     const earning = (snapshot.earnings ?? []).find(e => e.symbol === screen.symbol);
-    if (earning?.epsActual != null && earning?.epsEstimate != null && earning.epsEstimate !== 0) {
-      if (Math.abs((earning.epsActual - earning.epsEstimate) / earning.epsEstimate) > 0.1) ps += 3;
-    }
+    if (earning && hasEarningsSurprise(earning)) ps += 3;
     // Historical earnings surprise from earningsDetail
     const lastQ = screen.earningsDetail?.lastFourQuarters?.[0];
     if (lastQ?.surprisePct != null && Math.abs(lastQ.surprisePct) > 10) ps += 2;
 
-    // Publishing today (suspense)
+    // Publishing today (suspense) — Finnhub source
     if (screen.earningsDetail?.publishingToday) ps += 1.5;
+    // Recently published (≤ J-2 with actuals) — Yahoo source for EU
+    if (earningsRecentSymbols.has(screen.symbol)) ps += 1.5;
 
     // Extreme mover
     if (Math.abs(screen.changePct) > 5) ps += 3;
@@ -523,12 +573,10 @@ export function flagAssets(snapshot: DailySnapshot): SnapshotFlagged {
 
     // Narratif
     const earning = (snapshot.earnings ?? []).find(e => e.symbol === screen.symbol);
-    if (earning?.epsActual != null && earning?.epsEstimate != null && earning.epsEstimate !== 0) {
-      if (Math.abs((earning.epsActual - earning.epsEstimate) / earning.epsEstimate) > 0.1)
-        flags.push('EARNINGS_SURPRISE');
-    }
+    if (earning && hasEarningsSurprise(earning)) flags.push('EARNINGS_SURPRISE');
     if (screen.earningsDetail?.publishingToday || earningsTodaySymbols.has(screen.symbol))
       flags.push('EARNINGS_TODAY');
+    if (earningsRecentSymbols.has(screen.symbol)) flags.push('EARNINGS_RECENT');
     if (newsLinkedSymbols.has(screen.symbol)) flags.push('NEWS_LINKED');
     if ((newsCountBySymbol.get(screen.symbol) ?? 0) >= 3 || cluster)
       flags.push('NEWS_CLUSTER');
@@ -566,6 +614,42 @@ export function flagAssets(snapshot: DailySnapshot): SnapshotFlagged {
   if (promoCandidates.length > 0) {
     const promoted = flagged.filter(a => a.promoted);
     console.log(`  Promoted ${promoted.length} stocks: ${promoted.map(a => `${a.symbol}(${a.materialityScore})`).join(', ')}`);
+  }
+
+  // ════════════════════════════════════════════════════════════
+  // AUTO-PROMOTE — earnings-today symbols missed by watchlist + screening
+  // ════════════════════════════════════════════════════════════
+  // Mega-caps that publish today but didn't move >2% (so not in stockScreen)
+  // and aren't in the default watchlist would otherwise be invisible to C1.
+  // Promote them with EARNINGS_TODAY flag so the LLM can integrate the event
+  // into an existing segment (no dedicated segment forced — just visibility).
+  const alreadyFlagged = new Set(flagged.map(f => f.symbol));
+  for (const earning of snapshot.earnings ?? []) {
+    if (earning.epsActual != null) continue;                  // already published
+    if (earning.date !== snapshot.date && !isWithinNextDay(earning.date, snapshot.date)) continue;
+    if (alreadyFlagged.has(earning.symbol)) continue;
+    if (watchlistSymbols.has(earning.symbol)) continue;        // already in watchlist branch
+    const newsLinked = newsLinkedSymbols.has(earning.symbol);
+    const flags: MaterialityFlag[] = ['EARNINGS_TODAY'];
+    if (newsLinked) flags.push('NEWS_LINKED');
+    const score = flags.reduce((s, f) => s + (FLAG_WEIGHT[f] ?? 0), 0);
+    const synth: AssetSnapshot = {
+      symbol: earning.symbol,
+      name: earning.name ?? earning.symbol,
+      price: 0, change: 0, changePct: 0,
+      candles: [], high24h: 0, low24h: 0,
+    };
+    flagged.push({
+      symbol: earning.symbol,
+      name: earning.name ?? earning.symbol,
+      price: 0,
+      changePct: 0,
+      materialityScore: Math.round(score * 10) / 10,
+      flags,
+      snapshot: synth,
+      promoted: true,
+    });
+    alreadyFlagged.add(earning.symbol);
   }
 
   // Sort by materiality score descending

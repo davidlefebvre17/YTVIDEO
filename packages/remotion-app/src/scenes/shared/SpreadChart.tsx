@@ -243,8 +243,7 @@ export const SpreadChart: React.FC<SpreadChartProps> = ({
         style={{ display: 'block', overflow: 'visible' }}
         viewBox={`0 0 ${width} ${height}`}
       >
-        {/* Background */}
-        <rect width={width} height={height} fill={BRAND.colors.cream} />
+        {/* Background — transparent pour laisser passer l'image d'épisode */}
 
         {/* Grid lines */}
         {gridLines.left.map(({ y, price }, i) => (

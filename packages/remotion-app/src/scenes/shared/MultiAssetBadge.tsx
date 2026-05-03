@@ -12,12 +12,15 @@ export interface AssetBadge {
   name?: string;
   changePct: number;
   price?: number;
+  /** Trajectoire de prix réelle pour sparkline — close prices, ordre chronologique */
+  pricePath?: number[];
 }
 
-interface MultiAssetBadgeProps {
+export interface MultiAssetBadgeProps {
   assets: AssetBadge[];
   title?: string;
   accentColor?: string;
+  variant?: 'default' | 'sparklines' | 'lane-race';
 }
 
 export const MultiAssetBadge: React.FC<MultiAssetBadgeProps> = ({

@@ -6,6 +6,7 @@
   "types": "src/index.ts",
   "dependencies": {
     "@yt-maker/core": "*",
-    "trading-signals": "^7.4.3"
+    "trading-signals": "^7.4.3",
+    "yahoo-finance2": "^3.14.0"
   }
 }

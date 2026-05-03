@@ -161,8 +161,7 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({
       <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}
         style={{ display: "block", overflow: "hidden" }}>
 
-        {/* ── Price panel ── */}
-        <rect width={width} height={priceH} fill={BRAND.colors.cream} />
+        {/* Price panel — fond transparent (laisse passer l'image d'épisode) */}
 
         {/* Grid */}
         {gridLines.map(({ y, price }, i) => (
@@ -261,7 +260,8 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({
         {/* Volume panel */}
         {showVolume && volH > 0 && (
           <g>
-            <rect x={0} y={priceH} width={width} height={volH} fill={BRAND.colors.creamDark} />
+            {/* Volume panel — fond légèrement teinté pour démarquer du price panel */}
+            <rect x={0} y={priceH} width={width} height={volH} fill={BRAND.colors.creamDark} fillOpacity={0.3} />
             {cleanCandles.map((c, i) => {
               if (i < displayStart) return null;
               if (i - displayStart >= visibleCount) return null;
@@ -296,7 +296,8 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({
           const path = pts.length >= 2 ? `M ${pts.join(" L ")}` : "";
           return (
             <g opacity={rsiOpacity}>
-              <rect x={0} y={rsiTop} width={width} height={rsiH} fill={BRAND.colors.cream} />
+              {/* RSI panel — fond léger pour démarquer */}
+              <rect x={0} y={rsiTop} width={width} height={rsiH} fill={BRAND.colors.cream} fillOpacity={0.3} />
               <rect x={PAD_H} y={y70} width={width - 2 * PAD_H} height={y30 - y70}
                 fill={BRAND.colors.inkFaint} opacity={0.08} />
               <line x1={PAD_H} y1={y70} x2={width - PAD_H} y2={y70}

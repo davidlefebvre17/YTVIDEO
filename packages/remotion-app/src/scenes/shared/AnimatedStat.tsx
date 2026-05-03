@@ -1,8 +1,8 @@
 import React from "react";
 import { useCurrentFrame, interpolate } from "remotion";
-import { BRAND } from "@yt-maker/core";
+import { BRAND, compactStatValue, formatCounterFr } from "@yt-maker/core";
 
-interface AnimatedStatProps {
+export interface AnimatedStatProps {
   value: number;
   label: string;
   prefix?: string;
@@ -12,6 +12,7 @@ interface AnimatedStatProps {
   startFrame?: number;
   durationFrames?: number;
   size?: 'sm' | 'md' | 'lg';
+  variant?: 'default' | 'stamp-press' | 'avalanche';
 }
 
 export const AnimatedStat: React.FC<AnimatedStatProps> = ({
@@ -29,7 +30,9 @@ export const AnimatedStat: React.FC<AnimatedStatProps> = ({
   const rel = Math.max(0, frame - startFrame);
 
   const safeValue = typeof value === 'number' && Number.isFinite(value) ? value : 0;
-  const currentValue = interpolate(rel, [0, durationFrames], [0, safeValue], {
+  const compact = compactStatValue(safeValue, suffix);
+  const effectiveDecimals = decimals > 0 ? decimals : compact.decimals;
+  const currentValue = interpolate(rel, [0, durationFrames], [0, compact.scaledTarget], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
   });
@@ -52,9 +55,7 @@ export const AnimatedStat: React.FC<AnimatedStatProps> = ({
   const fontSize = size === 'lg' ? 80 : size === 'md' ? 56 : 36;
   const labelSize = size === 'lg' ? 20 : size === 'md' ? 17 : 14;
 
-  const formattedValue = Math.abs(currentValue) >= 1000
-    ? currentValue.toLocaleString('fr-FR', { maximumFractionDigits: decimals })
-    : currentValue.toFixed(decimals);
+  const formattedValue = formatCounterFr(currentValue, effectiveDecimals) + compact.scalePrefix;
 
   const showTrendArrow = prefix === '+' || prefix === '-';
   const arrowColor = prefix === '+' ? '#1a6b3a' : '#8b1a1a';
@@ -86,7 +87,7 @@ export const AnimatedStat: React.FC<AnimatedStatProps> = ({
           letterSpacing: '-0.01em',
           lineHeight: 1,
         }}>
-          {prefix}{formattedValue}{suffix}
+          {prefix}{formattedValue}{compact.cleanSuffix}
         </div>
         {showTrendArrow && (
           <div style={{
