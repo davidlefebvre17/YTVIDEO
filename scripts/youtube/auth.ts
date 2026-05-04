@@ -23,6 +23,8 @@ const REDIRECT_URI = `http://localhost:${REDIRECT_PORT}`;
 const SCOPES = [
   'https://www.googleapis.com/auth/youtube.upload',
   'https://www.googleapis.com/auth/youtube',
+  // youtube.force-ssl required for captions.insert() (subtitle upload)
+  'https://www.googleapis.com/auth/youtube.force-ssl',
 ];
 
 export class MissingCredentialsError extends Error {}

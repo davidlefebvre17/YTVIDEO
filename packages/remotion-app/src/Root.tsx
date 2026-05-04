@@ -18,6 +18,10 @@ import REAL_PROPS from "./fixtures/real-beats.json";
 import EPISODE_INDEX from "./fixtures/episode-index.json";
 import { BeatEpisode, computeNewspaperDuration } from "./compositions/BeatEpisode";
 import { StampOverlay } from "./scenes/shared/StampOverlay";
+import { ThumbnailScene, SAMPLE_THUMBNAIL_PROPS } from "./scenes/ThumbnailScene";
+import { ThumbnailTabloid, SAMPLE_PROPS as SAMPLE_TABLOID } from "./scenes/thumbnail-variants/ThumbnailTabloid";
+import { ThumbnailStat, SAMPLE_PROPS as SAMPLE_STAT } from "./scenes/thumbnail-variants/ThumbnailStat";
+import { ThumbnailNewspaper, SAMPLE_PROPS as SAMPLE_NEWSPAPER } from "./scenes/thumbnail-variants/ThumbnailNewspaper";
 import type { EpisodeScript, ScriptSection, AssetSnapshot, Beat } from "@yt-maker/core";
 import { BRAND } from "@yt-maker/core";
 
@@ -557,6 +561,45 @@ export const RemotionRoot: React.FC = () => {
           defaultProps={{
             section: outroSection,
           }}
+        />
+      </Folder>
+
+      <Folder name="Thumbnail">
+        <Composition
+          id="Thumbnail"
+          component={ThumbnailScene as React.ComponentType<any>}
+          durationInFrames={1}
+          fps={30}
+          width={1280}
+          height={720}
+          defaultProps={SAMPLE_THUMBNAIL_PROPS as any}
+        />
+        <Composition
+          id="ThumbnailTabloid"
+          component={ThumbnailTabloid as React.ComponentType<any>}
+          durationInFrames={1}
+          fps={30}
+          width={1280}
+          height={720}
+          defaultProps={SAMPLE_TABLOID as any}
+        />
+        <Composition
+          id="ThumbnailStat"
+          component={ThumbnailStat as React.ComponentType<any>}
+          durationInFrames={1}
+          fps={30}
+          width={1280}
+          height={720}
+          defaultProps={SAMPLE_STAT as any}
+        />
+        <Composition
+          id="ThumbnailNewspaper"
+          component={ThumbnailNewspaper as React.ComponentType<any>}
+          durationInFrames={1}
+          fps={30}
+          width={1280}
+          height={720}
+          defaultProps={SAMPLE_NEWSPAPER as any}
         />
       </Folder>
     </>

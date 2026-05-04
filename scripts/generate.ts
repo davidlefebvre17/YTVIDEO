@@ -83,6 +83,8 @@ async function main() {
   const skipFetch = !!opts["skip-fetch"];
   const skipScript = !!opts["skip-script"];
   const startFrom = opts["start-from"] as string | undefined;
+  const autoPublish = !!opts["publish"];   // Chain thumbnail + vtt + upload after render
+  const publishPrivacy = (opts["privacy"] as string | undefined) ?? undefined;
   // Default snap date = last trading day (skip weekend: Sat→Fri, Sun→Fri, Mon→Fri)
   const defaultSnap = new Date();
   defaultSnap.setDate(defaultSnap.getDate() - 1);
@@ -798,6 +800,7 @@ async function main() {
   }
 
   // Render
+  let renderedMp4Path: string | null = null;
   if (skipRender) {
     console.log("\n═══ Rendering SKIPPED (--no-render) ═══");
   } else {
@@ -805,14 +808,65 @@ async function main() {
     const outPath = path.join(epDir, `episode-${date}.mp4`);
 
     const remotionEntry = path.resolve(__dirname, "..", "packages", "remotion-app", "src", "index.ts");
-    const cmd = `npx remotion render "${remotionEntry}" BeatDaily "${outPath}" --codec=h264 --crf=18 --props="${propsPath}"`;
+    const publicDir = path.resolve(__dirname, "..", "packages", "remotion-app", "public");
+    // Required flags : --timeout (large props), --browser-launch-timeout (slow public dir copy),
+    // --public-dir (monorepo path resolution)
+    const cmd = `npx remotion render "${remotionEntry}" BeatDaily "${outPath}" --codec=h264 --crf=18 --props="${propsPath}" --timeout=300000 --browser-launch-timeout=120000 --public-dir="${publicDir}"`;
 
     console.log(`  Rendering: ${cmd.slice(0, 100)}...`);
     try {
       execSync(cmd, { stdio: "inherit", cwd: path.resolve(__dirname, "..") });
       console.log(`\n  Video: ${outPath}`);
+      renderedMp4Path = outPath;
     } catch (err) {
       console.error("  Render failed:", err);
+      if (autoPublish) {
+        console.error("  --publish skipped because render failed.");
+        process.exit(1);
+      }
+    }
+  }
+
+  // ════════════════════════════════════════════════════════════
+  // STEP 8 (--publish only) : Thumbnail → VTT → Upload to YouTube
+  // ════════════════════════════════════════════════════════════
+  if (autoPublish) {
+    if (!renderedMp4Path) {
+      console.error("\n✗ --publish requires a rendered MP4. Either remove --no-render or run render manually.");
+      process.exit(1);
+    }
+
+    console.log("\n═══ Step 8a: Thumbnail ═══");
+    try {
+      execSync(`npx tsx scripts/gen-thumbnail.ts --date ${episodeKey}`, {
+        stdio: "inherit",
+        cwd: path.resolve(__dirname, ".."),
+      });
+    } catch (err) {
+      console.warn(`  ⚠ Thumbnail generation failed — continuing without thumbnail`);
+    }
+
+    console.log("\n═══ Step 8b: VTT subtitles (Echogarden alignment) ═══");
+    try {
+      execSync(`npx tsx scripts/gen-vtt.ts --date ${episodeKey}`, {
+        stdio: "inherit",
+        cwd: path.resolve(__dirname, ".."),
+      });
+    } catch (err) {
+      console.warn(`  ⚠ VTT generation failed — continuing without subtitles`);
+    }
+
+    console.log("\n═══ Step 8c: Upload to YouTube ═══");
+    const privacyArg = publishPrivacy ? ` --privacy ${publishPrivacy}` : "";
+    try {
+      execSync(`npx tsx scripts/upload-youtube.ts --date ${episodeKey}${privacyArg}`, {
+        stdio: "inherit",
+        cwd: path.resolve(__dirname, ".."),
+      });
+    } catch (err) {
+      console.error(`  ✗ Upload failed: ${(err as Error).message}`);
+      console.error(`    You can retry with: npm run publish -- --date ${episodeKey}`);
+      process.exit(1);
     }
   }
 
@@ -820,6 +874,11 @@ async function main() {
   console.log(`Episode: "${script.title}"`);
   console.log(`Beats: ${beats.length} | Duration: ~${Math.round(beats.reduce((s, b) => s + b.durationSec, 0))}s`);
   console.log(`Folder: ${epDir}`);
+  if (autoPublish) {
+    console.log(`Status: uploaded to YouTube (review in Studio before public release)`);
+  } else if (renderedMp4Path) {
+    console.log(`Next:  npm run publish -- --date ${episodeKey}    (when ready to upload)`);
+  }
 }
 
 main().catch((err) => {

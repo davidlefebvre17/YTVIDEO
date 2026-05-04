@@ -16,6 +16,7 @@ import {
   useVideoConfig,
   interpolate,
   Video,
+  OffthreadVideo,
   Audio,
   staticFile,
 } from "remotion";
@@ -196,7 +197,7 @@ const OwlDiveWithCrossfade: React.FC<{
     <AbsoluteFill>
       <AbsoluteFill style={{ opacity: pageOp }}>{children}</AbsoluteFill>
       <AbsoluteFill style={{ opacity: combinedVideoOp }}>
-        <Video src={OWL_DIVE_SRC} style={{ width: "100%", height: "100%" }} volume={0} muted onError={() => {}} />
+        <OffthreadVideo src={OWL_DIVE_SRC} style={{ width: "100%", height: "100%" }} volume={0} muted onError={() => {}} />
       </AbsoluteFill>
     </AbsoluteFill>
   );
@@ -238,7 +239,7 @@ const FirstTransitionBlock: React.FC<{
       {/* 2. Video plays above end image */}
       {videoVisible && (
         <AbsoluteFill>
-          <Video
+          <OffthreadVideo
             src={OWL_PUSHUPS_SRC}
             muted
             volume={0}
@@ -748,7 +749,7 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
       {/* ── 1. Owl Intro clip (8s) — fades out at end ── */}
       <Sequence from={PUNCH_CARD_FRAMES} durationInFrames={OWL_INTRO_FRAMES}>
         <OwlClipFade durationInFrames={OWL_INTRO_FRAMES} fadeOutFrames={OWL_CLIP_OVERLAP}>
-          <Video src={OWL_INTRO_SRC} style={{ width: "100%", height: "100%" }} volume={0} muted onError={() => {}} />
+          <OffthreadVideo src={OWL_INTRO_SRC} style={{ width: "100%", height: "100%" }} volume={0} muted onError={() => {}} />
         </OwlClipFade>
       </Sequence>
 

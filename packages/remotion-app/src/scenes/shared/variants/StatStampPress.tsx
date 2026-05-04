@@ -69,21 +69,35 @@ export const StatStampPress: React.FC<AnimatedStatProps> = ({
           opacity: inkSpread,
           filter: "blur(20px)",
         }} />
-        <div style={{
-          transform: `scale(${stampScale}) rotate(${stampRot}deg)`,
-          opacity: stampOp,
-          transformOrigin: "center",
-          fontFamily: BRAND.fonts.condensed,
-          fontSize: 360, lineHeight: 0.85,
-          color: accentColor,
-          letterSpacing: "-0.04em",
-          display: "flex", alignItems: "baseline", gap: 12,
-        }}>
-          {isNegative && <span style={{ fontSize: 240 }}>−</span>}
-          {!isNegative && prefix && <span style={{ fontSize: 220 }}>{prefix}</span>}
-          <span>{formatCounterFr(counter, effectiveDecimals)}{compact.scalePrefix}</span>
-          {compact.cleanSuffix && <span style={{ fontSize: 220 }}>{compact.cleanSuffix}</span>}
-        </div>
+        {(() => {
+          // Adaptive sizing : keep the giant stamp readable even with a long
+          // suffix or value. Container budget is ~1400px wide.
+          const fullText = `${isNegative ? '−' : prefix}${formatCounterFr(counter, effectiveDecimals)}${compact.scalePrefix}${compact.cleanSuffix ?? ''}`;
+          const baseFs = 360;
+          const charBudget = 1400 / (baseFs * 0.55);
+          const fs = fullText.length > charBudget
+            ? baseFs * (charBudget / fullText.length)
+            : baseFs;
+          const sufFs = fs * 0.6;  // suffix slightly smaller than main value
+          return (
+            <div style={{
+              transform: `scale(${stampScale}) rotate(${stampRot}deg)`,
+              opacity: stampOp,
+              transformOrigin: "center",
+              fontFamily: BRAND.fonts.condensed,
+              fontSize: fs, lineHeight: 0.85,
+              color: accentColor,
+              letterSpacing: "-0.04em",
+              display: "flex", alignItems: "baseline", gap: 12,
+              maxWidth: 1400,
+            }}>
+              {isNegative && <span style={{ fontSize: sufFs * 1.1 }}>−</span>}
+              {!isNegative && prefix && <span style={{ fontSize: sufFs }}>{prefix}</span>}
+              <span>{formatCounterFr(counter, effectiveDecimals)}{compact.scalePrefix}</span>
+              {compact.cleanSuffix && <span style={{ fontSize: sufFs }}>{compact.cleanSuffix}</span>}
+            </div>
+          );
+        })()}
       </div>
 
       <div style={{

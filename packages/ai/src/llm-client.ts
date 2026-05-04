@@ -50,7 +50,9 @@ const ANTHROPIC_BASE = "https://api.anthropic.com/v1/messages";
 const ANTHROPIC_MODELS: Record<LLMRole, string> = {
   fast: "claude-haiku-4-5-20251001",
   balanced: "claude-sonnet-4-6",
-  quality: "claude-opus-4-7",
+  // A/B: Sonnet 4.6 instead of Opus 4.7 for C3 writing — ~5x cheaper.
+  // Compare quality on a few episodes; revert to "claude-opus-4-7" if needed.
+  quality: "claude-sonnet-4-6",
 };
 
 const ANTHROPIC_MAX_TOKENS_DEFAULT = 8192;

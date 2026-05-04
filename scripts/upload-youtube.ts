@@ -2,20 +2,61 @@
  * Upload an episode to YouTube.
  *
  * Usage :
- *   npm run publish -- --date 2026-04-28                    # default privacy from env (private)
+ *   npm run publish -- --date 2026-04-28                    # default privacy from env (unlisted)
  *   npm run publish -- --date 2026-04-28 --privacy unlisted
  *   npm run publish -- --date 2026-04-28 --dry-run          # validate inputs, no API call
  *   npm run publish -- --auth                                # OAuth interactive flow (one-time)
  *
- * Default video privacy is **private** so the user can review in YouTube Studio
- * before making it public. Override with --privacy unlisted | public.
+ * Default video privacy is **unlisted** so the user can share by link with friends/testers
+ * without the video being publicly indexed. Override with --privacy private | public.
  *
  * Reads :
- * - episodes/YYYY/MM-DD/script.json — uses script.seo (P10 output) if present,
- *   else falls back to script.title / script.description
- * - out/episode-YYYY-MM-DD.mp4 — the rendered MP4
+ * - episodes/YYYY/MM-DD/script.json — uses script.seo (P10 output) if present
+ * - episodes/YYYY/MM-DD/episode-DATE.mp4 OR out/episode-DATE.mp4
+ * - episodes/YYYY/MM-DD/thumbnail.png (optional, requires verified channel)
+ * - episodes/YYYY/MM-DD/episode-DATE.vtt (optional, FR subtitles via Echogarden)
  *
  * Quota cost : 1600 units per upload (10000/day quota = ~6 uploads/day max).
+ *
+ * ════════════════════════════════════════════════════════════════════════
+ * COMPLIANCE POLICY — Owl Street Journal
+ * ════════════════════════════════════════════════════════════════════════
+ * Decisions documented based on YouTube Help (support.google.com/youtube/answer/14328491)
+ * + research deep-dive 2026-05-04. Re-evaluate if production stack changes.
+ *
+ * 1. Made for kids (COPPA)             → FALSE
+ *    Finance content for adults; not designed for children.
+ *    → Auto-set via API: status.selfDeclaredMadeForKids = false
+ *
+ * 2. Altered content / Contenu modifié → "NON" (verdict from official examples)
+ *    The 3 modal questions ALL require "realistic content that could mislead viewers" :
+ *      a) Real person saying/doing things they didn't → ❌ no impersonation, owl is fictional
+ *      b) Modified images of real event/place        → ❌ all data + footage genuine
+ *      c) Realistic-looking scene that didn't happen → ❌ owl mascot is clearly animated
+ *
+ *    The voice is Fish Audio "Voix Homme 10" (ID accc8ea9...) — a generic synthetic voice
+ *    by user "DigitalCreator", NOT a clone of a real person. Per YouTube examples list :
+ *      - "Clonage de la voix d'UNE AUTRE PERSONNE" → requires disclosure
+ *      - "Clonage de SA PROPRE voix"               → exempt
+ *      - Generic synthetic voice (this case)       → exempt (no person identifiable)
+ *
+ *    → API cannot set this field; user must verify in Studio if asked.
+ *    → Reminder printed after each upload.
+ *
+ * 3. Default privacy                   → UNLISTED
+ *    Allows sharing the link with friends/reviewers without public indexing.
+ *    → Auto-set via env: YOUTUBE_DEFAULT_PRIVACY=unlisted
+ *
+ * 4. Category                          → 25 (News & Politics)
+ *    Daily market recap fits News & Politics taxonomy.
+ *    → Auto-set in snippet.categoryId
+ *
+ * 5. Default language                  → fr (French)
+ *    → Auto-set in snippet.defaultLanguage + defaultAudioLanguage
+ *
+ * If voice changes (clone of real person), or content uses deepfake/face-swap/synthetic-events,
+ * re-evaluate disclosure decision and update this block.
+ * ════════════════════════════════════════════════════════════════════════
  */
 import 'dotenv/config';
 import * as fs from 'fs';
@@ -32,10 +73,15 @@ interface CLIArgs {
   auth: boolean;
   videoPath?: string;
   scriptPath?: string;
+  thumbnailPath?: string;
+  noThumbnail: boolean;
+  captionsPath?: string;
+  noCaptions: boolean;
+  captionsOnly?: string;   // video ID — only replace captions on existing video
 }
 
 function parseArgs(argv: string[]): CLIArgs {
-  const out: CLIArgs = { dryRun: false, auth: false };
+  const out: CLIArgs = { dryRun: false, auth: false, noThumbnail: false, noCaptions: false };
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     const next = argv[i + 1];
@@ -49,6 +95,11 @@ function parseArgs(argv: string[]): CLIArgs {
     }
     else if (arg === '--video' && next) { out.videoPath = next; i++; }
     else if (arg === '--script' && next) { out.scriptPath = next; i++; }
+    else if (arg === '--thumbnail' && next) { out.thumbnailPath = next; i++; }
+    else if (arg === '--no-thumbnail') out.noThumbnail = true;
+    else if (arg === '--captions' && next) { out.captionsPath = next; i++; }
+    else if (arg === '--no-captions') out.noCaptions = true;
+    else if (arg === '--captions-only' && next) { out.captionsOnly = next; i++; }
     else if (arg === '--dry-run') out.dryRun = true;
     else if (arg === '--auth') out.auth = true;
     else if (arg === '--help' || arg === '-h') {
@@ -68,6 +119,11 @@ Options :
   --privacy <p>         private | unlisted | public  (default: $YOUTUBE_DEFAULT_PRIVACY or "private")
   --video <path>        Override path to MP4 (default: out/episode-YYYY-MM-DD.mp4)
   --script <path>       Override path to script.json (default: episodes/YYYY/MM-DD/script.json)
+  --thumbnail <path>    Override path to thumbnail PNG (default: episodes/YYYY/MM-DD/thumbnail.png)
+  --no-thumbnail        Skip thumbnail upload even if PNG exists
+  --captions <path>     Override path to VTT subtitles (default: episodes/YYYY/MM-DD/episode-DATE.vtt)
+  --no-captions         Skip captions upload even if VTT exists
+  --captions-only <id>  Replace captions on an existing video (id = YouTube video ID), no video upload
   --dry-run             Validate inputs and print metadata without uploading
   --auth                One-time OAuth consent flow to obtain refresh token
   --help                Show this help
@@ -84,7 +140,7 @@ function projectRoot(): string {
   return path.resolve(__dirname, '..');
 }
 
-function resolvePaths(args: CLIArgs): { videoPath: string; scriptPath: string; date: string } {
+function resolvePaths(args: CLIArgs): { videoPath: string; scriptPath: string; date: string; thumbnailPath?: string; captionsPath?: string } {
   if (!args.date && (!args.videoPath || !args.scriptPath)) {
     throw new Error('Either --date is required, or both --video and --script must be provided.');
   }
@@ -92,19 +148,58 @@ function resolvePaths(args: CLIArgs): { videoPath: string; scriptPath: string; d
   const root = projectRoot();
 
   const [y, m, d] = date.split('-');
+  const episodeDir = date ? path.join(root, 'episodes', y!, `${m}-${d}`) : '';
   const scriptPath = args.scriptPath
-    ?? (date ? path.join(root, 'episodes', y!, `${m}-${d}`, 'script.json') : '');
-  const videoPath = args.videoPath
-    ?? (date ? path.join(root, 'out', `episode-${date}.mp4`) : '');
+    ?? (date ? path.join(episodeDir, 'script.json') : '');
+
+  // Look for MP4 in : 1) explicit override, 2) episodes/YYYY/MM-DD/, 3) out/
+  let videoPath = args.videoPath ?? '';
+  if (!videoPath && date) {
+    const candidates = [
+      path.join(episodeDir, `episode-${date}.mp4`),
+      path.join(root, 'out', `episode-${date}.mp4`),
+    ];
+    videoPath = candidates.find(p => fs.existsSync(p)) ?? candidates[0]!;
+  }
 
   if (!fs.existsSync(scriptPath)) {
     throw new Error(`script.json not found: ${scriptPath}`);
   }
   if (!fs.existsSync(videoPath)) {
-    throw new Error(`MP4 not found: ${videoPath}\n(generate it with \`npm run render -- --episode ...\`)`);
+    throw new Error(`MP4 not found: ${videoPath}\n(generate it with \`npm run generate\` or \`npx remotion render ...\`)`);
   }
 
-  return { videoPath, scriptPath, date };
+  // Thumbnail: explicit override > episode folder > undefined
+  let thumbnailPath: string | undefined;
+  if (!args.noThumbnail) {
+    if (args.thumbnailPath) {
+      thumbnailPath = args.thumbnailPath;
+    } else if (date) {
+      const candidate = path.join(episodeDir, 'thumbnail.png');
+      if (fs.existsSync(candidate)) thumbnailPath = candidate;
+    }
+    if (thumbnailPath && !fs.existsSync(thumbnailPath)) {
+      console.warn(`  ⚠ Thumbnail path doesn't exist: ${thumbnailPath} — skipping`);
+      thumbnailPath = undefined;
+    }
+  }
+
+  // Captions: explicit override > episode folder > undefined
+  let captionsPath: string | undefined;
+  if (!args.noCaptions) {
+    if (args.captionsPath) {
+      captionsPath = args.captionsPath;
+    } else if (date) {
+      const candidate = path.join(episodeDir, `episode-${date}.vtt`);
+      if (fs.existsSync(candidate)) captionsPath = candidate;
+    }
+    if (captionsPath && !fs.existsSync(captionsPath)) {
+      console.warn(`  ⚠ Captions path doesn't exist: ${captionsPath} — skipping`);
+      captionsPath = undefined;
+    }
+  }
+
+  return { videoPath, scriptPath, date, thumbnailPath, captionsPath };
 }
 
 function buildMetadata(script: EpisodeScript): {
@@ -149,6 +244,58 @@ function previewMetadata(meta: ReturnType<typeof buildMetadata>, videoPath: stri
   console.log(`\n── Hashtags (${meta.hashtags.length}) ──`);
   console.log(meta.hashtags.map(h => `#${h}`).join(' '));
   console.log('\n══════════════════════════════════');
+}
+
+async function uploadThumbnail(videoId: string, thumbnailPath: string): Promise<void> {
+  const youtube = getYoutubeClient();
+  const stat = fs.statSync(thumbnailPath);
+  console.log(`\nUploading thumbnail (${(stat.size / 1024).toFixed(0)} KB)...`);
+  await youtube.thumbnails.set({
+    videoId,
+    media: { body: fs.createReadStream(thumbnailPath) },
+  });
+  console.log('  ✓ Thumbnail set');
+}
+
+async function uploadCaptions(videoId: string, captionsPath: string, replaceExisting = true): Promise<void> {
+  const youtube = getYoutubeClient();
+  const stat = fs.statSync(captionsPath);
+  const cueCount = (fs.readFileSync(captionsPath, 'utf-8').match(/-->/g) || []).length;
+
+  if (replaceExisting) {
+    try {
+      const existing = await youtube.captions.list({ part: ['snippet'], videoId });
+      const frTracks = (existing.data.items ?? []).filter(
+        (c: any) => c.snippet?.language === 'fr',
+      );
+      for (const track of frTracks) {
+        if (track.id) {
+          console.log(`  Removing existing FR caption track ${track.id}...`);
+          await youtube.captions.delete({ id: track.id });
+        }
+      }
+    } catch (err) {
+      console.warn(`  ⚠ Could not list/delete existing captions: ${(err as Error).message.slice(0, 120)}`);
+    }
+  }
+
+  console.log(`\nUploading captions VTT (${(stat.size / 1024).toFixed(1)} KB, ${cueCount} cues)...`);
+  await youtube.captions.insert({
+    part: ['snippet'],
+    requestBody: {
+      snippet: {
+        videoId,
+        language: 'fr',
+        name: 'Français',
+        isDraft: false,
+      },
+    },
+    media: {
+      mimeType: 'text/vtt',
+      body: fs.createReadStream(captionsPath),
+    },
+  });
+  console.log('  ✓ Captions set');
 }
 
 async function uploadVideo(args: {
@@ -215,14 +362,49 @@ async function main() {
     return;
   }
 
+  // Captions-only mode: replace captions on an existing video, skip everything else
+  if (args.captionsOnly) {
+    if (!args.date && !args.captionsPath) {
+      console.error('--captions-only requires --date YYYY-MM-DD or --captions <path>');
+      process.exit(1);
+    }
+    let captionsPath = args.captionsPath;
+    if (!captionsPath && args.date) {
+      const root = projectRoot();
+      const [y, m, d] = args.date.split('-');
+      captionsPath = path.join(root, 'episodes', y!, `${m}-${d}`, `episode-${args.date}.vtt`);
+    }
+    if (!captionsPath || !fs.existsSync(captionsPath)) {
+      console.error(`Captions VTT not found: ${captionsPath}`);
+      process.exit(1);
+    }
+    console.log(`\n═══ Captions-only mode — videoId=${args.captionsOnly} ═══`);
+    console.log(`Captions: ${captionsPath}`);
+    if (args.dryRun) {
+      const cueCount = (fs.readFileSync(captionsPath, 'utf-8').match(/-->/g) || []).length;
+      console.log(`[--dry-run] Would replace FR captions with ${cueCount} cues. No API call.`);
+      return;
+    }
+    try {
+      await uploadCaptions(args.captionsOnly, captionsPath, true);
+      console.log(`\n✓ Captions replaced on https://studio.youtube.com/video/${args.captionsOnly}/edit`);
+    } catch (err) {
+      console.error(`\n✗ Captions replace failed: ${(err as Error).message}`);
+      process.exit(1);
+    }
+    return;
+  }
+
   if (!args.date && !args.videoPath) {
     printHelp();
     process.exit(1);
   }
 
-  const { videoPath, scriptPath, date } = resolvePaths(args);
+  const { videoPath, scriptPath, date, thumbnailPath, captionsPath } = resolvePaths(args);
   console.log(`Episode date: ${date || '(custom)'}`);
   console.log(`Script:       ${scriptPath}`);
+  if (thumbnailPath) console.log(`Thumbnail:    ${thumbnailPath}`);
+  if (captionsPath) console.log(`Captions:     ${captionsPath}`);
 
   const script: EpisodeScript = JSON.parse(fs.readFileSync(scriptPath, 'utf-8'));
   const meta = buildMetadata(script);
@@ -246,11 +428,46 @@ async function main() {
 
   try {
     const { videoId, studioUrl } = await uploadVideo({ videoPath, meta, privacy });
-    console.log(`\n═══ Upload complete ═══`);
+    console.log(`\n═══ Video uploaded ═══`);
     console.log(`Video ID:  ${videoId}`);
+
+    if (thumbnailPath) {
+      try {
+        await uploadThumbnail(videoId, thumbnailPath);
+      } catch (thumbErr) {
+        console.warn(`  ⚠ Thumbnail upload failed: ${(thumbErr as Error).message.slice(0, 120)}`);
+        console.warn(`    (video itself uploaded OK — you can set thumbnail manually in Studio)`);
+      }
+    }
+
+    if (captionsPath) {
+      try {
+        await uploadCaptions(videoId, captionsPath);
+      } catch (capErr) {
+        const msg = (capErr as Error).message;
+        console.warn(`  ⚠ Captions upload failed: ${msg.slice(0, 200)}`);
+        if (msg.includes('insufficient') || msg.includes('scope')) {
+          console.warn(`    → Re-run \`npm run publish -- --auth\` to grant the youtube.force-ssl scope.`);
+        } else {
+          console.warn(`    (video itself uploaded OK — you can upload captions manually in Studio)`);
+        }
+      }
+    }
+
+    console.log(`\n═══ Upload complete ═══`);
     console.log(`Watch URL: https://youtu.be/${videoId}`);
     console.log(`Studio:    ${studioUrl}`);
-    console.log(`\n→ Review in Studio, add custom thumbnail, then publish when ready.`);
+
+    // Studio-only actions YouTube doesn't expose via API — print compact checklist
+    console.log(`\n━━━ Manual checks in Studio (if YouTube prompts) ━━━`);
+    console.log(`  Audience              → "Non, pas pour enfants"   (set via API ✓)`);
+    console.log(`  Privacy               → ${privacy}                 (set via API ✓)`);
+    console.log(`  Contenu modifié (IA)  → "Non"                      (per OSJ policy — voix générique, hibou animé)`);
+    if (!thumbnailPath) {
+      console.log(`  Thumbnail             → upload manually in Studio (channel verification needed)`);
+    }
+    console.log(`  Chapitres in player   → reload page if not visible (description has 00:00 anchor ✓)`);
+    console.log(`\n→ Review in Studio, then publish (or schedule) when ready.`);
   } catch (err) {
     if (err instanceof MissingCredentialsError) {
       console.error(`\n✗ ${err.message}`);

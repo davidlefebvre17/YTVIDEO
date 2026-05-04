@@ -89,13 +89,28 @@ export const NumberAvalanche: React.FC<AnimatedStatProps> = ({
         }}>
           {label}
         </div>
-        <div style={{
-          fontFamily: BRAND.fonts.condensed, fontSize: 380,
-          color, lineHeight: 0.85,
-          textShadow: `4px 4px 0 ${BRAND.colors.ink}`,
-        }}>
-          {prefix || sign}{formatCounterFr(absScaled, effectiveDecimals)}{compact.scalePrefix}{compact.cleanSuffix}
-        </div>
+        {(() => {
+          // Adaptive size — long suffix would otherwise overflow horizontally
+          // beyond W=1600.
+          const fullText = `${prefix || sign}${formatCounterFr(absScaled, effectiveDecimals)}${compact.scalePrefix}${compact.cleanSuffix ?? ''}`;
+          const baseFs = 380;
+          const charBudget = (W - 80) / (baseFs * 0.55);
+          const fs = fullText.length > charBudget
+            ? baseFs * (charBudget / fullText.length)
+            : baseFs;
+          return (
+            <div style={{
+              fontFamily: BRAND.fonts.condensed, fontSize: fs,
+              color, lineHeight: 0.85,
+              textShadow: `4px 4px 0 ${BRAND.colors.ink}`,
+              maxWidth: W - 80,
+              textAlign: "center",
+              whiteSpace: "nowrap",
+            }}>
+              {fullText}
+            </div>
+          );
+        })()}
         {/* Pas de baseline éditoriale présomptueuse — le label prop est déjà au-dessus du chiffre */}
       </div>
     </div>

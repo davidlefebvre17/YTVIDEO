@@ -51,6 +51,43 @@ function extractTarget(condition: string): string {
   return m ? m[1].trim() : '';
 }
 
+/**
+ * Render a target badge as a single line, scaling the font down dynamically
+ * so the label always fits within `maxWidth` (SVG units). No wrapping.
+ */
+function renderTarget(opts: {
+  target: string;
+  arrow: string;
+  color: string;
+  x: number;
+  y: number;
+  scale: number;
+  maxWidth: number;
+}) {
+  const { target, arrow, color, x, y, scale, maxWidth } = opts;
+  const label = `${arrow} ${target}`;
+  // Continuous font scaling: pick the largest fs ≤ baseFs that keeps the
+  // label on a single line within (maxWidth − padding). charWidth ratio is
+  // ~0.6 for the condensed display font (Oswald-style).
+  const baseFs = 24;
+  const minFs = 11;
+  const charW = 0.6;
+  const padding = 24;
+  const fitFs = (maxWidth - padding) / Math.max(1, label.length * charW);
+  const fs = Math.max(minFs, Math.min(baseFs, fitFs));
+  const boxH = 40;
+  return (
+    <g transform={`translate(${x}, ${y}) scale(${scale})`}>
+      <rect x={-maxWidth / 2} y={-boxH / 2} width={maxWidth} height={boxH} rx={4}
+        fill={BRAND.colors.cream} stroke={color} strokeWidth={2} />
+      <text x={0} y={fs / 3} textAnchor="middle"
+        fontFamily={BRAND.fonts.condensed} fontSize={fs} fontWeight={700} fill={color}>
+        {label}
+      </text>
+    </g>
+  );
+}
+
 export const ScenarioFork: React.FC<ScenarioForkProps> = ({
   trunk,
   bullish,
@@ -213,39 +250,27 @@ export const ScenarioFork: React.FC<ScenarioForkProps> = ({
           </g>
         )}
 
-        {/* Bull target (end of green line) */}
-        {bullTarget && targetScale > 0 && (() => {
-          const label = `▲ ${bullTarget}`;
-          const fs = label.length > 18 ? 16 : label.length > 12 ? 20 : 24;
-          const bw = Math.max(140, label.length * (fs * 0.65) + 24);
-          return (
-            <g transform={`translate(${RIGHT_END}, ${CHART_MID - 95}) scale(${targetScale})`}>
-              <rect x={-bw / 2} y={-20} width={bw} height={40} rx={4}
-                fill={BRAND.colors.cream} stroke={BRAND.colors.accentBull} strokeWidth={2} />
-              <text x={0} y={7} textAnchor="middle"
-                fontFamily={BRAND.fonts.condensed} fontSize={fs} fontWeight={700} fill={BRAND.colors.accentBull}>
-                {label}
-              </text>
-            </g>
-          );
-        })()}
+        {/* Bull target (end of green line) — fits within SVG, wraps long labels */}
+        {bullTarget && targetScale > 0 && renderTarget({
+          target: bullTarget,
+          arrow: '▲',
+          color: BRAND.colors.accentBull,
+          x: RIGHT_END,
+          y: CHART_MID - 95,
+          scale: targetScale,
+          maxWidth: 220,  // hard cap so it never overflows the SVG
+        })}
 
         {/* Bear target (end of red line) */}
-        {bearTarget && targetScale > 0 && (() => {
-          const label = `▼ ${bearTarget}`;
-          const fs = label.length > 18 ? 16 : label.length > 12 ? 20 : 24;
-          const bw = Math.max(140, label.length * (fs * 0.65) + 24);
-          return (
-            <g transform={`translate(${RIGHT_END}, ${CHART_MID + 95}) scale(${targetScale})`}>
-              <rect x={-bw / 2} y={-20} width={bw} height={40} rx={4}
-                fill={BRAND.colors.cream} stroke={BRAND.colors.accentBear} strokeWidth={2} />
-              <text x={0} y={7} textAnchor="middle"
-                fontFamily={BRAND.fonts.condensed} fontSize={fs} fontWeight={700} fill={BRAND.colors.accentBear}>
-                {label}
-              </text>
-            </g>
-          );
-        })()}
+        {bearTarget && targetScale > 0 && renderTarget({
+          target: bearTarget,
+          arrow: '▼',
+          color: BRAND.colors.accentBear,
+          x: RIGHT_END,
+          y: CHART_MID + 95,
+          scale: targetScale,
+          maxWidth: 220,
+        })}
 
         {/* HAUSSIER / BAISSIER labels */}
         <text x={CX + BRANCH_LEN * 0.5} y={CHART_TOP - 8}

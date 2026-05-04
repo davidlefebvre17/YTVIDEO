@@ -8,7 +8,7 @@
 
 export const BRAND = {
   name: "Owl Street Journal",
-  tagline: "Les marchés décortiqués, chaque soir.",
+  tagline: "Les marchés décortiqués, chaque matin.",
 
   colors: {
     // ── Backgrounds ─────────────────────────────────

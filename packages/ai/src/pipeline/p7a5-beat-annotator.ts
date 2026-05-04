@@ -642,6 +642,29 @@ function validateOverlaySpec(
     const v = spec.value;
     if (typeof v !== 'number' || !Number.isFinite(v) || v === 0) return null;
     if (spec.format === '%' && Math.abs(v) > 50) spec.value = Math.sign(v) * 50;
+    // Normalize suffix: should be a short unit ("%", "$", "€", "pb", "M$"…).
+    // Haiku sometimes packs a descriptor into it (e.g. "$ écart WTI-Brent")
+    // which overflows the giant hero font in NumberAvalanche/StatStampPress.
+    // Split: keep the leading unit as suffix, move the rest into label.
+    if (typeof spec.suffix === 'string') {
+      const raw = spec.suffix.trim();
+      const unitMatch = raw.match(/^(%|\$|€|£|¥|pb|bps|bp|M\$|Md\$|M€|Md€|x|°C?|j|h|min|s|y|an|ans)(?:\s+(.+))?$/i);
+      if (unitMatch) {
+        spec.suffix = unitMatch[1];
+        const extra = unitMatch[2]?.trim();
+        if (extra) {
+          spec.label = (typeof spec.label === 'string' && spec.label.trim())
+            ? `${spec.label.trim()} — ${extra}`
+            : extra;
+        }
+      } else if (raw.length > 4) {
+        // No unit prefix → fold the whole thing into label, drop suffix.
+        spec.label = (typeof spec.label === 'string' && spec.label.trim())
+          ? `${spec.label.trim()} — ${raw}`
+          : raw;
+        spec.suffix = '';
+      }
+    }
     return spec;
   }
 

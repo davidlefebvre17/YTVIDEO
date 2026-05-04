@@ -21,7 +21,9 @@
     "init-market-memory": "npx tsx scripts/init-market-memory.ts",
     "typecheck": "tsc --build tsconfig.json",
     "dashboard": "npx tsx scripts/dashboard.ts",
-    "publish": "npx tsx scripts/upload-youtube.ts"
+    "publish": "npx tsx scripts/upload-youtube.ts",
+    "thumbnail": "npx tsx scripts/gen-thumbnail.ts",
+    "vtt": "npx tsx scripts/gen-vtt.ts"
   },
   "keywords": [
     "remotion",

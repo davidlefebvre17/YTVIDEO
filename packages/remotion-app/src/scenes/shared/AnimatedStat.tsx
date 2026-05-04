@@ -52,10 +52,18 @@ export const AnimatedStat: React.FC<AnimatedStatProps> = ({
     extrapolateRight: 'clamp',
   });
 
-  const fontSize = size === 'lg' ? 80 : size === 'md' ? 56 : 36;
+  const baseFontSize = size === 'lg' ? 80 : size === 'md' ? 56 : 36;
   const labelSize = size === 'lg' ? 20 : size === 'md' ? 17 : 14;
 
   const formattedValue = formatCounterFr(currentValue, effectiveDecimals) + compact.scalePrefix;
+  // Compute total visible string to scale-down if it's long enough to overflow
+  // the maxWidth=500 container. Char count × ~0.55 of fontSize is a decent
+  // monospace-ish width estimate.
+  const fullText = `${prefix}${formattedValue}${compact.cleanSuffix}`;
+  const charBudget = 500 / (baseFontSize * 0.55);
+  const fontSize = fullText.length > charBudget
+    ? baseFontSize * (charBudget / fullText.length)
+    : baseFontSize;
 
   const showTrendArrow = prefix === '+' || prefix === '-';
   const arrowColor = prefix === '+' ? '#1a6b3a' : '#8b1a1a';
