@@ -22,8 +22,8 @@ import {
 import {
   runPipeline, toEpisodeScript,
   generateBeats, runC7Direction, runC8ImagePrompts, runImageGeneration,
-  adaptForTTS,
-  createEpisodeDir, saveToEpisode, syncImagesToPublic, syncAudioToPublic, saveRemotionProps, cleanPublicForNewEpisode,
+  adaptForTTS, preProcessForTTS,
+  createEpisodeDir, saveToEpisode, syncImagesToPublic, syncAudioToPublic, saveRemotionProps, cleanPublicForNewEpisode, cleanOldEpisodesFromPublic,
 } from "@yt-maker/ai";
 import type { PrevContext, RawBeat, AnalysisBundle } from "@yt-maker/ai";
 import type { EpisodeType, Language, EpisodeManifestEntry, DailySnapshot, Beat } from "@yt-maker/core";
@@ -139,6 +139,10 @@ async function main() {
   // Create episode folder + clean stale public files
   const epDir = createEpisodeDir(episodeKey);
   cleanPublicForNewEpisode(episodeKey, { skipImages: skipImages || reuseImages });
+  // Remove old episodes' assets from public/ to keep render copy fast (Remotion
+  // copies the whole public/ at start; >1 GB causes timeout). Keeps only the
+  // current episode's folder. Old episodes remain saved in episodes/YYYY/MM-DD/.
+  cleanOldEpisodesFromPublic(episodeKey);
   console.log(`Episode folder: ${epDir}`);
 
   let snapshot: DailySnapshot;
@@ -618,14 +622,22 @@ async function main() {
 
     const generatedOwlPaths: Record<string, string> = {};
     if (owlTexts.length > 0) {
-      // Generate each owl audio as a separate beat
-      const owlBeats = owlTexts.map(t => ({
-        id: t.id, segmentId: "owl", narrationChunk: t.text,
-        durationSec: t.text.split(/\s+/).length / 2.5,
-        timing: { estimatedDurationSec: t.text.split(/\s+/).length / 2.5 },
-        audioPath: "", imagePath: "", imagePrompt: "", imageEffect: "static" as any,
-        transitionOut: "fade" as any, emotion: "contexte" as any, overlay: null,
-      }));
+      // Generate each owl audio as a separate beat.
+      // IMPORTANT : on applique preProcessForTTS (phonétiques, élision, chiffres FR)
+      // sur le texte owl avant TTS — sinon Fish lit "Owl Street Journal" en anglais,
+      // ne phonétise pas Bitcoin, etc.
+      const owlBeats = owlTexts.map(t => {
+        const tts = preProcessForTTS(t.text);
+        return {
+          id: t.id, segmentId: "owl",
+          narrationChunk: t.text,
+          narrationTTS: tts,
+          durationSec: t.text.split(/\s+/).length / 2.5,
+          timing: { estimatedDurationSec: t.text.split(/\s+/).length / 2.5 },
+          audioPath: "", imagePath: "", imagePrompt: "", imageEffect: "static" as any,
+          transitionOut: "fade" as any, emotion: "contexte" as any, overlay: null,
+        };
+      });
       const { manifest: owlManifest } = await generateBeatAudio(
         owlBeats as any, lang, owlAudioDir, owlPublicPrefix,
         { skipExisting: false, legacyMode: true },

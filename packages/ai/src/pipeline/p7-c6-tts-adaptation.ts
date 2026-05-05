@@ -16,55 +16,12 @@
 import type { BeatEmotion } from '@yt-maker/core';
 import { generateStructuredJSON } from '../llm-client';
 import type { BeatAnnotation } from './p7a5-beat-annotator';
-import { existsSync, readFileSync } from 'fs';
-import { join } from 'path';
+import { phoneticRegistry } from '../p7-audio/phonetic-registry';
 
-// ─── Ticker / Name → Phonetic maps (loaded once from company-profiles.json) ──
-
-let _tickerMap: Map<string, string> | null = null;
-let _nameRules: Array<[RegExp, string]> | null = null;
-
-function loadProfiles(): void {
-  if (_tickerMap) return;
-  _tickerMap = new Map();
-  _nameRules = [];
-  const filePath = join(process.cwd(), 'data', 'company-profiles.json');
-  if (!existsSync(filePath)) return;
-  try {
-    const profiles: Array<{ symbol: string; name: string; phonetic?: string; aliases?: string[] }> =
-      JSON.parse(readFileSync(filePath, 'utf-8'));
-    // Collect name → phonetic pairs. Sort by name length DESC so longer names
-    // (e.g. "Goldman Sachs") match before substrings (e.g. "Goldman").
-    const namePairs: Array<[string, string]> = [];
-    for (const p of profiles) {
-      if (!p.phonetic) continue;
-      _tickerMap.set(p.symbol, p.phonetic);
-      // Plain name : skip if too short (≤2 chars, matches too aggressively).
-      // Keep all-caps sigles (KLM, ASML, BMW, GE, GM) — we want those phonetized
-      // when they appear unquoted in narration.
-      if (p.name && p.name.length >= 3) {
-        namePairs.push([p.name, p.phonetic]);
-      }
-    }
-    namePairs.sort((a, b) => b[0].length - a[0].length);
-    // Build regex for each name with word boundary. Escape special regex chars.
-    const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    for (const [name, phonetic] of namePairs) {
-      _nameRules.push([new RegExp(`\\b${escape(name)}\\b`, 'g'), phonetic]);
-    }
-    console.log(`  [TTS] Loaded ${_tickerMap.size} ticker / ${_nameRules.length} name phonetics`);
-  } catch { /* non-critical */ }
-}
-
-function getTickerMap(): Map<string, string> {
-  loadProfiles();
-  return _tickerMap!;
-}
-
-function getNameRules(): Array<[RegExp, string]> {
-  loadProfiles();
-  return _nameRules!;
-}
+// ─── Source unique de phonétiques : phoneticRegistry ──
+// Le registry agrège data/company-profiles.json (tickers + noms) +
+// data/phonetics-registry.json (règles regex catégorisées).
+// Voir packages/ai/src/p7-audio/phonetic-registry.ts
 
 // ─── Types ──────────────────────────────────────────────────────
 
@@ -211,7 +168,7 @@ function suppressRedundantAppositions(text: string, tickerMap: Map<string, strin
  */
 export function preProcessForTTS(text: string): string {
   let result = text;
-  const tickerMap = getTickerMap();
+  const tickerMap = phoneticRegistry.getTickerMap();
 
   // ── Passe 1 : suppression des appositions redondantes ──
   // C3 écrit souvent "TICKER", <apposition humaine> (ex: "CL=F", le brut américain).
@@ -283,7 +240,7 @@ export function preProcessForTTS(text: string): string {
   // Applique automatiquement les phonetics aux noms d'entités quand C3 les
   // écrit en texte normal (ex: "Bitcoin", "KLM", "Goldman Sachs"). Les tickers
   // entre guillemets sont déjà gérés par la passe précédente.
-  for (const [pattern, replacement] of getNameRules()) {
+  for (const [pattern, replacement] of phoneticRegistry.getNameRules()) {
     result = result.replace(pattern, replacement);
   }
 
@@ -292,7 +249,7 @@ export function preProcessForTTS(text: string): string {
   // sigles macro/CB (RSI, VIX, Fed, BCE), bugs Fish Audio (grimpe), etc.
   // Les overrides ici ont priorité sur les profiles (au cas où une règle
   // spécifique soit nécessaire).
-  for (const [pattern, replacement] of ALL_PRONUNCIATION_FIXES) {
+  for (const [pattern, replacement] of phoneticRegistry.getRegexRules()) {
     result = result.replace(pattern, replacement);
   }
 
@@ -333,146 +290,13 @@ export function preProcessForTTS(text: string): string {
   return result;
 }
 
-// ─── Table de prononciation unifiée ─────────────────────────────
-// Un seul tableau, un seul passage. Ordre : spécifique → général.
-
-const ALL_PRONUNCIATION_FIXES: [RegExp, string][] = [
-  // ── Fish Audio bugs ──
-  [/\bgrimpe\b/gi, 'grimp'],
-  [/(?<=\s|^)grimpé(?=\s|$|[.,;:!?])/gi, 'grimpé'],
-  [/\bgrimper\b/gi, 'grimper'],
-  [/\bvingt-onze\b/gi, 'vingt onze'],
-  [/\bP\.P\.I\./g, 'pé-pé-i'],
-  [/\bPPI\b/g, 'pé-pé-i'],
-  // Stablecoin / stablecoins → phonétisation FR (sinon Fish lit "stèïble-côwine")
-  [/\bstablecoins\b/gi, 'stébeul-connes'],
-  [/\bstablecoin\b/gi, 'stébeul-conne'],
-
-  // ── Noms propres instables ──
-  [/\bTesla\b/g, 'Tessla'],
-  [/\bASML\b/g, 'A.S.M.L.'],
-  [/\bMusk\b/g, 'Meusk'],
-  [/\bMousk\b/g, 'Meusk'],
-  [/\bON Semiconductor\b/gi, 'Onne Semi-conducteur'],
-  [/\bSemiconductor\b/gi, 'Semi-conducteur'],
-
-  // ── Anglicismes (testés 2026-04-16 : phonétisation nécessaire) ──
-  // ── Anglicismes : PAS de remplacement en code ──
-  // Les anglicismes doivent être éliminés par Opus (prompt C3 axe 2).
-  // Le code ne peut pas remplacer car la grammaire de la phrase dépend du mot.
-  // Seule exception : la phonétisation pour les mots qu'Opus pourrait encore laisser passer
-  // et que Fish Audio ne prononce pas correctement en raw.
-  [/(?<=\s|^)pricé(?=\s|$|[.,;:!?])/gi, 'praïcé'],
-  [/(?<=\s|^)pricait(?=\s|$|[.,;:!?])/gi, 'praïçait'],
-  [/(?<=\s|^)pricent(?=\s|$|[.,;:!?])/gi, 'praïcent'],
-  [/\bpricer\b/gi, 'praille-cé'],
-  [/\bpricing\b/gi, 'praille-cingue'],
-  [/\bprice\b/gi, 'praïce'],
-  [/\bbull run\b/gi, 'boull reune'],
-  [/\bbullish\b/gi, 'boulliche'],
-  [/\bbearish\b/gi, 'bèriche'],
-  // spread, risk-on, hedge, trading, trader, short squeeze → raw OK
-
-  // ── Suffixes anglais courants → français (couvre des centaines de sociétés) ──
-  [/\bSemiconductor\b/gi, 'Semi-conducteur'],
-  [/\bTechnologies\b/gi, 'Tèknolodji'],
-  [/\bHoldings\b/gi, 'Holdingz'],
-  [/\bCorporation\b/gi, 'Corporation'],
-  [/\bTherapeutics\b/gi, 'Térapeutiks'],
-  [/\bPartners\b/gi, 'Parteneurse'],
-
-  // ── Noms de sociétés récurrents ──
-  [/\bNvidia\b/g, 'Ènvidia'],
-  [/\bCoinbase\b/g, 'Coïnbèïse'],
-  [/\bBlackRock\b/g, 'Blakroke'],
-  [/\bJPMorgan\b/g, 'Djéï-Pi Morganne'],
-  [/\bMicron\b/g, 'Maïkronne'],
-  [/\bTeradyne\b/g, 'Téradaïne'],
-  [/\bBroadcom\b/g, 'Brodcome'],
-  [/\bCoreWeave\b/g, 'Core-ouive'],
-  [/\bServiceNow\b/g, 'Seurvissnao'],
-  [/\bMicroStrategy\b/g, 'Maïkro-stratédji'],
-  [/\bFastenal\b/g, 'Fasstenol'],
-  [/\bHelloFresh\b/g, 'Hélo-frèche'],
-  [/\bDelivery Hero\b/g, 'Déliveri Hiéro'],
-  [/\bGoldman Sachs\b/g, 'Goldmane Sax'],
-  [/\bWells Fargo\b/g, 'Ouèlse Fargo'],
-  [/\bCitigroup\b/g, 'Citigroupe'],
-  [/\bSoftBank\b/g, 'Softe-banque'],
-  [/\bTokyo Electron\b/g, 'Tokyo Élèctrone'],
-  [/\bJ\.?B\.?\s?Hunt\b/g, 'Djéï-bi Heunte'],
-  [/\bC\.?H\.?\s?Robinson\b/g, 'Ci-eïtch Robinsonne'],
-  [/\bBNY Mellon\b/g, 'Bi-ène-ouaï Mèlone'],
-  [/\bMorgan Stanley\b/g, 'Morgane Stanlé'],
-  [/\bBank of America\b/g, 'Banque of América'],
-  [/\bCharles Schwab\b/g, 'Charlse Chouab'],
-  [/\bDeutsche\b/g, 'Doïtche'],
-  // ── Abréviations courantes (filet de sécurité si Opus raccourcit) ──
-  [/\bBofA\b/g, 'Banque of América'],
-  [/\bGS\b/g, 'Goldmane Sax'],
-  [/\bMS\b(?!\.)(?!CI)/g, 'Morgane Stanlé'],  // MS mais pas MSCI
-  [/\bTSMC\b/g, 'Ti-èss-èmm-ci'],
-  [/\bAMD\b/g, 'A.M.D.'],
-
-  // ── Indices boursiers (composés en premier) ──
-  [/\bS&P 500\b/gi, 'essenne pi cinq cents'],
-  [/\bS\. and P\./g, 'essenne pi'],
-  [/\bS&P\b/gi, 'essenne pi'],
-  [/\bCAC 40\b/gi, 'caque karante'],
-  [/\bC\.A\.C\./g, 'caque'],
-  [/\bCAC\b/g, 'caque'],
-  [/\bDAX\b/gi, 'daxe'],
-  [/\bD\.A\.X\./g, 'daxe'],
-  [/\bFTSE\b/gi, 'fouttsi'],
-  [/\bF\.T\.S\.E\./g, 'fouttsi'],
-  [/\bKOSPI\b/gi, 'kospi'],
-  [/\bNasdaq\b/gi, 'nazdak'],
-  [/\bDow Jones\b/gi, 'daou djonnze'],
-  [/\bNikkei\b/gi, 'nikèï'],
-  [/\bVIX\b/gi, 'vixe'],
-  [/\bV\.I\.X\./g, 'vixe'],
-  [/\bRussell 2000\b/gi, 'reussèl deux mille'],
-  [/\bMSCI\b/gi, 'èmm-èss-ci-aï'],
-  [/\bM\.S\.C\.I\./g, 'èmm-èss-ci-aï'],
-
-  // ── Sigles épelés ──
-  [/\bW\.T\.I\.\b/g, 'doublevé té i'],
-  [/\bW\.T\.I\./g, 'doublevé té i'],
-  [/\bWTI\b/g, 'doublevé té i'],
-  [/\bDXY\b/g, 'D.X.Y.'],
-  [/\bRSI\b/g, 'R.S.I.'],
-  [/\bCOT\b/g, 'C.O.T.'],
-  [/\bSMA200\b/g, 'S.M.A. deux cents'],
-  [/\bSMA50\b/g, 'S.M.A. cinquante'],
-  [/\bSMA20\b/g, 'S.M.A. vingt'],
-  [/\bEMA\b/g, 'E.M.A.'],
-  [/\bCPI\b/g, 'C.P.I.'],
-  [/\bPMI\b/g, 'P.M.I.'],
-  [/\bUSDC\b/g, 'U.S.D.C.'],
-  [/\bUSDT\b/g, 'U.S.D.T.'],
-  [/\bAUD\b/g, 'A.U.D.'],
-
-  // ── Rattrapage sigles post-sanitize ──
-  [/\bE\.T\.F\./g, 'eutéèf'],
-  [/\bÉ\.T\.F\./g, 'eutéèf'],
-  [/\bETF\b/g, 'eutéèf'],
-
-  // ── Banques centrales ──
-  [/\bFed\b/g, 'Fède'],
-  [/\bBoJ\b/gi, 'Boge'],
-  [/\bBCE\b/g, 'B.C.E.'],
-  [/\bBoE\b/g, 'bi-eau-i'],
-  [/\bPBoC\b/g, 'pi-bi-eau-ci'],
-
-  // ── Prononciation française ──
-  [/\bquarante\b/g, 'karante'],
-  // Yen est invariable en français oral — Fish Audio prononce le "s" final
-  // de "yens" comme une consonne audible (yensse). Force le singulier en TTS.
-  [/\byens\b/gi, 'yen'],
-  // ── Anglicismes courants en finance/marché ──
-  [/\btankers\b/gi, 'tankeurs'],
-  [/\btanker\b/gi, 'tankeur'],
-];
+// ─── Table de prononciation MIGRÉE ──────────────────────────────
+// Toutes les règles sont désormais dans data/phonetics-registry.json,
+// chargées via phoneticRegistry.getRegexRules().
+// Workflow d'ajout d'une nouvelle phonétique :
+//   1. Ajouter une entrée dans data/phonetics-registry.json (catégorie pertinente)
+//   2. Ajouter un test dans scripts/test-phonetics.ts
+//   3. Run : npx tsx scripts/test-phonetics.ts
 
 // ═══════════════════════════════════════════════════════════════
 // ÉTAPE 2 — C6 HAIKU (placement de pauses uniquement)

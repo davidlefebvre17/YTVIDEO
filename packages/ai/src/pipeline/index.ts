@@ -7,8 +7,10 @@ import { loadKnowledgeBriefing } from "../knowledge/knowledge-briefing";
 import { flagAssets } from "./p1-flagging";
 import { runC1Editorial } from "./p2-editorial";
 import { runC2Analysis } from "./p3-analysis";
-import { runC3Writing } from "./p4-writing";
+import { runC3Writing, runC3Patch, applyPatches } from "./p4-writing";
 import { runValidation } from "./p5-validation";
+import { applySyntacticFixes } from "./helpers/syntactic-fixes";
+import { enrichIssues } from "./helpers/issue-enricher";
 import { runC5Direction } from "./p6-direction";
 import { runC10SEO, validateSEOMetadata } from "./p10-seo";
 import { computeWordBudget } from "./helpers/word-budget";
@@ -38,8 +40,11 @@ export * from "./types";
 export { flagAssets } from "./p1-flagging";
 export { runC1Editorial, validateEditorialPlan } from "./p2-editorial";
 export { runC2Analysis } from "./p3-analysis";
-export { runC3Writing } from "./p4-writing";
+export { runC3Writing, runC3Patch, applyPatches } from "./p4-writing";
 export { runValidation, validateMechanical } from "./p5-validation";
+export { applySyntacticFixes, numberToFrench } from "./helpers/syntactic-fixes";
+export { enrichIssues } from "./helpers/issue-enricher";
+export { extractSentenceContaining, extractSentenceAt } from "./helpers/sentence-extract";
 export { runC5Direction } from "./p6-direction";
 export { runC10SEO, validateSEOMetadata, computeChapterTimestamps } from "./p10-seo";
 export type { SEOValidationIssue } from "./p10-seo";
@@ -52,13 +57,13 @@ export type { BeatAnnotation } from "./p7a5-beat-annotator";
 export { runC7Direction } from "./p7b-direction-artistique";
 export { runC8ImagePrompts, buildStyleSuffix } from "./p7c-image-prompts";
 export { runImageGeneration } from "./p7d-image-generation";
-export { adaptForTTS } from "./p7-c6-tts-adaptation";
+export { adaptForTTS, preProcessForTTS } from "./p7-c6-tts-adaptation";
 export type { TTSBeat } from "./p7-c6-tts-adaptation";
 export { buildBriefingPack, enrichBriefingPackCBSpeeches, formatBriefingPack } from "./helpers/briefing-pack";
 export { runNewsDigest, formatNewsDigest } from "./p1b-news-digest";
 export type { NewsDigest, NewsDigestEvent } from "./p1b-news-digest";
 export type { BriefingPack, PoliticalTrigger, ScreenMover, EarningsBucket, COTHighlight, COTDivergence, SentimentTrend } from "./helpers/briefing-pack";
-export { episodeDir, createEpisodeDir, saveToEpisode, saveIntermediate as saveToEpisodeIntermediate, syncImagesToPublic, syncAudioToPublic, saveRemotionProps, saveEpisodeData, cleanPublicForNewEpisode } from "../episode-folder";
+export { episodeDir, createEpisodeDir, saveToEpisode, saveIntermediate as saveToEpisodeIntermediate, syncImagesToPublic, syncAudioToPublic, saveRemotionProps, saveEpisodeData, cleanPublicForNewEpisode, cleanOldEpisodesFromPublic } from "../episode-folder";
 
 /**
  * Format weekly brief as string for C1 prompt.
@@ -543,46 +548,102 @@ export async function runPipeline(
     };
   }
 
-  // ── P5: C4 Validation (seule boucle) ──────────────────
+  // ── P5: C4 Validation + surgical retry ────────────────
+  // Strategy: enrich issues → apply syntactic fixes (zero LLM) → patch
+  // semantic issues sentence-by-sentence (1 Opus call) → re-validate.
+  // Falls back to legacy full-regen only if patches don't converge.
   console.log("\nP5 — C4 Validation...");
   let validation = await runValidation(draft, editorial, analysis, budget, flagged);
   stats.llmCalls++;
 
   if (validation.status === "needs_revision") {
+    enrichIssues(validation.issues, draft);
     const blockers = validation.issues.filter((i) => i.severity === "blocker");
-    console.log(`  ⚠ ${blockers.length} blockers — retry C3...`);
+    const syntacticBlockers = blockers.filter((i) => i.safetyClass === "syntactic");
+    const semanticBlockers = blockers.filter((i) => i.safetyClass === "semantic");
+    const unclassifiedBlockers = blockers.filter((i) => !i.safetyClass);
+    console.log(
+      `  ⚠ ${blockers.length} blockers — surgical retry (${syntacticBlockers.length} syntactic, ${semanticBlockers.length} semantic, ${unclassifiedBlockers.length} unclassified)`,
+    );
 
-    // Retry C3 with feedback + previous draft for targeted correction
-    draft = await runC3Writing({
-      editorial,
-      analysis,
-      budget,
-      recentScripts,
-      knowledgeBriefing,
-      researchContext,
-      lang,
-      feedback: blockers,
-      assetContext,
-      flagged,
-      previousDraft: draft,
-      cotPositioning: snapshot.cotPositioning,
-      assets: snapshot.assets,
-      briefing: briefingForC3,
-    });
-    stats.llmCalls++;
-    stats.retries++;
+    // Step 1 — apply syntactic fixes deterministically (no LLM).
+    if (syntacticBlockers.length > 0) {
+      const synResult = applySyntacticFixes(draft, syntacticBlockers);
+      draft = synResult.patched;
+      console.log(`    syntactic: ${synResult.applied} fix(es) applied`);
+    }
 
-    // Re-validate
+    // Step 2 — apply semantic patches sentence-by-sentence via Opus.
+    if (semanticBlockers.length > 0) {
+      const patchResult = await runC3Patch({ draft, issues: semanticBlockers, lang });
+      stats.llmCalls++;
+      stats.retries++;
+      const applyResult = applyPatches(draft, patchResult.patches);
+      draft = applyResult.patched;
+      console.log(`    semantic: ${applyResult.applied} patch(es) applied, ${applyResult.skipped} skipped`);
+    }
+
+    // Step 3 — re-validate after patches.
     validation = await runValidation(draft, editorial, analysis, budget, flagged);
     stats.llmCalls++;
 
+    // Step 4 — if blockers remain (regressions or unclassified), do ONE
+    // more surgical pass before falling back to full regen.
     if (validation.status === "needs_revision") {
-      const remainingBlockers = validation.issues.filter(
-        (i) => i.severity === "blocker"
-      );
-      console.warn(
-        `  ⚠ Still ${remainingBlockers.length} blockers after retry — continuing with best result`
-      );
+      enrichIssues(validation.issues, draft);
+      const stillBlocking = validation.issues.filter((i) => i.severity === "blocker");
+      const stillSyn = stillBlocking.filter((i) => i.safetyClass === "syntactic");
+      const stillSem = stillBlocking.filter((i) => i.safetyClass === "semantic");
+
+      if (stillSyn.length > 0) {
+        const r = applySyntacticFixes(draft, stillSyn);
+        draft = r.patched;
+        console.log(`    pass 2 syntactic: ${r.applied} fix(es)`);
+      }
+      if (stillSem.length > 0) {
+        const r = await runC3Patch({ draft, issues: stillSem, lang });
+        stats.llmCalls++;
+        stats.retries++;
+        const ap = applyPatches(draft, r.patches);
+        draft = ap.patched;
+        console.log(`    pass 2 semantic: ${ap.applied} patch(es)`);
+      }
+
+      if (stillSyn.length > 0 || stillSem.length > 0) {
+        validation = await runValidation(draft, editorial, analysis, budget, flagged);
+        stats.llmCalls++;
+      }
+    }
+
+    // Step 5 — last resort fallback: full regen if patches didn't converge
+    // (typically because issues are unclassified or budget/structure problems).
+    if (validation.status === "needs_revision") {
+      const remaining = validation.issues.filter((i) => i.severity === "blocker");
+      console.warn(`  ⚠ ${remaining.length} blocker(s) survived patches — falling back to full regen`);
+      draft = await runC3Writing({
+        editorial,
+        analysis,
+        budget,
+        recentScripts,
+        knowledgeBriefing,
+        researchContext,
+        lang,
+        feedback: remaining,
+        assetContext,
+        flagged,
+        previousDraft: draft,
+        cotPositioning: snapshot.cotPositioning,
+        assets: snapshot.assets,
+        briefing: briefingForC3,
+      });
+      stats.llmCalls++;
+      stats.retries++;
+      validation = await runValidation(draft, editorial, analysis, budget, flagged);
+      stats.llmCalls++;
+      if (validation.status === "needs_revision") {
+        const final = validation.issues.filter((i) => i.severity === "blocker");
+        console.warn(`  ⚠ Still ${final.length} blockers after full regen — continuing with best result`);
+      }
     }
   }
 

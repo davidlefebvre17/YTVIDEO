@@ -1,30 +1,16 @@
 /**
  * Remplace les tickers entre guillemets ("CL=F", "SHEL.L", "GS"…) par leur
  * équivalent phonétique français lu par le TTS. Source : `data/company-profiles.json`
- * (champ `phonetic`). Si pas de phonétique, laisse le ticker tel quel.
+ * via phoneticRegistry. Si pas de phonétique, laisse le ticker tel quel.
  *
  * Les guillemets sont retirés autour du remplacement.
+ *
+ * Logique d'overlap detection : si le contexte immédiat contient déjà des
+ * mots significatifs de la phonétique, on supprime la mention pour éviter
+ * la redondance (ex: "le brut américain pétrole américain" → "le brut américain").
  */
 
-import { existsSync, readFileSync } from 'fs';
-import { join } from 'path';
-
-let _tickerMap: Map<string, string> | null = null;
-
-function loadTickerMap(): Map<string, string> {
-  if (_tickerMap) return _tickerMap;
-  _tickerMap = new Map();
-  const filePath = join(process.cwd(), 'data', 'company-profiles.json');
-  if (!existsSync(filePath)) return _tickerMap;
-  try {
-    const profiles: Array<{ symbol: string; name: string; phonetic?: string }> =
-      JSON.parse(readFileSync(filePath, 'utf-8'));
-    for (const p of profiles) {
-      if (p.phonetic) _tickerMap.set(p.symbol, p.phonetic);
-    }
-  } catch { /* non-critical */ }
-  return _tickerMap;
-}
+import { phoneticRegistry } from './phonetic-registry';
 
 const TICKER_QUOTED_RE = /"([A-Z0-9^=.\-]{1,15})"/g;
 
@@ -54,7 +40,7 @@ function tokenize(s: string): string[] {
  * pétrole américain a clôturé" → "le brut américain a clôturé").
  */
 export function replaceTickersInQuotes(text: string): { output: string; replaced: string[] } {
-  const map = loadTickerMap();
+  const map = phoneticRegistry.getTickerMap();
   const replaced: string[] = [];
 
   let output = text.replace(TICKER_QUOTED_RE, (match, ticker: string, offset: number, full: string) => {

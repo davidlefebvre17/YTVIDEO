@@ -143,6 +143,62 @@ export function cleanPublicForNewEpisode(date?: string, opts?: { skipImages?: bo
 }
 
 /**
+ * Remove ALL old episode folders from public/ (audio/ + editorial/) EXCEPT the current one.
+ *
+ * Why : Remotion copies the entire public/ to a temp dir at render start. With 30+
+ * accumulated episodes (~120 MB each), public/ grows to multi-GB and the copy
+ * times out. This function keeps public/ small by removing assets of past episodes.
+ *
+ * Tradeoff : you lose the ability to preview old episodes in Remotion Studio
+ * without regenerating them. Each episode's assets remain saved in
+ * episodes/YYYY/MM-DD/ so they can always be re-synced.
+ *
+ * Call this at the start of every production render (NOT during studio dev).
+ */
+export function cleanOldEpisodesFromPublic(currentDate: string): { removed: number; freedMB: number } {
+  const fs = require('fs') as typeof import('fs');
+  let removed = 0;
+  let freedBytes = 0;
+
+  const cleanRoot = (subdir: 'audio' | 'editorial') => {
+    const root = join(REMOTION_PUBLIC, subdir);
+    if (!fs.existsSync(root)) return;
+    for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
+      if (!entry.isDirectory()) continue;
+      if (!entry.name.startsWith('ep-')) continue;
+      if (entry.name === `ep-${currentDate}`) continue; // keep current
+      const dirPath = join(root, entry.name);
+      try {
+        // Compute size before removing (best-effort)
+        const stack = [dirPath];
+        while (stack.length) {
+          const p = stack.pop()!;
+          const stat = fs.statSync(p);
+          if (stat.isDirectory()) {
+            for (const child of fs.readdirSync(p)) stack.push(join(p, child));
+          } else {
+            freedBytes += stat.size;
+          }
+        }
+        fs.rmSync(dirPath, { recursive: true, force: true });
+        removed++;
+      } catch (err) {
+        console.warn(`Failed to remove ${dirPath}: ${(err as Error).message}`);
+      }
+    }
+  };
+
+  cleanRoot('audio');
+  cleanRoot('editorial');
+
+  const freedMB = Math.round(freedBytes / (1024 * 1024));
+  if (removed > 0) {
+    console.log(`  Cleaned ${removed} old episode folder(s) from public/, freed ${freedMB} MB`);
+  }
+  return { removed, freedMB };
+}
+
+/**
  * Copy image files to episode images/ AND remotion public/editorial/ep-{date}/
  * for render. Per-episode subdir prevents files of one episode from
  * overwriting another's when Studio switches between dates.

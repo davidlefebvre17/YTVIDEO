@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
+  "lastUpdated": "2026-05-05",
+  "doc": "Règles regex de phonétisation pour TTS Fish Audio. Catégorisées par usage. Les phonétiques par ticker/asset (Bitcoin, S&P 500, etc.) restent dans data/company-profiles.json — ce fichier ne contient QUE les règles génériques (anglicismes, sigles, banques centrales, fish bugs). L'ordre est : fish_bugs → geography → companies_named → anglicisms → suffixes → indices → acronyms → central_banks → linguistic.",
+  "categories": [
+    {
+      "id": "fish_bugs",
+      "description": "Bugs Fish Audio — mots que Fish prononce mal en raw. Phonétiser pour forcer.",
+      "rules": [
+        { "pattern": "\\bgrimpe\\b", "flags": "gi", "replacement": "grimp", "comment": "Fish lit le 'e' final" },
+        { "pattern": "(?<=\\s|^)grimpé(?=\\s|$|[.,;:!?])", "flags": "gi", "replacement": "grimpé", "comment": "Garantit l'accent" },
+        { "pattern": "\\bgrimper\\b", "flags": "gi", "replacement": "grimper" },
+        { "pattern": "\\bvingt-onze\\b", "flags": "gi", "replacement": "vingt onze", "comment": "Sans tiret pour Fish" },
+        { "pattern": "\\bP\\.P\\.I\\.", "flags": "g", "replacement": "pé-pé-i" },
+        { "pattern": "\\bPPI\\b", "flags": "g", "replacement": "pé-pé-i" },
+        { "pattern": "\\bstablecoins\\b", "flags": "gi", "replacement": "stébeul-connes", "comment": "Sinon Fish lit stèïble-côwine" },
+        { "pattern": "\\bstablecoin\\b", "flags": "gi", "replacement": "stébeul-conne" }
+      ]
+    },
+    {
+      "id": "geography",
+      "description": "Harmonisation orthographique géographique pour cohérence FR.",
+      "rules": [
+        { "pattern": "\\bd['’]Hormuz\\b", "flags": "g", "replacement": "d'Ormuz", "comment": "Forme française du détroit" },
+        { "pattern": "\\bHormuz\\b", "flags": "g", "replacement": "Ormuz" }
+      ]
+    },
+    {
+      "id": "companies_named",
+      "description": "Noms de sociétés instables que Fish prononce mal en raw.",
+      "rules": [
+        { "pattern": "\\bTesla\\b", "flags": "g", "replacement": "Tessla" },
+        { "pattern": "\\bASML\\b", "flags": "g", "replacement": "A.S.M.L." },
+        { "pattern": "\\bMusk\\b", "flags": "g", "replacement": "Meusk" },
+        { "pattern": "\\bMousk\\b", "flags": "g", "replacement": "Meusk" },
+        { "pattern": "\\bON Semiconductor\\b", "flags": "gi", "replacement": "Onne Semi-conducteur" },
+        { "pattern": "\\bNvidia\\b", "flags": "g", "replacement": "Ènvidia" },
+        { "pattern": "\\bCoinbase\\b", "flags": "g", "replacement": "Coïnbèïse" },
+        { "pattern": "\\bBlackRock\\b", "flags": "g", "replacement": "Blakroke" },
+        { "pattern": "\\bJPMorgan\\b", "flags": "g", "replacement": "Djéï-Pi Morganne" },
+        { "pattern": "\\bMicron\\b", "flags": "g", "replacement": "Maïkronne" },
+        { "pattern": "\\bTeradyne\\b", "flags": "g", "replacement": "Téradaïne" },
+        { "pattern": "\\bBroadcom\\b", "flags": "g", "replacement": "Brodcome" },
+        { "pattern": "\\bCoreWeave\\b", "flags": "g", "replacement": "Core-ouive" },
+        { "pattern": "\\bServiceNow\\b", "flags": "g", "replacement": "Seurvissnao" },
+        { "pattern": "\\bMicroStrategy\\b", "flags": "g", "replacement": "Maïkro-stratédji" },
+        { "pattern": "\\bFastenal\\b", "flags": "g", "replacement": "Fasstenol" },
+        { "pattern": "\\bHelloFresh\\b", "flags": "g", "replacement": "Hélo-frèche" },
+        { "pattern": "\\bDelivery Hero\\b", "flags": "g", "replacement": "Déliveri Hiéro" },
+        { "pattern": "\\bGoldman Sachs\\b", "flags": "g", "replacement": "Goldmane Sax" },
+        { "pattern": "\\bWells Fargo\\b", "flags": "g", "replacement": "Ouèlse Fargo" },
+        { "pattern": "\\bCitigroup\\b", "flags": "g", "replacement": "Citigroupe" },
+        { "pattern": "\\bSoftBank\\b", "flags": "g", "replacement": "Softe-banque" },
+        { "pattern": "\\bTokyo Electron\\b", "flags": "g", "replacement": "Tokyo Élèctrone" },
+        { "pattern": "\\bJ\\.?B\\.?\\s?Hunt\\b", "flags": "g", "replacement": "Djéï-bi Heunte" },
+        { "pattern": "\\bC\\.?H\\.?\\s?Robinson\\b", "flags": "g", "replacement": "Ci-eïtch Robinsonne" },
+        { "pattern": "\\bBNY Mellon\\b", "flags": "g", "replacement": "Bi-ène-ouaï Mèlone" },
+        { "pattern": "\\bMorgan Stanley\\b", "flags": "g", "replacement": "Morgane Stanlé" },
+        { "pattern": "\\bBank of America\\b", "flags": "g", "replacement": "Banque of América" },
+        { "pattern": "\\bCharles Schwab\\b", "flags": "g", "replacement": "Charlse Chouab" },
+        { "pattern": "\\bDeutsche\\b", "flags": "g", "replacement": "Doïtche" },
+        { "pattern": "\\bBofA\\b", "flags": "g", "replacement": "Banque of América", "comment": "Filet de sécurité abréviation" },
+        { "pattern": "\\bGS\\b", "flags": "g", "replacement": "Goldmane Sax" },
+        { "pattern": "\\bMS\\b(?!\\.)(?!CI)", "flags": "g", "replacement": "Morgane Stanlé", "comment": "MS mais pas MSCI" },
+        { "pattern": "\\bTSMC\\b", "flags": "g", "replacement": "Ti-èss-èmm-ci" },
+        { "pattern": "\\bAMD\\b", "flags": "g", "replacement": "A.M.D." }
+      ]
+    },
+    {
+      "id": "anglicisms",
+      "description": "Anglicismes finance/marché que Fish prononce mal en raw. Opus doit normalement les éviter, ces règles sont un filet.",
+      "rules": [
+        { "pattern": "(?<=\\s|^)pricé(?=\\s|$|[.,;:!?])", "flags": "gi", "replacement": "praïcé" },
+        { "pattern": "(?<=\\s|^)pricait(?=\\s|$|[.,;:!?])", "flags": "gi", "replacement": "praïçait" },
+        { "pattern": "(?<=\\s|^)pricent(?=\\s|$|[.,;:!?])", "flags": "gi", "replacement": "praïcent" },
+        { "pattern": "\\bpricer\\b", "flags": "gi", "replacement": "praille-cé" },
+        { "pattern": "\\bpricing\\b", "flags": "gi", "replacement": "praille-cingue" },
+        { "pattern": "\\bprice\\b", "flags": "gi", "replacement": "praïce" },
+        { "pattern": "\\bbull run\\b", "flags": "gi", "replacement": "boull reune" },
+        { "pattern": "\\bbullish\\b", "flags": "gi", "replacement": "boulliche" },
+        { "pattern": "\\bbearish\\b", "flags": "gi", "replacement": "bèriche" },
+        { "pattern": "\\btankers\\b", "flags": "gi", "replacement": "tankeurs" },
+        { "pattern": "\\btanker\\b", "flags": "gi", "replacement": "tankeur" }
+      ]
+    },
+    {
+      "id": "suffixes",
+      "description": "Suffixes anglais courants → français (couvre des centaines de sociétés via leur nom).",
+      "rules": [
+        { "pattern": "\\bSemiconductor\\b", "flags": "gi", "replacement": "Semi-conducteur" },
+        { "pattern": "\\bTechnologies\\b", "flags": "gi", "replacement": "Tèknolodji" },
+        { "pattern": "\\bHoldings\\b", "flags": "gi", "replacement": "Holdingz" },
+        { "pattern": "\\bCorporation\\b", "flags": "gi", "replacement": "Corporation" },
+        { "pattern": "\\bTherapeutics\\b", "flags": "gi", "replacement": "Térapeutiks" },
+        { "pattern": "\\bPartners\\b", "flags": "gi", "replacement": "Parteneurse" }
+      ]
+    },
+    {
+      "id": "indices",
+      "description": "Indices boursiers (composés en premier pour matcher avant le sigle seul).",
+      "rules": [
+        { "pattern": "\\bS&P 500\\b", "flags": "gi", "replacement": "essenne pi cinq cents" },
+        { "pattern": "\\bS\\. and P\\.", "flags": "g", "replacement": "essenne pi" },
+        { "pattern": "\\bS&P\\b", "flags": "gi", "replacement": "essenne pi" },
+        { "pattern": "\\bCAC 40\\b", "flags": "gi", "replacement": "caque karante" },
+        { "pattern": "\\bC\\.A\\.C\\.", "flags": "g", "replacement": "caque" },
+        { "pattern": "\\bCAC\\b", "flags": "g", "replacement": "caque" },
+        { "pattern": "\\bDAX\\b", "flags": "gi", "replacement": "daxe" },
+        { "pattern": "\\bD\\.A\\.X\\.", "flags": "g", "replacement": "daxe" },
+        { "pattern": "\\bFTSE\\b", "flags": "gi", "replacement": "fouttsi" },
+        { "pattern": "\\bF\\.T\\.S\\.E\\.", "flags": "g", "replacement": "fouttsi" },
+        { "pattern": "\\bKOSPI\\b", "flags": "gi", "replacement": "kospi" },
+        { "pattern": "\\bNasdaq\\b", "flags": "gi", "replacement": "nazdak" },
+        { "pattern": "\\bDow Jones\\b", "flags": "gi", "replacement": "daou djonnze" },
+        { "pattern": "\\bNikkei\\b", "flags": "gi", "replacement": "nikèï" },
+        { "pattern": "\\bVIX\\b", "flags": "gi", "replacement": "vixe" },
+        { "pattern": "\\bV\\.I\\.X\\.", "flags": "g", "replacement": "vixe" },
+        { "pattern": "\\bRussell 2000\\b", "flags": "gi", "replacement": "reussèl deux mille" },
+        { "pattern": "\\bMSCI\\b", "flags": "gi", "replacement": "èmm-èss-ci-aï" },
+        { "pattern": "\\bM\\.S\\.C\\.I\\.", "flags": "g", "replacement": "èmm-èss-ci-aï" }
+      ]
+    },
+    {
+      "id": "acronyms",
+      "description": "Sigles épelés (RSI, CPI, ETF...). On force la prononciation lettre par lettre.",
+      "rules": [
+        { "pattern": "\\bW\\.T\\.I\\.\\b", "flags": "g", "replacement": "doublevé té i" },
+        { "pattern": "\\bW\\.T\\.I\\.", "flags": "g", "replacement": "doublevé té i" },
+        { "pattern": "\\bWTI\\b", "flags": "g", "replacement": "doublevé té i" },
+        { "pattern": "\\bDXY\\b", "flags": "g", "replacement": "D.X.Y." },
+        { "pattern": "\\bRSI\\b", "flags": "g", "replacement": "R.S.I." },
+        { "pattern": "\\bCOT\\b", "flags": "g", "replacement": "C.O.T." },
+        { "pattern": "\\bSMA200\\b", "flags": "g", "replacement": "S.M.A. deux cents" },
+        { "pattern": "\\bSMA50\\b", "flags": "g", "replacement": "S.M.A. cinquante" },
+        { "pattern": "\\bSMA20\\b", "flags": "g", "replacement": "S.M.A. vingt" },
+        { "pattern": "\\bEMA\\b", "flags": "g", "replacement": "E.M.A." },
+        { "pattern": "\\bCPI\\b", "flags": "g", "replacement": "C.P.I." },
+        { "pattern": "\\bPMI\\b", "flags": "g", "replacement": "P.M.I." },
+        { "pattern": "\\bUSDC\\b", "flags": "g", "replacement": "U.S.D.C." },
+        { "pattern": "\\bUSDT\\b", "flags": "g", "replacement": "U.S.D.T." },
+        { "pattern": "\\bAUD\\b", "flags": "g", "replacement": "A.U.D." },
+        { "pattern": "\\bE\\.T\\.F\\.", "flags": "g", "replacement": "eutéèf" },
+        { "pattern": "\\bÉ\\.T\\.F\\.", "flags": "g", "replacement": "eutéèf" },
+        { "pattern": "\\bETF\\b", "flags": "g", "replacement": "eutéèf" }
+      ]
+    },
+    {
+      "id": "central_banks",
+      "description": "Banques centrales — prononciation française.",
+      "rules": [
+        { "pattern": "\\bFed\\b", "flags": "g", "replacement": "Fède" },
+        { "pattern": "\\bBoJ\\b", "flags": "gi", "replacement": "Boge" },
+        { "pattern": "\\bBCE\\b", "flags": "g", "replacement": "B.C.E." },
+        { "pattern": "\\bBoE\\b", "flags": "g", "replacement": "bi-eau-i" },
+        { "pattern": "\\bPBoC\\b", "flags": "g", "replacement": "pi-bi-eau-ci" }
+      ]
+    },
+    {
+      "id": "linguistic",
+      "description": "Corrections linguistiques pures (français oral).",
+      "rules": [
+        { "pattern": "\\bquarante\\b", "flags": "g", "replacement": "karante" },
+        { "pattern": "\\byens\\b", "flags": "gi", "replacement": "yen", "comment": "Yen invariable en français oral — Fish lit le 's' final sinon" }
+      ]
+    }
+  ]
+}

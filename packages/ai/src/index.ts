@@ -40,11 +40,11 @@ export type { BeatAnnotation } from "./pipeline";
 export { runC7Direction } from "./pipeline";
 export { runC8ImagePrompts, buildStyleSuffix } from "./pipeline";
 export { runImageGeneration } from "./pipeline";
-export { adaptForTTS } from "./pipeline";
+export { adaptForTTS, preProcessForTTS } from "./pipeline";
 export type { TTSBeat } from "./pipeline";
 
 // Episode folder management
-export { episodeDir, createEpisodeDir, saveToEpisode, saveToEpisodeIntermediate, syncImagesToPublic, syncAudioToPublic, saveRemotionProps, saveEpisodeData, cleanPublicForNewEpisode } from "./pipeline";
+export { episodeDir, createEpisodeDir, saveToEpisode, saveToEpisodeIntermediate, syncImagesToPublic, syncAudioToPublic, saveRemotionProps, saveEpisodeData, cleanPublicForNewEpisode, cleanOldEpisodesFromPublic } from "./pipeline";
 
 // News Memory (D2)
 export {

@@ -38,7 +38,7 @@ const FORBIDDEN_WORDS = [
 ];
 
 // Mots qui doivent apparaître dans la description pour signaler le disclaimer
-const DISCLAIMER_KEYWORDS = ['informatif', 'conseil', 'amf', 'mifid', 'risque'];
+const DISCLAIMER_KEYWORDS = ['informatif', 'conseil', 'risque', 'éducatif'];
 
 // ─── Helpers déterministes ─────────────────────────────────────────────
 
@@ -255,7 +255,7 @@ Traders particuliers et investisseurs amateurs francophones (FR/BE/CH/QC), nivea
 - Humble : on raconte ce qu'on observe, pas ce qu'il "faut faire".
 - Pédagogique : intermarché, causalité, pas de jargon gratuit.
 
-# Compliance AMF / MiFID II (NON-NÉGOCIABLE)
+# Compliance régulation française / européenne (NON-NÉGOCIABLE)
 - Interdit de donner un conseil en investissement.
 - Langage conditionnel obligatoire ("pourrait", "semble", "tend à").
 - Disclaimer visible dans les 300 premiers chars de la description.
@@ -306,7 +306,7 @@ Synthèse du jour avec le keyword principal et la date courte. Inclure : le mouv
 
 [Ligne vide]
 
-⚠️ Contenu informatif et pédagogique uniquement. Aucun conseil en investissement (AMF/MiFID II). Investir comporte un risque de perte en capital.
+⚠️ Contenu informatif et pédagogique uniquement. Aucun conseil en investissement. Investir comporte un risque de perte en capital.
 
 [Ligne vide]
 
@@ -344,7 +344,7 @@ Données : Yahoo Finance, FRED, Finnhub, RSS Reuters/Bloomberg. Mise à jour quo
 [Ligne vide]
 
 DISCLAIMER COMPLET
-Ce contenu est à but informatif et éducatif. Il ne constitue ni un conseil en investissement, ni une recommandation personnalisée, ni une sollicitation à l'achat ou à la vente d'instruments financiers, au sens de la directive MiFID II et de la réglementation AMF. Les performances passées ne préjugent pas des performances futures. Investir comporte des risques de perte en capital, pouvant aller jusqu'à la totalité de la somme investie. Avant toute décision d'investissement, consultez un conseiller en investissement financier (CIF) agréé.
+Ce contenu est à but informatif et éducatif. Il ne constitue ni un conseil en investissement, ni une recommandation personnalisée, ni une sollicitation à l'achat ou à la vente d'instruments financiers. Les performances passées ne préjugent pas des performances futures. Investir comporte des risques de perte en capital, pouvant aller jusqu'à la totalité de la somme investie. Avant toute décision d'investissement, consultez un conseiller en investissement financier agréé.
 
 [Ligne vide — DERNIÈRE LIGNE]
 #Bourse #CAC40 #Marches  (ou variation pertinente — ces 3 hashtags répliquent le champ "hashtags" du JSON)
@@ -579,7 +579,7 @@ function applyMechanicalFixes(seo: SEOMetadata, script: DraftScript, editorial: 
   const above = description.slice(0, 350).toLowerCase();
   const hasDisclaimer = DISCLAIMER_KEYWORDS.some(k => above.includes(k));
   if (!hasDisclaimer) {
-    const disclaimerLine = `⚠️ Contenu informatif et pédagogique uniquement. Aucun conseil en investissement (AMF/MiFID II). Investir comporte un risque de perte en capital.\n\n`;
+    const disclaimerLine = `⚠️ Contenu informatif et pédagogique uniquement. Aucun conseil en investissement. Investir comporte un risque de perte en capital.\n\n`;
     description = `Récap des marchés du ${fmt.dateShort} : ${editorial.dominantTheme}.\n\n${disclaimerLine}${description}`;
   }
 
@@ -605,7 +605,7 @@ function mechanicalFallbackSEO(
 
   const description = `Récap des marchés du ${fmt.dayLabel} ${fmt.dateShort} : ${editorial.dominantTheme}. Tour d'horizon : ${moversLine}.
 
-⚠️ Contenu informatif et pédagogique uniquement. Aucun conseil en investissement (AMF/MiFID II). Investir comporte un risque de perte en capital.
+⚠️ Contenu informatif et pédagogique uniquement. Aucun conseil en investissement. Investir comporte un risque de perte en capital.
 
 📊 SYNTHÈSE
 ${editorial.threadSummary}
@@ -624,7 +624,7 @@ ${chapters.map(c => `${c.time} ${c.defaultLabel}`).join('\n')}
 Données : Yahoo Finance, FRED, Finnhub, RSS Reuters/Bloomberg.
 
 DISCLAIMER COMPLET
-Ce contenu est à but informatif et éducatif. Il ne constitue ni un conseil en investissement, ni une recommandation personnalisée, au sens de la directive MiFID II et de la réglementation AMF. Les performances passées ne préjugent pas des performances futures. Investir comporte des risques de perte en capital. Consultez un conseiller en investissement financier (CIF) agréé avant toute décision.
+Ce contenu est à but informatif et éducatif. Il ne constitue ni un conseil en investissement, ni une recommandation personnalisée, ni une sollicitation à l'achat ou à la vente d'instruments financiers. Les performances passées ne préjugent pas des performances futures. Investir comporte des risques de perte en capital. Consultez un conseiller en investissement financier agréé avant toute décision.
 
 #Bourse #CAC40 #Marches`;
 

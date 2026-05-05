@@ -2046,7 +2046,7 @@
       "le BTC",
       "l'or numérique"
     ],
-    "phonetic": "bitcoïne"
+    "phonetic": "bitconne"
   },
   {
     "symbol": "BX",
@@ -3364,7 +3364,7 @@
       "l'Ethereum",
       "l'ETH"
     ],
-    "phonetic": "éthérium"
+    "phonetic": "étériom"
   },
   {
     "symbol": "ETN",
@@ -8230,5 +8230,16 @@
     "index": "OTHER",
     "description": "Dutch arm of Air France-KLM",
     "phonetic": "K.L.M."
+  },
+  {
+    "symbol": "__BRAND_OSJ__",
+    "name": "Owl Street Journal",
+    "finnhubIndustry": "Brand",
+    "sector": "Brand",
+    "correlation": "",
+    "index": "BRAND",
+    "description": "Channel brand name — must be pronounced French style, not English.",
+    "aliases": [],
+    "phonetic": "aul street journale"
   }
 ]

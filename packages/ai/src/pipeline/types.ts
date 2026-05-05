@@ -259,6 +259,18 @@ export interface DraftScript {
 
 // ── P5 C4 Validation ────────────────────────────────────
 
+/**
+ * Issue safety class — drives the retry strategy.
+ *
+ * - 'syntactic'  : the fix can be applied deterministically by code (parens
+ *                  stripping, digit-to-words conversion, punctuation cleanup,
+ *                  bullet markers, etc.). No LLM needed.
+ * - 'semantic'   : the fix requires contextual judgment — anglicisms,
+ *                  recommandations déguisées, ton retail, redondances
+ *                  ticker/name. Routes to the surgical Opus patch flow.
+ */
+export type IssueSafetyClass = 'syntactic' | 'semantic';
+
 export interface ValidationIssue {
   type: 'compliance' | 'factual' | 'length' | 'tone' | 'structure' | 'repetition';
   segmentId?: string;
@@ -266,6 +278,17 @@ export interface ValidationIssue {
   severity: 'blocker' | 'warning';
   suggestedFix?: string;
   source: 'code' | 'haiku';
+  /** The literal substring that triggered the issue (e.g. the anglicism word).
+   *  Used by syntactic fixes for find-and-replace, and by the patch prompt for
+   *  precise targeting. */
+  match?: string;
+  /** The full sentence that contains the match, extracted from the narration.
+   *  This is the unit Opus rewrites in the surgical patch flow — it preserves
+   *  surrounding sentences (notably J-N narrative callbacks) untouched. */
+  originalSentence?: string;
+  /** Routing hint : 'syntactic' goes to applySyntacticFixes, 'semantic' goes
+   *  to runC3Patch. Issues without a class fall back to legacy full-regen. */
+  safetyClass?: IssueSafetyClass;
 }
 
 export interface ValidationResult {

@@ -33,10 +33,11 @@ export const DisclaimerBar: React.FC<DisclaimerBarProps> = ({ lang = 'fr' }) => 
       <span
         style={{
           fontFamily: BRAND.fonts.mono,
-          fontSize: 11,
+          fontSize: 14,
           letterSpacing: '0.16em',
           textTransform: 'uppercase',
-          color: 'rgba(245, 240, 232, 0.55)',
+          color: 'rgba(245, 240, 232, 0.78)',
+          fontWeight: 600,
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis',

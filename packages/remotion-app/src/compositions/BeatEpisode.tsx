@@ -31,6 +31,7 @@ import { BeatSequence } from "../scenes/beat/BeatSequence";
 import { InkSubtitle, type SubtitleLine } from "../scenes/shared/InkSubtitle";
 import { GrainOverlay } from "../scenes/shared/GrainOverlay";
 import { DisclaimerBar } from "../scenes/shared/DisclaimerBar";
+import { DisclaimerOverlay } from "../scenes/shared/DisclaimerOverlay";
 import { LikeSubscribePrompt } from "../scenes/shared/LikeSubscribePrompt";
 import { BeatAudioTrack } from "../audio/BeatAudioTrack";
 import { getSfxPath, SFX_VOLUME } from "../audio/sfx-library";
@@ -1123,8 +1124,15 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
       <DisclaimerBar lang={script.lang} />
 
       {/* Like + Subscribe prompt à la seconde 12 du flux principal (post punch-card) */}
-      <Sequence from={PUNCH_CARD_FRAMES + 12 * fps} durationInFrames={5 * fps}>
-        <LikeSubscribePrompt durationInFrames={5 * fps} />
+      {/* Étendu à 6s pour rester presque jusqu'à la fin de l'owl video */}
+      <Sequence from={PUNCH_CARD_FRAMES + 12 * fps} durationInFrames={6 * fps}>
+        <LikeSubscribePrompt durationInFrames={6 * fps} />
+      </Sequence>
+
+      {/* Disclaimer overlay — JUSTE APRÈS le Like+Subscribe, fade out pendant la transition newspaper */}
+      {/* 18s post-punch-card = 24s absolus, dure 3s, finit pendant les 1.5 premières secondes du newspaper (fade) */}
+      <Sequence from={PUNCH_CARD_FRAMES + 18 * fps} durationInFrames={Math.round(3 * fps)}>
+        <DisclaimerOverlay durationInFrames={Math.round(3 * fps)} lang={script.lang} />
       </Sequence>
 
       {/* Like + Subscribe prompt à la fin, pendant l'owl closing (CTA) */}

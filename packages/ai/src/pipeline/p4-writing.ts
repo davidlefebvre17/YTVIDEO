@@ -330,7 +330,7 @@ EN REVANCHE, les **sigles de sociétés** (KLM, BMW, IBM, AMD, ASML, ON, NXP, GE
 COMPLIANCE AMF/MiFID II :
 - Contenu éducatif uniquement. Langage conditionnel pour toute projection.
 - JAMAIS de recommandation directe, même déguisée. JAMAIS "achetez", "vendez", "c'est le moment de".
-- Le disclaimer est dans le owlIntro. Pas besoin de le répéter ailleurs.
+- Le disclaimer est sur le bandeau permanent visible toute la vidéo + dans la description YouTube. NE PAS répéter à l'oral nulle part (ni owlIntro ni narration).
 - Le closing est un bloc "rendez-vous à venir" factuel (events + earnings de la semaine avec enjeu), JAMAIS de disclaimer ni de CTA — le CTA est dans owlClosing.
 
 RIGUEUR FACTUELLE :
@@ -350,9 +350,46 @@ BUDGET MOTS (STRICT) :
 
 STRUCTURE (tout est parlé à voix haute, dans cet ordre) :
 
-1. **owlIntro** (~45 mots, ~18s) — Parlé sur la vidéo d'introduction du hibou. Présentation de la CHAÎNE, pas de la journée. Contient : salutation + nom de la chaîne + ce qu'on fait ici (décortiquer les marchés chaque jour) + disclaimer éducatif + call-to-action (like + abonne-toi). Ton : chaleureux, direct. VARIE la formulation à chaque épisode — ne répète pas la même phrase mot pour mot. La date et le thème du jour sont dans le coldOpen, PAS dans l'intro.
+1. **owlIntro** (45-50 mots STRICT, ~17-18s en TTS) — Parlé sur la vidéo d'introduction du hibou. Doit IMPÉRATIVEMENT contenir un VALUE CLAIM SPÉCIFIQUE AU JOUR — c'est cette intro qui décide si le viewer reste ou part (rétention 30s = métrique #1).
 
-2. **coldOpen** (max 20 mots) — Parlé sur la page journal. Le fait choc du jour en une phrase, avec la date.
+   ⚠️ CONTRAINTE DE DURÉE CRITIQUE : la vidéo hibou dure 20s exactement. Au-delà de 50 mots, le TTS déborde sur la phase newspaper qui suit, ce qui casse le rythme. COMPTE TES MOTS.
+
+   STRUCTURE OBLIGATOIRE (5 blocs, dans cet ordre, séparés par des points) :
+
+   1. **Signature** (3 mots, OBLIGATOIRE EN PREMIER) : "Owl Street Journal."
+      → Pas de variation autour du nom. C'est la marque. Toujours en premier mot.
+
+   2. **Positionnement** (3-5 mots, OBLIGATOIRE) : "Récap quotidien des marchés."
+      → Variations possibles : "Le récap des marchés", "Votre récap quotidien". Reste court.
+
+   3. **Date** (3-5 mots, OBLIGATOIRE) : "[Jour] [date courte]."
+      → Format : jour de semaine + jour + mois, sans l'année. C'est ICI qu'on dit la date, pas dans le coldOpen.
+
+   4. **Value claim** (28-35 mots STRICT) : "Aujourd'hui : [sujet 1], [sujet 2], et [sujet 3]."
+      → 3 sujets concrets du jour, accrocheurs, COMPLÉMENTAIRES (pas le même angle 3 fois).
+      → Chaque sujet = 8-11 mots MAX. Pas de phrases multiples par sujet. Pas de tirets explicatifs internes.
+      → Format type : "[acteur/asset] [verbe d'action] [contexte court]" pour chaque sujet.
+
+   5. **Transition** (2-4 mots) : "C'est parti." OU "Allons-y." OU "On y va." OU "Voilà."
+
+   INTERDICTIONS ABSOLUES :
+   - PAS de "Bienvenue sur..." / "Bonjour à tous..." / "Salut"
+   - PAS de "chaque matin on décortique..." (utiliser "Récap quotidien des marchés")
+   - PAS de disclaimer "c'est éducatif", "pas du conseil"
+   - PAS de "abonne-toi et laisse un like"
+   - PAS d'année dans la date
+   - PAS de tirets explicatifs DANS un sujet (ex: "le pétrole — ce que ça change") — ça gonfle le mot count
+   - PAS de phrases composées dans le value claim
+
+   Ton : énergique, factuel, direct, RAPIDE. Tempo de livraison : signature+positionnement+date en ~5s, value claim en ~10-11s, transition en ~1s. Total cible : ~17s en TTS.
+
+   COMPLÉMENTARITÉ avec coldOpen et thread (CRUCIAL — éviter la redondance) :
+   - owlIntro = MENU (3 sujets listés, perspective d'ensemble)
+   - coldOpen = HOOK 1 fait choc unique en 1 phrase (généralement le sujet #1 du menu, mais reformulé en punch émotionnel)
+   - thread = ARC narratif qui RELIE les sujets (l'angle d'analyse de la vidéo)
+   Les 3 doivent dire des choses DIFFÉRENTES sur le même contenu — variation lexicale obligatoire.
+
+2. **coldOpen** (max 20 mots) — Parlé sur la page journal. **UN** fait choc du jour en une phrase courte et frappante. PAS DE DATE (la date est déjà dans owlIntro). Doit accrocher émotionnellement, pas lister des chiffres. Idéalement c'est l'angle du sujet #1 listé dans owlIntro, mais formulé comme un punch émotionnel et non comme un teaser.
 
 3. **thread** (~40 mots) — Parlé sur la page journal. Le thème dominant, la cascade narrative. PAS de prix ni pourcentages.
 
@@ -401,8 +438,8 @@ SORTIE : JSON strict avec EXACTEMENT cette structure :
   "date": "YYYY-MM-DD",
   "title": "Titre épisode (percutant, fait vérifié)",
   "description": "1-2 phrases résumé",
-  "owlIntro": "~45 mots : présentation de la chaîne + disclaimer + like/abonne-toi (PAS le thème du jour)",
-  "coldOpen": { "type": "hook", "title": "Cold Open", "narration": "Max 20 mots — le fait choc", "durationSec": N, "wordCount": N },
+  "owlIntro": "45-50 mots STRICT / ~17s — 5 blocs : 'Owl Street Journal.' + 'Récap quotidien des marchés.' + '[Jour] [date sans année].' + 'Aujourd'hui : [sujet 1 8-11 mots], [sujet 2 8-11 mots], et [sujet 3 8-11 mots].' + 'C'est parti.' AUCUN bonjour, disclaimer, abonne-toi, tiret explicatif. COMPTE TES MOTS — 50 max.",
+  "coldOpen": { "type": "hook", "title": "Cold Open", "narration": "Max 20 mots — UN fait choc émotionnel sans date (date dans owlIntro)", "durationSec": N, "wordCount": N },
   "titleCard": { "type": "title_card", "title": "Owl Street Journal", "narration": "", "durationSec": 4, "wordCount": 0 },
   "thread": { "type": "thread", "title": "Fil conducteur", "narration": "...", "durationSec": N, "wordCount": N },
   "segments": [
@@ -758,4 +795,178 @@ export async function runC3Writing(input: {
   console.log(`  C3 output: ${totalWords} mots, ~${Math.round(totalWords / 2.5)}s`);
 
   return draft;
+}
+
+// ─────────────────────────────────────────────────────────────────
+// runC3Patch — surgical sentence-level corrections
+// ─────────────────────────────────────────────────────────────────
+
+/**
+ * Apply surgical patches for semantic ValidationIssues. Instead of
+ * regenerating the whole DraftScript (which loses J-N narrative callbacks
+ * and burns tokens), Opus only rewrites the SPECIFIC sentences flagged.
+ *
+ * Each patch is keyed on the literal originalSentence string — the caller
+ * applies them via exact replace, preserving every other sentence verbatim.
+ *
+ * Issues without `originalSentence` are skipped (caller falls back to
+ * full-regen for those). Same for issues that share the same sentence —
+ * they're grouped and Opus addresses them all in one rewrite per sentence.
+ */
+
+interface PatchResult {
+  patches: Array<{
+    segmentId: string;
+    originalSentence: string;
+    correctedSentence: string;
+  }>;
+  /** Issues we couldn't address surgically (no originalSentence, etc.) */
+  unaddressed: ValidationIssue[];
+}
+
+const PATCH_SCHEMA = `Format de sortie JSON STRICT :
+{
+  "patches": [
+    { "index": 1, "correctedSentence": "..." },
+    { "index": 2, "correctedSentence": "..." }
+  ]
+}`;
+
+function buildPatchSystemPrompt(lang: Language): string {
+  if (lang !== "fr") {
+    return `You are in SURGICAL CORRECTION mode. You receive a list of sentences with the issues to fix in each. Rewrite ONLY each sentence, preserving its intent, length (±20%), and any narrative references. Return only the corrected sentences.\n\n${PATCH_SCHEMA}`;
+  }
+  return `Tu es en mode CORRECTION CHIRURGICALE.
+
+Tu reçois une liste de phrases extraites d'un script éditorial, chacune avec une liste de problèmes à corriger. Pour chaque phrase :
+- Garde l'INTENT, le ton, les références temporelles et les liens narratifs intacts (notamment "hier", "vendredi dernier", "J-N", "on avait dit", "on l'avait évoqué")
+- Modifie UNIQUEMENT ce qui est nécessaire pour résoudre les problèmes listés
+- Préserve la longueur (±20% maximum)
+- Reste dans le ton sobre, journalistique, jamais racoleur du script
+- Si la correction d'un anglicisme exige de reformuler la phrase entière (la traduction littérale du mot ne marche pas grammaticalement), reformule — mais sans changer ce que la phrase dit
+
+Si une phrase contient une référence à un épisode précédent ou à une séance antérieure, cette référence est CRITIQUE et tu la conserves au mot près sauf si elle est explicitement pointée comme problème.
+
+Tu ne réécris RIEN d'autre. Tu n'inventes pas de nouvelles informations. Tu ne change pas l'ordre des idées dans la phrase si tu peux l'éviter.
+
+${PATCH_SCHEMA}
+
+L'index dans la sortie correspond au numéro [N] de la phrase d'entrée. Renvoie les patches dans n'importe quel ordre — le code les applique par index.`;
+}
+
+function buildPatchUserPrompt(
+  groups: Array<{ index: number; segmentId: string; originalSentence: string; issues: ValidationIssue[] }>,
+): string {
+  let prompt = "## PHRASES À CORRIGER\n\n";
+  for (const g of groups) {
+    prompt += `[${g.index}] segment ${g.segmentId}\n`;
+    prompt += `   Originale : "${g.originalSentence}"\n`;
+    prompt += `   Problèmes :\n`;
+    for (const issue of g.issues) {
+      prompt += `     - ${issue.description}`;
+      if (issue.suggestedFix) prompt += ` → ${issue.suggestedFix}`;
+      prompt += "\n";
+    }
+    prompt += "\n";
+  }
+  return prompt;
+}
+
+export async function runC3Patch(input: {
+  draft: DraftScript;
+  issues: ValidationIssue[];
+  lang: Language;
+}): Promise<PatchResult> {
+  const semantic = input.issues.filter(
+    (i) => i.safetyClass === "semantic" && i.severity === "blocker" && i.originalSentence && i.segmentId,
+  );
+
+  // Group by (segmentId, originalSentence) — multiple issues on the same
+  // sentence are addressed in one rewrite to avoid conflicting patches.
+  const groupMap = new Map<string, { segmentId: string; originalSentence: string; issues: ValidationIssue[] }>();
+  for (const issue of semantic) {
+    const key = `${issue.segmentId}::${issue.originalSentence}`;
+    const existing = groupMap.get(key);
+    if (existing) existing.issues.push(issue);
+    else groupMap.set(key, { segmentId: issue.segmentId!, originalSentence: issue.originalSentence!, issues: [issue] });
+  }
+
+  const groups = Array.from(groupMap.values()).map((g, i) => ({ ...g, index: i + 1 }));
+  const unaddressed = input.issues.filter((i) => !semantic.includes(i));
+
+  if (groups.length === 0) {
+    return { patches: [], unaddressed };
+  }
+
+  const systemPrompt = buildPatchSystemPrompt(input.lang);
+  const userPrompt = buildPatchUserPrompt(groups);
+
+  console.log(`  P5 patch — ${groups.length} phrase(s) à corriger (${semantic.length} issues groupées)`);
+
+  type PatchResponse = { patches: Array<{ index: number; correctedSentence: string }> };
+  const response = await generateStructuredJSON<PatchResponse>(
+    systemPrompt,
+    userPrompt,
+    { role: "quality", maxTokens: 4000 },
+  );
+
+  const patches: PatchResult["patches"] = [];
+  for (const p of response.patches ?? []) {
+    const group = groups.find((g) => g.index === p.index);
+    if (!group) continue;
+    if (typeof p.correctedSentence !== "string" || !p.correctedSentence.trim()) continue;
+    patches.push({
+      segmentId: group.segmentId,
+      originalSentence: group.originalSentence,
+      correctedSentence: p.correctedSentence.trim(),
+    });
+  }
+
+  console.log(`  P5 patch — ${patches.length}/${groups.length} phrases corrigées par Opus`);
+  return { patches, unaddressed };
+}
+
+/**
+ * Apply patches to a draft via exact-string replacement on segment narrations.
+ * If the originalSentence isn't found verbatim in the targeted segment (rare
+ * but possible if a previous syntactic fix mutated the text), the patch is
+ * skipped and a warning logged.
+ */
+export function applyPatches(
+  draft: DraftScript,
+  patches: PatchResult["patches"],
+): { patched: DraftScript; applied: number; skipped: number } {
+  if (patches.length === 0) return { patched: draft, applied: 0, skipped: 0 };
+
+  let applied = 0;
+  let skipped = 0;
+  const patchesBySeg = new Map<string, PatchResult["patches"]>();
+  for (const p of patches) {
+    const arr = patchesBySeg.get(p.segmentId) ?? [];
+    arr.push(p);
+    patchesBySeg.set(p.segmentId, arr);
+  }
+
+  const newSegments = draft.segments.map((seg) => {
+    const segPatches = patchesBySeg.get(seg.segmentId);
+    if (!segPatches) return seg;
+
+    let narration = seg.narration;
+    for (const p of segPatches) {
+      const idx = narration.indexOf(p.originalSentence);
+      if (idx < 0) {
+        console.warn(`  P5 patch: sentence not found verbatim in ${seg.segmentId} — skipping`);
+        skipped++;
+        continue;
+      }
+      narration =
+        narration.slice(0, idx) + p.correctedSentence + narration.slice(idx + p.originalSentence.length);
+      applied++;
+    }
+
+    if (narration === seg.narration) return seg;
+    return { ...seg, narration };
+  });
+
+  return { patched: { ...draft, segments: newSegments }, applied, skipped };
 }

@@ -87,7 +87,13 @@ export async function fishTTS(opts: FishTTSOptions): Promise<FishTTSResult> {
   const body: Record<string, unknown> = {
     text: textWithSpeaker,
     format,
-    normalize: opts.normalize ?? true,
+    // normalize=false : Fish ne réinterprète pas notre texte phonétisé.
+    // Sinon Fish "normalize" peut surcharger nos phonétiques custom et lire
+    // "DHL.DE" au lieu de "dé ache èl groupe", ou "Owl Street" en anglais.
+    // On a déjà un pipeline de pré-traitement complet (preProcessForTTS) qui
+    // gère élision, chiffres FR, phonétiques. normalize=true rendrait ce
+    // pré-traitement contre-productif sur les noms anglais.
+    normalize: opts.normalize ?? false,
     latency: 'balanced',
   };
 

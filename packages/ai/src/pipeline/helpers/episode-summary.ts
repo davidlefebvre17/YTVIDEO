@@ -3,6 +3,32 @@ import type { DailySnapshot } from "@yt-maker/core";
 import { labelEventDate } from "./temporal-anchors";
 
 /**
+ * Locate an asset by symbol across both the curated watchlist (`snapshot.assets`)
+ * and the broad stock screen (`snapshot.stockScreen`). The screen is stored as
+ * a numeric-keyed dict-array of ~200 movers ; iterating values yields the same
+ * shape (symbol/changePct/price/name) as watchlist assets.
+ *
+ * Without this fallback, only the 38 watchlist symbols benefit from multi-day
+ * trajectory context — single-name screen movers like DHL.DE / UPS / FDX are
+ * invisible to the trend logic even when narratively covered the day before.
+ */
+function findAssetInSnapshot(
+  snapshot: DailySnapshot | undefined,
+  symbol: string,
+): { symbol: string; price?: number; changePct?: number; name?: string } | undefined {
+  if (!snapshot) return undefined;
+  const fromAssets = snapshot.assets?.find((x) => x.symbol === symbol);
+  if (fromAssets) return fromAssets;
+  const screen = (snapshot as unknown as { stockScreen?: Record<string, unknown> }).stockScreen;
+  if (!screen) return undefined;
+  for (const v of Object.values(screen)) {
+    const item = v as { symbol?: string; price?: number; changePct?: number; name?: string };
+    if (item?.symbol === symbol) return { symbol, price: item.price, changePct: item.changePct, name: item.name };
+  }
+  return undefined;
+}
+
+/**
  * Extract forward-looking items from a snapshot:
  * upcoming earnings (next 21 days) + upcoming high-impact economic events.
  */
@@ -66,18 +92,44 @@ export function buildEpisodeSummaries(
         .flatMap(s => s.assets ?? []) ?? []
     );
 
-    // Build assetMoves from snapshot — top movers + covered assets
+    // Build assetMoves from snapshot — top movers + covered assets.
+    // Includes both curated watchlist (snapshot.assets) AND covered screen
+    // movers (snapshot.stockScreen) so single-name stocks featured in a
+    // segment carry their trajectory forward into next-day context.
     const snapshot = entry.snapshot;
-    const assetMoves = (snapshot?.assets ?? [])
-      .filter(a => a.symbol && (Math.abs(a.changePct ?? 0) > 1.5 || coveredSymbols.has(a.symbol)))
-      .slice(0, 20)
-      .map(a => ({
-        symbol: a.symbol,
-        name: a.name ?? a.symbol,
-        price: a.price ?? 0,
-        changePct: a.changePct ?? 0,
-        covered: coveredSymbols.has(a.symbol),
-      }));
+    const movesByKey = new Map<string, { symbol: string; name: string; price: number; changePct: number; covered: boolean }>();
+    for (const a of snapshot?.assets ?? []) {
+      if (!a.symbol) continue;
+      if (Math.abs(a.changePct ?? 0) > 1.5 || coveredSymbols.has(a.symbol)) {
+        movesByKey.set(a.symbol, {
+          symbol: a.symbol,
+          name: a.name ?? a.symbol,
+          price: a.price ?? 0,
+          changePct: a.changePct ?? 0,
+          covered: coveredSymbols.has(a.symbol),
+        });
+      }
+    }
+    // Add covered screen movers that aren't already in watchlist.
+    for (const sym of coveredSymbols) {
+      if (movesByKey.has(sym)) continue;
+      const screen = (snapshot as unknown as { stockScreen?: Record<string, unknown> } | undefined)?.stockScreen;
+      if (!screen) continue;
+      for (const v of Object.values(screen)) {
+        const item = v as { symbol?: string; name?: string; price?: number; changePct?: number };
+        if (item?.symbol === sym) {
+          movesByKey.set(sym, {
+            symbol: sym,
+            name: item.name ?? sym,
+            price: item.price ?? 0,
+            changePct: item.changePct ?? 0,
+            covered: true,
+          });
+          break;
+        }
+      }
+    }
+    const assetMoves = Array.from(movesByKey.values()).slice(0, 30);
 
     return {
       date: entryDate ?? `?`,
@@ -137,7 +189,7 @@ export function buildAssetTrajectoryLine(
 
   for (let i = 0; i < entries.length; i++) {
     const entry = entries[i];
-    const a = entry.snapshot?.assets?.find((x) => x.symbol === symbol);
+    const a = findAssetInSnapshot(entry.snapshot, symbol);
     if (!a) continue;
     const coveredSymbols = new Set(
       entry.script?.sections
