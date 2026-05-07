@@ -188,6 +188,19 @@ export interface AssetSnapshot {
    * Utile pour coupler avec les news `post_session` / events `pub_morning_*`.
    */
   changePctNow?: number;
+  /**
+   * True si le marché de cet asset était fermé sur la narrative date (holiday).
+   * L'asset garde sa dernière session valide (avant fermeture). Détection :
+   * inférence sur sessionDate < narrativeDate, lag ≤ 14j (au-delà = drop).
+   *
+   * Effets dans le pipeline :
+   * - dramaScore est forcé à 0 (ne devient pas un mover)
+   * - Editorial score le dépriorise
+   * - P3 prompt mentionne sa fermeture pour que le LLM en parle brièvement
+   */
+  marketClosed?: boolean;
+  /** Jours calendaires entre la dernière session et la narrative date (1-14). */
+  daysSinceLastSession?: number;
   // Enriched fields (populated by computeTechnicals)
   dailyCandles?: Candle[];
   technicals?: TechnicalIndicators;

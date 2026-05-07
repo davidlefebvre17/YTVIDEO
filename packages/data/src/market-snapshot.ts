@@ -288,51 +288,98 @@ export async function fetchMarketSnapshot(
     }
   }
 
-  // Phase 2b — Drop assets that didn't trade on (or after) the narrative session.
+  // Phase 2b — Drop or MARK assets based on their session vs the narrative date.
   //
   // `snapshotDate` est la NARRATIVE date (= session qu'on récap, ex: vendredi
-  // pour un récap lundi matin). On veut chaque asset coté ≥ snapshotDate.
+  // pour un récap lundi matin). 4 cas :
   //
-  // - Asset avec sessionDate === snapshotDate → KEEP (TradFi: cas standard)
-  // - Asset avec sessionDate >  snapshotDate  → KEEP (Crypto 24/7 sur Monday recap:
-  //                                             BTC sessionDate=Sunday > Friday →
-  //                                             on veut les moves weekend)
-  // - Asset avec sessionDate <  snapshotDate  → DROP (HOLIDAY: marché fermé sur
-  //                                             la session ciblée — Yahoo renvoie
-  //                                             une vieille close, le LLM la
-  //                                             prendrait pour "hier" → halluciner)
-  // - Asset avec sessionDate manquant         → DROP (data corrompue)
+  // - Asset avec sessionDate === snapshotDate → KEEP active (TradFi standard)
+  // - Asset avec sessionDate >  snapshotDate  → KEEP active (Crypto 24/7 sur Monday
+  //                                             recap : BTC sessionDate=Sunday >
+  //                                             Friday → moves weekend)
+  // - Asset avec sessionDate <  snapshotDate  → KEEP **fermé** si lag ≤ 14j
+  //                                             (HOLIDAY: marché légitimement fermé.
+  //                                             On garde la dernière clôture valide
+  //                                             + flag `marketClosed=true` + lag.
+  //                                             dramaScore forcé à 0 pour ne pas
+  //                                             squatter les top movers. Le LLM en
+  //                                             parle brièvement via le prompt P3.)
+  // - Asset avec sessionDate <  snapshotDate, lag > 14j  → DROP (data corrompue ou
+  //                                             asset délisté — pas un holiday)
+  // - Asset avec sessionDate manquant         → DROP (fetch broken)
   //
   // Le hourly tail-patch en amont a déjà recovered les closes legitimes en lag.
-  // Seuls les vrais non-trading days atteignent ce filtre.
+  // Seuls les vrais non-trading days et les data corrompues atteignent ce filtre.
   {
     const dropped: string[] = [];
+    const closed: string[] = [];
     for (let i = assets.length - 1; i >= 0; i--) {
       const a = assets[i];
       const sd = a.sessionDate;
-      // Drop if no session OR session strictly older than the target narrative session
-      if (!sd || sd < snapshotDate) {
-        dropped.push(`${a.symbol}${sd ? ` (last=${sd})` : ` (no session)`}`);
+      if (!sd) {
+        // Pas de session → fetch broken
+        dropped.push(`${a.symbol} (no session)`);
         assets.splice(i, 1);
+        continue;
       }
+      if (sd < snapshotDate) {
+        const lagDays = Math.round(
+          (new Date(snapshotDate + "T12:00:00Z").getTime() -
+            new Date(sd + "T12:00:00Z").getTime()) / 86400000,
+        );
+        if (lagDays > 14) {
+          // Lag absurde → asset délisté ou data corrompue (pas un holiday réaliste)
+          dropped.push(`${a.symbol} (last=${sd}, ${lagDays}d ago — too stale)`);
+          assets.splice(i, 1);
+          continue;
+        }
+        // Holiday legitime → garde avec flag, neutralise les indicateurs de mouvement
+        a.marketClosed = true;
+        a.daysSinceLastSession = lagDays;
+        // Neutralise tous les indicateurs de "mouvement" puisque le marché n'a pas
+        // tradé : 7+ consommateurs (p1-flagging, editorial-score, knowledge-matcher,
+        // causal-chain-detector, etc.) utilisent Math.abs(asset.changePct) pour
+        // détecter les top movers — sans cela, les closed assets squatteraient la
+        // sélection avec leur changePct stale (ex: ^N225 +5.58% pré-Golden-Week).
+        // Le sessionClose et les candles historiques restent intacts pour les
+        // visuels (chart, ticker) — c'est juste le "delta du jour" qui devient nul.
+        a.changePct = 0;
+        a.changePctNow = 0;
+        a.sessionRange = 0;
+        a.sessionRangePct = 0;
+        if (a.technicals) {
+          a.technicals.dramaScore = 0;
+        }
+        closed.push(`${a.symbol} (last=${sd}, ${lagDays}d closed)`);
+      }
+      // sd >= snapshotDate → keep active (cas standard ou crypto weekend)
     }
     if (dropped.length > 0) {
       console.log(
-        `  Dropped ${dropped.length} watchlist asset(s) without a ${snapshotDate} session: ${dropped.slice(0, 8).join(", ")}${dropped.length > 8 ? ` (+${dropped.length - 8} more)` : ""}`,
+        `  Dropped ${dropped.length} watchlist asset(s): ${dropped.slice(0, 8).join(", ")}${dropped.length > 8 ? ` (+${dropped.length - 8} more)` : ""}`,
+      );
+    }
+    if (closed.length > 0) {
+      console.log(
+        `  Marketclosed (kept with stale data + dramaScore=0): ${closed.slice(0, 8).join(", ")}${closed.length > 8 ? ` (+${closed.length - 8} more)` : ""}`,
       );
     }
 
-    // Garde-fou: si on a perdu plus de 70% de la watchlist, ABORT — produire une
-    // vidéo avec quasi aucun asset déclencherait une cascade de fallbacks textuels
-    // dans Remotion (charts vides, sparklines manquantes). Mieux vaut planter ici
-    // et signaler clairement le problème upstream qu'uploader une vidéo cassée.
+    // Garde-fou intégrité — basé sur le nombre d'assets ACTIFS (non-fermés).
+    // Sur un jour férié majeur (Christmas, Tous les marchés fermés), 70%+ seraient
+    // marqués marketClosed. On bloque le pipeline car récap mostly-stale n'a pas
+    // de sens. Threshold : 15 actifs minimum (couvre Memorial Day = ~32 actifs OK,
+    // refuse Christmas = ~5-8 actifs).
     const totalCount = assets.length + dropped.length;
-    const minAccepted = Math.ceil(totalCount * 0.3);
-    if (assets.length < minAccepted) {
+    const activeCount = assets.filter((a) => !a.marketClosed).length;
+    const closedCount = assets.length - activeCount;
+    if (activeCount < 15) {
       throw new Error(
-        `Snapshot data integrity check failed: only ${assets.length}/${totalCount} watchlist assets survived session filter (snapshotDate=${snapshotDate}). ` +
-        `Likely causes: (1) Yahoo Finance fetch issue, (2) pipeline run before the target session closed (passer --date <YYYY-MM-DD> avec une session passée), ` +
-        `(3) snapshotDate matches a holiday/weekend day for most markets.`,
+        `Snapshot data integrity check failed: only ${activeCount} ACTIVE assets ` +
+          `(${closedCount} marketClosed, ${dropped.length} dropped, ${totalCount} total). ` +
+          `Probable cause: ${snapshotDate} est un jour férié majeur (Christmas/New Year) où la plupart ` +
+          `des marchés sont fermés. Pas de récap pertinent à produire ce jour-là — passer --date à une ` +
+          `session de trading antérieure si tu veux quand même un récap.`,
       );
     }
   }

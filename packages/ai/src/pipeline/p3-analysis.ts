@@ -279,6 +279,27 @@ function buildC2UserPrompt(
     prompt += `${formatTemporalCalendar(cal)}\n`;
   }
 
+  // ── Marchés fermés (holidays) — détectés en amont via marketClosed=true ──
+  // Le filtre Phase 2b de market-snapshot.ts marque les assets dont la session
+  // est antérieure à la narrative date (= marché fermé pour holiday). Ces assets
+  // gardent leur dernière clôture valide. On le mentionne au LLM pour qu'il en
+  // parle brièvement plutôt que d'inventer un mouvement basé sur des chiffres stale.
+  if (snapshot) {
+    const closedAssets = (snapshot.assets ?? []).filter((a: any) => a.marketClosed === true);
+    if (closedAssets.length > 0) {
+      prompt += `## MARCHÉS FERMÉS le ${snapshot.date}\n`;
+      prompt += `Ces marchés n'ont PAS tradé sur la session ciblée — leurs prix affichés sont la dernière clôture avant fermeture, à NE PAS interpréter comme "mouvement d'hier".\n`;
+      for (const a of closedAssets) {
+        prompt += `- ${a.name} (${a.symbol}) — fermé depuis ${a.daysSinceLastSession ?? '?'}j, dernière session ${a.sessionDate}\n`;
+      }
+      prompt += `\nRègles d'utilisation :\n`;
+      prompt += `- Mentionne brièvement leur fermeture si pertinent au narratif (1 phrase max, ex "Wall Street fermé hier pour Memorial Day", "Tokyo poursuit sa pause Golden Week").\n`;
+      prompt += `- N'utilise JAMAIS leur changePct/sessionHigh/Low comme indicateur du jour — ce sont des données pré-fermeture.\n`;
+      prompt += `- Ne les sélectionne pas comme deep-dive ou mover (leur dramaScore est déjà à 0).\n`;
+      prompt += `- Si tous les marchés US sont fermés, recentre le récit sur EU/Asie/crypto/FX/commodities qui ont tradé.\n\n`;
+    }
+  }
+
   // Plan éditorial
   prompt += `## PLAN ÉDITORIAL\n`;
   prompt += `Thème dominant: ${editorial.dominantTheme}\nFil conducteur: ${editorial.threadSummary}\nMood: ${editorial.moodMarche}\n\n`;
