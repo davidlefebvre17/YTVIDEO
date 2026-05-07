@@ -4,7 +4,7 @@ export { enrichNewsSummaries } from "./article-extractor";
 export { fetchCBSpeechContent, enrichCBSpeeches } from "./cb-speeches";
 export { fetchEconomicCalendar } from "./calendar";
 export { fetchSupabaseCalendar } from "./supabase-calendar";
-export { fetchMarketSnapshot } from "./market-snapshot";
+export { fetchMarketSnapshot, transformSnapshotForWeeklyMode } from "./market-snapshot";
 export { computeTechnicals, computeMultiTFAnalysis, computePerf, getAssetGroup } from "./technicals";
 export { fetchBondYields, fetchYieldsHistory } from "./fred";
 export { fetchEconomicCalendar as fetchFinnhubCalendar, fetchEarningsCalendar, fetchFinnhubNews, fetchStockEarningsHistory, fetchFinnhubCompanyNews } from "./finnhub";

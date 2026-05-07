@@ -21,23 +21,23 @@ async function main() {
   const imageUrl = await fal.storage.upload(file);
   console.log(`Uploaded: ${imageUrl}`);
 
-  console.log("\nSubmitting pushups (5s, 1080p, no audio)...");
+  console.log("\nSubmitting pushups to fal-ai/kling-video/v2.5-turbo/pro/image-to-video (5s)...");
   const result = await fal.subscribe(
-    "bytedance/seedance-2.0/image-to-video",
+    "fal-ai/kling-video/v2.5-turbo/pro/image-to-video",
     {
       input: {
         prompt: VIDEO_PROMPT,
         image_url: imageUrl,
         duration: "5",
-        resolution: "1080p",
-        aspect_ratio: "16:9",
-        generate_audio: false,
+        negative_prompt:
+          "blurry, distorted, low quality, warped face, deformed hands, melting, morphing, scene change, cut, camera shake, different character, different style",
+        cfg_scale: 0.6,
       },
       logs: true,
       onQueueUpdate: (u) => {
         if (u.status === "IN_PROGRESS") {
           for (const log of u.logs ?? []) {
-            if (log.message) console.log("  [seedance]", log.message);
+            if (log.message) console.log("  [kling-turbo]", log.message);
           }
         }
       },
@@ -45,7 +45,7 @@ async function main() {
   );
 
   const videoUrl = (result.data as { video?: { url: string } }).video?.url;
-  if (!videoUrl) throw new Error("seedance returned no video");
+  if (!videoUrl) throw new Error("kling-turbo returned no video");
 
   console.log(`\nVideo URL: ${videoUrl}`);
   const res = await fetch(videoUrl);

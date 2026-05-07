@@ -100,7 +100,17 @@ const CircularName: React.FC<{
     <svg
       width={radius * 2}
       height={radius * 2}
-      style={{ position: "absolute", top: 0, left: 0, pointerEvents: "none" }}
+      style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        pointerEvents: "none",
+        // Force GPU layer pour le SVG et stabiliser le texte sur petites bulles
+        transform: "translateZ(0)",
+        willChange: "transform",
+      }}
+      shapeRendering="geometricPrecision"
+      textRendering="geometricPrecision"
     >
       <defs>
         {/* Top arc: from left to right (upper semicircle) */}
@@ -118,6 +128,7 @@ const CircularName: React.FC<{
         letterSpacing={2.5}
         textAnchor="middle"
         dominantBaseline="central"
+        style={{ paintOrder: "stroke" }}
       >
         <textPath href={`#${id}`} startOffset="50%">
           {text.toUpperCase()}
@@ -181,8 +192,8 @@ const Stamp: React.FC<{
   const floatDx = Math.sin((frame / floatPeriodX) * Math.PI * 2 + phaseX) * 18;
   const floatDy = Math.cos((frame / floatPeriodY) * Math.PI * 2 + phaseY) * 14;
 
-  // ── Subtle rotation wobble (±1.5° around baseline) for "alive" feel ──
-  const rotWobble = Math.sin((frame / 240) * Math.PI * 2 + phaseX) * 1.5;
+  // ── Rotation FIGÉE — pas de wobble (changements fractionnaires de degré
+  //    re-rasterisent le SVG textPath à chaque frame, surtout sur petites bulles)
 
   const color = changePct > 0.05 ? COLOR_BULL : changePct < -0.05 ? COLOR_BEAR : COLOR_FLAT;
   const pctText = (changePct >= 0 ? "+" : "") + changePct.toFixed(1) + "%";
@@ -198,14 +209,16 @@ const Stamp: React.FC<{
     <div
       style={{
         position: "absolute",
-        left: x - radius + floatDx,
-        top: y - radius + floatDy,
+        left: x - radius,
+        top: y - radius,
         width: radius * 2,
         height: radius * 2,
-        transform: `scale(${scale}) rotate(${rotation + rotWobble}deg)`,
+        transform: `translate3d(${floatDx.toFixed(2)}px, ${floatDy.toFixed(2)}px, 0) scale(${scale}) rotate(${rotation.toFixed(2)}deg)`,
         transformOrigin: "center center",
         opacity,
         pointerEvents: "none",
+        willChange: "transform",
+        backfaceVisibility: "hidden",
       }}
     >
       {/* Cream background disc — stamp blocks the text behind it */}

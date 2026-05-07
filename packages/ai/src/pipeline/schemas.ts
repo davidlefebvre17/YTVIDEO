@@ -41,22 +41,36 @@ export const EditorialPlanSchema = z.object({
 
 // ─── C2 Analysis Bundle ─────────────────────────────────────
 
+// Helper : champ string toléré "absent" (undefined) ET "vide" (null) — Sonnet renvoie
+// parfois null pour signifier "pas pertinent ici" (ex: technicalReading sur panorama
+// sans données techniques). On accepte les 2, on remplace par '' pour le code aval.
+const optionalStringTolerant = z.preprocess(
+  (v) => (v == null ? '' : v),
+  z.string().default(''),
+);
+
+const ScenarioSchema = z.object({
+  // target/condition peuvent être null si Sonnet hésite sur un chiffre (ex: panorama)
+  target: optionalStringTolerant,
+  condition: optionalStringTolerant,
+}).passthrough().optional().nullable();
+
 const SegmentAnalysisSchema = z.object({
   segmentId: z.string().min(1),
   keyFacts: z.array(z.string()).default([]),
-  technicalReading: z.string().optional().default(''),
-  fundamentalContext: z.string().optional().default(''),
-  narrativeHook: z.string().optional().default(''),
+  technicalReading: optionalStringTolerant,
+  fundamentalContext: optionalStringTolerant,
+  narrativeHook: optionalStringTolerant,
   scenarios: z.object({
-    bullish: z.object({ target: z.string().optional(), condition: z.string().optional() }).passthrough().optional().nullable(),
-    bearish: z.object({ target: z.string().optional(), condition: z.string().optional() }).passthrough().optional().nullable(),
+    bullish: ScenarioSchema,
+    bearish: ScenarioSchema,
   }).passthrough().optional().nullable(),
 }).passthrough();
 
 export const AnalysisBundleSchema = z.object({
   segments: z.array(SegmentAnalysisSchema).min(1, 'analysis: au moins 1 segment requis'),
   globalContext: z.object({
-    marketMood: z.string().optional().default(''),
+    marketMood: optionalStringTolerant,
   }).passthrough(),
 }).passthrough();
 
@@ -95,14 +109,32 @@ export const DraftScriptSchema = z.object({
 
 // ─── C4 Validation Response ─────────────────────────────────
 
+// severity tolérante : Haiku invente parfois "critical", "info", "error" — on les
+// remappe vers blocker/warning pour éviter retry inutile.
+const severityTolerant = z.preprocess((v) => {
+  if (typeof v !== 'string') return 'warning';
+  const norm = v.toLowerCase().trim();
+  if (['blocker', 'critical', 'error', 'fatal', 'high'].includes(norm)) return 'blocker';
+  return 'warning'; // tout le reste (warning, info, low, medium, etc.)
+}, z.enum(['blocker', 'warning']));
+
 const ValidationIssueSchema = z.object({
   type: z.string().min(1),
   description: z.string().min(3),
-  severity: z.enum(['blocker', 'warning']),
+  severity: severityTolerant,
 }).passthrough();
 
+// status tolérant : on accepte des variantes ('passed', 'needs revision', etc.)
+const statusTolerant = z.preprocess((v) => {
+  if (typeof v !== 'string') return undefined;
+  const norm = v.toLowerCase().trim().replace(/[\s_-]+/g, '_');
+  if (['pass', 'passed', 'ok', 'success'].includes(norm)) return 'pass';
+  if (['needs_revision', 'revise', 'revision', 'fail', 'failed'].includes(norm)) return 'needs_revision';
+  return v; // laisser passer si déjà 'ok'
+}, z.enum(['pass', 'needs_revision', 'ok']).optional());
+
 export const ValidationResponseSchema = z.object({
-  status: z.enum(['pass', 'needs_revision', 'ok']).optional(),
+  status: statusTolerant,
   issues: z.array(ValidationIssueSchema).default([]),
 }).passthrough();
 
@@ -131,4 +163,5 @@ export const SEOMetadataSchema = z.object({
   chapters: z.array(SEOChapterSchema).min(3, 'au moins 3 chapitres requis').max(12, 'max 12 chapitres'),
   tags: z.array(z.string().min(2).max(60)).min(5, 'au moins 5 tags requis').max(15, 'max 15 tags'),
   hashtags: z.array(z.string().min(2).max(30)).min(2, 'au moins 2 hashtags').max(5, 'max 5 hashtags'),
+  pinnedComment: z.string().min(80, 'pinnedComment trop court (<80 chars)').max(500, 'pinnedComment trop long (>500 chars)').optional(),
 }).passthrough();

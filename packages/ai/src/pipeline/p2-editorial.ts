@@ -1,15 +1,16 @@
 import { generateStructuredJSON } from "../llm-client";
 import { EditorialPlanSchema, zodValidator } from "./schemas";
 import type {
-  SnapshotFlagged, EditorialPlan, EpisodeSummary, PlannedSegment,
+  SnapshotFlagged, EditorialPlan, EpisodeSummary, PlannedSegment, PrevContext,
 } from "./types";
-import type { Language } from "@yt-maker/core";
+import type { DailySnapshot, Language } from "@yt-maker/core";
 import type { BriefingPack } from "./helpers/briefing-pack";
 import { formatBriefingPack, classifyEventTemporal } from "./helpers/briefing-pack";
 import type { NewsDigest } from "./p1b-news-digest";
 import { formatNewsDigest } from "./p1b-news-digest";
 import { detectCalendarPatterns, formatCalendarPatterns } from "./helpers/calendar-patterns";
 import { buildTemporalAnchors } from "./helpers/temporal-anchors";
+import { buildTemporalCalendar, formatTemporalCalendar } from "./helpers/temporal-calendar";
 
 /**
  * Format flagged assets as compact lines for C1 prompt.
@@ -89,7 +90,7 @@ function formatEventsCompact(flagged: SnapshotFlagged, snapDayName?: string, pub
     if (!items.length) continue;
     text += `**${labels[tag as keyof typeof labels]}** :\n`;
     for (const e of items) {
-      text += `- [${e.date}] ${e.time ?? '??'} ${e.name} (${e.currency}, ${e.impact})`;
+      text += `- [${e.date}] ${e.name} (${e.currency}, ${e.impact})`;
       if (e.forecast) text += ` cons:${e.forecast}`;
       if (e.actual) text += ` actual:${e.actual}`;
       if (e.previous) text += ` prev:${e.previous}`;
@@ -246,6 +247,8 @@ function buildC1UserPrompt(
   weeklyBrief: string,
   briefingPack?: BriefingPack,
   newsDigest?: NewsDigest,
+  snapshot?: DailySnapshot,
+  prevContext?: PrevContext,
 ): string {
   let prompt = '';
 
@@ -319,23 +322,32 @@ function buildC1UserPrompt(
 
   prompt += `## THÈMES DU JOUR\n${formatThemesCompact(flagged)}\n\n`;
   prompt += `## ASSETS SCORÉS (${flagged.assets.length} total)\n${formatAssetsCompact(flagged)}\n\n`;
-  prompt += `## CALENDRIER ÉCO\n`;
-  prompt += `RÈGLE CAUSALITÉ : seuls les événements classés "Pendant la séance" peuvent expliquer le move du jour. Les événements "ce matin APRÈS diffusion" ou "à venir" sont FUTURS pour le spectateur — à présenter en anticipation ("ce matin à 11h", "mercredi").\n\n`;
-  prompt += `${formatEventsCompact(flagged, anchors.snapDayName, flagged.publishDate)}\n\n`;
 
-  // Briefing Pack (raw editorial facts)
-  if (briefingPack) {
-    prompt += formatBriefingPack(briefingPack);
+  // Unified temporal calendar — single source of truth (replaces ## CALENDRIER ÉCO
+  // + ## EARNINGS DU JOUR + briefing-pack calendar sections). Falls back to legacy
+  // formatting if snapshot is not available (defensive).
+  if (snapshot) {
+    const cal = buildTemporalCalendar(snapshot, prevContext, flagged.publishDate);
+    prompt += `${formatTemporalCalendar(cal)}\n`;
+  } else {
+    prompt += `## CALENDRIER ÉCO\n`;
+    prompt += `RÈGLE CAUSALITÉ : seuls les événements classés "Pendant la séance" peuvent expliquer le move du jour. Les événements "ce matin APRÈS diffusion" ou "à venir" sont FUTURS pour le spectateur — à présenter en anticipation.\n\n`;
+    prompt += `${formatEventsCompact(flagged, anchors.snapDayName, flagged.publishDate)}\n\n`;
+    const earningsToday = flagged.earnings.filter(e => e.earningsDetail?.publishingToday);
+    if (earningsToday.length) {
+      prompt += `## EARNINGS DU JOUR\n`;
+      for (const e of earningsToday) {
+        prompt += `${e.symbol} (${e.name}) — ${e.reason.join(', ')}\n`;
+      }
+      prompt += '\n';
+    }
   }
 
-  // Earnings
-  const earningsToday = flagged.earnings.filter(e => e.earningsDetail?.publishingToday);
-  if (earningsToday.length) {
-    prompt += `## EARNINGS DU JOUR\n`;
-    for (const e of earningsToday) {
-      prompt += `${e.symbol} (${e.name}) — ${e.reason.join(', ')}\n`;
-    }
-    prompt += '\n';
+  // Briefing Pack (raw editorial facts) — calendar sections are now in the
+  // unified calendar above, the pack only carries cot, political triggers,
+  // obligatoryMacroStats, themes, screen movers.
+  if (briefingPack) {
+    prompt += formatBriefingPack(briefingPack);
   }
 
   // News clusters — stocks with high news volume but not in watchlist
@@ -509,6 +521,8 @@ export async function runC1Editorial(input: {
   weeklyBrief: string;
   briefingPack?: BriefingPack;
   newsDigest?: NewsDigest;
+  snapshot?: DailySnapshot;
+  prevContext?: PrevContext;
   lang: Language;
   feedback?: string[];
 }): Promise<EditorialPlan> {
@@ -520,6 +534,8 @@ export async function runC1Editorial(input: {
     input.weeklyBrief,
     input.briefingPack,
     input.newsDigest,
+    input.snapshot,
+    input.prevContext,
   );
 
   if (input.feedback?.length) {

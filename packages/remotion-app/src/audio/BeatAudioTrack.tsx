@@ -59,11 +59,19 @@ export const BeatAudioTrack: React.FC<BeatAudioTrackProps> = ({
     }
 
     // Render one <Audio> per segment — use real audio duration to avoid cutting short
-    for (const [segId, { startFrame, segmentPath }] of segmentInfo) {
+    for (const [segId, { startFrame, endFrame, segmentPath }] of segmentInfo) {
       const audioDurSec = segmentAudioDurations[segId];
+      // Buffer adaptatif : panorama n'a pas d'owl transition après → +30 frames safe
+      // pour ne pas couper la dernière phrase. Autres segments → +3 frames seulement
+      // pour ne pas chevaucher avec owl transition qui démarre pile à la fin.
+      const isPanorama = segId === 'seg_panorama';
+      const bufferFrames = isPanorama ? 30 : 3;
+      // Fallback intelligent si segmentAudioDurations manque (skip-tts par exemple) :
+      // utiliser (endFrame - startFrame) reconstruit depuis les durées beat individuelles.
+      // Avant : 9000 frames (5 min !) qui faisait chevaucher tous les segments.
       const durationFrames = audioDurSec
-        ? Math.round(audioDurSec * fps) + 15
-        : 9000; // fallback
+        ? Math.round(audioDurSec * fps) + bufferFrames
+        : (endFrame - startFrame) + bufferFrames;
 
       const audioSrc = segmentPath.startsWith('http') || segmentPath.startsWith('/')
         ? segmentPath
@@ -93,7 +101,7 @@ export const BeatAudioTrack: React.FC<BeatAudioTrackProps> = ({
         <Sequence
           key={`voice-${beat.id}`}
           from={timing.start}
-          durationInFrames={timing.duration + 15}
+          durationInFrames={timing.duration + 3}
         >
           <Audio src={audioSrc} volume={voiceVolume} />
         </Sequence>

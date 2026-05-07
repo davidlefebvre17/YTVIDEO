@@ -2,10 +2,12 @@
  * Upload an episode to YouTube.
  *
  * Usage :
- *   npm run publish -- --date 2026-04-28                    # default privacy from env (unlisted)
- *   npm run publish -- --date 2026-04-28 --privacy unlisted
- *   npm run publish -- --date 2026-04-28 --dry-run          # validate inputs, no API call
- *   npm run publish -- --auth                                # OAuth interactive flow (one-time)
+ *   npm run publish -- --date 2026-04-28                              # default privacy + schedule from env
+ *   npm run publish -- --date 2026-04-28 --privacy unlisted           # override default privacy
+ *   npm run publish -- --date 2026-04-28 --publish-at 2026-05-07T07:00:00+02:00   # explicit ISO schedule
+ *   npm run publish -- --date 2026-04-28 --no-schedule                # ignore env scheduling
+ *   npm run publish -- --date 2026-04-28 --dry-run                    # validate inputs, no API call
+ *   npm run publish -- --auth                                          # OAuth interactive flow (one-time)
  *
  * Default video privacy is **unlisted** so the user can share by link with friends/testers
  * without the video being publicly indexed. Override with --privacy private | public.
@@ -43,9 +45,12 @@
  *    → API cannot set this field; user must verify in Studio if asked.
  *    → Reminder printed after each upload.
  *
- * 3. Default privacy                   → UNLISTED
+ * 3. Default privacy                   → UNLISTED (or scheduled)
  *    Allows sharing the link with friends/reviewers without public indexing.
  *    → Auto-set via env: YOUTUBE_DEFAULT_PRIVACY=unlisted
+ *    → If YOUTUBE_PUBLISH_HOUR_CET is set, privacy is forced to 'private' and
+ *      the video drops public automatically at that hour (Europe/Paris timezone).
+ *      Default 7h CET = morning recap, before EU market open at 9h.
  *
  * 4. Category                          → 25 (News & Politics)
  *    Daily market recap fits News & Politics taxonomy.
@@ -62,6 +67,7 @@ import 'dotenv/config';
 import * as fs from 'fs';
 import * as path from 'path';
 import { getYoutubeClient, runInteractiveAuth, MissingCredentialsError } from './youtube/auth';
+import { refreshChaptersFromVTT, patchDescriptionChapters } from './youtube/chapter-resolver';
 import type { EpisodeScript, EpisodeSEO } from '@yt-maker/core';
 
 type Privacy = 'private' | 'unlisted' | 'public';
@@ -78,10 +84,12 @@ interface CLIArgs {
   captionsPath?: string;
   noCaptions: boolean;
   captionsOnly?: string;   // video ID — only replace captions on existing video
+  publishAt?: string;      // ISO 8601 datetime — schedules public release; forces privacy=private
+  noSchedule: boolean;     // disable scheduling even if env var YOUTUBE_PUBLISH_HOUR_CET is set
 }
 
 function parseArgs(argv: string[]): CLIArgs {
-  const out: CLIArgs = { dryRun: false, auth: false, noThumbnail: false, noCaptions: false };
+  const out: CLIArgs = { dryRun: false, auth: false, noThumbnail: false, noCaptions: false, noSchedule: false };
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     const next = argv[i + 1];
@@ -100,6 +108,8 @@ function parseArgs(argv: string[]): CLIArgs {
     else if (arg === '--captions' && next) { out.captionsPath = next; i++; }
     else if (arg === '--no-captions') out.noCaptions = true;
     else if (arg === '--captions-only' && next) { out.captionsOnly = next; i++; }
+    else if (arg === '--publish-at' && next) { out.publishAt = next; i++; }
+    else if (arg === '--no-schedule') out.noSchedule = true;
     else if (arg === '--dry-run') out.dryRun = true;
     else if (arg === '--auth') out.auth = true;
     else if (arg === '--help' || arg === '-h') {
@@ -124,14 +134,24 @@ Options :
   --captions <path>     Override path to VTT subtitles (default: episodes/YYYY/MM-DD/episode-DATE.vtt)
   --no-captions         Skip captions upload even if VTT exists
   --captions-only <id>  Replace captions on an existing video (id = YouTube video ID), no video upload
+  --publish-at <ISO>    Schedule public release at ISO 8601 datetime (e.g. 2026-05-07T07:00:00+02:00).
+                        Forces privacy=private until then. Overrides $YOUTUBE_PUBLISH_HOUR_CET.
+  --no-schedule         Disable scheduling even if $YOUTUBE_PUBLISH_HOUR_CET is set in .env
   --dry-run             Validate inputs and print metadata without uploading
   --auth                One-time OAuth consent flow to obtain refresh token
   --help                Show this help
 
+Env vars :
+  YOUTUBE_DEFAULT_PRIVACY    private | unlisted | public  (default: private)
+  YOUTUBE_PLAYLIST_ID        if set, video is auto-added to this playlist
+  YOUTUBE_PUBLISH_HOUR_CET   if set (0-23), schedule public release at next occurrence of that
+                             hour in Europe/Paris timezone (handles CET/CEST DST automatically)
+
 Examples :
   npm run publish -- --date 2026-04-28
   npm run publish -- --date 2026-04-28 --privacy unlisted
-  npm run publish -- --date 2026-04-28 --dry-run
+  npm run publish -- --date 2026-04-28 --publish-at 2026-05-07T07:00:00+02:00
+  npm run publish -- --date 2026-04-28 --no-schedule         # ignore env hour
   npm run publish -- --auth
 `);
 }
@@ -298,14 +318,102 @@ async function uploadCaptions(videoId: string, captionsPath: string, replaceExis
   console.log('  ✓ Captions set');
 }
 
+/**
+ * Compute the next occurrence of `hourParis` o'clock in Europe/Paris timezone,
+ * returning a UTC ISO 8601 string suitable for YouTube's `status.publishAt`.
+ * Handles CET/CEST DST automatically by trying both offsets and picking the one
+ * that yields the requested Paris hour.
+ */
+function nextPublishAtParis(hourParis: number): string {
+  const now = new Date();
+  const fmtDate = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Paris',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', hour12: false,
+  });
+  const parts = fmtDate.formatToParts(now);
+  const get = (t: string) => parts.find((p) => p.type === t)!.value;
+
+  let y = parseInt(get('year'), 10);
+  let m = parseInt(get('month'), 10);
+  let d = parseInt(get('day'), 10);
+  const currentParisHour = parseInt(get('hour'), 10);
+
+  // Skip to tomorrow in Paris if target hour already passed (with 5-min safety margin)
+  if (currentParisHour >= hourParis) {
+    const tomorrowParts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Europe/Paris',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+    }).formatToParts(new Date(now.getTime() + 24 * 60 * 60 * 1000));
+    y = parseInt(tomorrowParts.find((p) => p.type === 'year')!.value, 10);
+    m = parseInt(tomorrowParts.find((p) => p.type === 'month')!.value, 10);
+    d = parseInt(tomorrowParts.find((p) => p.type === 'day')!.value, 10);
+  }
+
+  // Try CET (+01:00) and CEST (+02:00); the offset where Paris-formatted hour
+  // matches the target is the correct one for that date.
+  for (const offsetH of [1, 2]) {
+    const candidateUTC = new Date(Date.UTC(y, m - 1, d, hourParis - offsetH, 0, 0));
+    const checkParis = parseInt(
+      new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris', hour: '2-digit', hour12: false }).format(candidateUTC),
+      10,
+    );
+    if (checkParis === hourParis) return candidateUTC.toISOString();
+  }
+  // DST transition edge case fallback — use CET
+  return new Date(Date.UTC(y, m - 1, d, hourParis - 1, 0, 0)).toISOString();
+}
+
+async function addToPlaylist(videoId: string, playlistId: string): Promise<void> {
+  const youtube = getYoutubeClient();
+  await youtube.playlistItems.insert({
+    part: ['snippet'],
+    requestBody: {
+      snippet: {
+        playlistId,
+        resourceId: { kind: 'youtube#video', videoId },
+      },
+    },
+  });
+}
+
+/**
+ * Poste un commentaire en tant que propriétaire de chaîne. YouTube n'expose
+ * PAS d'API pour épingler — c'est un clic manuel dans Studio après le post.
+ * Requires the youtube.force-ssl OAuth scope (same as captions).
+ */
+async function postPinnedComment(videoId: string, text: string): Promise<void> {
+  const youtube = getYoutubeClient();
+  await youtube.commentThreads.insert({
+    part: ['snippet'],
+    requestBody: {
+      snippet: {
+        videoId,
+        topLevelComment: {
+          snippet: { textOriginal: text },
+        },
+      },
+    },
+  });
+}
+
 async function uploadVideo(args: {
   videoPath: string;
   meta: ReturnType<typeof buildMetadata>;
   privacy: Privacy;
+  publishAt?: string;  // ISO 8601 UTC — when set, privacy is forced to 'private'
 }): Promise<{ videoId: string; studioUrl: string }> {
   const youtube = getYoutubeClient();
 
-  console.log(`\nUploading to YouTube (privacy=${args.privacy})...`);
+  // YouTube requires privacyStatus='private' when publishAt is set; the video
+  // becomes public automatically at publishAt time.
+  const effectivePrivacy: Privacy = args.publishAt ? 'private' : args.privacy;
+
+  if (args.publishAt) {
+    console.log(`\nUploading to YouTube (scheduled publish at ${args.publishAt})...`);
+  } else {
+    console.log(`\nUploading to YouTube (privacy=${effectivePrivacy})...`);
+  }
   const fileSize = fs.statSync(args.videoPath).size;
   let lastProgress = 0;
 
@@ -324,10 +432,11 @@ async function uploadVideo(args: {
           defaultAudioLanguage: 'fr',
         },
         status: {
-          privacyStatus: args.privacy,
+          privacyStatus: effectivePrivacy,
           selfDeclaredMadeForKids: false,
           embeddable: true,
           publicStatsViewable: true,
+          ...(args.publishAt ? { publishAt: args.publishAt } : {}),
         },
       },
       media: {
@@ -407,27 +516,79 @@ async function main() {
   if (captionsPath) console.log(`Captions:     ${captionsPath}`);
 
   const script: EpisodeScript = JSON.parse(fs.readFileSync(scriptPath, 'utf-8'));
+
+  // Refresh chapter timestamps from the VTT BEFORE building metadata. P10 SEO
+  // computes chapters from estimated narration durations (~150 wpm) but Fish
+  // Audio + Remotion transitions yield real positions that drift cumulatively.
+  // The VTT (Echogarden DTW alignment) is the source of truth for the MP4 timeline.
+  if (captionsPath && script.seo?.chapters) {
+    const refreshed = refreshChaptersFromVTT(script, captionsPath);
+    if (refreshed) {
+      const oldCount = script.seo.chapters.length;
+      const driftSec = refreshed.reduce((max, c, i) => {
+        const oldT = script.seo!.chapters[i]?.time ?? '';
+        const [oM, oS] = oldT.split(':').map(Number);
+        const [nM, nS] = c.time.split(':').map(Number);
+        const oldSec = (oM ?? 0) * 60 + (oS ?? 0);
+        const newSec = (nM ?? 0) * 60 + (nS ?? 0);
+        return Math.max(max, Math.abs(newSec - oldSec));
+      }, 0);
+      console.log(`\n  Refreshed chapter timings from VTT (${oldCount} chapters, max drift = ${driftSec}s)`);
+      script.seo.chapters = refreshed.map((c) => ({ time: c.time, label: c.label }));
+      script.seo.description = patchDescriptionChapters(script.seo.description, refreshed);
+      // Persist back to disk so re-runs (e.g., --captions-only later) see corrected data
+      fs.writeFileSync(scriptPath, JSON.stringify(script, null, 2));
+    } else {
+      console.warn(`  ⚠ Could not refresh chapters from VTT (insufficient matches) — using estimated timings`);
+    }
+  }
+
   const meta = buildMetadata(script);
 
   const defaultPrivacy = (process.env.YOUTUBE_DEFAULT_PRIVACY as Privacy) ?? 'private';
   const privacy: Privacy = args.privacy ?? defaultPrivacy;
 
+  // Resolve scheduling: explicit --publish-at takes precedence, then env var auto-compute,
+  // unless --no-schedule overrides everything.
+  let publishAt: string | undefined;
+  if (!args.noSchedule) {
+    if (args.publishAt) {
+      publishAt = args.publishAt;
+    } else if (process.env.YOUTUBE_PUBLISH_HOUR_CET) {
+      const hour = parseInt(process.env.YOUTUBE_PUBLISH_HOUR_CET, 10);
+      if (Number.isInteger(hour) && hour >= 0 && hour <= 23) {
+        publishAt = nextPublishAtParis(hour);
+      } else {
+        console.warn(`⚠ YOUTUBE_PUBLISH_HOUR_CET="${process.env.YOUTUBE_PUBLISH_HOUR_CET}" invalid (0-23 expected). Skipping schedule.`);
+      }
+    }
+  }
+
   previewMetadata(meta, videoPath, privacy);
+  if (publishAt) {
+    const parisStr = new Intl.DateTimeFormat('fr-FR', {
+      timeZone: 'Europe/Paris',
+      weekday: 'long', day: '2-digit', month: 'long', hour: '2-digit', minute: '2-digit',
+    }).format(new Date(publishAt));
+    console.log(`\n⏰ Scheduled drop : ${parisStr} Paris  (${publishAt})`);
+    console.log(`   Privacy uploaded as 'private', will become 'public' automatically at that time.`);
+  }
 
   if (args.dryRun) {
     console.log('\n[--dry-run] No API call made. Remove --dry-run to upload.');
     return;
   }
 
-  // Confirm before pushing public/unlisted (those are visible immediately)
-  if (privacy !== 'private') {
+  // Confirm before pushing public/unlisted (those are visible immediately).
+  // Skipped when scheduled — scheduling forces 'private' until publishAt fires.
+  if (!publishAt && privacy !== 'private') {
     console.log(`\n⚠ Privacy is "${privacy}" — video will be VISIBLE immediately after upload.`);
     console.log(`If this is unintended, ctrl+C now.`);
     await new Promise(r => setTimeout(r, 3000));
   }
 
   try {
-    const { videoId, studioUrl } = await uploadVideo({ videoPath, meta, privacy });
+    const { videoId, studioUrl } = await uploadVideo({ videoPath, meta, privacy, publishAt });
     console.log(`\n═══ Video uploaded ═══`);
     console.log(`Video ID:  ${videoId}`);
 
@@ -454,20 +615,63 @@ async function main() {
       }
     }
 
+    const playlistId = process.env.YOUTUBE_PLAYLIST_ID;
+    if (playlistId) {
+      console.log(`\nAdding to playlist ${playlistId}...`);
+      try {
+        await addToPlaylist(videoId, playlistId);
+        console.log('  ✓ Added to playlist');
+      } catch (plErr) {
+        console.warn(`  ⚠ Playlist add failed: ${(plErr as Error).message.slice(0, 200)}`);
+        console.warn(`    (video uploaded OK — you can add it to the playlist manually in Studio)`);
+      }
+    }
+
+    let commentPosted = false;
+    const pinnedCommentText = (script as any)?.seo?.pinnedComment as string | undefined;
+    if (pinnedCommentText && pinnedCommentText.trim().length >= 80) {
+      console.log(`\nPosting pinned comment (${pinnedCommentText.length} chars)...`);
+      try {
+        await postPinnedComment(videoId, pinnedCommentText);
+        console.log('  ✓ Comment posted (epingle manuellement dans Studio)');
+        commentPosted = true;
+      } catch (cErr) {
+        const msg = (cErr as Error).message;
+        console.warn(`  ⚠ Comment post failed: ${msg.slice(0, 200)}`);
+        if (msg.includes('insufficient') || msg.includes('scope')) {
+          console.warn(`    → Re-run \`npm run publish -- --auth\` to grant the youtube.force-ssl scope.`);
+        } else {
+          console.warn(`    (video uploaded OK — tu peux poster le commentaire manuellement)`);
+        }
+      }
+    }
+
     console.log(`\n═══ Upload complete ═══`);
     console.log(`Watch URL: https://youtu.be/${videoId}`);
     console.log(`Studio:    ${studioUrl}`);
 
     // Studio-only actions YouTube doesn't expose via API — print compact checklist
+    const effectivePrivacy = publishAt ? 'private (scheduled)' : privacy;
     console.log(`\n━━━ Manual checks in Studio (if YouTube prompts) ━━━`);
     console.log(`  Audience              → "Non, pas pour enfants"   (set via API ✓)`);
-    console.log(`  Privacy               → ${privacy}                 (set via API ✓)`);
+    console.log(`  Privacy               → ${effectivePrivacy}        (set via API ✓)`);
     console.log(`  Contenu modifié (IA)  → "Non"                      (per OSJ policy — voix générique, hibou animé)`);
     if (!thumbnailPath) {
       console.log(`  Thumbnail             → upload manually in Studio (channel verification needed)`);
     }
-    console.log(`  Chapitres in player   → reload page if not visible (description has 00:00 anchor ✓)`);
-    console.log(`\n→ Review in Studio, then publish (or schedule) when ready.`);
+    console.log(`  Chapitres in player   → reload page if not visible (description has 0:00 anchor ✓)`);
+    if (commentPosted) {
+      console.log(`  Premier commentaire   → ÉPINGLER manuellement dans Studio (pas d'API pour pinning)`);
+    }
+    if (publishAt) {
+      const parisStr = new Intl.DateTimeFormat('fr-FR', {
+        timeZone: 'Europe/Paris',
+        weekday: 'long', day: '2-digit', month: 'long', hour: '2-digit', minute: '2-digit',
+      }).format(new Date(publishAt));
+      console.log(`\n⏰ Drop programmé : ${parisStr} Paris — la vidéo passera 'public' automatiquement.`);
+    } else {
+      console.log(`\n→ Review in Studio, then publish (or schedule) when ready.`);
+    }
   } catch (err) {
     if (err instanceof MissingCredentialsError) {
       console.error(`\n✗ ${err.message}`);

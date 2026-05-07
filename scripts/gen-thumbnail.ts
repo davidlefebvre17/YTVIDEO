@@ -115,6 +115,21 @@ function pickBgImage(date: string, thumbnailSegmentId: string, tempPublicDir: st
   return undefined;
 }
 
+/** Same logic as pickFeaturedAsset but returns the raw symbol (not pretty ticker). */
+function pickFeaturedSymbol(script: EpisodeScript, snapshot: { assets?: AssetSnapshot[] }): string | undefined {
+  const moment = script.direction?.thumbnailMoment;
+  const segId = moment?.segmentId;
+  const segment = script.sections.find(s => s.id === segId);
+  const segAssets = segment?.assets ?? [];
+  const assets = snapshot.assets ?? [];
+  if (assets.length === 0) return undefined;
+  const candidates = segAssets.length
+    ? assets.filter(a => segAssets.includes(a.symbol))
+    : assets;
+  const sorted = [...candidates].sort((a, b) => Math.abs(b.changePct) - Math.abs(a.changePct));
+  return sorted[0]?.symbol;
+}
+
 /** Pick the asset most relevant to thumbnail (highest abs %, in dominant theme). */
 function pickFeaturedAsset(script: EpisodeScript, snapshot: { assets?: AssetSnapshot[] }): { ticker: string; changePct: number } | undefined {
   const moment = script.direction?.thumbnailMoment;
@@ -295,8 +310,18 @@ async function buildPropsForEpisode(date: string, useLlm: boolean, tempPublicDir
   const moment = script.direction?.thumbnailMoment;
   if (!moment) throw new Error(`No thumbnailMoment in ${date}/script.json — pipeline P6 must have produced one.`);
 
-  const bgImagePath = pickBgImage(date, moment.segmentId, tempPublicDir);
   const featured = pickFeaturedAsset(script, snapshot);
+  // Cohérence titre/image : préfère le segment qui contient le featured asset
+  // (= asset central du titre SEO), sinon fallback sur thumbnailMoment de C5.
+  const featuredSymbol = pickFeaturedSymbol(script, snapshot);
+  const featuredSegmentId = featuredSymbol
+    ? script.sections.find(s => s.assets?.includes(featuredSymbol))?.id
+    : undefined;
+  const bgSegmentId = featuredSegmentId ?? moment.segmentId;
+  if (featuredSegmentId && featuredSegmentId !== moment.segmentId) {
+    console.log(`  [${date}] image segment: ${featuredSegmentId} (featured asset ${featuredSymbol}) vs C5 moment ${moment.segmentId}`);
+  }
+  const bgImagePath = pickBgImage(date, bgSegmentId, tempPublicDir);
   const accent = emotionToAccent(moment.emotionalTone);
 
   let headlineLines: string[];

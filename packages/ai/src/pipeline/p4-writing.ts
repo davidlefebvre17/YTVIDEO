@@ -1,9 +1,10 @@
 import { generateStructuredJSON } from "../llm-client";
 import type {
-  EditorialPlan, AnalysisBundle, DraftScript, WordBudget, ValidationIssue,
+  EditorialPlan, AnalysisBundle, DraftScript, WordBudget, ValidationIssue, PrevContext,
 } from "./types";
-import type { Language, COTPositioning, AssetSnapshot } from "@yt-maker/core";
+import type { Language, COTPositioning, AssetSnapshot, DailySnapshot } from "@yt-maker/core";
 import { buildTemporalAnchors } from "./helpers/temporal-anchors";
+import { buildTemporalCalendar, formatTemporalCalendar } from "./helpers/temporal-calendar";
 import { loadWeeklyBrief, computeCotInsights, formatCotInsightsMarkdown } from "@yt-maker/data";
 import { DraftScriptSchema, zodValidator } from "./schemas";
 
@@ -56,7 +57,7 @@ Même pour ces sujets, il y a TOUJOURS quelque chose de tangible — pas seuleme
 
 1. **Personnes en action** — un gérant qui débouclerait une position, un risk manager qui signe une limite, un comité qui vote, un raffineur qui bascule sa cargaison. (cf. liste détaillée plus bas)
 2. **Objets et terminaux** — un écran de cotation qui clignote, un livre d'ordres qui se vide, un ticker tape, un compteur de barils sur un terminal pétrolier, un téléphone qui sonne en pleine nuit, un boîtier de tirage d'enchères du Trésor.
-3. **Documents écrits** — un communiqué qui tombe à 14h GMT, une note de research interne, un margin call par e-mail, un dot plot, un communiqué FOMC, une lettre 13F, un prospectus.
+3. **Documents écrits** — un communiqué qui tombe sur les fils mercredi matin, une note de research interne, un margin call par e-mail, un dot plot, un communiqué FOMC, une lettre 13F, un prospectus.
 4. **Processus institutionnels** — une chambre de compensation qui appelle de la marge, une chaîne de settlement T+2 qui se grippe, une enchère du Trésor sursouscrite, un cycle d'expiration d'options, un fixing d'or de 10h30.
 5. **Instruments financiers en mouvement** — un futur qui passe en backwardation, un swap dont la jambe bascule, le payoff d'une option qui se forme, une courbe qui s'inverse, un spread qui se compresse.
 6. **Environnements physiques spécifiques** — un floor d'échange particulier, une salle de board, le toit d'un terminal pétrolier, un auditorium nommé (Eccles, Saint-Cloud, Threadneedle Street).
@@ -325,6 +326,13 @@ ZÉRO SIGLE TECHNIQUE — pour les indicateurs, banques centrales et devises, TO
 
 EN REVANCHE, les **sigles de sociétés** (KLM, BMW, IBM, AMD, ASML, ON, NXP, GE, GM, P&G, BNY, JPM, etc.) restent **inchangés** — ne traduis JAMAIS leur expansion (KLM ≠ "Compagnie Royale Néerlandaise" ; BMW ≠ "Bayerische Motoren Werke"). Le pipeline TTS s'occupe de leur prononciation. Les noms propres à garder tels quels incluent aussi : S&P 500, Nasdaq, Dow Jones, Bitcoin, Ethereum.
 
+## ANTI-TEMPLATE — OUVERTURES INTERDITES
+
+YouTube démonétise les chaînes "contenu produit en série". Trois patterns à BANNIR :
+- **coldOpen** : aucune date, aucun jour de semaine, aucun mois. Ouvre par un fait (acteur + verbe), un chiffre, une citation, ou un paradoxe.
+- **thread** : évite l'énumérateur initial ("Trois X qui…", "Cinq Y…"). Préfère ouverture descriptive, en question, en paradoxe ou causale.
+- **closing** : évite "Trois rendez-vous à surveiller" et variantes. Entre directement par un événement, un enjeu, ou un contraste.
+
 ## GARDE-FOUS
 
 COMPLIANCE AMF/MiFID II :
@@ -350,27 +358,26 @@ BUDGET MOTS (STRICT) :
 
 STRUCTURE (tout est parlé à voix haute, dans cet ordre) :
 
-1. **owlIntro** (45-50 mots STRICT, ~17-18s en TTS) — Parlé sur la vidéo d'introduction du hibou. Doit IMPÉRATIVEMENT contenir un VALUE CLAIM SPÉCIFIQUE AU JOUR — c'est cette intro qui décide si le viewer reste ou part (rétention 30s = métrique #1).
+1. **owlIntro** (45-50 mots STRICT, ~17-18s en TTS) — Parlé sur la vidéo d'introduction du hibou. Doit IMPÉRATIVEMENT OUVRIR sur un VALUE CLAIM SPÉCIFIQUE AU JOUR — c'est cette intro qui décide si le viewer reste ou part (rétention 30s = métrique #1).
 
    ⚠️ CONTRAINTE DE DURÉE CRITIQUE : la vidéo hibou dure 20s exactement. Au-delà de 50 mots, le TTS déborde sur la phase newspaper qui suit, ce qui casse le rythme. COMPTE TES MOTS.
 
-   STRUCTURE OBLIGATOIRE (5 blocs, dans cet ordre, séparés par des points) :
+   STRUCTURE OBLIGATOIRE (4 blocs, dans cet ordre — VALUE CLAIM EN PREMIER pour hooker dès la 1ère seconde) :
 
-   1. **Signature** (3 mots, OBLIGATOIRE EN PREMIER) : "Owl Street Journal."
-      → Pas de variation autour du nom. C'est la marque. Toujours en premier mot.
+   1. **Value claim** (28-35 mots STRICT, EN TOUT PREMIER) : "Aujourd'hui : [sujet 1], [sujet 2], et [sujet 3]."
+      → 3 sujets concrets du jour, accrocheurs, COMPLÉMENTAIRES (pas le même angle 3 fois).
+      → Chaque sujet = 8-11 mots MAX. Pas de phrases multiples par sujet. Pas de tirets explicatifs internes.
+      → Format type : "[acteur/asset] [verbe d'action] [contexte court]" pour chaque sujet.
+      → Le viewer DOIT entendre les 3 sujets dans les 10 premières secondes (avant que YouTube lui propose une autre vidéo).
 
-   2. **Positionnement** (3-5 mots, OBLIGATOIRE) : "Récap quotidien des marchés."
-      → Variations possibles : "Le récap des marchés", "Votre récap quotidien". Reste court.
+   2. **Signature + positionnement** (6-9 mots, OBLIGATOIRE) : "Owl Street Journal, récap quotidien des marchés."
+      → Variations possibles : "Owl Street Journal, votre récap quotidien", "Owl Street Journal, le récap des marchés du jour".
+      → Le nom "Owl Street Journal" est obligatoire et intact. Pas de variation autour du nom.
 
    3. **Date** (3-5 mots, OBLIGATOIRE) : "[Jour] [date courte]."
       → Format : jour de semaine + jour + mois, sans l'année. C'est ICI qu'on dit la date, pas dans le coldOpen.
 
-   4. **Value claim** (28-35 mots STRICT) : "Aujourd'hui : [sujet 1], [sujet 2], et [sujet 3]."
-      → 3 sujets concrets du jour, accrocheurs, COMPLÉMENTAIRES (pas le même angle 3 fois).
-      → Chaque sujet = 8-11 mots MAX. Pas de phrases multiples par sujet. Pas de tirets explicatifs internes.
-      → Format type : "[acteur/asset] [verbe d'action] [contexte court]" pour chaque sujet.
-
-   5. **Transition** (2-4 mots) : "C'est parti." OU "Allons-y." OU "On y va." OU "Voilà."
+   4. **Transition** (2-4 mots) : "C'est parti." OU "Allons-y." OU "On y va." OU "Voilà."
 
    INTERDICTIONS ABSOLUES :
    - PAS de "Bienvenue sur..." / "Bonjour à tous..." / "Salut"
@@ -381,7 +388,7 @@ STRUCTURE (tout est parlé à voix haute, dans cet ordre) :
    - PAS de tirets explicatifs DANS un sujet (ex: "le pétrole — ce que ça change") — ça gonfle le mot count
    - PAS de phrases composées dans le value claim
 
-   Ton : énergique, factuel, direct, RAPIDE. Tempo de livraison : signature+positionnement+date en ~5s, value claim en ~10-11s, transition en ~1s. Total cible : ~17s en TTS.
+   Ton : énergique, factuel, direct, RAPIDE. Tempo de livraison : value claim en ~10-11s (PRIORITÉ — c'est la fenêtre rétention), signature+positionnement+date en ~5s, transition en ~1s. Total cible : ~17s en TTS.
 
    COMPLÉMENTARITÉ avec coldOpen et thread (CRUCIAL — éviter la redondance) :
    - owlIntro = MENU (3 sujets listés, perspective d'ensemble)
@@ -438,7 +445,7 @@ SORTIE : JSON strict avec EXACTEMENT cette structure :
   "date": "YYYY-MM-DD",
   "title": "Titre épisode (percutant, fait vérifié)",
   "description": "1-2 phrases résumé",
-  "owlIntro": "45-50 mots STRICT / ~17s — 5 blocs : 'Owl Street Journal.' + 'Récap quotidien des marchés.' + '[Jour] [date sans année].' + 'Aujourd'hui : [sujet 1 8-11 mots], [sujet 2 8-11 mots], et [sujet 3 8-11 mots].' + 'C'est parti.' AUCUN bonjour, disclaimer, abonne-toi, tiret explicatif. COMPTE TES MOTS — 50 max.",
+  "owlIntro": "45-50 mots STRICT / ~17s — 4 blocs DANS CET ORDRE : 1) value claim 'Aujourd'hui : [sujet 1 8-11 mots], [sujet 2 8-11 mots], et [sujet 3 8-11 mots].' EN PREMIER + 2) 'Owl Street Journal, récap quotidien des marchés.' + 3) '[Jour] [date sans année].' + 4) 'C'est parti.' AUCUN bonjour, disclaimer, abonne-toi, tiret explicatif. COMPTE TES MOTS — 50 max.",
   "coldOpen": { "type": "hook", "title": "Cold Open", "narration": "Max 20 mots — UN fait choc émotionnel sans date (date dans owlIntro)", "durationSec": N, "wordCount": N },
   "titleCard": { "type": "title_card", "title": "Owl Street Journal", "narration": "", "durationSec": 4, "wordCount": 0 },
   "thread": { "type": "thread", "title": "Fil conducteur", "narration": "...", "durationSec": N, "wordCount": N },
@@ -466,10 +473,9 @@ IMPORTANT : le champ "segments" est un ARRAY d'objets avec segmentId, narration,
 }
 
 interface BriefingExtract {
-  upcomingHighImpact?: string[];
-  earningsUpcomingWatchlist?: string[];
-  earningsUpcomingOther?: string[];
+  /** CB speech CONTENT enriched via BIS RSS — what was said, not when (when is in calendar) */
   cbSpeechesYesterday?: string[];
+  /** Curated tier-1 macro stats with surprise % — date+value, not just date */
   obligatoryMacroStats?: string[];
 }
 
@@ -484,12 +490,22 @@ function buildC3UserPrompt(
   previousDraft?: DraftScript,
   cotInsightsMd?: string,
   briefing?: BriefingExtract,
+  snapshot?: DailySnapshot,
+  prevContext?: PrevContext,
 ): string {
   let prompt = '';
 
   // Temporal anchors — injected first so LLM anchors all temporal refs
   const anchors = buildTemporalAnchors(editorial.date, editorial.publishDate);
   prompt += `${anchors.block}\n\n`;
+
+  // Unified temporal calendar — same block as C1/C2. Source unique de vérité
+  // pour events macro / earnings / discours BC / décisions BC. Remplace les
+  // anciens blocs ## RENDEZ-VOUS À VENIR et ## DISCOURS BC.
+  if (snapshot) {
+    const cal = buildTemporalCalendar(snapshot, prevContext, editorial.publishDate);
+    prompt += `${formatTemporalCalendar(cal)}\n`;
+  }
 
   // Monday recap: reload weekly brief + inject for narrative material
   if (anchors.isMondayRecap) {
@@ -559,26 +575,10 @@ function buildC3UserPrompt(
     prompt += `\n→ Si C2 a déjà thématisé un de ces signaux dans son analyse ci-dessous, garde le phrasé fourni ici (il est calibré pour la narration). Sinon, ne pioche que si un signal recoupe le sujet d'un de tes segments — pas d'usage forcé.\n\n`;
   }
 
-  // Rendez-vous à venir (events macro + earnings) — matière brute pour le bloc closing
-  // Le `closing` a été redéfini pour traiter spécifiquement ces rendez-vous (voir STRUCTURE).
-  if (briefing && (briefing.upcomingHighImpact?.length || briefing.earningsUpcomingWatchlist?.length || briefing.earningsUpcomingOther?.length)) {
-    prompt += `## RENDEZ-VOUS À VENIR (matière pour le bloc CLOSING)\n`;
-    prompt += `Le \`closing\` doit citer 2-3 catalyseurs majeurs avec date + enjeu en une ligne. Pioche ici (pas tout, sélectionne les plus marquants pour la semaine qui vient).\n\n`;
-    if (briefing.upcomingHighImpact?.length) {
-      prompt += `**Événements macro (publication CFTC / banques centrales / inflation / emploi)** :\n`;
-      for (const e of briefing.upcomingHighImpact) prompt += `- ${e}\n`;
-      prompt += '\n';
-    }
-    if (briefing.earningsUpcomingWatchlist?.length) {
-      prompt += `**Earnings — watchlist suivie** (priorité narrative, ces noms sont déjà dans l'épisode) : ${briefing.earningsUpcomingWatchlist.join(' | ')}\n\n`;
-    }
-    if (briefing.earningsUpcomingOther?.length) {
-      prompt += `**Earnings — autres notables** (contexte, à citer si pertinent) : ${briefing.earningsUpcomingOther.slice(0, 12).join(' | ')}\n\n`;
-    }
-  }
-
   // Stats macro OBLIGATOIRES — sortes hier ou en cours, doivent être citées
   // au moins une fois (intégrées dans un segment existant, pas un segment dédié).
+  // Le calendrier unifié donne la DATE ; ce bloc apporte la SURPRISE chiffrée
+  // (actual vs forecast) — non redondant.
   if (briefing?.obligatoryMacroStats?.length) {
     prompt += `## ⚠ STATS MACRO OBLIGATOIRES À CITER\n`;
     prompt += `Ces statistiques économiques (consensus tier-1) sont sorties ou attendues sur la session couverte. Elles DOIVENT apparaître au moins une fois dans la narration — intégrées dans un segment existant pertinent (banques centrales, devise concernée, indice impacté). PAS de segment dédié juste pour ça : la mention est une ligne ou deux dans un segment qui parle déjà du sujet. Si aucun segment ne porte naturellement le sujet, l'inclure en transition ou en contexte d'un autre point.\n`;
@@ -586,10 +586,12 @@ function buildC3UserPrompt(
     prompt += '\n';
   }
 
-  // Discours banques centrales d'hier — souvent un déclencheur que C2 a peut-être mentionné,
-  // mais que C3 doit pouvoir relayer avec son phrasé natif (sans jargon analytique).
+  // Contenu des discours banques centrales d'hier (contenu éditorial enrichi
+  // par BIS RSS — complémentaire du calendrier qui ne donne que les noms +
+  // le jour). Si BIS a échoué, on a juste les titres : on saute alors.
   if (briefing?.cbSpeechesYesterday?.length) {
-    prompt += `## DISCOURS BANQUES CENTRALES (hier — contexte éditorial)\n`;
+    prompt += `## CONTENU DES DISCOURS BC (hier — extraits éditoriaux)\n`;
+    prompt += `Le calendrier ci-dessus indique QUI a parlé QUAND. Ce bloc donne CE QUI A ÉTÉ DIT.\n`;
     for (const s of briefing.cbSpeechesYesterday) prompt += `- ${s}\n`;
     prompt += `→ Si l'un de ces discours explique un mouvement du jour, intègre-le dans le segment concerné. Pas d'énumération.\n\n`;
   }
@@ -723,6 +725,10 @@ export async function runC3Writing(input: {
   assets?: AssetSnapshot[];
   /** Slices du briefing pack à passer directement à Opus (sinon perdues via C2) */
   briefing?: BriefingExtract;
+  /** Full snapshot — used to build the unified temporal calendar in the prompt */
+  snapshot?: DailySnapshot;
+  /** Previous episodes context — used by the temporal calendar for past CB speeches */
+  prevContext?: PrevContext;
   [key: string]: unknown;
 }): Promise<DraftScript> {
   // Compute COT insights (same call as P3 — déterministe, output identique)
@@ -764,6 +770,8 @@ export async function runC3Writing(input: {
     input.previousDraft,
     cotInsightsMd,
     input.briefing,
+    input.snapshot,
+    input.prevContext,
   );
 
   console.log('  P4 C3 Opus — rédaction narrative...');

@@ -152,12 +152,15 @@ export function computeSessionFields(
   changePctNow: number;
 } | undefined {
   if (!dailyCandles || dailyCandles.length < 2) return undefined;
-  // Filter: keep only sessions STRICTLY before pubDate AND with a real close.
+  // Filter: keep candles up to AND INCLUDING pubDate (the session being covered),
+  // with a real close. pubDate is the snap date / session day, NOT "today".
   // Yahoo's daily endpoint sometimes returns candles with close=null (FX edge case,
   // e.g. EURUSD 2026-04-21 had O=1.1744 but C=null). Skip these dégénérées.
+  // The caller (market-snapshot) is responsible for stripping today's partial
+  // candle before feeding us; we only enforce the upper bound and validity here.
   const completed = dailyCandles.filter((c) => {
     const d = (c.date || "").slice(0, 10);
-    return d && d < pubDate && c.c != null && Number.isFinite(c.c);
+    return d && d <= pubDate && c.c != null && Number.isFinite(c.c);
   });
   if (completed.length < 2) return undefined;
   const sess = completed[completed.length - 1];

@@ -11,7 +11,7 @@ import "dotenv/config";
 import * as fs from "fs";
 import * as path from "path";
 import { execSync } from "child_process";
-import { fetchMarketSnapshot, updateAllMarketMemory, isWeeklyJobDay, applyHaikuEnrichment, loadMemory, enrichNewsSummaries, fetchAssetSnapshot, fetchDaily3yCandles } from "@yt-maker/data";
+import { fetchMarketSnapshot, transformSnapshotForWeeklyMode, updateAllMarketMemory, isWeeklyJobDay, applyHaikuEnrichment, loadMemory, enrichNewsSummaries, fetchAssetSnapshot, fetchDaily3yCandles } from "@yt-maker/data";
 import type { ZoneEvent, HaikuEnrichmentResult } from "@yt-maker/data";
 import {
   generateScript, getNextEpisodeNumber, appendToManifest,
@@ -193,17 +193,29 @@ async function main() {
     console.log(`  ${snapshot.assets?.length ?? 0} assets loaded`);
   } else {
     console.log("\n═══ Step 1: Fetching market data ═══");
-    // Monday mode : fetch avec today pour récupérer crypto weekend moves + news live.
-    // Sinon (daily) : fetch avec la date d'épisode (comportement historique).
-    // snapshot.date est ensuite aligné sur la narrative (vendredi pour Monday, date pour daily).
-    const fetchDate = publishDate ? publishDate : date;
-    if (fetchDate !== date) {
+    // Fetch toujours avec la date narrative (= session qu'on récap), pas avec
+    // publishDate (today). Sinon, lancé tôt le matin avant clôture US, snapshotDate
+    // ne match aucune session disponible → asset filter drop tout.
+    // Pour news/calendar, fetchMarketSnapshot bascule en mode `isHistorical` quand
+    // narrativeDate < today et utilise des sources date-filtered (Finnhub company-news,
+    // Marketaux) au lieu de live.
+    if (publishDate !== date) {
       const modeLabel = isMondayRecap ? 'Mode LUNDI' : 'Publication post-séance';
-      console.log(`  ${modeLabel}: fetch avec ${fetchDate} (today), narrative snap = ${date}`);
+      console.log(`  ${modeLabel}: narrative=${date}, publish=${publishDate}`);
     }
-    snapshot = await fetchMarketSnapshot(fetchDate);
-    // Override narrative date: pipeline utilise snapshot.date pour temporal anchors
+    snapshot = await fetchMarketSnapshot(date);
+    // snapshot.date déjà = narrative date (passée en param), mais on la remet
+    // explicitement au cas où des sources internes l'auraient écrasée.
     snapshot.date = date;
+
+    // Monday recap: remplace les valeurs daily des assets (changePct, sessionHigh/Low,
+    // dramaScore) par leurs équivalents hebdomadaires pour que la sélection des
+    // movers + le narratif raconte la SEMAINE écoulée plutôt que la séance
+    // vendredi seule. Cf. transformSnapshotForWeeklyMode docstring.
+    if (isMondayRecap) {
+      console.log(`  Mode LUNDI: transform snapshot (daily → weekly fields)`);
+      transformSnapshotForWeeklyMode(snapshot);
+    }
 
     // Enrich news summaries via article extraction (articles sans summary)
     console.log("\n── Step 1.0: Enriching news summaries ──");
@@ -212,6 +224,42 @@ async function main() {
     fs.writeFileSync(snapshotFilePath, JSON.stringify(snapshot, null, 2));
     console.log(`  Snapshot saved: ${snapshotFilePath}`);
   }
+
+  // ── Guard: refuse to continue if asset fetch failed or returned incomplete data.
+  // The LLM pipeline will hallucinate prices if assets are empty — unacceptable.
+  //
+  // Strategy: BREADTH-based check, not specific symbols. On real holidays the
+  // closed market's symbols are legitimately absent (US fermé Memorial Day → no
+  // ^GSPC ; Tokyo fermé Golden Week → no ^N225 ; UK Bank Holiday → no ^FTSE).
+  // We just need ENOUGH coverage across categories to do a credible recap.
+  //
+  // Categories : indices, FX, commodities, crypto. Demand at least 3 of 4 to
+  // be represented, with min count 25 (Christmas Day worst case ~15 assets but
+  // we wouldn't run a recap that day anyway).
+  const MIN_ASSET_COUNT = 25;
+  const assetCount = Array.isArray(snapshot.assets) ? snapshot.assets.length : 0;
+  if (assetCount < MIN_ASSET_COUNT) {
+    console.error(`\n❌ FATAL: snapshot.assets has ${assetCount} entries, expected at least ${MIN_ASSET_COUNT}.`);
+    console.error(`   Yahoo Finance fetch likely failed or rate-limited, or the narrative date is a major global holiday.`);
+    console.error(`   Re-run with \`npm run generate -- --date ${date}\` to retry the fetch.`);
+    console.error(`   Refusing to continue — would hallucinate prices in the LLM script.\n`);
+    process.exit(1);
+  }
+  const symbols = new Set(snapshot.assets.map((a) => a.symbol));
+  const categoriesPresent = {
+    indices: ["^GSPC", "^IXIC", "^DJI", "^FCHI", "^GDAXI", "^FTSE", "^STOXX", "^N225", "^HSI", "^KS11"].some((s) => symbols.has(s)),
+    fx: ["EURUSD=X", "USDJPY=X", "GBPUSD=X", "DX-Y.NYB"].some((s) => symbols.has(s)),
+    commodities: ["GC=F", "CL=F", "BZ=F", "SI=F"].some((s) => symbols.has(s)),
+    crypto: ["BTC-USD", "ETH-USD", "SOL-USD"].some((s) => symbols.has(s)),
+  };
+  const presentCategories = Object.entries(categoriesPresent).filter(([_, ok]) => ok).map(([k]) => k);
+  if (presentCategories.length < 3) {
+    console.error(`\n❌ FATAL: snapshot covers only ${presentCategories.length}/4 asset categories: [${presentCategories.join(", ") || "none"}].`);
+    console.error(`   Need at least 3 of: indices, fx, commodities, crypto.`);
+    console.error(`   Re-run with \`npm run generate -- --date ${date}\` to retry the fetch.\n`);
+    process.exit(1);
+  }
+  console.log(`  ✓ Asset guard OK: ${assetCount} assets across ${presentCategories.length}/4 categories [${presentCategories.join(", ")}]`);
 
   // Save snapshot to episode folder
   saveToEpisode(episodeKey, "snapshot.json", snapshot);
@@ -660,6 +708,45 @@ async function main() {
 
   } else {
     console.log("\n═══ Step 5: TTS SKIPPED (--skip-tts) ═══");
+    // Reconstruire segmentDurations depuis audio-manifest.json existant
+    // pour que BeatAudioTrack ait les bonnes durées (sinon 9000 frames fallback
+    // = chevauchement des segments).
+    const manifestPath = path.join(epDir, "audio-manifest.json");
+    if (fs.existsSync(manifestPath)) {
+      try {
+        const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf-8"));
+        const segDurs: Record<string, number> = {};
+        for (const beat of manifest.beats ?? []) {
+          const segMatch = beat.relativePath?.match(/segments\/([^/]+)\.mp3$/);
+          if (!segMatch) continue;
+          const segName = segMatch[1];
+          // Map filename → segmentId : hook → hook, thread → thread, seg_X → seg_X, closing → closing, seg_panorama → seg_panorama
+          const beatEnd = beat.startSec + beat.durationSec;
+          const segId = beat.segmentId ?? segName;
+          // Find max end time per segment file (from absolute startSec since each MP3 has its own clock)
+          // Actually : audio-manifest startSec is GLOBAL across all segments.
+          // So we need to reconstruct per-segment duration from the MP3 itself.
+          // Use music-metadata to read the real MP3 duration.
+        }
+        // Read MP3 durations directly (more reliable than manifest)
+        const segDir = path.join(epDir, "audio", "segments");
+        if (fs.existsSync(segDir)) {
+          const { parseFile } = await import("music-metadata");
+          for (const file of fs.readdirSync(segDir)) {
+            if (!file.endsWith(".mp3")) continue;
+            const segName = file.replace(".mp3", "");
+            try {
+              const meta = await parseFile(path.join(segDir, file));
+              if (meta.format.duration) segDurs[segName] = meta.format.duration;
+            } catch {}
+          }
+          segmentDurations = segDurs;
+          console.log(`  Reconstructed ${Object.keys(segDurs).length} segment durations from MP3s`);
+        }
+      } catch (err) {
+        console.warn(`  ⚠ Failed to reconstruct segmentDurations: ${(err as Error).message.slice(0, 100)}`);
+      }
+    }
   }
 
   // Load owl audio paths (from current or previous run)
@@ -817,13 +904,16 @@ async function main() {
     console.log("\n═══ Rendering SKIPPED (--no-render) ═══");
   } else {
     console.log("\n═══ Step 7: Rendering BeatEpisode ═══");
-    const outPath = path.join(epDir, `episode-${date}.mp4`);
+    // Use episodeKey (publish date) so VTT + upload trouvent le MP4 sans mismatch.
+    // Avant : ${date} = snap date (J-1) → bug si date != publishDate (mode lundi).
+    const outPath = path.join(epDir, `episode-${episodeKey}.mp4`);
 
     const remotionEntry = path.resolve(__dirname, "..", "packages", "remotion-app", "src", "index.ts");
     const publicDir = path.resolve(__dirname, "..", "packages", "remotion-app", "public");
     // Required flags : --timeout (large props), --browser-launch-timeout (slow public dir copy),
-    // --public-dir (monorepo path resolution)
-    const cmd = `npx remotion render "${remotionEntry}" BeatDaily "${outPath}" --codec=h264 --crf=18 --props="${propsPath}" --timeout=300000 --browser-launch-timeout=120000 --public-dir="${publicDir}"`;
+    // --public-dir (monorepo path resolution),
+    // --concurrency=4 (default 8 saturates local proxy on OffthreadVideo seeks → timeout)
+    const cmd = `npx remotion render "${remotionEntry}" BeatDaily "${outPath}" --codec=h264 --crf=18 --props="${propsPath}" --timeout=300000 --browser-launch-timeout=120000 --public-dir="${publicDir}" --concurrency=4`;
 
     console.log(`  Rendering: ${cmd.slice(0, 100)}...`);
     try {

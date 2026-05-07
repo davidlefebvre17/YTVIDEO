@@ -322,7 +322,7 @@ export function validateMechanical(
     });
   }
 
-  // 7. Cold open too long
+  // 7. Cold open too long (word count)
   if (draft.coldOpen && draft.coldOpen.wordCount > 20) {
     issues.push({
       type: 'length',
@@ -332,6 +332,44 @@ export function validateMechanical(
       suggestedFix: 'Raccourcir à max 15 mots, télégraphique',
       source: 'code',
     });
+  }
+
+  // 7b. Cold open value-claim must arrive within ~15 seconds (YouTube growth rule).
+  // Coverage : refuse "bonjour bienvenue", "je m'appelle", "dans cette vidéo on va...".
+  // Threshold: 4s estimated for 10 words at 150 wpm; cold open should hit value claim
+  // within 15s i.e. its narration must be ≤45 words AND skip greeting fillers.
+  if (draft.coldOpen) {
+    const txt = (draft.coldOpen.narration ?? '').toLowerCase().trim();
+    const greetingPatterns = [
+      /^bonjour\b/, /^bienvenue\b/, /^salut\b/, /^hello\b/,
+      /^aujourd'hui dans cette vidéo/, /^dans cette vidéo/,
+      /^je m'appelle\b/, /^moi c'est\b/, /^je suis\b/,
+      /^chers? (?:amis|abonnés|spectateurs|viewers)\b/,
+    ];
+    for (const re of greetingPatterns) {
+      if (re.test(txt)) {
+        issues.push({
+          type: 'structure',
+          segmentId: 'coldOpen',
+          description: `Cold open commence par un greeting/filler ("${txt.slice(0, 40)}...") — value claim retardée`,
+          severity: 'blocker',
+          suggestedFix: 'Démarrer directement par le hook (paradoxe, chiffre saillant, cliffhanger). Pas de "bonjour", pas de "dans cette vidéo".',
+          source: 'code',
+        });
+        break;
+      }
+    }
+    // Hard length cap: 15s ≈ 45 words at Fish ~190 wpm. Above that, value claim drift past 15s.
+    if (draft.coldOpen.wordCount > 45) {
+      issues.push({
+        type: 'length',
+        segmentId: 'coldOpen',
+        description: `Cold open ${draft.coldOpen.wordCount} mots > 45 (value claim après 15s — viewer décroche)`,
+        severity: 'blocker',
+        suggestedFix: 'Couper à ≤ 20 mots. Le hook doit être télégraphique.',
+        source: 'code',
+      });
+    }
   }
 
   // 8. Empty narrations

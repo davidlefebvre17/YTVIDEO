@@ -399,6 +399,12 @@ export interface SEOMetadata {
   tags: string[];
   /** Exactly 3 hashtags, without # prefix */
   hashtags: string[];
+  /**
+   * Premier commentaire posté automatiquement après upload (engagement booster).
+   * Court (200-400 chars), éditorial, question ouverte aux viewers, CTA abonnement soft.
+   * Pas de liens (filtré spam). À épingler manuellement dans Studio (pas d'API pour pinning).
+   */
+  pinnedComment?: string;
 }
 
 // ── Helpers ─────────────────────────────────────────────

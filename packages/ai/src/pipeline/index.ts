@@ -293,7 +293,7 @@ export async function runPipeline(
   if (shouldRun('p1')) {
     const calendarHighlights = (snapshot.events ?? [])
       .filter(e => e.impact === 'high')
-      .map(e => `${e.time ?? '?'} ${e.name} (${e.currency}) forecast:${e.forecast ?? '?'} actual:${e.actual ?? '?'}`);
+      .map(e => `${e.name} (${e.currency}) forecast:${e.forecast ?? '?'} actual:${e.actual ?? '?'}`);
     newsDigest = await runNewsDigest(snapshot.news ?? [], calendarHighlights);
     stats.llmCalls++;
     if (newsDigest.events.length) {
@@ -339,6 +339,8 @@ export async function runPipeline(
       weeklyBrief,
       briefingPack,
       newsDigest,
+      snapshot,
+      prevContext,
       lang,
     });
     stats.llmCalls++;
@@ -514,11 +516,12 @@ export async function runPipeline(
   if (Object.keys(assetContext).length) {
     console.log(`  Asset context: ${Object.keys(assetContext).length} assets with descriptions`);
   }
-  // Slices du briefing pack à pousser directement à Opus (perdues via C2 sinon)
+  // Slices du briefing pack à pousser à Opus en complément du calendrier unifié.
+  // Calendrier (C3) = source de vérité dates/events/earnings/discours BC/décisions BC.
+  // Ce briefing apporte ce qui n'est PAS dans le calendrier :
+  // - obligatoryMacroStats : surprise % calculée vs forecast (curated tier-1)
+  // - cbSpeechesYesterday  : contenu éditorial du discours (enrichi BIS RSS)
   const briefingForC3 = {
-    upcomingHighImpact: briefingPack?.upcomingHighImpact,
-    earningsUpcomingWatchlist: briefingPack?.earningsBuckets?.upcomingWatchlist,
-    earningsUpcomingOther: briefingPack?.earningsBuckets?.upcoming,
     cbSpeechesYesterday: briefingPack?.cbSpeechesYesterday,
     obligatoryMacroStats: briefingPack?.obligatoryMacroStats,
   };
@@ -536,6 +539,8 @@ export async function runPipeline(
     cotPositioning: snapshot.cotPositioning,
     assets: snapshot.assets,
     briefing: briefingForC3,
+    snapshot,
+    prevContext,
   });
   stats.llmCalls++;
   saveIntermediate(snapshot.date, "episode_draft", draft);
@@ -635,6 +640,8 @@ export async function runPipeline(
         cotPositioning: snapshot.cotPositioning,
         assets: snapshot.assets,
         briefing: briefingForC3,
+        snapshot,
+        prevContext,
       });
       stats.llmCalls++;
       stats.retries++;

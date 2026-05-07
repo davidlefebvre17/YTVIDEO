@@ -1,5 +1,5 @@
 import type { DailySnapshot, EarningsEvent, NewsItem } from "@yt-maker/core";
-import { fetchAllAssets, fetchDailyCandles, fetchWeeklyCandles, fetchDaily3yCandles, DEFAULT_ASSETS } from "./yahoo";
+import { fetchAllAssets, fetchDailyCandles, fetchWeeklyCandles, fetchDaily3yCandles, fetchHourlyCandles, DEFAULT_ASSETS } from "./yahoo";
 import { fetchNews } from "./news";
 import { fetchEconomicCalendar } from "./calendar";
 import { computeTechnicals, computeMultiTFAnalysis, computePerf, getAssetGroup, computeSessionFields } from "./technicals";
@@ -116,13 +116,19 @@ export async function fetchMarketSnapshot(
   // Phase 2 — per-asset enrichment (sequential with throttle to avoid Yahoo rate-limit)
   console.log(`\nEnriching ${assets.length} assets (technicals + multi-TF)...`);
 
-  // Strip today's partial intraday candle. The cutoff is strict (`< snapshotDate`)
-  // so that the J candle — which has live OHLC and renders as a degenerate thin
-  // line in the chart — is always excluded. Last kept candle is J-1.
+  // Strip today's partial intraday candle while keeping the session we cover.
+  //   - d <= narrativeDate : keep up to and including snapshotDate (the session
+  //     being covered — its candle is complete by the time we run).
+  //   - d <  todayUTC      : exclude today's candle which is in-progress with
+  //     live OHLC and renders as a degenerate thin line on the chart.
+  // For historical snaps (narrativeDate < today) only the first condition binds.
+  // For a live snap where narrativeDate == today, the second excludes today.
+  const todayUTC = today;
   const stripPartial = <T extends { date?: string; c?: number | null }>(arr: T[], narrativeDate: string): T[] =>
     arr.filter((c) => {
       const d = (c.date || "").slice(0, 10);
-      return d && d < narrativeDate;
+      if (!d) return false;
+      return d <= narrativeDate && d < todayUTC;
     });
 
   /** Tail validity check : last kept candle must be on snapDate (or close to it,
@@ -137,6 +143,48 @@ export async function fetchMarketSnapshot(
     return lag >= 0 && lag <= 3;
   };
 
+  /**
+   * Patch null closes on the tail of a daily candle array using the corresponding
+   * hourly closes. Yahoo's daily aggregation lags for FX (the J-1 candle at 23:00
+   * UTC has open valid but close=null while the 1h granularity holds the data).
+   *
+   * For each daily candle in the last 3 entries with c=null, find the latest
+   * hourly close on the same UTC calendar day and copy it in. Mutates the array
+   * in place. No-op if hourly fetch returns nothing.
+   */
+  const patchTailFromHourly = async <T extends { date?: string; c?: number | null }>(
+    daily: T[],
+    symbol: string,
+  ): Promise<number> => {
+    const tail = daily.slice(-3);
+    const hasNull = tail.some((c) => c.c == null);
+    if (!hasNull) return 0;
+
+    const hourly = await fetchHourlyCandles(symbol);
+    if (hourly.length === 0) return 0;
+
+    // Index hourly closes by YYYY-MM-DD → keep the LAST close of each day.
+    const lastCloseByDay = new Map<string, number>();
+    for (const h of hourly) {
+      if (h.c == null || !Number.isFinite(h.c)) continue;
+      const day = (h.date || "").slice(0, 10);
+      if (day) lastCloseByDay.set(day, h.c);
+    }
+
+    let patched = 0;
+    for (let i = daily.length - 3; i < daily.length; i++) {
+      const candle = daily[i];
+      if (!candle || candle.c != null) continue;
+      const day = (candle.date || "").slice(0, 10);
+      const recovered = lastCloseByDay.get(day);
+      if (recovered != null) {
+        candle.c = recovered as any;
+        patched++;
+      }
+    }
+    return patched;
+  };
+
   for (let ai = 0; ai < assets.length; ai++) {
     const asset = assets[ai];
     try {
@@ -147,35 +195,30 @@ export async function fetchMarketSnapshot(
         fetchDaily3yCandles(asset.symbol),     // 1d, 3y   → multi-TF medium/short
       ]);
 
-      // ── Retry on data gap : Yahoo sometimes returns the J-1 candle late
-      // (missing entirely OR with c=null) when fetched too soon after close.
-      // If the post-strip tail isn't valid (last candle older than 3 days OR
-      // close is null), retry once with a short delay.
+      // ── Patch missing closes from hourly data ────────────────────────────
+      // Yahoo's daily aggregation lags for FX pairs : the J-1 candle stamped
+      // at 23:00 UTC carries open=valid but close=null until ~24h later, even
+      // though the 1h granularity holds the actual close earlier. Detect this
+      // pattern in the daily tail and recover the missing close from the 1h
+      // candles before downstream technicals consume the data.
       let cleanDaily = stripPartial(dailyCandles, snapshotDate);
       let cleanDaily3y = stripPartial(daily3yCandles, snapshotDate);
       const tailValid = isTailValid(cleanDaily, snapshotDate) && isTailValid(cleanDaily3y, snapshotDate);
       if (!tailValid) {
-        console.log(`  ${asset.name}: tail gap detected (last candle stale or null) — retrying after 5s...`);
-        await new Promise((r) => setTimeout(r, 5000));
-        try {
-          const [retryDaily, retryDaily3y] = await Promise.all([
-            fetchDailyCandles(asset.symbol),
-            fetchDaily3yCandles(asset.symbol),
-          ]);
-          const retryClean = stripPartial(retryDaily, snapshotDate);
-          const retryClean3y = stripPartial(retryDaily3y, snapshotDate);
-          if (isTailValid(retryClean, snapshotDate) && isTailValid(retryClean3y, snapshotDate)) {
-            cleanDaily = retryClean;
-            cleanDaily3y = retryClean3y;
-            dailyCandles = retryDaily;
-            daily3yCandles = retryDaily3y;
-            console.log(`  ${asset.name}: retry succeeded — fresh candles obtained`);
+        const patched1d = await patchTailFromHourly(dailyCandles, asset.symbol);
+        const patched3y = await patchTailFromHourly(daily3yCandles, asset.symbol);
+        const totalPatched = patched1d + patched3y;
+        if (totalPatched > 0) {
+          cleanDaily = stripPartial(dailyCandles, snapshotDate);
+          cleanDaily3y = stripPartial(daily3yCandles, snapshotDate);
+          if (isTailValid(cleanDaily, snapshotDate) && isTailValid(cleanDaily3y, snapshotDate)) {
+            console.log(`  ${asset.name}: tail patched from hourly (${totalPatched} close${totalPatched > 1 ? "s" : ""} recovered)`);
           } else {
-            console.warn(`  ${asset.name}: retry still incomplete — narrative will use latest valid candle`);
+            console.warn(`  ${asset.name}: hourly patch insufficient (${totalPatched} closes recovered) — using latest valid`);
             (asset as any).dataStale = true;
           }
-        } catch (err) {
-          console.warn(`  ${asset.name}: retry failed (${(err as Error).message.slice(0, 60)})`);
+        } else {
+          console.warn(`  ${asset.name}: tail gap and hourly fallback also empty — using latest valid candle`);
           (asset as any).dataStale = true;
         }
       }
@@ -242,6 +285,55 @@ export async function fetchMarketSnapshot(
     // Throttle between assets (3 requests each) to avoid Yahoo rate-limit
     if (ai < assets.length - 1) {
       await new Promise((r) => setTimeout(r, 500));
+    }
+  }
+
+  // Phase 2b — Drop assets that didn't trade on (or after) the narrative session.
+  //
+  // `snapshotDate` est la NARRATIVE date (= session qu'on récap, ex: vendredi
+  // pour un récap lundi matin). On veut chaque asset coté ≥ snapshotDate.
+  //
+  // - Asset avec sessionDate === snapshotDate → KEEP (TradFi: cas standard)
+  // - Asset avec sessionDate >  snapshotDate  → KEEP (Crypto 24/7 sur Monday recap:
+  //                                             BTC sessionDate=Sunday > Friday →
+  //                                             on veut les moves weekend)
+  // - Asset avec sessionDate <  snapshotDate  → DROP (HOLIDAY: marché fermé sur
+  //                                             la session ciblée — Yahoo renvoie
+  //                                             une vieille close, le LLM la
+  //                                             prendrait pour "hier" → halluciner)
+  // - Asset avec sessionDate manquant         → DROP (data corrompue)
+  //
+  // Le hourly tail-patch en amont a déjà recovered les closes legitimes en lag.
+  // Seuls les vrais non-trading days atteignent ce filtre.
+  {
+    const dropped: string[] = [];
+    for (let i = assets.length - 1; i >= 0; i--) {
+      const a = assets[i];
+      const sd = a.sessionDate;
+      // Drop if no session OR session strictly older than the target narrative session
+      if (!sd || sd < snapshotDate) {
+        dropped.push(`${a.symbol}${sd ? ` (last=${sd})` : ` (no session)`}`);
+        assets.splice(i, 1);
+      }
+    }
+    if (dropped.length > 0) {
+      console.log(
+        `  Dropped ${dropped.length} watchlist asset(s) without a ${snapshotDate} session: ${dropped.slice(0, 8).join(", ")}${dropped.length > 8 ? ` (+${dropped.length - 8} more)` : ""}`,
+      );
+    }
+
+    // Garde-fou: si on a perdu plus de 70% de la watchlist, ABORT — produire une
+    // vidéo avec quasi aucun asset déclencherait une cascade de fallbacks textuels
+    // dans Remotion (charts vides, sparklines manquantes). Mieux vaut planter ici
+    // et signaler clairement le problème upstream qu'uploader une vidéo cassée.
+    const totalCount = assets.length + dropped.length;
+    const minAccepted = Math.ceil(totalCount * 0.3);
+    if (assets.length < minAccepted) {
+      throw new Error(
+        `Snapshot data integrity check failed: only ${assets.length}/${totalCount} watchlist assets survived session filter (snapshotDate=${snapshotDate}). ` +
+        `Likely causes: (1) Yahoo Finance fetch issue, (2) pipeline run before the target session closed (passer --date <YYYY-MM-DD> avec une session passée), ` +
+        `(3) snapshotDate matches a holiday/weekend day for most markets.`,
+      );
     }
   }
 
@@ -385,4 +477,77 @@ export async function fetchMarketSnapshot(
   if (cotPositioning) console.log(`  COT: ${cotPositioning.contracts.length} contracts (${cotPositioning.reportDate})`);
 
   return snapshot;
+}
+
+/**
+ * Transforme un snapshot pour le mode Monday recap : remplace les valeurs daily
+ * (changePct, sessionHigh/Low, dramaScore) par leurs équivalents HEBDOMADAIRES.
+ *
+ * Pourquoi : en Monday mode, le narratif doit raconter la SEMAINE écoulée
+ * (lun→ven), pas la séance vendredi seule. Le drama score / sélection des movers
+ * doit aussi se baser sur la perf hebdo, sinon on rate les movers de la semaine
+ * qui n'ont pas bougé spécifiquement vendredi.
+ *
+ * Approche : "REPLACE" — les champs daily sont écrasés. Le pipeline downstream
+ * (P1→P10) consomme les valeurs hebdo comme s'il s'agissait de la session à
+ * récap. Les prompts P3/P4 ont déjà des règles "talk in weekly terms" en
+ * `isMondayRecap` — leurs chiffres sont maintenant cohérents avec ces règles.
+ *
+ * Champs touchés par asset :
+ *   - `changePct`              ← `perf.week` (rolling 7 jours, ≈ Friday vs prev Friday)
+ *   - `sessionHigh`            ← max(highs des 5 derniers jours)
+ *   - `sessionLow`             ← min(lows des 5 derniers jours)
+ *   - `sessionRange`           ← sessionHigh - sessionLow
+ *   - `sessionRangePct`        ← sessionRange / prevSessionClose
+ *   - `prevSessionClose`       ← close il y a 5 jours ouvrés (= previous Friday close)
+ *   - `technicals.dramaScore`  ← recomputé avec |changePct hebdo| au lieu de daily
+ *
+ * Inchangé :
+ *   - `sessionDate` reste Friday (ancrage temporel pour P3/P4)
+ *   - `sessionClose` reste Friday close
+ *   - `multiTF`, `perf` (gardés intacts pour référence si prompts en ont besoin)
+ *   - news, events, sentiment, etc.
+ */
+export function transformSnapshotForWeeklyMode(snapshot: DailySnapshot): void {
+  let touched = 0;
+  for (const asset of snapshot.assets) {
+    const candles = (asset as any).dailyCandles ?? asset.candles ?? [];
+    if (candles.length < 6) continue; // need ≥5 daily highs + 1 prior close
+
+    const last5 = candles.slice(-5);
+    const highs = last5.map((c: any) => c.h ?? c.c).filter((v: any) => Number.isFinite(v));
+    const lows = last5.map((c: any) => c.l ?? c.c).filter((v: any) => Number.isFinite(v));
+    const sessionHigh = highs.length ? Math.max(...highs) : undefined;
+    const sessionLow = lows.length ? Math.min(...lows) : undefined;
+
+    // prevSessionClose = close avant les 5 derniers jours ouvrés (= prev Friday close)
+    const prevWeekCandle = candles[candles.length - 6];
+    const prevSessionClose = prevWeekCandle?.c ?? asset.prevSessionClose;
+
+    const oldChangePct = asset.changePct ?? 0;
+    const newChangePct = asset.perf?.week ?? oldChangePct;
+
+    asset.changePct = newChangePct;
+    if (sessionHigh !== undefined) asset.sessionHigh = sessionHigh;
+    if (sessionLow !== undefined) asset.sessionLow = sessionLow;
+    if (sessionHigh !== undefined && sessionLow !== undefined) {
+      asset.sessionRange = Math.round((sessionHigh - sessionLow) * 100) / 100;
+      if (prevSessionClose && prevSessionClose > 0) {
+        asset.sessionRangePct = Math.round((asset.sessionRange / prevSessionClose) * 10000) / 100;
+      }
+    }
+    if (prevSessionClose) asset.prevSessionClose = prevSessionClose;
+
+    // Recompute dramaScore: replace daily |changePct|*3 component with weekly |changePct|*3
+    if (asset.technicals && Number.isFinite(asset.technicals.dramaScore)) {
+      const dailyComponent = Math.abs(oldChangePct) * 3;
+      const weeklyComponent = Math.abs(newChangePct) * 3;
+      asset.technicals.dramaScore = Math.max(
+        0,
+        asset.technicals.dramaScore - dailyComponent + weeklyComponent,
+      );
+    }
+    touched++;
+  }
+  console.log(`  [weekly-transform] Replaced daily fields with weekly equivalents on ${touched} assets`);
 }

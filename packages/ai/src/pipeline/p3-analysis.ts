@@ -12,6 +12,7 @@ import type { BriefingPack } from "./helpers/briefing-pack";
 import { formatBriefingPackMinimal } from "./helpers/briefing-pack";
 import { buildTemporalAnchors, labelEventDate } from "./helpers/temporal-anchors";
 import { buildAssetTrajectoryLine } from "./helpers/episode-summary";
+import { buildTemporalCalendar, formatTemporalCalendar } from "./helpers/temporal-calendar";
 
 const KNOWLEDGE_DIR = path.resolve(__dirname, "..", "knowledge");
 
@@ -234,7 +235,7 @@ Le COT reflète les positions AVANT le move du jour, jamais pendant. Trois règl
    c. Signal de fond neutre : "pas de capitulation structurelle visible dans le COT" (sans relier au move du jour)
 Si le COT est cité dans un segment, le sourcesUsed DOIT noter "market_memory" avec le daysOld exact.
 - **Anti-répétition** : si un mécanisme est listé dans "MÉCANISMES DÉJÀ ENSEIGNÉS", ne le réexpliquez pas dans fondamentalContext ou causalChain. Trouvez un angle plus profond via le KNOWLEDGE : positionnement COT, saisonnalité, yield spreads, divergences de corrélation, impact sectoriel, etc.
-- **Lien data→banque centrale** : si une donnée macro (NFP, CPI, PCE, PMI) est sortie hier ET qu'une réunion CB est dans les 7 prochains jours (visible dans upcomingHighImpact), analyse explicitement : cette data confirme-t-elle ou remet-elle en cause le pricing de la prochaine décision ? Le marché bouge en AMONT des réunions grâce aux données — la donnée d'hier est peut-être plus importante que la décision à venir. Mentionner dans coreMechanism si pertinent.
+- **Lien data→banque centrale** : si une donnée macro (NFP, CPI, PCE, PMI) est sortie hier ET qu'une réunion CB est dans les 7 prochains jours (visible dans le CALENDRIER unifié J+N), analyse explicitement : cette data confirme-t-elle ou remet-elle en cause le pricing de la prochaine décision ? Le marché bouge en AMONT des réunions grâce aux données — la donnée d'hier est peut-être plus importante que la décision à venir. Mentionner dans coreMechanism si pertinent.
 - Pour les segments PANORAMA : analyse MINIMALE. Un keyFact par asset (mouvement + raison probable). Pas de causalChain, pas de scenarios, pas de chartInstructions.`;
 }
 
@@ -248,6 +249,7 @@ function buildC2UserPrompt(
   episodeSummaries?: EpisodeSummary[],
   cotPositioning?: import("@yt-maker/core").COTPositioning,
   prevContext?: PrevContext,
+  snapshot?: DailySnapshot,
 ): string {
   let prompt = '';
 
@@ -267,6 +269,14 @@ function buildC2UserPrompt(
     prompt += `- Les scenarios bullish/bearish doivent raisonner sur la semaine à venir, pas sur J+1.\n`;
     prompt += `- technicalReading : parle de "clôture hebdo", "niveaux testés cette semaine", pas "aujourd'hui".\n`;
     prompt += `- causalChain : maille hebdo (cause → effet sur 5 jours), pas 24h.\n\n`;
+  }
+
+  // Unified temporal calendar — single source of truth for events / earnings /
+  // CB speeches / CB decisions. Same block injected into C1, C2, C3 so the
+  // narrative timeline stays coherent across stages.
+  if (snapshot) {
+    const cal = buildTemporalCalendar(snapshot, prevContext, editorial.publishDate);
+    prompt += `${formatTemporalCalendar(cal)}\n`;
   }
 
   // Plan éditorial
@@ -441,6 +451,7 @@ export async function runC2Analysis(input: {
     input.episodeSummaries,
     input.snapshot.cotPositioning,
     input.prevContext,
+    input.snapshot,
   );
 
   console.log('  P3 C2 Sonnet — analyse approfondie...');

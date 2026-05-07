@@ -44,9 +44,14 @@ export function classifyEventTemporal(
 /**
  * Format an event with its actuals for narration prompts.
  * Includes actual/forecast/previous if present.
+ *
+ * Note : on n'expose JAMAIS l'heure précise (HH:MM) dans les prompts narratifs.
+ * Les heures viennent dans des fuseaux mixtes (EST / GMT / CET) selon la
+ * source — citer "13h30" sans le fuseau induit le narrateur en erreur. Le
+ * jour suffit ; le narrateur dit "mercredi" / "demain" / "aujourd'hui".
  */
 export function formatEventWithContext(event: EconomicEvent): string {
-  let line = `${event.time ?? '?'} ${event.name} (${event.currency}, ${event.impact})`;
+  let line = `${event.name} (${event.currency}, ${event.impact})`;
   if (event.forecast) line += ` consensus:${event.forecast}`;
   if (event.actual) line += ` résultat:${event.actual}`;
   if (event.previous) line += ` précédent:${event.previous}`;
@@ -438,10 +443,12 @@ export function buildBriefingPack(
     }));
 
   // ── Calendar highlights (today's events — labeled "hier" from viewer perspective) ──
+  // Pas d'heure précise : les sources mélangent EST/GMT/CET et le narrateur
+  // ne doit citer que le jour ("hier", "mercredi") — pas un horaire ambigu.
   const calendarHighlights = (flagged.events ?? [])
     .filter(e => e.impact === 'high' || e.impact === 'medium')
     .slice(0, 5)
-    .map(e => `hier ${e.time ?? '?'} ${e.name} (${e.currency}, ${e.impact})${e.actual ? ` résultat:${e.actual}` : ` consensus:${e.forecast ?? '?'}`}`);
+    .map(e => `hier ${e.name} (${e.currency}, ${e.impact})${e.actual ? ` résultat:${e.actual}` : ` consensus:${e.forecast ?? '?'}`}`);
 
   // ── Earnings in 3 buckets ──
   // Priority score: watchlist asset > named company > large EPS surprise > default
@@ -550,12 +557,14 @@ export function buildBriefingPack(
   }
 
   // ── Upcoming high-impact events (J+1 to J+7) — labeled with temporal context ──
+  // Pas d'heure précise : voir commentaire calendarHighlights ci-dessus. Le
+  // dateLabel ("demain", "mercredi", "dans 3 jours") suffit au narrateur.
   const upcomingHighImpact = (snapshot.upcomingEvents ?? [])
     .filter(e => e.impact === 'high')
     .slice(0, 10)
     .map(e => {
       const dateLabel = labelEventDate(e.date, snapshot.date);
-      return `${dateLabel} ${e.time ?? '?'} ${e.name} (${e.currency})`;
+      return `${dateLabel} ${e.name} (${e.currency})`;
     });
 
   // ── CB speeches yesterday (detect from calendar, enriched later by BIS) ──
@@ -754,8 +763,9 @@ export function formatBriefingPackMinimal(pack: BriefingPack): string {
     }
     text += '\n';
   }
+  // Contenu éditorial des discours BC (qui/quand sont dans le calendrier unifié)
   if (pack.cbSpeechesYesterday.length) {
-    text += `## DISCOURS BANQUES CENTRALES HIER (contexte éditorial important)\n`;
+    text += `## CONTENU DES DISCOURS BC (extraits éditoriaux — le calendrier ci-dessus indique qui/quand)\n`;
     for (const s of pack.cbSpeechesYesterday) text += `- ${s}\n`;
     text += `→ Analyser : était-ce attendu ? Qu'est-ce que ça change pour la trajectoire future ? Le marché avait-il déjà pricé ?\n\n`;
   }
@@ -767,21 +777,8 @@ export function formatBriefingPackMinimal(pack: BriefingPack): string {
     }
     text += '\n';
   }
-  if (pack.upcomingHighImpact.length) {
-    text += `## ÉVÉNEMENTS À VENIR (high impact, 7j)\n`;
-    for (const e of pack.upcomingHighImpact) text += `- ${e}\n`;
-    text += `→ Relie la data d'hier à la prochaine décision : la séance d'aujourd'hui pricé-t-elle déjà cet event ? Qu'est-ce qui confirmerait ou invaliderait le pricing actuel ?\n\n`;
-  }
-  if (pack.earningsBuckets.upcomingWatchlist.length || pack.earningsBuckets.upcoming.length) {
-    text += `## EARNINGS À VENIR (7j)\n`;
-    if (pack.earningsBuckets.upcomingWatchlist.length) {
-      text += `**Watchlist trackée** (priorité narrative — ces noms sont déjà suivis dans l'épisode) : ${pack.earningsBuckets.upcomingWatchlist.join(' | ')}\n`;
-    }
-    if (pack.earningsBuckets.upcoming.length) {
-      text += `**Autres notables** (contexte — cite uniquement si narrativement pertinent) : ${pack.earningsBuckets.upcoming.join(' | ')}\n`;
-    }
-    text += `→ Si un mouvement sectoriel aujourd'hui anticipe ces publications, flag-le explicitement (rotation pré-earnings, re-rating sur guidance attendue).\n\n`;
-  }
+  // ## ÉVÉNEMENTS À VENIR et ## EARNINGS À VENIR retirés — déjà dans le
+  // calendrier unifié injecté plus haut dans le prompt C2.
   return text;
 }
 
@@ -821,50 +818,25 @@ export function formatBriefingPack(pack: BriefingPack): string {
     text += '\n';
   }
 
-  if (pack.cbSpeechesYesterday.length) {
-    text += `## DISCOURS BANQUES CENTRALES HIER (contexte éditorial important)\n`;
-    for (const s of pack.cbSpeechesYesterday) {
-      text += `- ${s}\n`;
-    }
-    text += `→ Analyser : était-ce attendu ? Qu'est-ce que ça change pour la trajectoire future ? Le marché avait-il déjà pricé ?\n`;
-    text += '\n';
-  }
-
-  if (pack.calendarHighlights.length) {
-    text += `## CALENDAR HIGHLIGHTS\n`;
-    for (const h of pack.calendarHighlights) {
-      text += `- ${h}\n`;
-    }
-    text += '\n';
-  }
+  // ── REDONDANT AVEC LE CALENDRIER UNIFIÉ — sections retirées ──
+  // Les blocs ci-dessous étaient injectés AVANT l'introduction du calendrier
+  // unifié (helpers/temporal-calendar.ts). Désormais ils dupliqueraient ce
+  // qui figure dans `## CALENDRIER — SOURCE UNIQUE DE VÉRITÉ` :
+  // - cbSpeechesYesterday → calendrier (ligne 🗣 par institution)
+  // - calendarHighlights  → calendrier (J-N events)
+  // - earningsBuckets     → calendrier (lignes 💼 par jour)
+  // - upcomingHighImpact  → calendrier (J+N events)
+  //
+  // On garde ici uniquement ce qui n'est PAS dans le calendrier :
+  // - obligatoryMacroStats (curated avec surprise % calculée)
+  // - cotHighlights / cotDivergences (positionnement spéculateurs)
+  // - sentimentTrend (Fear & Greed sur 7 jours)
 
   if (pack.obligatoryMacroStats?.length) {
     text += `## ⚠ STATS MACRO OBLIGATOIRES À MENTIONNER\n`;
     text += `Ces stats sont sorties (ou attendues) sur la session couverte. Elles doivent OBLIGATOIREMENT être citées au moins une fois dans la narration — intégrées dans un segment existant pertinent (banques centrales, devise concernée, indice impacté), JAMAIS un segment dédié juste pour les évoquer. Si leur lien narratif n'est pas évident, citer en transition ou en contexte d'un autre point.\n`;
     for (const s of pack.obligatoryMacroStats) {
       text += `- ${s}\n`;
-    }
-    text += '\n';
-  }
-
-  if (pack.earningsBuckets.reported.length || pack.earningsBuckets.pending.length) {
-    text += `## EARNINGS DU JOUR\n`;
-    if (pack.earningsBuckets.reported.length) {
-      text += `Publiés: ${pack.earningsBuckets.reported.join(' | ')}\n`;
-    }
-    if (pack.earningsBuckets.pending.length) {
-      text += `En attente: ${pack.earningsBuckets.pending.join(' | ')}\n`;
-    }
-    text += '\n';
-  }
-
-  if (pack.earningsBuckets.upcomingWatchlist.length || pack.earningsBuckets.upcoming.length) {
-    text += `## EARNINGS À VENIR (7j)\n`;
-    if (pack.earningsBuckets.upcomingWatchlist.length) {
-      text += `**Watchlist trackée** (priorité narrative) : ${pack.earningsBuckets.upcomingWatchlist.join(' | ')}\n`;
-    }
-    if (pack.earningsBuckets.upcoming.length) {
-      text += `**Autres notables** : ${pack.earningsBuckets.upcoming.join(' | ')}\n`;
     }
     text += '\n';
   }
@@ -894,13 +866,7 @@ export function formatBriefingPack(pack: BriefingPack): string {
     text += '\n';
   }
 
-  if (pack.upcomingHighImpact.length) {
-    text += `## ÉVÉNEMENTS À VENIR (high impact, 7j)\n`;
-    for (const e of pack.upcomingHighImpact) {
-      text += `- ${e}\n`;
-    }
-    text += '\n';
-  }
+  // ## ÉVÉNEMENTS À VENIR retiré — désormais dans le calendrier unifié (J+N).
 
   if (pack.sentimentTrend) {
     const t = pack.sentimentTrend;

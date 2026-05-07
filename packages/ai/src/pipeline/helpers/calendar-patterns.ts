@@ -80,7 +80,7 @@ export function detectCalendarPatterns(
     patterns.push({
       type: 'macro_data_cluster',
       label: `${macroToday.length} données macro high-impact aujourd'hui`,
-      events: macroToday.map(e => `${e.time ?? '?'} ${e.name} (${e.currency})`),
+      events: macroToday.map(e => `${e.name} (${e.currency})`),
       editorial_hint: `Journée chargée en données macro — les résultats se renforcent ou se contredisent ? Cherche le signal dans le bruit.`,
     });
   }

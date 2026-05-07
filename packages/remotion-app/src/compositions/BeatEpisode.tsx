@@ -147,45 +147,54 @@ export interface BeatEpisodeProps {
   [key: string]: unknown;
 }
 
-// ── Owl video clips ──────────────────────────────────────────
-const OWL_INTRO_SRC = staticFile("owl-video/owl_seg1_seedance.mp4");
-const OWL_DIVE_SRC = staticFile("owl-video/owl_seg2_seedance.mp4");
-const OWL_INTRO_FRAMES = 300; // 10s @ 30fps
-const OWL_DIVE_FRAMES = 300; // 10s @ 30fps
-const OWL_CROSSFADE = 20; // crossfade from dive video into NewspaperPage
-const OWL_CLIP_OVERLAP = 15; // overlap between intro and dive for smooth transition
+// ── Owl Paris opener ────────────────────────────────────────
+// Single pre-rendered clip (V1 sit-talk + V2 stand + V3 walk-to-window + V4 dive-to-newspaper).
+// Replaces the previous owl_seg1 + owl_seg2 pair.
+const PARIS_OPENER_SRC = staticFile("owl-video/paris-opener.mp4");
+const PARIS_OPENER_FRAMES = 678; // 22.6s @ 30fps (real render length)
+const OWL_CROSSFADE = 20; // crossfade from end of opener into NewspaperPage
 
-// ── First-transition pushups clip ──────────────────────────────
-const OWL_PUSHUPS_SRC = staticFile("owl-video/owl_pushups.mp4");
-const OWL_PUSHUPS_START_IMG = staticFile("owl-video/owl_pushups_start.png");
-const OWL_PUSHUPS_END_IMG = staticFile("owl-video/owl_pushups_end.png");
-const PUSHUPS_FRAMES = 150; // 5s @ 30fps
-const PUSHUPS_FADE = 30; // 1s crossfade image → newspaper after video ends
+// ── Inter-segment owl video clips ──────────────────────────────
+// Each video plays for ~5s during a transition between segments, then crossfades to NewspaperPage.
+// Layered with start/end frame images to prevent flashes around the OffthreadVideo decode boundaries.
+const TRANSITION_VIDEO_FRAMES = 150; // 5s @ 30fps
+const TRANSITION_FADE_FRAMES = 30; // 1s crossfade image → newspaper after video ends
 
-/** Owl clip with fade-out at end */
-const OwlClipFade: React.FC<{
-  durationInFrames: number;
-  fadeOutFrames: number;
-  children: React.ReactNode;
-}> = ({ durationInFrames, fadeOutFrames, children }) => {
-  const frame = useCurrentFrame();
-  const op = interpolate(frame, [durationInFrames - fadeOutFrames, durationInFrames], [1, 0], {
-    extrapolateLeft: "clamp", extrapolateRight: "clamp",
-  });
-  return <AbsoluteFill style={{ opacity: op }}>{children}</AbsoluteFill>;
-};
+interface OwlTransitionClip {
+  videoSrc: string;
+  startImg: string;
+  endImg: string;
+}
 
-/** Owl dive clip: fade-in at start, crossfade to newspaper at end */
-const OwlDiveWithCrossfade: React.FC<{
+/** Ordered list of inter-segment owl clips. Transition i (between segments i and i+1)
+ *  uses TRANSITION_CLIPS[i] if defined, otherwise falls back to a static newspaper. */
+const TRANSITION_CLIPS: OwlTransitionClip[] = [
+  // T0 (after seg 1) — Paris V5: turn from window + walk right
+  {
+    videoSrc: staticFile("owl-video/paris_v5.mp4"),
+    startImg: staticFile("owl-video/paris_v5_start.png"),
+    endImg: staticFile("owl-video/paris_v5_end.png"),
+  },
+  // T1 (after seg 2) — Paris V6: walk toward camera
+  {
+    videoSrc: staticFile("owl-video/paris_v6.mp4"),
+    startImg: staticFile("owl-video/paris_v6_start.png"),
+    endImg: staticFile("owl-video/paris_v6_end.png"),
+  },
+  // T2 (after seg 3) — Paris V7: stop + take hands out + gesture
+  {
+    videoSrc: staticFile("owl-video/paris_v7.mp4"),
+    startImg: staticFile("owl-video/paris_v7_start.png"),
+    endImg: staticFile("owl-video/paris_v7_end.png"),
+  },
+];
+
+/** Paris opener (single pre-rendered clip) with crossfade to newspaper at end */
+const ParisOpenerWithCrossfade: React.FC<{
   durationInFrames: number;
   children: React.ReactNode;
 }> = ({ durationInFrames, children }) => {
   const frame = useCurrentFrame();
-  // Fade in at start (overlaps with intro clip)
-  const fadeIn = interpolate(frame, [0, OWL_CLIP_OVERLAP], [0, 1], {
-    extrapolateLeft: "clamp", extrapolateRight: "clamp",
-  });
-  // Fade out at end (crossfade to newspaper)
   const fadeStart = durationInFrames - OWL_CROSSFADE;
   const videoOp = interpolate(frame, [fadeStart, durationInFrames], [1, 0], {
     extrapolateLeft: "clamp", extrapolateRight: "clamp",
@@ -193,30 +202,30 @@ const OwlDiveWithCrossfade: React.FC<{
   const pageOp = interpolate(frame, [fadeStart, durationInFrames], [0, 1], {
     extrapolateLeft: "clamp", extrapolateRight: "clamp",
   });
-  const combinedVideoOp = Math.min(fadeIn, videoOp);
   return (
     <AbsoluteFill>
       <AbsoluteFill style={{ opacity: pageOp }}>{children}</AbsoluteFill>
-      <AbsoluteFill style={{ opacity: combinedVideoOp }}>
-        <OffthreadVideo src={OWL_DIVE_SRC} style={{ width: "100%", height: "100%" }} volume={0} muted onError={() => {}} />
+      <AbsoluteFill style={{ opacity: videoOp }}>
+        <OffthreadVideo src={PARIS_OPENER_SRC} style={{ width: "100%", height: "100%" }} volume={0} muted onError={() => {}} />
       </AbsoluteFill>
     </AbsoluteFill>
   );
 };
 
-/** First between-segment transition: layered crossfades to avoid white flashes.
+/** Generic inter-segment owl video transition: layered crossfades to avoid white flashes.
  *  Layer stack (bottom→top):
  *    1) end-image (always full opacity — revealed cleanly when video unmounts)
- *    2) video (plays frame 0 to PUSHUPS_FRAMES; last frame pixel-matches end-image)
+ *    2) video (plays frame 0 to TRANSITION_VIDEO_FRAMES; last frame pixel-matches end-image)
  *    3) start-image (opaque at frame 0, fades out → reveals video beneath, covers potential flash)
- *    4) newspaper (fades in over END_CF frames after video ends)
+ *    4) newspaper (fades in over TRANSITION_FADE_FRAMES frames after video ends)
  */
 const START_CF = 12; // 0.4s crossfade start-image → video
-const FirstTransitionBlock: React.FC<{
+const OwlVideoTransitionBlock: React.FC<{
+  clip: OwlTransitionClip;
   durationInFrames: number;
   npProps: React.ComponentProps<typeof NewspaperPage>;
   activeSegmentIdx: number;
-}> = ({ durationInFrames, npProps, activeSegmentIdx }) => {
+}> = ({ clip, npProps, activeSegmentIdx }) => {
   const frame = useCurrentFrame();
 
   const startImgOpacity = interpolate(frame, [0, START_CF], [1, 0], {
@@ -224,24 +233,24 @@ const FirstTransitionBlock: React.FC<{
   });
   const npOpacity = interpolate(
     frame,
-    [PUSHUPS_FRAMES, PUSHUPS_FRAMES + PUSHUPS_FADE],
+    [TRANSITION_VIDEO_FRAMES, TRANSITION_VIDEO_FRAMES + TRANSITION_FADE_FRAMES],
     [0, 1],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
   );
-  const videoVisible = frame < PUSHUPS_FRAMES;
+  const videoVisible = frame < TRANSITION_VIDEO_FRAMES;
   const imgStyle = { width: "100%", height: "100%", objectFit: "cover" } as const;
 
   return (
     <AbsoluteFill>
-      {/* 1. End image as stable base — prevents flash when video unmounts */}
+      {/* 1. End image as stable base */}
       <AbsoluteFill>
-        <img src={OWL_PUSHUPS_END_IMG} style={imgStyle} alt="" />
+        <img src={clip.endImg} style={imgStyle} alt="" />
       </AbsoluteFill>
       {/* 2. Video plays above end image */}
       {videoVisible && (
         <AbsoluteFill>
           <OffthreadVideo
-            src={OWL_PUSHUPS_SRC}
+            src={clip.videoSrc}
             muted
             volume={0}
             style={imgStyle}
@@ -252,7 +261,7 @@ const FirstTransitionBlock: React.FC<{
       {/* 3. Start image crossfades out to reveal video */}
       {startImgOpacity > 0 && (
         <AbsoluteFill style={{ opacity: startImgOpacity }}>
-          <img src={OWL_PUSHUPS_START_IMG} style={imgStyle} alt="" />
+          <img src={clip.startImg} style={imgStyle} alt="" />
         </AbsoluteFill>
       )}
       {/* 4. Newspaper crossfades in from end image at the end of the block */}
@@ -276,25 +285,26 @@ const PUNCH_CARD_FRAMES = 180; // 6s cold-open punch card (~2s per fragment for 
 
 const PRE_SEGMENT_IDS = ["hook", "thread"];
 
-/** Minimum frames required for the pushups-clip first-transition block:
+/** Minimum frames required for any owl-video transition block:
  *  video + crossfade to newspaper + 15f newspaper tail before zoom-in. */
-const FIRST_TRANSITION_MIN_FRAMES = PUSHUPS_FRAMES + PUSHUPS_FADE + 15;
+const VIDEO_TRANSITION_MIN_FRAMES = TRANSITION_VIDEO_FRAMES + TRANSITION_FADE_FRAMES + 15;
 
-/** Get transition duration in frames for a given segment, using real owl audio duration if available. */
+/** Get transition duration in frames for a given segment, using real owl audio duration if available.
+ *  Transitions with index < TRANSITION_CLIPS.length embed a 5s owl video, so they need a minimum. */
 function getBetweenFrames(
   segId: string,
   fps: number,
   owlAudioDurations: Record<string, number> | undefined,
-  isFirstTransition: boolean,
+  transitionIdx: number,
 ): number {
   const key = `owl_tr_${segId}`;
   const audioDur = owlAudioDurations?.[key];
   const audioFrames = audioDur && audioDur > 0
     ? Math.round(audioDur * fps) + 15
     : BETWEEN_FRAMES_DEFAULT;
-  // First transition embeds the 5s pushups video, so ensure enough room.
-  if (isFirstTransition) {
-    return Math.max(FIRST_TRANSITION_MIN_FRAMES, audioFrames);
+  // Transitions with a pre-rendered owl video need to fit it.
+  if (transitionIdx >= 0 && transitionIdx < TRANSITION_CLIPS.length) {
+    return Math.max(VIDEO_TRANSITION_MIN_FRAMES, audioFrames);
   }
   return audioFrames;
 }
@@ -418,7 +428,7 @@ export function computeNewspaperDuration(
       // CROSSFADE_FRAMES overlap means beats start earlier, reducing total
       segTotal += ZOOM_FRAMES + dur + ZOOM_FRAMES - CROSSFADE_FRAMES;
     }
-    if (i < segIds.length - 1) segTotal += getBetweenFrames(segIds[i], fps, owlAudioDurations, i === 0);
+    if (i < segIds.length - 1) segTotal += getBetweenFrames(segIds[i], fps, owlAudioDurations, i);
   }
 
   const closingBeatsDur = groups.has("closing")
@@ -426,8 +436,7 @@ export function computeNewspaperDuration(
     : MIN_CLOSING_FRAMES;
   const closingDur = closingBeatsDur + getOwlClosingFrames(fps, owlAudioDurations);
 
-  const owlTotal = OWL_INTRO_FRAMES + OWL_DIVE_FRAMES - OWL_CLIP_OVERLAP;
-  return PUNCH_CARD_FRAMES + owlTotal + newspaperIntro + segTotal + closingDur;
+  return PUNCH_CARD_FRAMES + PARIS_OPENER_FRAMES + newspaperIntro + segTotal + closingDur;
 }
 
 // ── CrossfadeBeat ────────────────────────────────────────────
@@ -557,10 +566,9 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
     );
 
     // Section start times (absolute frames)
-    // Cold-open punch card → owl intro + dive → newspaper intro
-    const owlTotalFrames = OWL_INTRO_FRAMES + OWL_DIVE_FRAMES - OWL_CLIP_OVERLAP;
+    // Cold-open punch card → Paris opener → newspaper intro
     const sectionStarts = new Map<string, number>();
-    let preCum = PUNCH_CARD_FRAMES + owlTotalFrames;
+    let preCum = PUNCH_CARD_FRAMES + PARIS_OPENER_FRAMES;
     for (const id of PRE_SEGMENT_IDS) {
       if (beatGroups.has(id)) {
         sectionStarts.set(id, preCum);
@@ -578,7 +586,7 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
       zoomOutStart: number;
       end: number;
     }
-    let segCum = PUNCH_CARD_FRAMES + owlTotalFrames + newspaperIntroFrames;
+    let segCum = PUNCH_CARD_FRAMES + PARIS_OPENER_FRAMES + newspaperIntroFrames;
     const segs: SegTiming[] = segmentIds.map((segId, i) => {
       const crossfadeDur = groupDurationFrames(
         beatGroups.get(segId) ?? [],
@@ -593,7 +601,7 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
       if (isPanorama) {
         // PANORAMA: no zoom in/out — stays on newspaper page with StampOverlay + audio
         const beatsStart = segCum;
-        const betweenF = getBetweenFrames(segId, fps, owlAudioDurations as any, i === 0);
+        const betweenF = getBetweenFrames(segId, fps, owlAudioDurations as any, i);
         const end = beatsStart + dur + (isLast ? 0 : betweenF);
         sectionStarts.set(segId, beatsStart);
         segCum = end;
@@ -608,7 +616,7 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
         };
       }
 
-      const betweenF = getBetweenFrames(segId, fps, owlAudioDurations as any, i === 0);
+      const betweenF = getBetweenFrames(segId, fps, owlAudioDurations as any, i);
       const zoomInStart = segCum;
       // Beats start CROSSFADE_FRAMES before zoom ends (overlap for smooth transition)
       const beatsStart = zoomInStart + ZOOM_FRAMES - CROSSFADE_FRAMES;
@@ -747,28 +755,21 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
         </Sequence>
       ))}
 
-      {/* ── 1. Owl Intro clip (8s) — fades out at end ── */}
-      <Sequence from={PUNCH_CARD_FRAMES} durationInFrames={OWL_INTRO_FRAMES}>
-        <OwlClipFade durationInFrames={OWL_INTRO_FRAMES} fadeOutFrames={OWL_CLIP_OVERLAP}>
-          <OffthreadVideo src={OWL_INTRO_SRC} style={{ width: "100%", height: "100%" }} volume={0} muted onError={() => {}} />
-        </OwlClipFade>
-      </Sequence>
-
-      {/* ── 2. Owl Dive clip (10s) — fades in at start, crossfades to newspaper at end ── */}
-      <Sequence from={PUNCH_CARD_FRAMES + OWL_INTRO_FRAMES - OWL_CLIP_OVERLAP} durationInFrames={OWL_DIVE_FRAMES}>
-        <OwlDiveWithCrossfade durationInFrames={OWL_DIVE_FRAMES}>
+      {/* ── 1. Paris opener (V1+V2+V3+V4 pre-rendered, 22.6s) — crossfades to newspaper at end ── */}
+      <Sequence from={PUNCH_CARD_FRAMES} durationInFrames={PARIS_OPENER_FRAMES}>
+        <ParisOpenerWithCrossfade durationInFrames={PARIS_OPENER_FRAMES}>
           <NewspaperPage
             {...npProps}
             activeSegmentIdx={0}
             showTypewriter
             cardRevealSpread={timings.newspaperIntroFrames}
           />
-        </OwlDiveWithCrossfade>
+        </ParisOpenerWithCrossfade>
       </Sequence>
 
-      {/* ── 3. Newspaper intro (pre-segment audio plays over this) ── */}
+      {/* ── 2. Newspaper intro (pre-segment audio plays over this) ── */}
       <Sequence
-        from={PUNCH_CARD_FRAMES + OWL_INTRO_FRAMES + OWL_DIVE_FRAMES - OWL_CLIP_OVERLAP}
+        from={PUNCH_CARD_FRAMES + PARIS_OPENER_FRAMES}
         durationInFrames={timings.newspaperIntroFrames}
       >
         <NewspaperPage
@@ -786,7 +787,7 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
 
       {/* ── SFX: Individual key strikes during headline typewriter ── */}
       {(() => {
-        const typeStart = PUNCH_CARD_FRAMES + OWL_INTRO_FRAMES + OWL_DIVE_FRAMES - OWL_CLIP_OVERLAP;
+        const typeStart = PUNCH_CARD_FRAMES + PARIS_OPENER_FRAMES;
         const titleLen = script.title?.length ?? 40;
         const charsPerFrame = 1.2;
         // One strike every ~4 chars (not every char — too dense)
@@ -920,16 +921,16 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
               );
             })}
 
-            {/* Zoom Out → i===0: direct cut to pushups image (no zoom avoids zooming into random region);
-                otherwise zoom out onto newspaper card. */}
+            {/* Zoom Out → if next transition has an owl video: direct cut to that video's start image
+                (no zoom avoids zooming into random region); otherwise zoom out onto newspaper card. */}
             <Sequence
               from={st.zoomOutStart}
               durationInFrames={ZOOM_FRAMES}
             >
-              {i === 0 ? (
+              {i < TRANSITION_CLIPS.length ? (
                 <AbsoluteFill>
                   <img
-                    src={OWL_PUSHUPS_START_IMG}
+                    src={TRANSITION_CLIPS[i].startImg}
                     style={{ width: "100%", height: "100%", objectFit: "cover" }}
                     alt=""
                   />
@@ -956,14 +957,15 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
               <Audio src={getSfxPath("pageFlip", i)} volume={SFX_VOLUME.pageFlip} />
             </Sequence>
 
-            {/* Brief pause on newspaper between segments */}
+            {/* Brief pause on newspaper between segments — owl video transition for first N transitions, then static newspaper */}
             {i < segmentIds.length - 1 && st.betweenFrames > 0 && (
-              i === 0 ? (
+              i < TRANSITION_CLIPS.length ? (
                 <Sequence
                   from={st.zoomOutStart + ZOOM_FRAMES}
                   durationInFrames={st.betweenFrames}
                 >
-                  <FirstTransitionBlock
+                  <OwlVideoTransitionBlock
+                    clip={TRANSITION_CLIPS[i]}
                     durationInFrames={st.betweenFrames}
                     npProps={npProps}
                     activeSegmentIdx={i + 1}
@@ -1006,12 +1008,22 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
         <Audio src={getSfxPath("close", 0)} volume={SFX_VOLUME.close} />
       </Sequence>
 
-      {/* ── Owl audio: intro over video clips (plays before beats — no overlap) ── */}
-      {owlIntroAudio && (
-        <Sequence from={PUNCH_CARD_FRAMES} durationInFrames={OWL_INTRO_FRAMES + OWL_DIVE_FRAMES}>
-          <Audio src={staticFile(owlIntroAudio)} volume={1} />
-        </Sequence>
-      )}
+      {/* ── Owl audio: intro over video clips ── */}
+      {/* Durée audio = vraie durée du MP3 + 3 frames buffer (pas la durée vidéo).
+          Évite de couper la fin de l'owl intro si l'audio dépasse les 20s de la
+          séquence vidéo. L'audio peut overlapper sur le newspaper visuel —
+          c'est OK, on préfère entendre la phrase complète. */}
+      {owlIntroAudio && (() => {
+        const introDur = (owlAudioDurations as Record<string, number> | undefined)?.["owl_intro"];
+        const audioFrames = introDur && introDur > 0
+          ? Math.round(introDur * fps) + 3
+          : PARIS_OPENER_FRAMES;
+        return (
+          <Sequence from={PUNCH_CARD_FRAMES} durationInFrames={audioFrames}>
+            <Audio src={staticFile(owlIntroAudio)} volume={1} />
+          </Sequence>
+        );
+      })()}
 
       {/* ── Owl audio: transitions between segments (over cream background) ── */}
       {/* owlTransition text introduces the NEXT segment, so we play seg[i-1]'s audio before seg[i] */}

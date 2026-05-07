@@ -40,6 +40,11 @@ const FORBIDDEN_WORDS = [
 // Mots qui doivent apparaître dans la description pour signaler le disclaimer
 const DISCLAIMER_KEYWORDS = ['informatif', 'conseil', 'risque', 'éducatif'];
 
+// Ligne de transparence production (mention IA discrète, signal préventif YouTube policy 15/07/2025)
+const PRODUCTION_LINE =
+  'Production : voix de synthèse Owl Street Journal, écriture et recherche éditoriale assistées.';
+const PRODUCTION_LINE_KEYWORD = 'voix de synthèse';
+
 // ─── Helpers déterministes ─────────────────────────────────────────────
 
 /**
@@ -104,7 +109,7 @@ function formatDateFR(isoDate: string): { dateShort: string; dayLabel: string; d
 // ─── Validation mécanique ─────────────────────────────────────────────
 
 export interface SEOValidationIssue {
-  field: 'title' | 'description' | 'chapters' | 'tags' | 'hashtags';
+  field: 'title' | 'description' | 'chapters' | 'tags' | 'hashtags' | 'pinnedComment';
   severity: 'blocker' | 'warning';
   description: string;
 }
@@ -155,6 +160,18 @@ export function validateSEOMetadata(seo: SEOMetadata): SEOValidationIssue[] {
   }
   if (wordCount > 700) {
     issues.push({ field: 'description', severity: 'warning', description: `description longue (${wordCount} mots, cible 200-400)` });
+  }
+  // First line (above-the-fold) must be 50-130 chars and look hook-y, not plain "Bourse du X : a-b-c"
+  const firstLine = seo.description.split('\n')[0] ?? '';
+  if (firstLine.length < 50) {
+    issues.push({ field: 'description', severity: 'warning', description: `1ère ligne trop courte (${firstLine.length} chars, cible 100-130)` });
+  }
+  if (firstLine.length > 150) {
+    issues.push({ field: 'description', severity: 'warning', description: `1ère ligne trop longue (${firstLine.length} chars — risque coupure dans snippet)` });
+  }
+  // Anti-pattern: plain "Bourse du JJ mois : keyword1, keyword2, keyword3" → descriptif sec, pas de hook
+  if (/^Bourse du \d+\s+\w+\s*:\s*[^—.!?]+,\s*[^—.!?]+,/.test(firstLine)) {
+    issues.push({ field: 'description', severity: 'warning', description: `1ère ligne en "Bourse du X : a, b, c" → trop descriptif/plat. Préférer un hook curiosity-gap ou paradoxe.` });
   }
   // Disclaimer above-the-fold (300 premiers chars)
   const above = seo.description.slice(0, 350).toLowerCase();
@@ -219,6 +236,38 @@ export function validateSEOMetadata(seo: SEOMetadata): SEOValidationIssue[] {
     }
   }
 
+  // ── Pinned comment (optionnel) ─────────────────────────
+  if (seo.pinnedComment !== undefined) {
+    const pc = seo.pinnedComment;
+    if (pc.length < 80) {
+      issues.push({ field: 'pinnedComment', severity: 'warning', description: `pinnedComment trop court (${pc.length} chars, cible 150-350)` });
+    }
+    if (pc.length > 500) {
+      issues.push({ field: 'pinnedComment', severity: 'blocker', description: `pinnedComment trop long (${pc.length} chars, max 500)` });
+    }
+    // Liens interdits (spam flag YouTube)
+    if (/https?:\/\/|www\.|youtu\.be|youtube\.com|t\.co\/|@\w{3,}/.test(pc)) {
+      issues.push({ field: 'pinnedComment', severity: 'blocker', description: `pinnedComment contient un lien ou @mention (filtré comme spam)` });
+    }
+    // Hashtags interdits dans commentaire
+    if (/#\w{2,}/.test(pc)) {
+      issues.push({ field: 'pinnedComment', severity: 'warning', description: `pinnedComment contient un hashtag (à mettre dans la description)` });
+    }
+    // Mots interdits
+    const pcLower = pc.toLowerCase();
+    for (const word of FORBIDDEN_WORDS) {
+      if (pcLower.includes(word)) {
+        issues.push({ field: 'pinnedComment', severity: 'blocker', description: `mot interdit "${word}" dans pinnedComment` });
+        break;
+      }
+    }
+    // Emojis : max 3 (un peu plus tolérant que le titre)
+    const pcEmojis = (pc.match(/\p{Extended_Pictographic}/gu) || []).length;
+    if (pcEmojis > 3) {
+      issues.push({ field: 'pinnedComment', severity: 'warning', description: `${pcEmojis} emojis dans pinnedComment (max 3)` });
+    }
+  }
+
   // ── Hashtags ───────────────────────────────────────────
   if (seo.hashtags.length !== 3) {
     issues.push({ field: 'hashtags', severity: 'warning', description: `${seo.hashtags.length} hashtags (recommandé exactement 3 pour placement above-title)` });
@@ -267,7 +316,8 @@ Traders particuliers et investisseurs amateurs francophones (FR/BE/CH/QC), nivea
   "description": string,     // 250-400 mots structurée (voir TEMPLATE)
   "chapters": [{ "time": "MM:SS", "label": string }],   // labels uniquement, timestamps imposés
   "tags": string[],          // 8-12 tags
-  "hashtags": string[]       // exactement 3, SANS le #
+  "hashtags": string[],      // exactement 3, SANS le #
+  "pinnedComment": string    // premier commentaire d'engagement (150-350 chars)
 }
 
 # RÈGLES TITRE (35-65 chars cible, 70 max)
@@ -301,8 +351,31 @@ Sentence case (1ère lettre + noms propres). 1 mot capitalisé MAX pour emphase,
 
 Structure OBLIGATOIRE (respecte l'ordre et les marqueurs) :
 
-[Ligne 1 — 100-130 chars MAX, c'est le "above the fold"]
-Synthèse du jour avec le keyword principal et la date courte. Inclure : le mouvement principal du jour + asset clé.
+[Ligne 1 — 100-130 chars MAX, c'est le "above the fold" — 1ère LIGNE CRUCIALE pour le SEO + CTR]
+
+⚠️ Cette ligne décide si le viewer clique "Plus" ou scroll. C'est la SEULE qui s'affiche dans les snippets de recherche YouTube et Google. Doit être un HOOK CURIOSITY-GAP, pas un résumé sec.
+
+## Patterns à utiliser (curiosity-gap > description plate)
+
+A) **Paradoxe / contradiction** :
+   ✅ "Trump a suspendu une opération militaire et le pétrole a perdu 4% — pourtant la prime physique tient bon."
+   ✅ "Le KOSPI bat un record absolu pendant que HSBC plonge sur des résultats... corrects."
+   ❌ "Bourse du 6 mai : pétrole -3,9 %, KOSPI au sommet, S&P 500 à +0,81 %." (plat, descriptif)
+
+B) **Cliffhanger / question implicite** :
+   ✅ "Trois banques centrales en 24h, et c'est le dollar australien qui sort grand gagnant. Voici pourquoi."
+   ✅ "Bitcoin à 80 000 $ malgré deux forces qui se tirent dessus. Le marché tranche aujourd'hui."
+
+C) **Chiffre saillant + cause cachée** :
+   ✅ "Samsung +17% sur la séance — un détail technique relance toute la chaîne IA."
+
+## Règles dures
+- 100-130 chars MAX (compté précisément, sinon coupé dans le snippet).
+- Inclure le keyword principal du jour (le mouvement clé).
+- Inclure la date courte ("6 mai" ou "06/05") MAIS pas comme préfixe — l'intégrer dans la phrase.
+- Ton conditionnel + sobre (compliance AMF).
+- AUCUN clickbait : pas de "INCROYABLE", "CHOC", "PERSONNE NE VOIT", "DOIT VOIR".
+- Construit pour faire cliquer "Plus" → générer du watch time.
 
 [Ligne vide]
 
@@ -340,6 +413,7 @@ Suivez la chaîne pour le récap quotidien des marchés.
 
 📊 SOURCES & MÉTHODOLOGIE
 Données : Yahoo Finance, FRED, Finnhub, RSS Reuters/Bloomberg. Mise à jour quotidienne.
+Production : voix de synthèse Owl Street Journal, écriture et recherche éditoriale assistées.
 
 [Ligne vide]
 
@@ -353,10 +427,20 @@ Ce contenu est à but informatif et éducatif. Il ne constitue ni un conseil en 
 
 Tu dois fournir UN LABEL pour chaque timestamp imposé (l'ordre et les temps sont fixés par le code, ne les modifie pas).
 
+⚠️ FORMAT CRITIQUE pour la description (sinon YouTube ne détecte pas les chapitres) :
+- Format STRICT : "MM:SS LABEL" (avec UN SEUL espace entre le timestamp et le label)
+- INTERDIT : "MM:SS — LABEL" (tiret cadratin) → casse la détection YouTube
+- INTERDIT : "MM:SS - LABEL" (tiret simple) → idem
+- INTERDIT : "MM:SS : LABEL" (deux-points avant) → idem
+- INTERDIT : "MM:SS | LABEL" → idem
+- ✅ CORRECT : "00:00 Intro Le marché en 30 secondes"
+- ✅ CORRECT : "01:30 CAC 40 la peur l'emporte"
+
 Format label :
 - 25-45 chars idéal (max 60).
 - Hybride asset + micro-narrative ("CAC 40 : la peur l'emporte", "Or : nouveau record").
-- Pas de "Intro" sec — préférer "Intro — Le marché en 30 secondes" ou "[date courte] : ce qui bouge".
+- Le label PEUT contenir des deux-points/tirets À L'INTÉRIEUR du label (ex: "Or : nouveau record"), juste pas comme séparateur après le timestamp.
+- Pas de "Intro" tout court — préférer "Intro Le marché en 30 secondes" ou "[date courte] ce qui bouge".
 - Pas de mots interdits (krach, etc.).
 - Sentence case.
 
@@ -378,6 +462,44 @@ Le 1er apparaît au-dessus du titre = placement premium. Ordre par importance.
 Pour daily recap finance FR, recommandation par défaut : ["Bourse", "CAC40", "Marches"]
 Adapter au jour : si journée Wall Street dominante, "WallStreet" peut remplacer "CAC40".
 Si crypto dominante, "Bitcoin" ou "Crypto" possible.
+
+# RÈGLES PINNED COMMENT (150-350 chars idéal, 500 max — premier commentaire d'engagement)
+
+Ce commentaire est posté automatiquement par le bot après upload, en tant que propriétaire de chaîne. Sera épinglé manuellement (= "Commentaire le plus utile" en haut de la section commentaires). Objectif : engager les viewers à répondre + soft CTA abonnement.
+
+## Structure recommandée (3 phrases, dans cet ordre)
+1. **Hook éditorial** (1 phrase, 60-100 chars) : un fait saillant ou un paradoxe du jour, formulé pour faire réfléchir. PAS un résumé — un angle.
+2. **Question ouverte** (1 phrase, 60-120 chars) : une question d'opinion liée au sujet du jour, qui invite les viewers à répondre. Format "Vous pensez que...?" ou "Pour vous, X ou Y ?". Termine par 👇 (un seul emoji).
+3. **CTA soft** (optionnel, 1 phrase courte) : "Abonne-toi pour le récap quotidien." ou variante. Pas obligatoire.
+
+## RÈGLES DURES
+- 150-350 chars idéal (max 500). Trop court = pauvre, trop long = TLDR.
+- AUCUN lien (URL, t.co, youtu.be, mention de chaîne par @) — YouTube anti-spam flag direct.
+- AUCUN hashtag dans le commentaire (les hashtags sont dans la description).
+- Tu peux utiliser 1-2 emojis MAX (👇 pour la question, ou 📊/🛢️/💱 selon le sujet, mais sobre).
+- Pas de TOUT EN MAJUSCULES.
+- Pas de "Salut tout le monde", "Hey les amis" — direct.
+- Ton : éditorial humble, factuel. Comme un pote trader qui te raconte. Tutoiement OK.
+- Conditionnel obligatoire si tu évoques le futur ("pourrait", "semble").
+- Mots interdits : krach, crash, panique, urgent, "achetez", "vendez", "ne ratez pas".
+- Pas de "first" ou "premier commentaire" (cringe).
+- N'inclus PAS de timestamps ni de récap des chapitres (déjà dans la description).
+
+## Bons exemples (pour calibrer le ton)
+
+✅ "La désescalade efface 4% du brut en une séance, mais la prime de fret tient bon. Pour vous, le vrai signal cette semaine c'est l'emploi US vendredi ou la prochaine étape diplomatique dans le Golfe ? 👇
+
+Abonne-toi pour le récap quotidien."
+
+✅ "KOSPI au record absolu pendant que HSBC plonge sur des résultats... corrects. Vous pensez que c'est l'Asie qui mène le cycle IA ou Wall Street fait mine de pas voir ? 👇"
+
+✅ "Trois banques centrales en 24h, et le dollar australien sort grand gagnant. Quelle banque centrale a le plus surpris pour vous ? 👇
+
+Abonne-toi si tu veux décortiquer ça chaque jour."
+
+❌ MAUVAIS : "Salut tout le monde ! N'oubliez pas de LIKER et de vous ABONNER pour ne rien rater ! 🚨🚨🚨" (clickbait + caps + spammy)
+❌ MAUVAIS : "Voici le récap du jour. Bonne vidéo." (plat, zéro engagement)
+❌ MAUVAIS : "Lien vers le suivant : youtu.be/..." (lien = spam flag)
 
 # Discipline finale
 - Ne JAMAIS inventer de chiffres : tous les % et niveaux doivent venir des données fournies.
@@ -502,6 +624,15 @@ export async function runC10SEO(input: {
   // Force timestamps to be the deterministic ones (LLM only chose labels)
   seo.chapters = enforceTimestamps(seo.chapters, chapters);
 
+  // Sanitize chapter format dans la description : YouTube exige "MM:SS LABEL"
+  // strict (espace simple). Le tiret cadratin/simple/deux-points entre timestamp
+  // et label CASSE la détection des chapitres. Si Sonnet a glissé un séparateur,
+  // on le retire ici.
+  seo.description = seo.description.replace(
+    /(^|\n)(\d{1,2}:\d{2}(?::\d{2})?)\s*[—–\-:|·]\s+/g,
+    '$1$2 ',
+  );
+
   // Mechanical validation
   const issues = validateSEOMetadata(seo);
   const blockers = issues.filter(i => i.severity === 'blocker');
@@ -583,6 +714,20 @@ function applyMechanicalFixes(seo: SEOMetadata, script: DraftScript, editorial: 
     description = `Récap des marchés du ${fmt.dateShort} : ${editorial.dominantTheme}.\n\n${disclaimerLine}${description}`;
   }
 
+  // Safety net: ensure production transparency line is present (anti-"inauthentic content" signal).
+  // If Sonnet strips it, re-inject before the disclaimer block (or append to SOURCES section if present).
+  if (!description.toLowerCase().includes(PRODUCTION_LINE_KEYWORD)) {
+    const sourcesMatch = description.match(/(📊 SOURCES[^\n]*\n[^\n]+)/);
+    if (sourcesMatch) {
+      description = description.replace(sourcesMatch[1], `${sourcesMatch[1]}\n${PRODUCTION_LINE}`);
+    } else {
+      description = description.replace(
+        /(\n+DISCLAIMER COMPLET)/,
+        `\n\n📊 SOURCES & MÉTHODOLOGIE\nDonnées : Yahoo Finance, FRED, Finnhub, RSS Reuters/Bloomberg.\n${PRODUCTION_LINE}$1`,
+      );
+    }
+  }
+
   return { ...seo, title, description };
 }
 
@@ -620,13 +765,19 @@ ${chapters.map(c => `${c.time} ${c.defaultLabel}`).join('\n')}
 • Theme dominant : ${editorial.dominantTheme}
 • ${editorial.closingTeaser}
 
-📊 SOURCES
+📊 SOURCES & MÉTHODOLOGIE
 Données : Yahoo Finance, FRED, Finnhub, RSS Reuters/Bloomberg.
+Production : voix de synthèse Owl Street Journal, écriture et recherche éditoriale assistées.
 
 DISCLAIMER COMPLET
 Ce contenu est à but informatif et éducatif. Il ne constitue ni un conseil en investissement, ni une recommandation personnalisée, ni une sollicitation à l'achat ou à la vente d'instruments financiers. Les performances passées ne préjugent pas des performances futures. Investir comporte des risques de perte en capital. Consultez un conseiller en investissement financier agréé avant toute décision.
 
 #Bourse #CAC40 #Marches`;
+
+  const topMover = topAssets[0];
+  const pinnedComment = topMover
+    ? `${topMover.name} ${topMover.changePct >= 0 ? '+' : ''}${topMover.changePct.toFixed(2)}% sur la séance — ${editorial.dominantTheme.toLowerCase()}. Pour vous, c'est le mouvement clé du jour ou un signal plus profond ? 👇\n\nAbonne-toi pour le récap quotidien.`
+    : `${editorial.dominantTheme}. Vous le voyez comment côté positionnement ? 👇\n\nAbonne-toi pour le récap quotidien.`;
 
   return {
     title,
@@ -644,5 +795,6 @@ Ce contenu est à but informatif et éducatif. Il ne constitue ni un conseil en 
       'investissement bourse',
     ],
     hashtags: ['Bourse', 'CAC40', 'Marches'],
+    pinnedComment,
   };
 }

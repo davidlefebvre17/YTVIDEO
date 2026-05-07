@@ -17,6 +17,7 @@ import { SAMPLE_BEATS } from "./fixtures/sample-beats";
 import REAL_PROPS from "./fixtures/real-beats.json";
 import EPISODE_INDEX from "./fixtures/episode-index.json";
 import { BeatEpisode, computeNewspaperDuration } from "./compositions/BeatEpisode";
+import { ParisOpener, PARIS_OPENER_DURATION_FRAMES } from "./compositions/ParisOpener";
 import { StampOverlay } from "./scenes/shared/StampOverlay";
 import { ThumbnailScene, SAMPLE_THUMBNAIL_PROPS } from "./scenes/ThumbnailScene";
 import { ThumbnailTabloid, SAMPLE_PROPS as SAMPLE_TABLOID } from "./scenes/thumbnail-variants/ThumbnailTabloid";
@@ -561,6 +562,17 @@ export const RemotionRoot: React.FC = () => {
           defaultProps={{
             section: outroSection,
           }}
+        />
+      </Folder>
+
+      <Folder name="ParisOpener">
+        <Composition
+          id="ParisOpener"
+          component={ParisOpener}
+          durationInFrames={PARIS_OPENER_DURATION_FRAMES}
+          fps={30}
+          width={1920}
+          height={1080}
         />
       </Folder>
 

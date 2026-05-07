@@ -41,7 +41,7 @@ const LikeCard: React.FC<{
   });
   const opacity = Math.min(enter, fadeOut);
   const scale = interpolate(enter, [0, 1], [0.5, 1]);
-  const baseRotate = interpolate(enter, [0, 1], [-14, -3]);
+  const baseRotate = interpolate(enter, [0, 1], [14, 3]);
 
   // Draw-in des traits principaux
   const strokeLen = 420;
@@ -98,10 +98,10 @@ const LikeCard: React.FC<{
       style={{
         position: "absolute",
         top: 60,
-        left: 60,
+        right: 60,
         opacity,
         transform: `scale(${scale}) rotate(${baseRotate}deg)`,
-        transformOrigin: "top left",
+        transformOrigin: "top right",
         pointerEvents: "none",
       }}
     >
@@ -158,7 +158,7 @@ const LikeCard: React.FC<{
           style={{
             position: "absolute",
             top: -28,
-            right: 40,
+            left: 40,
             transform: `scale(${stampScale}) rotate(${stampRotate}deg)`,
             transformOrigin: "center",
             backgroundColor: accentColor,
@@ -351,7 +351,7 @@ const SubscribeCard: React.FC<{
   });
   const opacity = Math.min(enter, fadeOut);
   const scale = interpolate(enter, [0, 1], [0.5, 1]);
-  const baseRotate = interpolate(enter, [0, 1], [10, 2]);
+  const baseRotate = interpolate(enter, [0, 1], [-10, -2]);
 
   const strokeLen = 480;
   const dashOffset = interpolate(rel, [3, 30], [strokeLen, 0], {
@@ -405,10 +405,10 @@ const SubscribeCard: React.FC<{
       style={{
         position: "absolute",
         top: 280,
-        left: 140,
+        right: 140,
         opacity,
         transform: `scale(${scale}) rotate(${baseRotate}deg)`,
-        transformOrigin: "top left",
+        transformOrigin: "top right",
         pointerEvents: "none",
       }}
     >
@@ -463,7 +463,7 @@ const SubscribeCard: React.FC<{
           style={{
             position: "absolute",
             top: -28,
-            right: 32,
+            left: 32,
             transform: `scale(${stampScale}) rotate(${stampRotate}deg)`,
             transformOrigin: "center",
             backgroundColor: accentColor,

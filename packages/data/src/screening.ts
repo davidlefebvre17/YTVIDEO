@@ -75,13 +75,16 @@ async function screenIndex(
   const symbols = constituents.map((c) => c.symbol);
   const nameMap = Object.fromEntries(constituents.map((c) => [c.symbol, c.name]));
 
-  // Use spark endpoint (public, no auth): returns changePct only
-  // pubDate filter: ignore partial today candle so changePct = séance J-1 (la vraie bougie d'hier)
+  // Use spark endpoint (public, no auth): returns {symbol, changePct, sessionDate}.
+  // sessionDate = date of the latest completed candle ≤ pubDate. If it's < pubDate,
+  // the asset did NOT trade on pubDate (holiday) — skip it: a "mover" reported on
+  // a stale session would mislead the LLM into treating an old move as today's.
   const changes = await fetchSparkChanges(symbols, pubDate);
 
   const results: StockScreenResult[] = [];
-  for (const { symbol, changePct } of changes) {
+  for (const { symbol, changePct, sessionDate } of changes) {
     if (Math.abs(changePct) < MOVER_THRESHOLD) continue;
+    if (pubDate && sessionDate !== pubDate) continue;  // not traded on snapshot day
 
     const reason: string[] = [];
     if (changePct >= MOVER_THRESHOLD) reason.push("mover_up");

@@ -70,15 +70,15 @@ export const ThumbnailScene: React.FC<ThumbnailProps> = ({
               width: "100%",
               height: "100%",
               objectFit: "cover",
-              filter: "saturate(0.65) contrast(1.05) sepia(0.18)",
-              opacity: 0.55,
+              filter: "saturate(1.05) contrast(1.08)",
+              opacity: 0.85,
             }}
           />
-          {/* Vignette gradient pour booster la lisibilité du texte */}
+          {/* Vignette gradient pour booster la lisibilité du texte (allégée pour préserver l'image) */}
           <AbsoluteFill
             style={{
               background:
-                "linear-gradient(180deg, rgba(245,240,232,0.35) 0%, rgba(245,240,232,0.85) 70%, rgba(245,240,232,0.95) 100%)",
+                "linear-gradient(180deg, rgba(245,240,232,0.15) 0%, rgba(245,240,232,0.55) 70%, rgba(245,240,232,0.75) 100%)",
             }}
           />
         </AbsoluteFill>

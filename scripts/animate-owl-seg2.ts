@@ -5,7 +5,7 @@ import * as path from "path";
 
 const ROOT = path.resolve(__dirname, "..");
 const INPUT_IMAGE = path.join(ROOT, "data", "owl-seg1-last-frame.png");
-const OUTPUT = path.join(ROOT, "data", "owl-seg2-seedance.mp4");
+const OUTPUT = path.join(ROOT, "data", "owl-seg2-kling-turbo.mp4");
 
 const VIDEO_PROMPT = `The shot opens on the young anthropomorphic great horned owl trader standing near the tall arched Art Deco window, mid-gesture with one feathered hand raised. He immediately lowers his hand, turns so his back faces the camera, and continues walking slowly and calmly toward the tall arched window, his back to the camera. He continues to speak as he walks: his head moves slightly as if talking, even though we see him only from behind. For the entire clip we see him only from behind: the back of his great-horned owl head with the two pointed ear tufts, his navy pinstripe three-piece suit, his shoulders, his confident stride.
 
@@ -25,23 +25,23 @@ async function main() {
   const startUrl = await fal.storage.upload(startFile);
   console.log(`Start: ${startUrl}`);
 
-  console.log("\nSubmitting seg2 to bytedance/seedance-2.0/image-to-video (10s, 1080p, no audio)...");
+  console.log("\nSubmitting seg2 to fal-ai/kling-video/v2.5-turbo/pro/image-to-video (10s)...");
   const result = await fal.subscribe(
-    "bytedance/seedance-2.0/image-to-video",
+    "fal-ai/kling-video/v2.5-turbo/pro/image-to-video",
     {
       input: {
         prompt: VIDEO_PROMPT,
         image_url: startUrl,
         duration: "10",
-        resolution: "1080p",
-        aspect_ratio: "16:9",
-        generate_audio: false,
+        negative_prompt:
+          "blurry, distorted, low quality, warped face, deformed hands, melting, morphing, scene change, cut, camera shake, different character, different style",
+        cfg_scale: 0.6,
       },
       logs: true,
       onQueueUpdate: (u) => {
         if (u.status === "IN_PROGRESS") {
           for (const log of u.logs ?? []) {
-            if (log.message) console.log("  [seedance]", log.message);
+            if (log.message) console.log("  [kling-turbo]", log.message);
           }
         }
       },
@@ -51,7 +51,7 @@ async function main() {
   const videoUrl = (result.data as { video?: { url: string } }).video?.url;
   if (!videoUrl) {
     console.error("no video:", JSON.stringify(result.data));
-    throw new Error("seedance returned no video");
+    throw new Error("kling-turbo returned no video");
   }
 
   console.log(`\nVideo URL: ${videoUrl}`);

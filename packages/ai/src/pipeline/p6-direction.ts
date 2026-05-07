@@ -206,6 +206,8 @@ export async function runC5Direction(input: {
   // Downgrade Sonnet → Haiku : C5 = tâches déterministes (arc numérique, transitions,
   // chartTimings mapping par wordIndex, moodMusic enum). Pas de raisonnement causal
   // profond requis. Gain : ~-0.18€/épisode sans perte qualité.
+  // maxTokens: 16384 — sinon JSON tronqué (arc + transitions + chartTimings peuvent
+  // dépasser 8k tokens sur des épisodes denses, surtout avec audioBreakpoints).
   const c5Output = await generateStructuredJSON<{
     arc: ArcBeat[];
     transitions: Transition[];
@@ -216,7 +218,7 @@ export async function runC5Direction(input: {
   }>(
     systemPrompt,
     userPrompt,
-    { role: 'fast', validate: zodValidator(DirectionSchema) as any },
+    { role: 'fast', maxTokens: 16384, validate: zodValidator(DirectionSchema) as any },
   );
 
   // ── Normalize LLM output field names ──

@@ -91,15 +91,35 @@ export const DEFAULT_ASSETS = [
   { symbol: "XLE", name: "Energy ETF" },
 ];
 
-async function fetchYahoo(url: string): Promise<any> {
-  const res = await fetch(url, {
-    headers: { "User-Agent": USER_AGENT },
-  });
-  const json = await res.json();
-  if (json.chart?.error) {
-    throw new Error(`Yahoo Finance error: ${json.chart.error.description}`);
+async function fetchYahoo(url: string, attempt = 1): Promise<any> {
+  const MAX_ATTEMPTS = 4;
+  try {
+    const res = await fetch(url, {
+      headers: { "User-Agent": USER_AGENT },
+    });
+    // Retry on Yahoo rate-limit (429) and transient server errors (502/503/504).
+    // Yahoo's public API isn't documented to rate-limit, but parallel fetches of
+    // 45 watchlist assets × 3 endpoints (=135 reqs) regularly trigger throttle,
+    // especially on consecutive symbols (BTC, ETH, SOL all dropped together).
+    if (res.status === 429 || res.status === 502 || res.status === 503 || res.status === 504) {
+      throw new Error(`Yahoo HTTP ${res.status}`);
+    }
+    const json = await res.json();
+    if (json.chart?.error) {
+      throw new Error(`Yahoo Finance error: ${json.chart.error.description}`);
+    }
+    return json;
+  } catch (err) {
+    const msg = (err as Error).message ?? String(err);
+    if (attempt < MAX_ATTEMPTS) {
+      // Exponential backoff: 1s, 2s, 4s. Total worst case 7s before giving up.
+      const delayMs = 1000 * 2 ** (attempt - 1);
+      await new Promise((r) => setTimeout(r, delayMs));
+      return fetchYahoo(url, attempt + 1);
+    }
+    // Final failure — annotate with attempt count and rethrow so callers can log.
+    throw new Error(`Yahoo fetch failed after ${MAX_ATTEMPTS} attempts: ${msg.slice(0, 120)}`);
   }
-  return json;
 }
 
 function parseCandles(json: any): Candle[] {
@@ -191,7 +211,8 @@ export async function fetchDailyCandles(
   try {
     const json = await fetchYahoo(url);
     return parseCandles(json);
-  } catch {
+  } catch (e) {
+    console.warn(`  [yahoo-fail] ${symbol} daily(1mo): ${(e as Error).message.slice(0, 100)}`);
     return [];
   }
 }
@@ -204,7 +225,8 @@ export async function fetchWeeklyCandles(
   try {
     const json = await fetchYahoo(url);
     return parseCandles(json);
-  } catch {
+  } catch (e) {
+    console.warn(`  [yahoo-fail] ${symbol} weekly(10y): ${(e as Error).message.slice(0, 100)}`);
     return [];
   }
 }
@@ -217,6 +239,43 @@ export async function fetchDaily3yCandles(
   try {
     const json = await fetchYahoo(url);
     return parseCandles(json);
+  } catch (e) {
+    console.warn(`  [yahoo-fail] ${symbol} daily(3y): ${(e as Error).message.slice(0, 100)}`);
+    return [];
+  }
+}
+
+/**
+ * Fetch hourly candles for the last 5 days. Used as a fallback to recover
+ * a missing daily close — Yahoo's daily aggregation lags for FX pairs while
+ * the 1h granularity has the same data committed earlier.
+ *
+ * Returns candles where both open AND close are non-null (we only need the
+ * usable hourly closes to patch the daily tail).
+ */
+export async function fetchHourlyCandles(
+  symbol: string,
+): Promise<import("@yt-maker/core").Candle[]> {
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1h&range=5d`;
+  try {
+    const json = await fetchYahoo(url);
+    const result = json.chart.result[0];
+    const { timestamp, indicators } = result;
+    const q = indicators.quote[0];
+    const out: import("@yt-maker/core").Candle[] = [];
+    for (let i = 0; i < timestamp.length; i++) {
+      if (q.open[i] === null || q.close[i] === null) continue;
+      out.push({
+        t: timestamp[i],
+        date: new Date(timestamp[i] * 1000).toISOString(),
+        o: q.open[i],
+        h: q.high[i],
+        l: q.low[i],
+        c: q.close[i],
+        v: q.volume[i] || 0,
+      });
+    }
+    return out;
   } catch {
     return [];
   }
@@ -243,14 +302,16 @@ export async function fetchDailyMaxCandles(
 export async function fetchSparkChanges(
   symbols: string[],
   pubDate?: string,
-): Promise<Array<{ symbol: string; changePct: number }>> {
+): Promise<Array<{ symbol: string; changePct: number; sessionDate: string }>> {
   if (symbols.length === 0) return [];
 
   const BATCH = 20;
-  const results: Array<{ symbol: string; changePct: number }> = [];
-  // Cutoff: any candle whose date (UTC) is >= pubDate is treated as "partial today" and skipped.
-  // Ensures changePct = bougie J-1 (vraie séance) même pour marchés Europe/Asia qui ont
-  // une close partielle d'aujourd'hui au moment du fetch.
+  const results: Array<{ symbol: string; changePct: number; sessionDate: string }> = [];
+  // Cutoff: any candle whose date (UTC) is > pubDate is treated as "future" and skipped.
+  // pubDate itself is INCLUDED — it represents the session being covered (a trading
+  // day for which we expect a close). This way `sessionDate === pubDate` indicates a
+  // genuine session that day; sessionDate < pubDate means the asset did NOT trade
+  // on pubDate (holiday, market closed) and the caller should drop it.
   const cutoff = pubDate || new Date().toISOString().slice(0, 10);
 
   for (let i = 0; i < symbols.length; i += BATCH) {
@@ -267,22 +328,24 @@ export async function fetchSparkChanges(
       for (const item of json.spark?.result ?? []) {
         const ts: number[] = item.response?.[0]?.timestamp ?? [];
         const closes: (number | null)[] = item.response?.[0]?.indicators?.quote?.[0]?.close ?? [];
-        // Pair timestamp with close + filter: keep only completed sessions (date < cutoff)
-        // AND valid close. Avoids counting today's partial intraday as a "session".
+        // Pair timestamp with close + filter: keep all sessions WITH valid close
+        // up to and including `cutoff` (= pubDate). If sessionDate is exactly the
+        // cutoff, the asset traded that day; if it's earlier, the asset did not.
         const completed: Array<{ ts: number; c: number; date: string }> = [];
         for (let k = 0; k < closes.length; k++) {
           const c = closes[k];
           if (c == null || c <= 0) continue;
           const d = new Date((ts[k] ?? 0) * 1000).toISOString().slice(0, 10);
-          if (d && d < cutoff) completed.push({ ts: ts[k], c, date: d });
+          if (d && d <= cutoff) completed.push({ ts: ts[k], c, date: d });
         }
         if (completed.length >= 2) {
           const prev = completed[completed.length - 2].c;
           const last = completed[completed.length - 1].c;
+          const sessionDate = completed[completed.length - 1].date;
           const changePct = ((last - prev) / prev) * 100;
-          results.push({ symbol: item.symbol, changePct });
+          results.push({ symbol: item.symbol, changePct, sessionDate });
         } else if (completed.length === 1) {
-          console.warn(`  [spark] ${item.symbol}: only 1 completed session before ${cutoff}, skipped`);
+          console.warn(`  [spark] ${item.symbol}: only 1 completed session at/before ${cutoff}, skipped`);
         }
       }
       // Small delay between batches to be respectful

@@ -94,16 +94,21 @@ expectContains(
 );
 
 // ─── Géographie ────────────────────────────────────────────
-console.log('\n=== Géographie : Hormuz harmonisation ===');
+console.log('\n=== Géographie : Hormuz harmonisation + phonétique ===');
 expectContains(
   "Le détroit d'Hormuz reclassé zone de guerre",
-  "d'Ormuz",
-  "d'Hormuz → d'Ormuz (forme FR)",
+  "de hormouse",
+  "d'Hormuz → de hormouse (élision retirée + h aspiré bloque liaison 'dans-ormouse')",
 );
 expectContains(
   'Hormuz reste sous tension',
-  'Ormuz reste sous tension',
-  'Hormuz (début phrase) → Ormuz',
+  'hormouse',
+  'Hormuz → hormouse (h aspiré empêche la liaison)',
+);
+expectContains(
+  'Le projet de Clarity Act passe au Sénat',
+  'Klariti Acte',
+  'Clarity Act → Klariti Acte (phonétique FR stable)',
 );
 
 // ─── Indices boursiers ─────────────────────────────────────
@@ -242,6 +247,39 @@ if (once === twice) {
   failures.push({ label: 'idempotence Bitcoin', expected: once, actual: twice });
 }
 
+// ─── Régressions case-insensitive + nouvelles phonétiques ──
+console.log("\n=== Case-insensitive + nouvelles phonétiques ===");
+expectContains(
+  "C'est pour ça que coinbase a bondi de six pour cent",
+  'connebèse',
+  'coinbase (minuscule) → connebèse',
+);
+expectContains(
+  "Coinbase publie ses résultats",
+  'connebèse',
+  'Coinbase (majuscule) → connebèse',
+);
+expectContains(
+  "tesla et nvidia ont chuté",
+  'Tessla',
+  'tesla (minuscule) → Tessla (case-insensitive)',
+);
+expectContains(
+  "tesla et nvidia ont chuté",
+  'Ènvidia',
+  'nvidia (minuscule) → Ènvidia (case-insensitive)',
+);
+expectContains(
+  "united parcel service publie demain",
+  'parssèl',
+  'united parcel service (minuscule) → phonétique',
+);
+expectContains(
+  "fedex chute de cinq pour cent",
+  'fèdèxe',
+  'fedex (minuscule) → fèdèxe',
+);
+
 // ─── Cas critiques bug récents (regression checks) ─────────
 console.log("\n=== Régressions reportées (épisode 2026-05-05) ===");
 expectContains(
@@ -259,10 +297,10 @@ expectContains(
   'aul street journale',
   'BUG #3 — Owl Street Journal phonétisé (n\'existait pas avant)',
 );
-expectNotContains(
+expectContains(
   "Hormuz et d'Hormuz reclassés",
-  'Hormuz',
-  'BUG #4 — Hormuz harmonisé en Ormuz partout',
+  'ormouse',
+  'BUG #4 — Hormuz harmonisé + phonétique ormouse',
 );
 
 // ─── Combinaisons réalistes ────────────────────────────────
