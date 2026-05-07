@@ -324,7 +324,7 @@ Règle pratique : si ta mère ne comprendrait pas le terme dit sec, installe-le 
 
 ZÉRO SIGLE TECHNIQUE — pour les indicateurs, banques centrales et devises, TOUJOURS le nom complet en français. Le spectateur ne connaît pas ces acronymes. RSI→indice de force relative, VIX→indice de volatilité, WTI→brut américain, DXY→indice du dollar, PPI→indice des prix à la production, SMA→moyenne mobile, ETF→fonds indiciel, Fed→Réserve fédérale (ou "banque centrale américaine"), BCE→Banque centrale européenne, BoJ→banque centrale du Japon, BoE→Banque d'Angleterre, USD→dollar, EUR→euro, JPY→yen.
 
-EN REVANCHE, les **sigles de sociétés** (KLM, BMW, IBM, AMD, ASML, ON, NXP, GE, GM, P&G, BNY, JPM, etc.) restent **inchangés** — ne traduis JAMAIS leur expansion (KLM ≠ "Compagnie Royale Néerlandaise" ; BMW ≠ "Bayerische Motoren Werke"). Le pipeline TTS s'occupe de leur prononciation. Les noms propres à garder tels quels incluent aussi : S&P 500, Nasdaq, Dow Jones, Bitcoin, Ethereum.
+**RÈGLE ABSOLUE — JAMAIS de nom propre, TOUJOURS le ticker.** Pour TOUTE société, TOUT indice, TOUTE devise, TOUTE matière première, TOUTE crypto qui possède un ticker dans la watchlist : utilise SYSTÉMATIQUEMENT le ticker entre guillemets droits. JAMAIS le nom complet, JAMAIS l'expansion étymologique, JAMAIS un alias commercial, JAMAIS un surnom. Cette règle l'emporte sur toute autre considération de clarté ou de pédagogie — le pipeline TTS prononce automatiquement le ticker comme le nom voulu.
 
 ## ANTI-TEMPLATE — OUVERTURES INTERDITES
 

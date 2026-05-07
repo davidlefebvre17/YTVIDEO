@@ -32,7 +32,7 @@ param(
     [string]$TaskName = "OwlStreetJournal-Generate",
     [string]$StartTime = "04:00",
     [string[]]$DaysOfWeek = @("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"),
-    [string]$Privacy = "private",
+    [string]$Privacy = "unlisted",  # unlisted : permet le pinned comment auto (private bloque)
     [switch]$LoggedOff  # Si specifie, mode Password (run quand sign-out). Sinon Interactive.
 )
 

@@ -126,7 +126,7 @@ Usage: npm run publish -- [options]
 
 Options :
   --date YYYY-MM-DD     Episode date (e.g. 2026-04-28)
-  --privacy <p>         private | unlisted | public  (default: $YOUTUBE_DEFAULT_PRIVACY or "private")
+  --privacy <p>         private | unlisted | public  (default: $YOUTUBE_DEFAULT_PRIVACY or "unlisted")
   --video <path>        Override path to MP4 (default: out/episode-YYYY-MM-DD.mp4)
   --script <path>       Override path to script.json (default: episodes/YYYY/MM-DD/script.json)
   --thumbnail <path>    Override path to thumbnail PNG (default: episodes/YYYY/MM-DD/thumbnail.png)
@@ -545,7 +545,10 @@ async function main() {
 
   const meta = buildMetadata(script);
 
-  const defaultPrivacy = (process.env.YOUTUBE_DEFAULT_PRIVACY as Privacy) ?? 'private';
+  // Default = 'unlisted' : visible avec le lien, pas indexé publiquement, ET
+  // permet la pose du commentaire automatique (YouTube désactive les comments
+  // sur les videos 'private', donc 'private' casserait le pinned comment).
+  const defaultPrivacy = (process.env.YOUTUBE_DEFAULT_PRIVACY as Privacy) ?? 'unlisted';
   const privacy: Privacy = args.privacy ?? defaultPrivacy;
 
   // Resolve scheduling: explicit --publish-at takes precedence, then env var auto-compute,

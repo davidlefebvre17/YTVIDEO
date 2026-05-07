@@ -163,5 +163,9 @@ export const SEOMetadataSchema = z.object({
   chapters: z.array(SEOChapterSchema).min(3, 'au moins 3 chapitres requis').max(12, 'max 12 chapitres'),
   tags: z.array(z.string().min(2).max(60)).min(5, 'au moins 5 tags requis').max(15, 'max 15 tags'),
   hashtags: z.array(z.string().min(2).max(30)).min(2, 'au moins 2 hashtags').max(5, 'max 5 hashtags'),
-  pinnedComment: z.string().min(80, 'pinnedComment trop court (<80 chars)').max(500, 'pinnedComment trop long (>500 chars)').optional(),
+  // REQUIRED (pas .optional()) — sans cela, Sonnet skippe régulièrement le champ
+  // alors que le prompt le demande. Le retry P10 (3 attempts) force la génération
+  // si Zod fail. Si malgré tout le LLM échoue 3x, le mechanical fallback dans
+  // p10-seo.ts génère un pinnedComment de remplacement.
+  pinnedComment: z.string().min(80, 'pinnedComment manquant ou trop court (<80 chars)').max(500, 'pinnedComment trop long (>500 chars)'),
 }).passthrough();

@@ -170,6 +170,21 @@
         { "pattern": "\\bquarante\\b", "flags": "g", "replacement": "karante" },
         { "pattern": "\\byens\\b", "flags": "gi", "replacement": "yen", "comment": "Yen invariable en français oral — Fish lit le 's' final sinon" }
       ]
+    },
+    {
+      "id": "acronym_protections",
+      "description": "Filet de sécurité — collapse les expansions étymologiques verbeuses qu'Opus pourrait inventer malgré le prompt (CAC ≠ Cotation Assistée en Continu, RSI ≠ Relative Strength Index, etc.). Appliqué EN DERNIER pour rattraper tout ce qui passe à travers les name rules de company-profiles.json.",
+      "rules": [
+        { "pattern": "\\bCotation Assistée en Continu (?:quarante|karante)\\b", "flags": "gi", "replacement": "caque karante" },
+        { "pattern": "\\bCotation Assistée en Continu\\b", "flags": "gi", "replacement": "caque" },
+        { "pattern": "\\bRelative Strength Index\\b", "flags": "gi", "replacement": "èr ès i" },
+        { "pattern": "\\bVolatility Index\\b", "flags": "gi", "replacement": "vixe" },
+        { "pattern": "\\bWest Texas Intermediate\\b", "flags": "gi", "replacement": "brut américain" },
+        { "pattern": "\\bDeutscher Aktienindex\\b", "flags": "gi", "replacement": "daxe" },
+        { "pattern": "\\bFinancial Times Stock Exchange\\b", "flags": "gi", "replacement": "fouttsi" },
+        { "pattern": "\\bDow Jones Industrial Average\\b", "flags": "gi", "replacement": "daou djonnze" },
+        { "pattern": "\\bStandard and Poor'?s\\b", "flags": "gi", "replacement": "essenne pi" }
+      ]
     }
   ]
 }

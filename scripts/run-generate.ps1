@@ -15,7 +15,7 @@
 #  - .env est charge par dotenv cote Node, pas besoin de toucher au profil PS.
 
 param(
-    [string]$Privacy = "private",
+    [string]$Privacy = "unlisted",  # unlisted : visible avec lien + permet le pinned comment auto (private bloque les comments)
     [string]$Date = "",
     [switch]$NoPublish
 )

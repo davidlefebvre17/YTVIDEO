@@ -73,15 +73,31 @@ class PhoneticRegistry {
     try {
       const profiles: CompanyProfile[] = JSON.parse(readFileSync(filePath, 'utf-8'));
       const namePairs: Array<[string, string]> = [];
+      // Suffixes corporate à stripper pour matcher aussi "Apple Inc" → "Apple", "Goldman Sachs Group" → "Goldman Sachs", etc.
+      const CORP_SUFFIX_RE = /\s+(?:Inc\.?|Incorporated|Corp\.?|Corporation|Ltd\.?|Limited|LLC|S\.?A\.?|AG|Plc|N\.?V\.?|Co\.?|Group|Holdings?)$/i;
       for (const p of profiles) {
         if (!p.phonetic) continue;
         this.tickerMap!.set(p.symbol, p.phonetic);
-        // Skip names < 3 chars (matches too aggressively, false positives like "GE", "GM")
-        if (p.name && p.name.length >= 3) {
-          namePairs.push([p.name, p.phonetic]);
+        // Collect all candidate spellings: the canonical name, the name without corporate suffix,
+        // and every alias declared in the profile. Skip duplicates and < 3 chars (avoids false positives like "GE", "GM").
+        const seen = new Set<string>();
+        const addCandidate = (candidate: string | undefined) => {
+          if (!candidate) return;
+          const trimmed = candidate.trim();
+          if (trimmed.length < 3) return;
+          const lower = trimmed.toLowerCase();
+          if (seen.has(lower)) return;
+          seen.add(lower);
+          namePairs.push([trimmed, p.phonetic!]);
+        };
+        if (p.name) {
+          addCandidate(p.name);
+          const stripped = p.name.replace(CORP_SUFFIX_RE, '').trim();
+          if (stripped !== p.name) addCandidate(stripped);
         }
+        for (const alias of p.aliases ?? []) addCandidate(alias);
       }
-      // Sort by length DESC : "Goldman Sachs" before "Goldman" before "Sachs"
+      // Sort by length DESC : "Goldman Sachs Group" before "Goldman Sachs" before "Goldman".
       namePairs.sort((a, b) => b[0].length - a[0].length);
       const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       for (const [name, phonetic] of namePairs) {

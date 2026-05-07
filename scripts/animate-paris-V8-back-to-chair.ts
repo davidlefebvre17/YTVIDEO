@@ -7,13 +7,13 @@ import { execFileSync } from "child_process";
 const ROOT = path.resolve(__dirname, "..");
 const PREV_VIDEO = path.join(ROOT, "data", "owl-paris-V7-stop-hands.mp4");
 const LAST_FRAME = path.join(ROOT, "data", "owl-paris-V7-last-frame.png");
-const END_FRAME = path.join(ROOT, "data", "owl-paris-K1-clean.png");
-const OUTPUT = path.join(ROOT, "data", "owl-paris-V8-back-to-chair.mp4");
+const END_FRAME = path.join(ROOT, "data", "owl-paris-K4-standing-left-table.png");
+const OUTPUT = path.join(ROOT, "data", "owl-paris-V8-walk-to-left-table.mp4");
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const FFMPEG = (require("ffmpeg-static") as string);
 
-const VIDEO_PROMPT = `The owl walks calmly toward the lounge armchair, walking AROUND the marble coffee table (not through it) to reach the chair, then sits down in it and ends in a relaxed reclined pose with both feet propped up on the coffee table, ankles visible. He keeps speaking continuously throughout the ENTIRE 5-second clip — his beak opens and closes regularly and rhythmically without ever stopping, from the very first frame to the very last frame. Hands gesture naturally while walking. Camera completely static, only the owl moves, the room stays perfectly still.`;
+const VIDEO_PROMPT = `The owl walks calmly toward the foreground, walking AROUND the marble coffee table (not through it) to reach a standing position to the left of the table, ending facing the camera. He keeps speaking continuously throughout the ENTIRE 5-second clip — his beak opens and closes regularly and rhythmically without ever stopping, from the very first frame to the very last frame. Hands gesture naturally while walking. Camera completely static, only the owl moves, the room stays perfectly still.`;
 
 function extractLastFrame(): void {
   console.log(`Extracting last frame of ${PREV_VIDEO}...`);

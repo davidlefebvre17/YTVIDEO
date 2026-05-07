@@ -17,6 +17,9 @@ const CLIPS: Clip[] = [
   { id: "paris_v5", srcVideo: path.join(ROOT, "data", "owl-paris-V5-K2-K3.mp4") },
   { id: "paris_v6", srcVideo: path.join(ROOT, "data", "owl-paris-V6-walk-to-cam.mp4") },
   { id: "paris_v7", srcVideo: path.join(ROOT, "data", "owl-paris-V7-stop-hands.mp4") },
+  { id: "paris_v8", srcVideo: path.join(ROOT, "data", "owl-paris-V8-walk-to-left-table.mp4") },
+  { id: "paris_v9", srcVideo: path.join(ROOT, "data", "owl-paris-V9-sit-down.mp4") },
+  { id: "paris_outro", srcVideo: path.join(ROOT, "data", "owl-paris-OUTRO-10s.mp4") },
 ];
 
 function extractFrame(input: string, output: string, atEnd: boolean): void {

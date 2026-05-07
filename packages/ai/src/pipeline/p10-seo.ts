@@ -507,6 +507,12 @@ Abonne-toi si tu veux décortiquer ça chaque jour."
 - Ne JAMAIS donner d'instruction d'achat/vente.
 - Si un mouvement est ambigu, dis-le ("les marchés hésitent", "lecture mitigée").
 
+# OUTPUT — TOUS LES 6 CHAMPS OBLIGATOIRES
+
+Ton JSON DOIT contenir EXACTEMENT ces 6 champs : title, description, chapters, tags, hashtags, **pinnedComment**.
+
+⚠️ Le champ \`pinnedComment\` est OBLIGATOIRE — sans lui le pipeline rejette ta réponse et te renvoie en retry. Suis la structure 3 phrases (hook éditorial → question ouverte avec 👇 → CTA soft) décrite dans la section RÈGLES PINNED COMMENT plus haut. 150-350 chars.
+
 Réponds UNIQUEMENT par le JSON, sans markdown wrapper.`;
 }
 
@@ -653,6 +659,18 @@ export async function runC10SEO(input: {
   // Hashtags should be without # prefix — strip if LLM added them
   seo.hashtags = seo.hashtags.map(h => h.replace(/^#+/, '').trim()).filter(Boolean);
   seo.tags = seo.tags.map(t => t.replace(/^#+/, '').trim()).filter(Boolean);
+
+  // Fallback : si Sonnet a omis le pinnedComment (champ .optional() dans le
+  // schema, donc absence non-bloquante), on en synthétise un déterministe
+  // depuis le top mover. Sans ça, l'upload script saute la pose du
+  // commentaire d'engagement, donc plus de "first comment" épinglable.
+  if (!seo.pinnedComment || seo.pinnedComment.trim().length < 80) {
+    const topMover = input.topAssets[0];
+    seo.pinnedComment = topMover
+      ? `${topMover.name} ${topMover.changePct >= 0 ? '+' : ''}${topMover.changePct.toFixed(2)}% sur la séance — ${input.editorial.dominantTheme.toLowerCase()}. Pour vous, c'est le mouvement clé du jour ou un signal plus profond ? 👇\n\nAbonne-toi pour le récap quotidien.`
+      : `${input.editorial.dominantTheme}. Vous le voyez comment côté positionnement ? 👇\n\nAbonne-toi pour le récap quotidien.`;
+    console.log(`  C10: pinnedComment synthétisé (LLM l'avait omis)`);
+  }
 
   return seo;
 }

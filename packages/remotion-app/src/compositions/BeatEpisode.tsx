@@ -167,7 +167,8 @@ interface OwlTransitionClip {
 }
 
 /** Ordered list of inter-segment owl clips. Transition i (between segments i and i+1)
- *  uses TRANSITION_CLIPS[i] if defined, otherwise falls back to a static newspaper. */
+ *  uses TRANSITION_CLIPS[i] if defined, otherwise falls back to a static newspaper.
+ *  V9 covers the last transition (before-last → last segment, e.g. seg_5 → panorama). */
 const TRANSITION_CLIPS: OwlTransitionClip[] = [
   // T0 (after seg 1) — Paris V5: turn from window + walk right
   {
@@ -187,7 +188,34 @@ const TRANSITION_CLIPS: OwlTransitionClip[] = [
     startImg: staticFile("owl-video/paris_v7_start.png"),
     endImg: staticFile("owl-video/paris_v7_end.png"),
   },
+  // T3 (after seg 4) — Paris V8: walk back, around table, end standing left of table
+  {
+    videoSrc: staticFile("owl-video/paris_v8.mp4"),
+    startImg: staticFile("owl-video/paris_v8_start.png"),
+    endImg: staticFile("owl-video/paris_v8_end.png"),
+  },
+  // T4 (after seg 5, before panorama) — Paris V9: walk last steps + sit in armchair
+  {
+    videoSrc: staticFile("owl-video/paris_v9.mp4"),
+    startImg: staticFile("owl-video/paris_v9_start.png"),
+    endImg: staticFile("owl-video/paris_v9_end.png"),
+  },
 ];
+
+// ── Closing/outro clip (overlay on the closing newspaper, ending with freeze + fade-to-black) ──
+const PARIS_OUTRO_SRC = staticFile("owl-video/paris_outro.mp4");
+const PARIS_OUTRO_END_IMG = staticFile("owl-video/paris_outro_end.png");
+const PARIS_OUTRO_FRAMES = 300; // 10s @ 30fps
+const PARIS_OUTRO_FREEZE_FRAMES = 150; // 5s freeze on last frame, with fade-to-black overlay
+
+/** Black overlay that fades in from 0 → 1 opacity over the duration. */
+const FadeToBlackOverlay: React.FC<{ durationInFrames: number }> = ({ durationInFrames }) => {
+  const frame = useCurrentFrame();
+  const opacity = interpolate(frame, [0, durationInFrames], [0, 1], {
+    extrapolateLeft: "clamp", extrapolateRight: "clamp",
+  });
+  return <AbsoluteFill style={{ backgroundColor: "#000", opacity }} />;
+};
 
 /** Paris opener (single pre-rendered clip) with crossfade to newspaper at end */
 const ParisOpenerWithCrossfade: React.FC<{
@@ -1054,6 +1082,53 @@ export const BeatEpisode: React.FC<BeatEpisodeProps> = ({
           </Sequence>
         );
       })()}
+
+      {/* ── Outro: 10s talk-and-point video, then 5s freeze on last frame with fade-to-black ── */}
+      {owlClosingAudio && (() => {
+        const owlF = getOwlClosingFrames(fps, owlAudioDurations as any);
+        if (owlF <= 0) return null;
+        const owlStart = timings.closingStart + timings.closingDur - owlF;
+        return (
+          <>
+            <Sequence
+              key="paris-outro-video"
+              from={owlStart}
+              durationInFrames={PARIS_OUTRO_FRAMES}
+            >
+              <AbsoluteFill>
+                <OffthreadVideo
+                  src={PARIS_OUTRO_SRC}
+                  muted
+                  volume={0}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  onError={() => {}}
+                />
+              </AbsoluteFill>
+            </Sequence>
+            <Sequence
+              key="paris-outro-freeze"
+              from={owlStart + PARIS_OUTRO_FRAMES}
+              durationInFrames={PARIS_OUTRO_FREEZE_FRAMES}
+            >
+              <AbsoluteFill>
+                <img
+                  src={PARIS_OUTRO_END_IMG}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  alt=""
+                />
+              </AbsoluteFill>
+            </Sequence>
+          </>
+        );
+      })()}
+
+      {/* ── Fade-to-black overlay during the 5s freeze at the very end ── */}
+      <Sequence
+        from={timings.closingStart + timings.closingDur - PARIS_OUTRO_FREEZE_FRAMES}
+        durationInFrames={PARIS_OUTRO_FREEZE_FRAMES}
+      >
+        <FadeToBlackOverlay durationInFrames={PARIS_OUTRO_FREEZE_FRAMES} />
+      </Sequence>
 
       {/* ── Beat audio: voice TTS + SFX ── */}
       <BeatAudioTrack
